@@ -1,0 +1,30 @@
+{%- comment -%}
+  Private block: Hour range for a Date Range (nested under Date Range block)
+{%- endcomment -%}
+
+<div {{ block.shopify_attributes }}>
+  {%- comment -%}Config only; parent uses this data{%- endcomment -%}
+</div>
+
+{% schema %}
+{
+  "name": "Time Range",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "time_start",
+      "label": "Start Time",
+      "info": "Format: HH:MM (24h, e.g., 09:00)",
+      "placeholder": "09:00"
+    },
+    {
+      "type": "text",
+      "id": "time_end",
+      "label": "End Time",
+      "info": "Format: HH:MM (24h, e.g., 17:00)",
+      "placeholder": "17:00"
+    }
+  ]
+}
+{% endschema %}

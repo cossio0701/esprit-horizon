@@ -1,0 +1,221 @@
+{%- doc -%}
+  Generic validator for date and time range visibility.
+  Used to determine if content should be visible based on scheduled date/time ranges.
+  
+  @param {object} block - The block object containing schedule settings
+  @param {string} date_start_setting - Setting key for start date (default: 'date_start')
+  @param {string} date_end_setting - Setting key for end date (default: 'date_end')
+  @param {number} max_time_ranges - Maximum number of time ranges to check (default: 5)
+  @returns {boolean} is_visible_by_schedule - True if current date/time is within schedule
+  
+  Date format expected: YYYY-MM-DD (e.g., 2025-11-01)
+  Time format expected: HH:MM in 24-hour format (e.g., 09:00, 19:30)
+  
+  Handles midnight crossover: If start time > end time, assumes end is next day
+  Example: 19:00 - 10:00 means 7 PM today to 10 AM tomorrow
+  
+  If no time ranges specified, entire date range is valid
+  If multiple time ranges specified, any matching range makes it valid
+{%- enddoc -%}
+
+{%- liquid
+  # Set defaults for parameter names
+  assign date_start_setting = date_start_setting | default: 'date_start'
+  assign date_end_setting = date_end_setting | default: 'date_end'
+  assign max_time_ranges = max_time_ranges | default: 5
+  
+  # Initialize result
+  assign is_visible_by_schedule = false
+  
+  # Get current timestamp in shop's timezone
+  assign now_timestamp = 'now' | date: '%s' | times: 1
+  assign current_time = 'now' | date: '%H:%M'
+  
+  # Support nested Date blocks (and nested Time blocks) when present.
+  # If the block has nested date blocks, iterate those and evaluate each date->time group.
+  assign has_nested_date_blocks = false
+  if block.blocks != blank and block.blocks.size > 0
+    assign has_nested_date_blocks = true
+  endif
+
+  if has_nested_date_blocks
+    # Iterate date blocks (these are nested blocks under the scheduled-image block)
+    for date_block in block.blocks
+      # date_block may be any nested block; check its settings for date_start/date_end
+      assign date_start = date_block.settings[date_start_setting]
+      assign date_end = date_block.settings[date_end_setting]
+
+      # If no dates specified on this date_block, treat it as open-ended (always valid)
+      if date_start == blank and date_end == blank
+        assign date_is_valid = true
+      else
+        assign date_start_ts = date_start | append: ' 00:00:00' | date: '%s' | times: 1
+        assign date_end_ts = date_end | append: ' 23:59:59' | date: '%s' | times: 1
+        assign date_is_valid = false
+
+        if date_start == blank
+          if now_timestamp <= date_end_ts
+            assign date_is_valid = true
+          endif
+        elsif date_end == blank
+          if now_timestamp >= date_start_ts
+            assign date_is_valid = true
+          endif
+        else
+          if now_timestamp >= date_start_ts and now_timestamp <= date_end_ts
+            assign date_is_valid = true
+          endif
+        endif
+      endif
+
+      # If date matches, evaluate time ranges attached to this date_block
+      if date_is_valid
+        assign time_is_valid = false
+        assign has_time_ranges = false
+
+        # Check for nested time blocks under this date_block
+        if date_block.blocks != blank and date_block.blocks.size > 0
+          for hour_block in date_block.blocks
+            assign time_start = hour_block.settings.time_start
+            assign time_end = hour_block.settings.time_end
+            if time_start != blank and time_end != blank
+              assign has_time_ranges = true
+              assign time_start_compare = time_start | replace: ':', '' | times: 1
+              assign time_end_compare = time_end | replace: ':', '' | times: 1
+              assign current_time_compare = current_time | replace: ':', '' | times: 1
+
+              if time_start_compare > time_end_compare
+                if current_time_compare >= time_start_compare or current_time_compare <= time_end_compare
+                  assign time_is_valid = true
+                  break
+                endif
+              else
+                if current_time_compare >= time_start_compare and current_time_compare <= time_end_compare
+                  assign time_is_valid = true
+                  break
+                endif
+              endif
+            endif
+          endfor
+        else
+          # Fallback: check old-style settings on the parent block (time_range_1..n)
+          for i in (1..max_time_ranges)
+            assign time_start_key = 'time_range_' | append: i | append: '_start'
+            assign time_end_key = 'time_range_' | append: i | append: '_end'
+            assign time_start = block.settings[time_start_key]
+            assign time_end = block.settings[time_end_key]
+            if time_start != blank and time_end != blank
+              assign has_time_ranges = true
+              assign time_start_compare = time_start | replace: ':', '' | times: 1
+              assign time_end_compare = time_end | replace: ':', '' | times: 1
+              assign current_time_compare = current_time | replace: ':', '' | times: 1
+
+              if time_start_compare > time_end_compare
+                if current_time_compare >= time_start_compare or current_time_compare <= time_end_compare
+                  assign time_is_valid = true
+                  break
+                endif
+              else
+                if current_time_compare >= time_start_compare and current_time_compare <= time_end_compare
+                  assign time_is_valid = true
+                  break
+                endif
+              endif
+            endif
+          endfor
+        endif
+
+        if has_time_ranges == false
+          assign time_is_valid = true
+        endif
+
+        if time_is_valid
+          assign is_visible_by_schedule = true
+          break
+        endif
+      endif
+    endfor
+  else
+    # No nested date blocks: fallback to legacy single date/time settings on the block
+    # Get date range from block settings
+    assign date_start = block.settings[date_start_setting]
+    assign date_end = block.settings[date_end_setting]
+
+    # If no dates specified, skip schedule validation (always visible)
+    if date_start == blank and date_end == blank
+      assign is_visible_by_schedule = true
+    else
+      # Convert dates to timestamps for comparison
+      assign date_start_ts = date_start | append: ' 00:00:00' | date: '%s' | times: 1
+      assign date_end_ts = date_end | append: ' 23:59:59' | date: '%s' | times: 1
+
+      # Check if current date is within range
+      assign date_is_valid = false
+
+      if date_start == blank
+        # No start date - check if before end date
+        if now_timestamp <= date_end_ts
+          assign date_is_valid = true
+        endif
+      elsif date_end == blank
+        # No end date - check if after start date
+        if now_timestamp >= date_start_ts
+          assign date_is_valid = true
+        endif
+      else
+        # Both dates specified
+        if now_timestamp >= date_start_ts and now_timestamp <= date_end_ts
+          assign date_is_valid = true
+        endif
+      endif
+
+      # If date is valid, check time ranges
+      if date_is_valid
+        # Check if any time ranges are specified
+        assign has_time_ranges = false
+        assign time_is_valid = false
+        
+        for i in (1..max_time_ranges)
+          assign time_start_key = 'time_range_' | append: i | append: '_start'
+          assign time_end_key = 'time_range_' | append: i | append: '_end'
+          assign time_start = block.settings[time_start_key]
+          assign time_end = block.settings[time_end_key]
+          
+          if time_start != blank and time_end != blank
+            assign has_time_ranges = true
+            
+            # Convert times to comparable format (remove colon for comparison)
+            assign time_start_compare = time_start | replace: ':', '' | times: 1
+            assign time_end_compare = time_end | replace: ':', '' | times: 1
+            assign current_time_compare = current_time | replace: ':', '' | times: 1
+            
+            # Check for midnight crossover (start > end means next day)
+            if time_start_compare > time_end_compare
+              # Midnight crossover: valid if current >= start OR current <= end
+              if current_time_compare >= time_start_compare or current_time_compare <= time_end_compare
+                assign time_is_valid = true
+                break
+              endif
+            else
+              # Normal range: valid if current >= start AND current <= end
+              if current_time_compare >= time_start_compare and current_time_compare <= time_end_compare
+                assign time_is_valid = true
+                break
+              endif
+            endif
+          endif
+        endfor
+        
+        # If no time ranges specified, entire day is valid
+        if has_time_ranges == false
+          assign time_is_valid = true
+        endif
+        
+        # Final result: date valid AND time valid
+        if time_is_valid
+          assign is_visible_by_schedule = true
+        endif
+      endif
+    endif
+  endif
+-%}

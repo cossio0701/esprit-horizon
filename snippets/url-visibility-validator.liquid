@@ -1,0 +1,65 @@
+{%- comment -%}
+  Generic validator for URL-based visibility control.
+  Used to determine if content should be visible based on current page URL.
+  
+  @param {object} block - The block object containing URL settings
+  @param {string} url_mode_setting - Setting key for URL mode (default: 'url_mode')
+  @param {string} url_list_setting - Setting key for URL list (default: 'url_list')
+  @returns {boolean} is_visible_by_url - True if current URL matches visibility rules
+  
+  URL Modes:
+  - 'all': Show on all pages (default)
+  - 'include': Show only on URLs in the list
+  - 'exclude': Show on all pages except URLs in the list
+  
+  URL List format: One URL per line, supports partial matching
+  Example:
+    /collections
+    /products/shirt
+    /pages/about
+  
+  Matching is case-insensitive and uses 'contains' for flexible matching
+{%- endcomment -%}
+
+{%- liquid
+  assign url_mode_setting = url_mode_setting | default: 'url_mode'
+  assign url_list_setting = url_list_setting | default: 'url_list'
+  assign is_visible_by_url = false
+  assign current_url = request.path | downcase
+  assign url_mode = block.settings[url_mode_setting] | default: 'all'
+  assign url_list = block.settings[url_list_setting]
+-%}
+
+{%- case url_mode -%}
+  {%- when 'all' -%}
+    {%- assign is_visible_by_url = true -%}
+    
+  {%- when 'include' -%}
+    {%- if url_list != blank -%}
+      {%- assign url_lines = url_list | newline_to_br | split: '<br />' -%}
+      {%- for url_pattern in url_lines -%}
+        {%- assign url_pattern_clean = url_pattern | strip | downcase -%}
+        {%- if url_pattern_clean != blank -%}
+          {%- if current_url contains url_pattern_clean -%}
+            {%- assign is_visible_by_url = true -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+    
+  {%- when 'exclude' -%}
+    {%- assign is_visible_by_url = true -%}
+    {%- if url_list != blank -%}
+      {%- assign url_lines = url_list | newline_to_br | split: '<br />' -%}
+      {%- for url_pattern in url_lines -%}
+        {%- assign url_pattern_clean = url_pattern | strip | downcase -%}
+        {%- if url_pattern_clean != blank -%}
+          {%- if current_url contains url_pattern_clean -%}
+            {%- assign is_visible_by_url = false -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+{%- endcase -%}

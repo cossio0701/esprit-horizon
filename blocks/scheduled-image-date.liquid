@@ -1,0 +1,36 @@
+{%- comment -%}
+  Private block: Date Range for Scheduled Image
+  Contains settings for start/end dates and nested hour blocks.
+{%- endcomment -%}
+
+<div {{ block.shopify_attributes }} style="display: none;"></div>
+
+{% schema %}
+{
+  "name": "Date Range",
+  "blocks": [
+    {
+      "type": "_scheduled-image-hour",
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "date_start",
+      "label": "Start Date",
+      "info": "Start date for this range. Format: YYYY-MM-DD. Leave empty for no start limit.",
+      "placeholder": "2025-11-01"
+    },
+    {
+      "type": "text",
+      "id": "date_end",
+      "label": "End Date",
+      "info": "End date for this range. Format: YYYY-MM-DD. Leave empty for no end limit.",
+      "placeholder": "2025-11-30"
+    }
+  ]
+}
+{% endschema %}

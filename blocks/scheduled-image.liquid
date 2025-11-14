@@ -1,0 +1,89 @@
+{%- comment -%}
+  Block for scheduled image display.
+  This block is used inside the 'scheduled-images' section.
+  The actual rendering is handled by the parent section.
+{%- endcomment -%}
+
+<div {{ block.shopify_attributes }} style="display: none;"></div>
+
+{% schema %}
+{
+  "name": "Imagen responsive",
+  "blocks": [
+    {
+      "type": "scheduled-image-date"
+    },
+  ],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image",
+      "info": "Recommended: 1600px width or larger"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image",
+      "info": "Recommended: 800px width. If not set, desktop image will be used."
+    },
+    {
+      "type": "text",
+      "id": "desktop_alt",
+      "label": "Desktop Alt Text",
+      "info": "Describe the image for accessibility"
+    },
+    {
+      "type": "text",
+      "id": "mobile_alt",
+      "label": "Mobile Alt Text",
+      "info": "Optional: If different from desktop alt text"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL (Optional)",
+      "info": "Make the image clickable"
+    },
+    {
+      "type": "checkbox",
+      "id": "link_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Schedule (use Date blocks below)"
+    }
+    ,
+    {
+      "type": "select",
+      "id": "url_mode",
+      "label": "Display Mode",
+      "options": [
+        {
+          "value": "all",
+          "label": "All pages"
+        },
+        {
+          "value": "include",
+          "label": "Only on specific URLs"
+        },
+        {
+          "value": "exclude",
+          "label": "Exclude specific URLs"
+        }
+      ],
+      "default": "all",
+      "info": "Control where this image appears"
+    },
+    {
+      "type": "textarea",
+      "id": "url_list",
+      "label": "URL List",
+      "info": "One URL per line. Use partial matches (e.g., /collections, /products/shirt, /pages/about). Case-insensitive.",
+      "placeholder": "/collections\n/products/special-item"
+    }
+  ]
+}
+{% endschema %}

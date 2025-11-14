@@ -1,0 +1,180 @@
+{%- comment -%}
+  Section for scheduled images with date/time and URL-based visibility.
+  
+  Features:
+  - Accepts multiple '_scheduled-image' blocks
+  - Priority: First valid image in block order is displayed
+  - Validates each block against date/time schedule and URL rules
+  - Mobile-first responsive images with separate desktop/mobile variants
+  - Optional link wrapper for clickable images
+  
+  Usage:
+  1. Add this section to your theme
+  2. Add multiple '_scheduled-image' blocks
+  3. Configure each block with images, schedules, and URL rules
+  4. First block that passes validation will be rendered
+{%- endcomment -%}
+
+{%- liquid
+  # Flag to track if we've rendered an image
+  assign image_rendered = false
+-%}
+
+{%- for block in section.blocks -%}
+  {%- liquid
+    # Skip if we've already rendered an image
+    if image_rendered
+      break
+    endif
+    
+    # Validate schedule (dates and time ranges)
+    render 'scheduled-visibility-validator', block: block
+    
+    # Validate URL visibility
+    render 'url-visibility-validator', block: block
+    
+    # Check if this block should be visible
+    if is_visible_by_schedule and is_visible_by_url
+      # Get image settings
+      assign desktop_image = block.settings.desktop_image
+      assign mobile_image = block.settings.mobile_image
+      assign desktop_alt = block.settings.desktop_alt | default: ''
+      assign mobile_alt = block.settings.mobile_alt | default: desktop_alt
+      assign link_url = block.settings.link_url
+      assign link_new_tab = block.settings.link_new_tab
+      
+      # Use desktop image as fallback if mobile image not set
+      if mobile_image == blank
+        assign mobile_image = desktop_image
+        assign mobile_alt = desktop_alt
+      endif
+      
+      # Only render if at least desktop image exists
+      if desktop_image != blank
+        assign image_rendered = true
+      endif
+    endif
+  -%}
+  
+  {%- if image_rendered -%}
+    <div class="scheduled-image-wrapper" {{ block.shopify_attributes }}>
+      {%- if link_url != blank -%}
+        <a 
+          href="{{ link_url }}" 
+          class="scheduled-image-link"
+          {%- if link_new_tab %} target="_blank" rel="noopener noreferrer"{% endif -%}
+        >
+      {%- endif -%}
+      
+      <picture class="scheduled-image">
+        {%- if mobile_image != blank -%}
+          <source
+            media="(max-width: 1023px)"
+            srcset="
+              {{- mobile_image | image_url: width: 400 }} 400w,
+              {{- mobile_image | image_url: width: 600 }} 600w,
+              {{- mobile_image | image_url: width: 800 }} 800w,
+              {{- mobile_image | image_url: width: 1000 }} 1000w
+            "
+            sizes="100vw"
+            width="{{ mobile_image.width }}"
+            height="{{ mobile_image.height }}"
+          >
+        {%- endif -%}
+        
+        <img
+          src="{{ desktop_image | image_url: width: 1600 }}"
+          srcset="
+            {{- desktop_image | image_url: width: 800 }} 800w,
+            {{- desktop_image | image_url: width: 1200 }} 1200w,
+            {{- desktop_image | image_url: width: 1600 }} 1600w,
+            {{- desktop_image | image_url: width: 2000 }} 2000w,
+            {{- desktop_image | image_url: width: 2400 }} 2400w
+          "
+          sizes="100vw"
+          width="{{ desktop_image.width }}"
+          height="{{ desktop_image.height }}"
+          loading="lazy"
+          alt="{{ desktop_alt }}"
+          class="scheduled-image__img"
+        >
+      </picture>
+      
+      {%- if link_url != blank -%}
+        </a>
+      {%- endif -%}
+    </div>
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if image_rendered == false and request.design_mode -%}
+  {%- comment -%}Show placeholder in theme editor if no valid image{%- endcomment -%}
+  <div class="scheduled-image-placeholder" style="padding: 60px 20px; text-align: center; background: #f7f7f7; border: 2px dashed #ccc; color: #666;">
+    <p style="margin: 0; font-size: 14px;">
+      📅 <strong>Scheduled Images</strong><br>
+      No image is currently scheduled for this date/time/URL.<br>
+      Add blocks and configure schedules in the theme editor.
+    </p>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .scheduled-image-wrapper {
+    display: block;
+    width: 100%;
+  }
+  
+  .scheduled-image-link {
+    display: block;
+    text-decoration: none;
+  }
+  
+  .scheduled-image {
+    display: block;
+    width: 100%;
+  }
+  
+  .scheduled-image__img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  .scheduled-image-placeholder {
+    margin: 20px 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Imagenes programadas",
+  "tag": "section",
+  "class": "section-scheduled-images",
+  "blocks": [
+    {
+      "type": "scheduled-image",
+    },
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚡ **How it works:** Add multiple 'Scheduled Image' blocks below. The **first block** that matches current date/time and URL will be displayed. Drag to reorder priority."
+    },
+    {
+      "type": "paragraph",
+      "content": "💡 **Tip:** Add a final block with no date/time restrictions as a fallback default image."
+    },
+  ],
+  "presets": [
+    {
+      "name": "Scheduled Images",
+      "blocks": [
+        {
+          "type": "scheduled-image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
