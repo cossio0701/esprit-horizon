@@ -1,0 +1,32 @@
+# Ignore VS Code workspace and settings
+.vscode/
+*.code-workspace
+
+# macOS
+.DS_Store
+
+# Node modules (if applicable)
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / local dev artifacts
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor backups
+*~
+*.swp
+
+# OS generated files
+Thumbs.db
