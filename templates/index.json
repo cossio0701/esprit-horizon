@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
@@ -61,6 +62,11 @@
       "settings": {
         "media_type_1": "image",
         "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -82,6 +88,84 @@
         "reflection_opacity": 75,
         "padding-block-start": 100,
         "padding-block-end": 72
+      }
+    },
+    "1763584284ac7bb19d": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_5d9738d_7rRXqK": {
+          "type": "ai_gen_block_5d9738d",
+          "settings": {
+            "section_title": "¿QUÉ ESTÁS BUSCANDO?",
+            "title_size": 14,
+            "title_margin_bottom": 20,
+            "title_color": "#000000",
+            "background_color": "#ffffff",
+            "section_padding_top": 40,
+            "section_padding_bottom": 40,
+            "grid_gap": 10,
+            "image_aspect_width": 3,
+            "image_aspect_height": 4,
+            "text_alignment": "left",
+            "text_vertical_position": "bottom",
+            "text_offset_horizontal": 30,
+            "text_offset_vertical": 30,
+            "category_size": 18,
+            "subtitle_size": 13,
+            "text_color": "#ffffff",
+            "text_shadow_x": 0,
+            "text_shadow_y": 2,
+            "text_shadow_blur": 8,
+            "text_shadow_opacity": 0.3,
+            "category_1_image": "shopify://shop_images/a861b66d091dbad798645445816de3ddbd7c4af7.jpg",
+            "category_1_title": "CAMISAS",
+            "category_1_subtitle": "Descubrir ahora",
+            "category_1_link": "",
+            "category_2_image": "shopify://shop_images/30208c7f7b27bb3344f9769dad8a8269afeef965.jpg",
+            "category_2_title": "VESTIDOS",
+            "category_2_subtitle": "Descubrir ahora",
+            "category_2_link": "",
+            "category_3_image": "shopify://shop_images/27bf7fae5cfdc8d0091aaa872fc5e123ff3bd28e.jpg",
+            "category_3_title": "PANTALONES",
+            "category_3_subtitle": "Descubrir ahora",
+            "category_3_link": "",
+            "category_4_image": "shopify://shop_images/9fa57cd15786274da16b0dbd3ba579ccc9e42027.png",
+            "category_4_title": "CHAQUETAS",
+            "category_4_subtitle": "Descubrir ahora",
+            "category_4_link": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_5d9738d_7rRXqK"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 0,
+        "section_width": "full-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "product_list_fa6P9H": {
@@ -281,6 +365,7 @@
   },
   "order": [
     "hero_jVaWmY",
+    "1763584284ac7bb19d",
     "product_list_fa6P9H"
   ]
 }

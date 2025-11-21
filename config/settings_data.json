@@ -9,6 +9,8 @@
  */
 {
   "current": {
+    "logo_height": 36,
+    "logo_height_mobile": 28,
     "type_body_font": "inter_n4",
     "type_subheading_font": "inter_n5",
     "type_heading_font": "inter_n7",
@@ -39,7 +41,7 @@
     "type_font_h6": "subheading",
     "type_size_h6": "12",
     "type_line_height_h6": "display-loose",
-    "page_width": "narrow",
+    "page_width": "wide",
     "page_transition_enabled": false,
     "transition_to_main_product": false,
     "card_hover_effect": "none",
@@ -66,7 +68,7 @@
     "currency_code_enabled_product_cards": false,
     "currency_code_enabled_cart_items": false,
     "product_corner_radius": 0,
-    "card_corner_radius": 3,
+    "card_corner_radius": 4,
     "show_variant_image": false,
     "variant_swatch_width": 34,
     "variant_swatch_height": 34,
@@ -74,6 +76,7 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "content_for_index": [],
     "color_schemes": {
       "scheme-1": {
         "settings": {
@@ -121,7 +124,7 @@
           "foreground": "#000000cf",
           "primary": "#000000cf",
           "primary_hover": "#ffffff",
-          "border": "#DFDFDF",
+          "border": "#dfdfdf",
           "shadow": "#000000",
           "primary_button_background": "#000000",
           "primary_button_text": "#ffffff",
@@ -348,9 +351,7 @@
           "selected_variant_hover_border_color": "#1a1a1a"
         }
       }
-    },
-    "logo_height": 36,
-    "logo_height_mobile": 28
+    }
   },
   "presets": {
     "Horizon": {

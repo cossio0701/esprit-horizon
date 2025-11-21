@@ -1,0 +1,586 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-category-grid-{{ ai_gen_id }} {
+    width: 100%;
+    padding: {{ block.settings.section_padding_top }}px 0px {{ block.settings.section_padding_bottom }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-category-grid__title-{{ ai_gen_id }} {
+    text-align: center;
+    font-size: {{ block.settings.title_size }}px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 {{ block.settings.title_margin_bottom }}px;
+    font-weight: 500;
+  }
+
+  .ai-category-grid__container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    margin: 0 auto;
+  }
+
+  .ai-category-grid__item-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: {{ block.settings.image_aspect_width }} / {{ block.settings.image_aspect_height }};
+  }
+
+  .ai-category-grid__link-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+  }
+
+  .ai-category-grid__image-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .ai-category-grid__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-category-grid__placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-category-grid__placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+    opacity: 0.3;
+  }
+
+  .ai-category-grid__overlay-{{ ai_gen_id }} {
+    position: absolute;
+    z-index: 2;
+    {% if block.settings.text_vertical_position == 'top' %}
+      top: {{ block.settings.text_offset_vertical }}px;
+    {% elsif block.settings.text_vertical_position == 'center' %}
+      top: 50%;
+      transform: translateY(-50%);
+    {% else %}
+      bottom: {{ block.settings.text_offset_vertical }}px;
+    {% endif %}
+    {% if block.settings.text_alignment == 'left' %}
+      left: {{ block.settings.text_offset_horizontal }}px;
+      text-align: left;
+    {% elsif block.settings.text_alignment == 'center' %}
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    {% else %}
+      right: {{ block.settings.text_offset_horizontal }}px;
+      text-align: right;
+    {% endif %}
+    {% if block.settings.text_vertical_position == 'center' and block.settings.text_alignment == 'center' %}
+      transform: translate(-50%, -50%);
+    {% endif %}
+  }
+
+  .ai-category-grid__category-{{ ai_gen_id }} {
+    font-size: {{ block.settings.category_size }}px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 8px;
+    letter-spacing: 1.5px;
+    text-shadow: {{ block.settings.text_shadow_x }}px {{ block.settings.text_shadow_y }}px {{ block.settings.text_shadow_blur }}px rgba(0, 0, 0, {{ block.settings.text_shadow_opacity }});
+  }
+
+  .ai-category-grid__subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    font-weight: 300;
+    text-shadow: {{ block.settings.text_shadow_x }}px {{ block.settings.text_shadow_y }}px {{ block.settings.text_shadow_blur }}px rgba(0, 0, 0, {{ block.settings.text_shadow_opacity }});
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-category-grid__container-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ai-category-grid__title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+
+    .ai-category-grid__category-{{ ai_gen_id }} {
+      font-size: {{ block.settings.category_size | times: 0.85 }}px;
+    }
+
+    .ai-category-grid__subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtitle_size | times: 0.9 }}px;
+    }
+
+    .ai-category-grid__overlay-{{ ai_gen_id }} {
+      {% if block.settings.text_vertical_position == 'top' %}
+        top: {{ block.settings.text_offset_vertical | times: 0.7 }}px;
+      {% elsif block.settings.text_vertical_position == 'bottom' %}
+        bottom: {{ block.settings.text_offset_vertical | times: 0.7 }}px;
+      {% endif %}
+      {% if block.settings.text_alignment == 'left' %}
+        left: {{ block.settings.text_offset_horizontal | times: 0.7 }}px;
+      {% elsif block.settings.text_alignment == 'right' %}
+        right: {{ block.settings.text_offset_horizontal | times: 0.7 }}px;
+      {% endif %}
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-category-grid-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding_top | times: 0.7 }}px 15px {{ block.settings.section_padding_bottom | times: 0.7 }}px;
+    }
+
+    .ai-category-grid__container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-category-grid__title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.7 }}px;
+    }
+
+    .ai-category-grid__category-{{ ai_gen_id }} {
+      font-size: {{ block.settings.category_size | times: 0.75 }}px;
+    }
+
+    .ai-category-grid__subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtitle_size | times: 0.85 }}px;
+    }
+
+    .ai-category-grid__overlay-{{ ai_gen_id }} {
+      {% if block.settings.text_vertical_position == 'top' %}
+        top: {{ block.settings.text_offset_vertical | times: 0.6 }}px;
+      {% elsif block.settings.text_vertical_position == 'bottom' %}
+        bottom: {{ block.settings.text_offset_vertical | times: 0.6 }}px;
+      {% endif %}
+      {% if block.settings.text_alignment == 'left' %}
+        left: {{ block.settings.text_offset_horizontal | times: 0.6 }}px;
+      {% elsif block.settings.text_alignment == 'right' %}
+        right: {{ block.settings.text_offset_horizontal | times: 0.6 }}px;
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<div class="ai-category-grid-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.section_title != blank %}
+    <h2 class="ai-category-grid__title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+  {% endif %}
+
+  <div class="ai-category-grid__container-{{ ai_gen_id }}">
+    {% for i in (1..4) %}
+      {% liquid
+        assign image_key = 'category_' | append: i | append: '_image'
+        assign title_key = 'category_' | append: i | append: '_title'
+        assign subtitle_key = 'category_' | append: i | append: '_subtitle'
+        assign link_key = 'category_' | append: i | append: '_link'
+
+        assign category_image = block.settings[image_key]
+        assign category_title = block.settings[title_key]
+        assign category_subtitle = block.settings[subtitle_key]
+        assign category_link = block.settings[link_key]
+      %}
+
+      <div class="ai-category-grid__item-{{ ai_gen_id }}">
+        <a
+          href="{{ category_link }}"
+          class="ai-category-grid__link-{{ ai_gen_id }}"
+          aria-label="{{ category_title }}"
+        >
+          <div class="ai-category-grid__image-wrapper-{{ ai_gen_id }}">
+            {% if category_image %}
+              <img
+                src="{{ category_image | image_url: width: 800 }}"
+                alt="{{ category_image.alt | escape }}"
+                loading="lazy"
+                width="{{ category_image.width }}"
+                height="{{ category_image.height }}"
+                class="ai-category-grid__image-{{ ai_gen_id }}"
+              >
+            {% else %}
+              <div class="ai-category-grid__placeholder-{{ ai_gen_id }}">
+                {{ 'hero-apparel-1' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="ai-category-grid__overlay-{{ ai_gen_id }}">
+            {% if category_title != blank %}
+              <h3 class="ai-category-grid__category-{{ ai_gen_id }}">{{ category_title }}</h3>
+            {% endif %}
+            {% if category_subtitle != blank %}
+              <p class="ai-category-grid__subtitle-{{ ai_gen_id }}">{{ category_subtitle }}</p>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Fashion category grid",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Title",
+      "default": "¿QUÉ ESTÁS BUSCANDO?"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 10,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Title margin bottom",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Grid layout"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between images",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_aspect_width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Image aspect ratio width",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "image_aspect_height",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Image aspect ratio height",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Text positioning"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Horizontal alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "text_vertical_position",
+      "label": "Vertical position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "text_offset_horizontal",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Horizontal offset",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "text_offset_vertical",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical offset",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "category_size",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Category size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Text shadow"
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_x",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow X offset",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_y",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow Y offset",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_blur",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow blur",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Shadow opacity",
+      "default": 0.3
+    },
+    {
+      "type": "header",
+      "content": "Category 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "category_1_title",
+      "label": "Title",
+      "default": "CAMISAS"
+    },
+    {
+      "type": "text",
+      "id": "category_1_subtitle",
+      "label": "Subtitle",
+      "default": "Descubrir ahora"
+    },
+    {
+      "type": "url",
+      "id": "category_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "category_2_title",
+      "label": "Title",
+      "default": "VESTIDOS"
+    },
+    {
+      "type": "text",
+      "id": "category_2_subtitle",
+      "label": "Subtitle",
+      "default": "Descubrir ahora"
+    },
+    {
+      "type": "url",
+      "id": "category_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "category_3_title",
+      "label": "Title",
+      "default": "PANTALONES"
+    },
+    {
+      "type": "text",
+      "id": "category_3_subtitle",
+      "label": "Subtitle",
+      "default": "Descubrir ahora"
+    },
+    {
+      "type": "url",
+      "id": "category_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Category 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "category_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "category_4_title",
+      "label": "Title",
+      "default": "CHAQUETAS"
+    },
+    {
+      "type": "text",
+      "id": "category_4_subtitle",
+      "label": "Subtitle",
+      "default": "Descubrir ahora"
+    },
+    {
+      "type": "url",
+      "id": "category_4_link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fashion category grid"
+    }
+  ]
+}
+{% endschema %}
