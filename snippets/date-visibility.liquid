@@ -1,0 +1,322 @@
+{%- comment -%}
+  Date Visibility Snippet
+  
+  Validates if content should be visible based on multiple date and time ranges.
+  Supports simulated date from query params for testing (e.g., ?simulatedDate=2025-09-30T14:30:00Z).
+  Uses Shopify store timezone - ensure your store is configured to "America/Bogota" (UTC-5)
+  in Settings > General > Store details > Timezone.
+  
+  Outputs: 'true' or 'false'
+  
+  Parameters:
+    - date_ranges: (optional) JSON array of date range objects. If empty/not provided, returns true.
+    - date_ranges_meta: (optional) Metaobject entry (e.g., list_date_range) that contains nested date/hour range references.
+      Example structure:
+      [
+        {
+          "start_date": "2024-07-10T00:00:00Z",
+          "end_date": "2024-07-26T00:00:00Z",
+          "time_ranges": [
+            {
+              "start_time": "19:30",
+              "end_time": "10:00",
+              "label": "Noches"
+            }
+          ]
+        }
+      ]
+  
+  Logic:
+    - If date_ranges is empty → returns true (visible by default)
+    - Iterates through each date range
+    - For each valid date range:
+      - If no time_ranges defined → visible for entire day
+      - If time_ranges exist → checks if current time falls within any range
+      - Handles midnight crossover (e.g., 19:30 to 10:00)
+    - Returns true if ANY date range with ANY time range matches
+{%- endcomment -%}
+
+{%- liquid
+  # Initialize visibility to true (visible by default if no ranges defined)
+  assign is_visible = true
+  assign found_match = false
+  
+  # Get simulated date from query params only if on Shopify preview domain
+  assign host = request.host
+  if host contains '.shopify.com'
+    assign simulated_date = request.query_string | split: 'simulatedDate=' | last | split: '&' | first
+  else
+    assign simulated_date = blank
+  endif
+
+  # Determine current date/time
+  if simulated_date == blank
+    assign current_date = 'now'
+  else
+    assign current_date = simulated_date
+  endif
+  
+  # Extract current timestamp and time components
+  assign current_ts = current_date | date: '%s'
+  assign current_hour = current_date | date: '%H' | plus: 0
+  assign current_minute = current_date | date: '%M' | plus: 0
+  assign current_time_in_minutes = current_hour | times: 60 | plus: current_minute
+
+  # Determine if we have a metaobject input with nested date ranges
+  assign has_metaobject_input = false
+  assign meta_date_ranges = blank
+  if date_ranges_meta != blank
+    assign meta_reference_field = blank
+    for field in date_ranges_meta.fields
+      if field.type contains 'metaobject_reference'
+        assign meta_reference_field = field.value
+        break
+      endif
+    endfor
+
+    if meta_reference_field != blank and meta_reference_field.size > 0
+      assign has_metaobject_input = true
+      assign meta_date_ranges = meta_reference_field
+    endif
+  endif
+  
+  if has_metaobject_input
+    assign is_visible = false
+    assign found_match = false
+
+    for date_range_entry in meta_date_ranges
+      unless found_match
+        assign start_date_value = ''
+        assign end_date_value = ''
+        assign hour_group_refs = blank
+
+        for meta_field in date_range_entry.fields
+          assign key = meta_field.key | downcase
+          if key contains 'inicio'
+            assign start_date_value = meta_field.value
+          elsif key contains 'fin'
+            assign end_date_value = meta_field.value
+          elsif meta_field.type contains 'metaobject_reference'
+            assign hour_group_refs = meta_field.value
+          endif
+        endfor
+
+        if start_date_value != '' and end_date_value != ''
+          assign start_ts = start_date_value | date: '%s'
+          assign end_ts = end_date_value | date: '%s'
+
+          if current_ts >= start_ts and current_ts <= end_ts
+            assign has_time_ranges = false
+
+            if hour_group_refs != blank and hour_group_refs.size > 0
+              for hour_group in hour_group_refs
+                unless found_match
+                  assign hour_ranges_refs = blank
+                  for group_field in hour_group.fields
+                    if group_field.type contains 'metaobject_reference'
+                      assign hour_ranges_refs = group_field.value
+                      break
+                    endif
+                  endfor
+
+                  if hour_ranges_refs != blank and hour_ranges_refs.size > 0
+                    for hour_range_entry in hour_ranges_refs
+                      unless found_match
+                        assign start_time_value = ''
+                        assign end_time_value = ''
+                        for hour_field in hour_range_entry.fields
+                          assign hkey = hour_field.key | downcase
+                          if hkey contains 'inicio'
+                            assign start_time_value = hour_field.value
+                          elsif hkey contains 'fin'
+                            assign end_time_value = hour_field.value
+                          endif
+                        endfor
+
+                        if start_time_value != '' and end_time_value != ''
+                          assign has_time_ranges = true
+
+                          assign start_time_parts = start_time_value | split: ':'
+                          assign end_time_parts = end_time_value | split: ':'
+
+                          if start_time_parts.size >= 2 and end_time_parts.size >= 2
+                            assign start_hour = start_time_parts[0] | plus: 0
+                            assign start_minute = start_time_parts[1] | plus: 0
+                            assign start_time_in_minutes = start_hour | times: 60 | plus: start_minute
+
+                            assign end_hour = end_time_parts[0] | plus: 0
+                            assign end_minute = end_time_parts[1] | plus: 0
+                            assign end_time_in_minutes = end_hour | times: 60 | plus: end_minute
+
+                            if end_time_in_minutes < start_time_in_minutes
+                              if current_time_in_minutes >= start_time_in_minutes or current_time_in_minutes <= end_time_in_minutes
+                                assign is_visible = true
+                                assign found_match = true
+                              endif
+                            else
+                              if current_time_in_minutes >= start_time_in_minutes and current_time_in_minutes <= end_time_in_minutes
+                                assign is_visible = true
+                                assign found_match = true
+                              endif
+                            endif
+                          endif
+                        endif
+                      endunless
+                    endfor
+                  endif
+                endunless
+              endfor
+            endif
+
+            if found_match == false and has_time_ranges == false
+              assign is_visible = true
+              assign found_match = true
+            endif
+          endif
+        endif
+      endunless
+    endfor
+
+  # Check if date_ranges parameter exists and is not empty (JSON input)
+  elsif date_ranges != blank and date_ranges.size > 0
+    # Start with visibility false (must match at least one range)
+    assign is_visible = false
+    assign found_match = false
+    
+    # Iterate through each date range
+    for date_range in date_ranges
+      # Skip if already found a match (simulates early exit)
+      unless found_match
+        # Normalize fields (support custom metafields using Spanish labels)
+        assign date_range_start = date_range.start_date | default: date_range.fecha_inicio | default: date_range['fecha-inicio']
+        assign date_range_end = date_range.end_date | default: date_range.fecha_fin | default: date_range['fecha-fin']
+
+        if date_range_start == blank or date_range_end == blank
+          continue
+        endif
+
+        # Validate current date is within this date range
+        assign start_ts = date_range_start | date: '%s'
+        assign end_ts = date_range_end | date: '%s'
+        
+        if current_ts >= start_ts and current_ts <= end_ts
+          # Current date is within range
+          assign time_ranges_collection = date_range.time_ranges
+
+          if time_ranges_collection == blank and date_range.rangos_de_horas != blank
+            if date_range.rangos_de_horas.value != blank
+              assign time_ranges_collection = date_range.rangos_de_horas.value
+            else
+              assign time_ranges_collection = date_range.rangos_de_horas
+            endif
+          endif
+
+          if time_ranges_collection != blank and time_ranges_collection.size > 0
+            assign first_time_range = time_ranges_collection[0]
+            assign has_nested_time_groups = false
+            if first_time_range and first_time_range.rangos_de_horas != blank
+              assign has_nested_time_groups = true
+            endif
+
+            if has_nested_time_groups
+              for time_group in time_ranges_collection
+                unless found_match
+                  assign nested_ranges = time_group.rangos_de_horas
+                  if nested_ranges == blank and time_group.rangos_de_horas and time_group.rangos_de_horas.value != blank
+                    assign nested_ranges = time_group.rangos_de_horas.value
+                  endif
+                  if nested_ranges != blank
+                    for nested_time_range in nested_ranges
+                      unless found_match
+                        assign start_time_value = nested_time_range.start_time | default: nested_time_range.hora_inicio
+                        assign end_time_value = nested_time_range.end_time | default: nested_time_range.hora_fin
+                        if start_time_value != blank and end_time_value != blank
+                          assign start_time_parts = start_time_value | split: ':'
+                          assign end_time_parts = end_time_value | split: ':'
+                          if start_time_parts.size >= 2 and end_time_parts.size >= 2
+                            assign start_hour = start_time_parts[0] | plus: 0
+                            assign start_minute = start_time_parts[1] | plus: 0
+                            assign start_time_in_minutes = start_hour | times: 60 | plus: start_minute
+
+                            assign end_hour = end_time_parts[0] | plus: 0
+                            assign end_minute = end_time_parts[1] | plus: 0
+                            assign end_time_in_minutes = end_hour | times: 60 | plus: end_minute
+
+                            if end_time_in_minutes < start_time_in_minutes
+                              if current_time_in_minutes >= start_time_in_minutes or current_time_in_minutes <= end_time_in_minutes
+                                assign is_visible = true
+                                assign found_match = true
+                              endif
+                            else
+                              if current_time_in_minutes >= start_time_in_minutes and current_time_in_minutes <= end_time_in_minutes
+                                assign is_visible = true
+                                assign found_match = true
+                              endif
+                            endif
+                          endif
+                        endif
+                      endunless
+                    endfor
+                  endif
+                endunless
+              endfor
+            else
+              for time_range in time_ranges_collection
+                unless found_match
+                  assign start_time_value = time_range.start_time | default: time_range.hora_inicio
+                  assign end_time_value = time_range.end_time | default: time_range.hora_fin
+                  if start_time_value != blank and end_time_value != blank
+                    assign start_time_parts = start_time_value | split: ':'
+                    assign end_time_parts = end_time_value | split: ':'
+                    if start_time_parts.size >= 2 and end_time_parts.size >= 2
+                      assign start_hour = start_time_parts[0] | plus: 0
+                      assign start_minute = start_time_parts[1] | plus: 0
+                      assign start_time_in_minutes = start_hour | times: 60 | plus: start_minute
+
+                      assign end_hour = end_time_parts[0] | plus: 0
+                      assign end_minute = end_time_parts[1] | plus: 0
+                      assign end_time_in_minutes = end_hour | times: 60 | plus: end_minute
+
+                      if end_time_in_minutes < start_time_in_minutes
+                        if current_time_in_minutes >= start_time_in_minutes or current_time_in_minutes <= end_time_in_minutes
+                          assign is_visible = true
+                          assign found_match = true
+                        endif
+                      else
+                        if current_time_in_minutes >= start_time_in_minutes and current_time_in_minutes <= end_time_in_minutes
+                          assign is_visible = true
+                          assign found_match = true
+                        endif
+                      endif
+                    endif
+                  endif
+                endunless
+              endfor
+            endif
+          else
+            # No time restrictions for this date range, entire day is valid
+            assign is_visible = true
+            assign found_match = true
+          endif
+        endif
+      endunless
+    endfor
+  endif
+  
+  echo is_visible
+-%}
+
+{%- comment -%}
+  TODO [CONTEXT]: Enhanced date-visibility snippet with support for multiple date_ranges and time_ranges.
+  Implements midnight crossover logic using minutes-based comparison.
+  
+  TODO [NEXT]: Consider adding error logging for invalid date/time formats in development environments.
+  Consider adding support for recurring weekly patterns (e.g., "every Friday 19:30-22:00").
+  
+  TODO [REF]: This snippet should be included in sections that need time-based visibility control.
+  Typical usage: {% render 'date-visibility', date_ranges: block.settings.date_ranges, date_ranges_meta: shop.metaobjects.list_date_range[block.settings.date_ranges] %}
+  
+  TODO [REVIEW]: Verify that Shopify store timezone is correctly configured to "America/Bogota" (UTC-5).
+  Test midnight crossover scenarios thoroughly (19:30 to 10:00 should work across day boundary).
+  Validate JSON structure of date_ranges matches expected format in section schema definitions.
+{%- endcomment -%}
