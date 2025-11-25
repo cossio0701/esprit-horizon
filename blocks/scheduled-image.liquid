@@ -1,0 +1,280 @@
+
+{%- if request.design_mode and block.settings.date_ranges != blank and shop.metaobjects.list_date_range[block.settings.date_ranges] and shop.metaobjects.list_date_range[block.settings.date_ranges].rangos_de_fechas != blank -%}
+  <script>
+    console.log('Metaobjeto de rangos de fechas:', {{ shop.metaobjects.list_date_range[block.settings.date_ranges].rangos_de_fechas.value | json }});
+  </script>
+{%- endif -%}
+{%- liquid
+  assign desktop_image = block.settings.desktop_image
+  assign mobile_image = block.settings.mobile_image
+  assign image_alt = block.settings.image_alt
+  if image_alt == blank and desktop_image != blank
+    assign image_alt = desktop_image.alt
+  endif
+  assign link_url = block.settings.link_url
+  assign link_new_tab = block.settings.link_new_tab
+  assign url_mode = block.settings.url_mode | default: 'all'
+  assign url_list = block.settings.url_list | default: ''
+  assign date_ranges_handle = block.settings.date_ranges
+  assign date_ranges_entry = nil
+  if date_ranges_handle != blank
+    assign date_ranges_entry = shop.metaobjects.list_date_range[date_ranges_handle]
+  endif
+  assign date_ranges = blank
+  assign should_render = false
+  assign schedule_visible = false
+  assign display_visible = false
+-%}
+
+{%- if date_ranges_entry and date_ranges_entry.rangos_de_fechas != blank and date_ranges_entry.rangos_de_fechas.value != blank -%}
+  {%- assign date_ranges = date_ranges_entry.rangos_de_fechas.value -%}
+{%- elsif date_ranges_handle != blank -%}
+  {%- assign date_ranges = date_ranges_handle -%}
+{%- endif -%}
+
+{%- if desktop_image != blank -%}
+  {%- assign display_rule = 'all_store' -%}
+  {%- case url_mode -%}
+    {%- when 'include' -%}
+      {%- assign display_rule = 'only_urls' -%}
+    {%- when 'exclude' -%}
+      {%- assign display_rule = 'exclude_urls' -%}
+  {%- endcase -%}
+
+  {%- assign urls_array = url_list | newline_to_br | split: '<br />' -%}
+  {%- assign normalized_urls = '' -%}
+  {%- for url in urls_array -%}
+    {%- assign trimmed = url | strip -%}
+    {%- if trimmed != blank -%}
+      {%- if normalized_urls == '' -%}
+        {%- assign normalized_urls = trimmed -%}
+      {%- else -%}
+        {%- assign normalized_urls = normalized_urls | append: '||' | append: trimmed -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if normalized_urls != '' -%}
+    {%- assign urls_array = normalized_urls | split: '||' -%}
+  {%- else -%}
+    {%- assign urls_array = '' | split: '' -%}
+  {%- endif -%}
+
+  {%- capture schedule_result_raw -%}
+  {% render 'date-visibility', date_ranges: date_ranges, date_ranges_meta: date_ranges_entry %}
+  {%- endcapture -%}
+  {%- capture display_result_raw -%}
+    {% render 'display-rule', display_rule: display_rule, urls: urls_array %}
+  {%- endcapture -%}
+
+  {%- assign schedule_result = schedule_result_raw | strip -%}
+  {%- assign display_result = display_result_raw | strip -%}
+  {%- if schedule_result == 'true' -%}
+    {%- assign schedule_visible = true -%}
+  {%- endif -%}
+  {%- if display_result == 'true' -%}
+    {%- assign display_visible = true -%}
+  {%- endif -%}
+  {%- if schedule_visible and display_visible -%}
+    {%- assign should_render = true -%}
+  {%- endif -%}
+
+  {%- if should_render -%}
+    <div class="scheduled-image-block" {{ block.shopify_attributes }}>
+      {%- if link_url != blank -%}
+        <a
+          href="{{ link_url }}"
+          class="scheduled-image-block__link"
+          {% if link_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+      {%- endif -%}
+
+      <picture class="scheduled-image-block__picture">
+        {%- if mobile_image != blank -%}
+          <source media="(max-width: 1023px)" srcset="{{ mobile_image | image_url: width: 1600 }}">
+        {%- endif -%}
+        {{
+          desktop_image
+          | image_url: width: 3200
+          | image_tag:
+            loading: 'lazy',
+            decoding: 'async',
+            sizes: '(min-width: 1024px) 75vw, 100vw',
+            widths: '400, 600, 800, 1200, 1600, 2000, 2400, 3200',
+            class: 'scheduled-image-block__image',
+            alt: image_alt
+        }}
+      </picture>
+
+      {%- if link_url != blank -%}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{%- if request.design_mode -%}
+  <div class="scheduled-image-block__debug" aria-live="polite">
+    <strong>Scheduled image debug</strong>
+    <dl>
+      <dt>Schedule visible</dt>
+      <dd>{{ schedule_visible }}</dd>
+      <dt>URL visible</dt>
+      <dd>{{ display_visible }}</dd>
+      <dt>Should render</dt>
+      <dd>{{ should_render }}</dd>
+      <dt>Date ranges metaobject</dt>
+      <dd>
+        <div><strong>Selected handle:</strong> {{ date_ranges_handle | default: '—' }}</div>
+        {% if date_ranges_entry %}
+          <div><strong>Type:</strong> {{ date_ranges_entry.type }}</div>
+          <div><strong>Handle:</strong> {{ date_ranges_entry.handle }}</div>
+          <div><strong>ID:</strong> {{ date_ranges_entry.id }}</div>
+          <details open>
+            <summary>Fields ({{ date_ranges_entry.fields.size }})</summary>
+            <ul>
+              {% for field in date_ranges_entry.fields %}
+                <li>
+                  <strong>{{ field.key }}</strong>
+                  ({{ field.type }}) —
+                  <code>{{ field.value }}</code>
+                </li>
+              {% endfor %}
+            </ul>
+          </details>
+        {% else %}
+          <em>No metaobject entry resolved. Verifica que el metaobjeto exista y esté publicado.</em>
+        {% endif %}
+      </dd>
+    </dl>
+  </div>
+  <script>
+    (() => {
+      const blockId = {{ block.id | json }};
+      const prefix = `ScheduledImage(${blockId})`;
+      console.group(prefix);
+      console.log('schedule_visible', {{ schedule_visible | json }});
+      console.log('display_visible', {{ display_visible | json }});
+      console.log('should_render', {{ should_render | json }});
+      console.log('date_ranges_handle', {{ date_ranges_handle | json }});
+      console.log('date_ranges_entry', {
+        id: {{ date_ranges_entry.id | json }},
+        type: {{ date_ranges_entry.type | json }},
+        handle: {{ date_ranges_entry.handle | json }},
+        fields: [
+          {% if date_ranges_entry %}
+            {% for field in date_ranges_entry.fields %}
+              { key: {{ field.key | json }}, type: {{ field.type | json }}, value: {{ field.value | json }} }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          {% endif %}
+        ]
+      });
+      console.log('url_mode', {{ url_mode | json }});
+      console.log('urls', {{ urls_array | json }});
+      console.groupEnd();
+    })();
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  .scheduled-image-block__picture {
+    display: block;
+  }
+
+  .scheduled-image-block__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .scheduled-image-block__debug {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    border: 1px dashed rgb(var(--color-foreground, 0 0 0));
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .scheduled-image-block__debug pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+{% endstylesheet %}
+
+
+
+{% schema %}
+{
+  "name": "Imagen responsive",
+  "settings": [
+    {
+      "type": "metaobject",
+      "id": "date_ranges",
+      "label": "Rangos de fechas y horas",
+      "metaobject_type": "list_date_range",
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image",
+      "info": "Recommended: 1600px width or larger"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image",
+      "info": "Recommended: 800px width. If not set, desktop image will be used."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image Alt Text",
+      "info": "Describe the image for accessibility"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL (Optional)",
+      "info": "Make the image clickable"
+    },
+    {
+      "type": "checkbox",
+      "id": "link_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Schedule (use Date blocks below)"
+    }
+    ,
+    {
+      "type": "select",
+      "id": "url_mode",
+      "label": "Display Mode",
+      "options": [
+        {
+          "value": "all",
+          "label": "All pages"
+        },
+        {
+          "value": "include",
+          "label": "Only on specific URLs"
+        },
+        {
+          "value": "exclude",
+          "label": "Exclude specific URLs"
+        }
+      ],
+      "default": "all",
+      "info": "Control where this image appears"
+    },
+    {
+      "type": "textarea",
+      "id": "url_list",
+      "label": "URL List",
+      "info": "One URL per line. Use partial matches (e.g., /collections, /products/shirt, /pages/about). Case-insensitive.",
+      "placeholder": "/collections\n/products/special-item"
+    }
+  ]
+}
+{% endschema %}
