@@ -90,6 +90,100 @@
         "padding-block-end": 72
       }
     },
+    "section_payTgk": {
+      "type": "section",
+      "blocks": {
+        "text_j8ePWD": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h4>Forever Essentials</h4>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 20,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_8969bbd_9jme4A": {
+          "type": "ai_gen_block_8969bbd",
+          "settings": {
+            "text": "MODA Y ESTILO",
+            "enable_line_breaks": false,
+            "custom_break_marker": "",
+            "font_size": 36,
+            "font_size_mobile": 14,
+            "font_weight": "400",
+            "line_height": 1,
+            "text_alignment": "left",
+            "text_color": "#000000"
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_8969bbd_Gm6Hxj": {
+          "type": "ai_gen_block_8969bbd",
+          "settings": {
+            "text": "PARA CADA MUJER",
+            "enable_line_breaks": false,
+            "custom_break_marker": "",
+            "font_size": 36,
+            "font_size_mobile": 14,
+            "font_weight": "400",
+            "line_height": 1,
+            "text_alignment": "left",
+            "text_color": "#000000"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_j8ePWD",
+        "ai_gen_block_8969bbd_9jme4A",
+        "ai_gen_block_8969bbd_Gm6Hxj"
+      ],
+      "name": "t:names.custom_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "flex-start",
+        "gap": 0,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "scheme-eec0e7cc-8bb8-4145-ac69-6765915bb5f9",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 30,
+        "padding-block-end": 30
+      }
+    },
     "1763584284ac7bb19d": {
       "type": "_blocks",
       "blocks": {
@@ -365,6 +459,7 @@
   },
   "order": [
     "hero_jVaWmY",
+    "section_payTgk",
     "1763584284ac7bb19d",
     "product_list_fa6P9H"
   ]
