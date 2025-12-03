@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "section": {
       "type": "section",
@@ -96,6 +97,46 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "scheduled_images_rLkyBn": {
+      "type": "scheduled-images",
+      "blocks": {
+        "scheduled_image_hwfA4j": {
+          "type": "scheduled-image",
+          "name": "Black",
+          "settings": {
+            "date_ranges": "list-date-range-kvepecau",
+            "desktop_image": "shopify://shop_images/20240817_LandingDesktop.jpg",
+            "mobile_image": "shopify://shop_images/20240817_LandingMobile.jpg",
+            "image_alt": "Black",
+            "link_url": "shopify://collections/sale1",
+            "link_new_tab": false,
+            "url_mode": "exclude",
+            "url_list": "/black"
+          },
+          "blocks": {}
+        },
+        "scheduled_image_KAQFWX": {
+          "type": "scheduled-image",
+          "settings": {
+            "date_ranges": "cyber-fechas",
+            "desktop_image": "shopify://shop_images/20250703-BANNER---LANDING-DESKTOP---SITE-NIGHT-SALE-30-_-50.jpg",
+            "mobile_image": "shopify://shop_images/20250703-BANNER---LANDING-MOBILE---SITE-NIGHT-SALE-30-_-50.jpg",
+            "image_alt": "Test",
+            "link_url": "shopify://collections/sale1",
+            "link_new_tab": false,
+            "url_mode": "all",
+            "url_list": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "scheduled_image_hwfA4j",
+        "scheduled_image_KAQFWX"
+      ],
+      "name": "Imagenes programadas",
+      "settings": {}
     },
     "main": {
       "type": "main-collection",
@@ -214,6 +255,8 @@
         "layout_type": "grid",
         "product_card_size": "medium",
         "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
         "product_grid_width": "centered",
         "full_width_on_mobile": true,
         "columns_gap_horizontal": 16,
@@ -228,6 +271,7 @@
   },
   "order": [
     "section",
+    "scheduled_images_rLkyBn",
     "main"
   ]
 }

@@ -1,41 +1,114 @@
-
-
 {% assign block_settings = block.settings %}
 
 {% capture video_style %}
-  {%  render 'spacing-style', settings: block_settings %}
+  {% render 'spacing-style', settings: block_settings %}
   {% render 'border-override', settings: block_settings %}
-   --size-style-width: {{ block_settings.custom_width }}%; --size-style-width-mobile: {{ block_settings.custom_width_mobile }}%;
-   --size-style-aspect-ratio: {% if block_settings.source == 'uploaded' %}{{ block_settings.video.aspect_ratio | default: 'auto' }}{% elsif block_settings.cover_image == blank %}{{ block_settings.aspect_ratio }}{% else %}auto{% endif %};
+  --size-style-width: {{ block_settings.custom_width }}%; 
+  --size-style-width-mobile: {{ block_settings.custom_width_mobile }}%;
+  --size-style-aspect-ratio: {% if block_settings.source == 'uploaded' %}{{ block_settings.video.aspect_ratio | default: 'auto' }}{% elsif block_settings.cover_image == blank %}{{ block_settings.aspect_ratio }}{% else %}auto{% endif %};
+  {% if block_settings.video_height != 'auto' %}
+    --video-height: {{ block_settings.video_height }};
+  {% endif %}
 {% endcapture %}
 
 {% if block_settings.source == 'uploaded' %}
   {% render 'video',
     video: block_settings.video,
-    video_class: 'spacing-style size-style border-style',
+    video_class: 'spacing-style size-style border-style video-no-controls',
     video_loop: block_settings.video_loop,
     video_style: video_style,
     video_preview_image: block_settings.video.preview_image,
     additional_attributes: block.shopify_attributes,
-    section_id: section.id
+    section_id: section.id,
+    disable_controls: true
   %}
 {% else %}
   {% render 'video',
     video_from_url: true,
     video: block_settings.video_url.id,
-    video_class: 'spacing-style size-style border-style',
+    video_class: 'spacing-style size-style border-style video-no-controls',
     video_type: block_settings.video_url.type,
     video_style: video_style,
     video_alt: block_settings.alt,
     video_preview_image: block_settings.cover_image,
     additional_attributes: block.shopify_attributes,
-    section_id: section.id
+    section_id: section.id,
+    disable_controls: true
   %}
 {% endif %}
 
 {% stylesheet %}
   .placeholder-video {
     aspect-ratio: 5 / 3;
+  }
+  
+  /* Estilos para altura personalizada */
+  .video-no-controls {
+    pointer-events: none;
+  }
+  
+  .video-no-controls[style*="--video-height: pequeno"] {
+    height: 300px;
+    max-height: 300px;
+  }
+  
+  .video-no-controls[style*="--video-height: mediano"] {
+    height: 500px;
+    max-height: 500px;
+  }
+  
+  .video-no-controls[style*="--video-height: grande"] {
+    height: 700px;
+    max-height: 700px;
+  }
+  
+  .video-no-controls[style*="--video-height: extra-grande"] {
+    height: 900px;
+    max-height: 900px;
+  }
+  
+  /* Ocultar controles nativos */
+  .video-no-controls video::-webkit-media-controls {
+    display: none !important;
+  }
+  
+  .video-no-controls video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+  
+  .video-no-controls video::-webkit-media-controls-panel {
+    display: none !important;
+  }
+  
+  .video-no-controls video {
+    pointer-events: none;
+  }
+  
+  .video-no-controls iframe {
+    pointer-events: none;
+  }
+  
+  /* Responsive en móvil */
+  @media (max-width: 768px) {
+    .video-no-controls[style*="--video-height: pequeno"] {
+      height: 200px;
+      max-height: 200px;
+    }
+    
+    .video-no-controls[style*="--video-height: mediano"] {
+      height: 350px;
+      max-height: 350px;
+    }
+    
+    .video-no-controls[style*="--video-height: grande"] {
+      height: 500px;
+      max-height: 500px;
+    }
+    
+    .video-no-controls[style*="--video-height: extra-grande"] {
+      height: 650px;
+      max-height: 650px;
+    }
   }
 {% endstylesheet %}
 
@@ -105,6 +178,35 @@
       "content": "t:content.size"
     },
     {
+      "type": "select",
+      "id": "video_height",
+      "label": "Altura del video",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Automática"
+        },
+        {
+          "value": "pequeno",
+          "label": "Pequeño (300px)"
+        },
+        {
+          "value": "mediano",
+          "label": "Mediano (500px)"
+        },
+        {
+          "value": "grande",
+          "label": "Grande (700px)"
+        },
+        {
+          "value": "extra-grande",
+          "label": "Extra Grande (900px)"
+        }
+      ],
+      "default": "auto",
+      "info": "Selecciona la altura fija del video"
+    },
+    {
       "type": "range",
       "id": "custom_width",
       "label": "t:settings.width",
@@ -128,7 +230,7 @@
       "type": "select",
       "id": "aspect_ratio",
       "label": "t:settings.aspect_ratio",
-      "visible_if": "{{ block.settings.source == 'url' and block.settings.cover_image == blank }}",
+      "visible_if": "{{ block.settings.source == 'url' and block.settings.cover_image == blank and block.settings.video_height == 'auto' }}",
       "options": [
         {
           "value": "auto",

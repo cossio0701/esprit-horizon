@@ -1,5 +1,8 @@
-
-{%- if request.design_mode and block.settings.date_ranges != blank and shop.metaobjects.list_date_range[block.settings.date_ranges] and shop.metaobjects.list_date_range[block.settings.date_ranges].rangos_de_fechas != blank -%}
+{%- if request.design_mode
+  and block.settings.date_ranges != blank
+  and shop.metaobjects.list_date_range[block.settings.date_ranges]
+  and shop.metaobjects.list_date_range[block.settings.date_ranges].rangos_de_fechas != blank
+-%}
   <script>
     console.log('Metaobjeto de rangos de fechas:', {{ shop.metaobjects.list_date_range[block.settings.date_ranges].rangos_de_fechas.value | json }});
   </script>
@@ -16,7 +19,7 @@
   assign url_mode = block.settings.url_mode | default: 'all'
   assign url_list = block.settings.url_list | default: ''
   assign date_ranges_handle = block.settings.date_ranges
-  assign date_ranges_entry = nil
+  assign date_ranges_entry = null
   if date_ranges_handle != blank
     assign date_ranges_entry = shop.metaobjects.list_date_range[date_ranges_handle]
   endif
@@ -26,7 +29,10 @@
   assign display_visible = false
 -%}
 
-{%- if date_ranges_entry and date_ranges_entry.rangos_de_fechas != blank and date_ranges_entry.rangos_de_fechas.value != blank -%}
+{%- if date_ranges_entry
+  and date_ranges_entry.rangos_de_fechas != blank
+  and date_ranges_entry.rangos_de_fechas.value != blank
+-%}
   {%- assign date_ranges = date_ranges_entry.rangos_de_fechas.value -%}
 {%- elsif date_ranges_handle != blank -%}
   {%- assign date_ranges = date_ranges_handle -%}
@@ -84,7 +90,9 @@
         <a
           href="{{ link_url }}"
           class="scheduled-image-block__link"
-          {% if link_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          {% if link_new_tab %}
+            target="_blank" rel="noopener noreferrer"
+          {% endif %}
         >
       {%- endif -%}
 
@@ -200,8 +208,6 @@
   }
 {% endstylesheet %}
 
-
-
 {% schema %}
 {
   "name": "Imagen responsive",
@@ -210,7 +216,7 @@
       "type": "metaobject",
       "id": "date_ranges",
       "label": "Rangos de fechas y horas",
-      "metaobject_type": "list_date_range",
+      "metaobject_type": "list_date_range"
     },
     {
       "type": "image_picker",
@@ -245,8 +251,7 @@
     {
       "type": "header",
       "content": "Schedule (use Date blocks below)"
-    }
-    ,
+    },
     {
       "type": "select",
       "id": "url_mode",
@@ -274,6 +279,11 @@
       "label": "URL List",
       "info": "One URL per line. Use partial matches (e.g., /collections, /products/shirt, /pages/about). Case-insensitive.",
       "placeholder": "/collections\n/products/special-item"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Imagen responsive"
     }
   ]
 }

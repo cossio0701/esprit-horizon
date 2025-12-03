@@ -146,15 +146,34 @@
 
   @media screen and (max-width: 749px) {
     .ai-category-grid-{{ ai_gen_id }} {
-      padding: {{ block.settings.section_padding_top | times: 0.7 }}px 15px {{ block.settings.section_padding_bottom | times: 0.7 }}px;
-    }
-
-    .ai-category-grid__container-{{ ai_gen_id }} {
-      grid-template-columns: 1fr;
+      padding: {{ block.settings.section_padding_top | times: 0.7 }}px 0px {{ block.settings.section_padding_bottom | times: 0.7 }}px;
     }
 
     .ai-category-grid__title-{{ ai_gen_id }} {
       font-size: {{ block.settings.title_size | times: 0.7 }}px;
+      padding: 0 15px;
+    }
+
+    .ai-category-grid__container-{{ ai_gen_id }} {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: {{ block.settings.mobile_gap }}px;
+      padding: 0 15px;
+      grid-template-columns: unset;
+    }
+
+    .ai-category-grid__container-{{ ai_gen_id }}::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-category-grid__item-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.mobile_slide_width }}%;
+      scroll-snap-align: start;
+      aspect-ratio: {{ block.settings.mobile_aspect_width }} / {{ block.settings.mobile_aspect_height }};
     }
 
     .ai-category-grid__category-{{ ai_gen_id }} {
@@ -305,7 +324,7 @@
     },
     {
       "type": "header",
-      "content": "Grid layout"
+      "content": "Grid layout (Desktop & Tablet)"
     },
     {
       "type": "range",
@@ -334,6 +353,51 @@
       "step": 1,
       "label": "Image aspect ratio height",
       "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Mobile carousel settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_slide_width",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Slide width on mobile",
+      "default": 85,
+      "info": "Porcentaje del ancho de pantalla que ocupa cada slide"
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between slides (mobile)",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "mobile_aspect_width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Mobile aspect ratio width",
+      "default": 3,
+      "info": "Aspecto vertical para mobile"
+    },
+    {
+      "type": "range",
+      "id": "mobile_aspect_height",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Mobile aspect ratio height",
+      "default": 4,
+      "info": "Aspecto vertical para mobile"
     },
     {
       "type": "header",
