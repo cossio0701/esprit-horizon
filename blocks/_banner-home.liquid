@@ -1,0 +1,159 @@
+{{ 'banner-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'banner-home.js' | asset_url }}" defer></script>
+
+<div class="banners-programables">
+  {% assign today = 'now' | date: '%s' %}
+  {% assign start_date = block.settings.start_date | date: '%s' %}
+  {% assign end_date = block.settings.end_date | date: '%s' %}
+
+  {% if today >= start_date and today <= end_date %}
+    <div class="banner-programable h-screen z-50 overflow-hidden" id="banner-{{ block.id }}">
+      <a href="{{ block.settings.banner_url | default: '#' }}" class="block h-full w-full">
+        <picture>
+          <source
+            media="(max-width: 1024px)"
+            srcset="{{ block.settings.image_mobile | img_url: 'master' }}"
+          >
+          <img
+            src="{{ block.settings.image_desktop | img_url: 'master' }}"
+            alt="{{ block.settings.alt_text }}"
+            class="w-full h-full object-cover"
+            width="100%"
+            height="auto"
+          >
+        </picture>
+      </a>
+
+      {% for child_block in block.blocks %}
+        <div class="child-block-wrapper" {{ child_block.shopify_attributes }}>
+          {% case child_block.type %}
+            {% when 'banner_button' %}
+              <a
+                href="{{ child_block.settings.link }}"
+                style="position: absolute; top: 50%; left: 50%; padding: 10px; background: blue; color: white; z-index: 100;"
+              >
+                {{ child_block.settings.label }}
+              </a>
+            {% when '@theme' %}
+              {% render child_block %}
+          {% endcase %}
+        </div>
+      {% endfor %}
+      <div
+        id="countdown"
+        class="banner-home-timer"
+        data-end-date="{{ block.settings.banner_timer }}"
+      >
+        00:00:00:00
+      </div>
+
+      {% if block.settings.legal != blank %}
+        <div class="banner-legal">
+          <svg class="legal-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" fill="none" />
+            <line x1="12" y1="10" x2="12" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="7" r="1.2" fill="currentColor" />
+          </svg>
+          <div class="legal-tooltip">{{ block.settings.legal }}</div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% if request.design_mode %}
+  <style>
+    #banner-{{ block.id }} .banner-home-timer {
+      min-width: 120px;
+      min-height: 40px;
+      background: rgba(0,0,0,0.35);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px dashed white;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const t = document.querySelector('#banner-{{ block.id }} .banner-home-timer');
+      if (t) t.textContent = 'Timer preview';
+    });
+  </script>
+{% endif %}
+
+<style>
+      /* ---- Timer Desktop ---- */
+      #banner-{{ block.id }} .banner-home-timer {
+        position: absolute;
+        top: {{ block.settings.timer_top_dktp }}%;
+        left: {{ block.settings.timer_left_dktp }}%;
+        transform: translate(-50%, -50%);
+        z-index: 200;
+        color: {{ block.settings.timer_text_color }};
+        font-size: {{ block.settings.timer_font_dktp }}vw;
+      }
+
+      /* ---- Timer Mobile ---- */
+      @media (max-width: 1024px) {
+        #banner-{{ block.id }} .banner-home-timer {
+          top: {{ block.settings.timer_top_mbl }}%;
+          left: {{ block.settings.timer_left_mbl }}%;
+          color: {{ block.settings.timer_text_color }};
+  font-size: {{ block.settings.timer_font_mbl }}vw;
+
+        }
+      }
+</style>
+
+{% schema %}
+{
+  "name": "Banners Programables GCO",
+  "settings": [
+    { "type": "image_picker", "id": "image_desktop", "label": "Imagen Desktop" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Imagen Mobile" },
+    { "type": "text", "id": "alt_text", "label": "Texto alternativo" },
+    { "type": "text", "id": "start_date", "label": "Fecha inicio (YYYY-MM-DD)" },
+    { "type": "text", "id": "end_date", "label": "Fecha fin (YYYY-MM-DD)" },
+    { "type": "textarea", "id": "legal", "label": "Texto Legal (tooltip)" },
+    { "type": "url", "id": "banner_url", "label": "Enlace del banner" },
+    { "type": "text", "id": "banner_timer", "label": "Fecha de finalizacion para el timer (YYYY-MM-DD 00:00)" },
+    { "type": "header", "content": "Posicion del timer en desktop" },
+    { "type": "range", "id": "timer_top_dktp", "min": 0, "max": 100, "default": 50, "label": "Top Desktop (%)" },
+    { "type": "range", "id": "timer_left_dktp", "min": 0, "max": 100, "default": 50, "label": "Left Desktop (%)" },
+    { "type": "header", "content": "Posicion del timer en mobile" },
+    { "type": "range", "id": "timer_top_mbl", "min": 0, "max": 100, "default": 50, "label": "Top Mobile (%)" },
+    { "type": "range", "id": "timer_left_mbl", "min": 0, "max": 100, "default": 50, "label": "Left Mobile (%)" },
+    { "type": "header", "content": "Estilos del timer" },
+    { "type": "color", "id": "timer_text_color", "label": "Color de texto", "default": "#ffffff" },
+
+    {
+      "type": "range",
+      "id": "timer_font_dktp",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 1.2,
+      "label": "Tamaño texto Desktop (vw)"
+    },
+    {
+      "type": "range",
+      "id": "timer_font_mbl",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "default": 3.5,
+      "label": "Tamaño texto Mobile (vw)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "_banner-home-button"
+    }
+  ],
+  "presets": [{ "name": "Banner slide" }]
+}
+{% endschema %}

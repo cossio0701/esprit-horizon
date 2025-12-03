@@ -1,0 +1,213 @@
+{% comment %}
+  GCO Contenedor Flexible con Swiper + Configuración de UI
+{% endcomment %}
+
+<section class="gco-flex-container w-full z-50 relative">
+  <div class="hero-inner">
+    <div class="swiper gco-swiper">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          <div class="swiper-slide">
+            {% render block %}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if section.settings.show_arrows %}
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      {% endif %}
+
+      {% if section.settings.show_dots %}
+        <div class="swiper-pagination"></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new Swiper(".gco-swiper", {
+      loop: true,
+      slidesPerView: 1,
+
+      {% if section.settings.show_dots %}
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true
+      },
+      {% endif %}
+
+      {% if section.settings.show_arrows %}
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev"
+      },
+      {% endif %}
+
+        autoplay: {
+        delay: 5000,
+        disableOnInteraction: false
+      }
+    });
+  });
+</script>
+
+<style>
+  @media(max-width:1024px){
+  .gco-swiper{
+    height: 70dvh;
+    max-height: 700px;
+  }
+  }
+
+  .gco-flex-container {
+    position: relative;
+    background-color: lightblue;
+    margin-top: -68px;
+  }
+
+  @media (min-width: 1024px) {
+    .gco-flex-container {
+      height: 95vh;
+    }
+  }
+
+
+
+  @media (min-width: 1024px) {
+    .hero-inner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+    }
+  }
+
+
+  @media (min-width: 1024px) {
+    .hero-inner .swiper {
+      height: 95vh;
+    }
+  }
+
+  .hero-inner::after {
+    content: '';
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  {% if section.settings.show_arrows %}
+  .gco-swiper .swiper-button-next,
+  .gco-swiper .swiper-button-prev {
+    color: {{ section.settings.arrows_color }};
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .gco-swiper .swiper-button-next:hover,
+  .gco-swiper .swiper-button-prev:hover {
+    opacity: 1;
+  }
+
+
+
+  @media(min-width:1024px){
+  .swiper-button-next {
+    right: 30px !important;
+  }
+
+  .swiper-button-prev {
+    left: 30px !important;
+  }
+  }
+
+  .gco-swiper .swiper-button-next .swiper-navigation-icon,
+  .gco-swiper .swiper-button-prev .swiper-navigation-icon {
+    width: 16px;
+  }
+  {% endif %}
+
+  {% if section.settings.show_dots %}
+  .gco-swiper .swiper-pagination-bullet {
+    background: {{ section.settings.dots_color }};
+    opacity: 0.4;
+  }
+
+  .gco-swiper .swiper-pagination-bullet-active {
+    background: {{ section.settings.dots_active_color }};
+    opacity: 1;
+  }
+  {% endif %}
+
+  .section-hero-banner ~ section,
+  .section-hero-banner ~ div,
+  .section-hero-banner ~ main {
+    position: relative;
+    z-index: 3;
+    background: #ffffff;
+  }
+
+  .swiper-slide div,
+  .swiper-slide picture,
+  .swiper-slide img,
+  .swiper-slide .banners-programables {
+    height: 100%;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "GCO slider contenedor",
+  "class": "section-hero-banner",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "arrows_color",
+      "label": "Color de flechas",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Mostrar dots",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "dots_color",
+      "label": "Color dots (inactivos)",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "dots_active_color",
+      "label": "Color dot activo",
+      "default": "#000000"
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "_banner-home"
+    }
+  ],
+  "presets": [{ "name": "Banner home slider GCO" }]
+}
+{% endschema %}

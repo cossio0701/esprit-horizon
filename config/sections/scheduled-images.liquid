@@ -1,0 +1,76 @@
+{% comment %}
+  Scheduled Images Section
+  - Displays the first image block that matches the current date/time and URL.
+{% endcomment %}
+
+{% liquid
+  assign first_visible_block = ''
+%}
+
+{% for block in section.blocks %}
+  {% capture block_markup %}
+    {% render block %}
+  {% endcapture %}
+
+  {% assign block_markup_clean = block_markup | strip %}
+  {% if block_markup_clean != '' %}
+    {% assign first_visible_block = block_markup %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% capture children %}
+  {% if first_visible_block != '' %}
+    {{ first_visible_block }}
+  {% elsif request.design_mode %}
+    <div class="scheduled-images__placeholder" role="status">
+      <p><strong>Sin coincidencias.</strong> Ajusta las reglas o añade un bloque de fallback.</p>
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{% render 'section', section: section, children: children %}
+
+{% stylesheet %}
+  .scheduled-images__placeholder {
+    padding: var(--gap-xl);
+    border: 1px dashed rgba(var(--color-foreground, 0 0 0) / 0.4);
+    border-radius: var(--radius-md, 8px);
+    text-align: center;
+    font-size: 0.95rem;
+    background: rgba(var(--color-background, 255 255 255) / 0.35);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Imagenes programadas",
+  "tag": "section",
+  "class": "section-scheduled-images",
+  "blocks": [
+    {
+      "type": "scheduled-image"
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚡ **How it works:** Add multiple 'Scheduled Image' blocks below. The **first block** that matches current date/time and URL will be displayed. Drag to reorder priority."
+    },
+    {
+      "type": "paragraph",
+      "content": "💡 **Tip:** Add a final block with no date/time restrictions as a fallback default image."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Imagenes programadas",
+      "blocks": [
+        {
+          "type": "scheduled-image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
