@@ -1,0 +1,115 @@
+{% assign s = block.settings %}
+
+<style>
+  /* ------- Estilos de escritorio ------- */
+  #btn-block-{{ block.id }} {
+    position: absolute;
+    top: {{ s.btn1_top }}%;
+    left: {{ s.btn1_left }}%;
+    width: {{ s.btn1_width }}%;
+    height: {{ s.btn1_height }}%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+
+    color: {{ s.btn1_color_dktp }};
+    background-color: {{ s.btn1_bg_color_dktp }};
+    border: 1px solid {{ s.btn1_border_color_dktp }};
+    border-radius: {{ s.btn1_radius }}px;
+        font-size: {{ s.btn1_font_dktp }}vw;
+
+
+    text-decoration: none;
+    transition: 0.2s ease all;
+  }
+
+  #btn-block-{{ block.id }}:hover {
+    background-color: {{ s.btn1_hover_bg_color_dktp }};
+    color: {{ s.btn1_hover_text_color_dktp }};
+    border-color: {{ s.btn1_hover_border_color_dktp }};
+  }
+
+  /* ------- Estilos Mobile ------- */
+  @media (max-width: 1024px) {
+    #btn-block-{{ block.id }} {
+      top: {{ s.btn1_top_mobile }}%;
+      left: {{ s.btn1_left_mobile }}%;
+      width: {{ s.btn1_width_mobile }}%;
+      height: {{ s.btn1_height_mobile }}%;
+
+      color: {{ s.btn1_color_mbl }};
+      background-color: {{ s.btn1_bg_color_mbl }};
+      border: 1px solid {{ s.btn1_border_color_mbl }};
+
+      font-size: {{ s.btn1_font_mbl }}vw;
+
+    }
+
+    #btn-block-{{ block.id }}:hover {
+      background-color: {{ s.btn1_hover_bg_color_mbl }};
+      color: {{ s.btn1_hover_text_color_mbl }};
+      border-color: {{ s.btn1_hover_border_color_mbl }};
+    }
+  }
+</style>
+
+<a
+  id="btn-block-{{ block.id }}"
+  href="{{ s.btn1_link }}"
+>
+  {{ s.btn1_label }}
+</a>
+
+{% schema %}
+{
+  "name": "Boton configurable",
+  "settings": [
+    { "type": "text", "id": "btn1_label", "label": "Texto del botón 1", "default": "Comprar ahora" },
+    { "type": "url", "id": "btn1_link", "label": "Enlace del botón 1" },
+    { "type": "header", "content": "Posicion en desktop" },
+    { "type": "range", "id": "btn1_top", "min": 0, "max": 100, "default": 50, "label": "Top Desktop (%)" },
+    { "type": "range", "id": "btn1_left", "min": 0, "max": 100, "default": 50, "label": "Left Desktop (%)" },
+    { "type": "range", "id": "btn1_width", "min": 1, "max": 100, "default": 12, "label": "Ancho Desktop (%)" },
+    { "type": "range", "id": "btn1_height", "min": 1, "max": 100, "default": 5, "label": "Alto Desktop (%)" },
+    { "type": "header", "content": "Posicion en mobileee" },
+    { "type": "range", "id": "btn1_top_mobile", "min": 0, "max": 100, "default": 50, "label": "Top Mobile (%)" },
+    { "type": "range", "id": "btn1_left_mobile", "min": 0, "max": 100, "default": 50, "label": "Left Mobile (%)" },
+    { "type": "range", "id": "btn1_width_mobile", "min": 1, "max": 100, "default": 40, "label": "Ancho Mobile (%)" },
+    { "type": "range", "id": "btn1_height_mobile", "min": 1, "max": 100, "default": 5, "label": "Alto Mobile (%)" },
+    { "type": "header", "content": "Estilos del boton" },
+    {
+      "type": "range",
+      "id": "btn1_font_dktp",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 1.2,
+      "label": "Tamaño de fuente Desktop (vw)"
+    },
+    {
+      "type": "range",
+      "id": "btn1_font_mbl",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "default": 3.5,
+      "label": "Tamaño de fuente Mobile (vw)"
+    },
+    { "type": "color", "id": "btn1_color_dktp", "label": "Color de texto desktop", "default": "#ffffff" },
+    { "type": "color", "id": "btn1_border_color_dktp", "label": "Color de borde desktop", "default": "#ffffff" },
+    { "type": "color", "id": "btn1_bg_color_dktp", "label": "Color de fondo desktop", "default": "transparent" },
+    { "type": "color", "id": "btn1_hover_bg_color_dktp", "label": "Background hover desktop" },
+    { "type": "color", "id": "btn1_hover_text_color_dktp", "label": "Texto hover desktop" },
+    { "type": "color", "id": "btn1_hover_border_color_dktp", "label": "Border hover desktop" },
+    { "type": "color", "id": "btn1_color_mbl", "label": "Color de texto", "default": "#ffffff" },
+    { "type": "color", "id": "btn1_border_color_mbl", "label": "Color de borde", "default": "#ffffff" },
+    { "type": "color", "id": "btn1_bg_color_mbl", "label": "Color de fondo", "default": "transparent" },
+    { "type": "color", "id": "btn1_hover_bg_color_mbl", "label": "Background hover mobile" },
+    { "type": "color", "id": "btn1_hover_text_color_mbl", "label": "Texto hover mobile" },
+    { "type": "color", "id": "btn1_hover_border_color_mbl", "label": "Border hover mobile" },
+    { "type": "range", "id": "btn1_radius", "min": 0, "max": 50, "default": 8, "label": "Border radius (px)" }
+  ],
+  "presets": [{ "name": "Boton para banner" }]
+}
+{% endschema %}

@@ -1,0 +1,142 @@
+.banner-btn {
+  transition: all 0.25s ease;
+}
+
+/* Hover dinámico */
+.banner-btn:hover {
+  background: var(--hover-bg-dktp, initial) !important;
+  color: var(--hover-text-dktp, initial) !important;
+  border-color: var(--hover-border-dktp, initial) !important;
+
+  @media (max-width: 1024px) {
+    background: var(--hover-bg-mbl, initial) !important;
+    color: var(--hover-text-mbl, initial) !important;
+    border-color: var(--hover-border-mbl, initial) !important;
+  }
+}
+
+.banners-programables {
+  height: 65vh;
+  /* min-height: 800px; */
+
+  @media(min-width: 1024px) {
+    position: relative;
+    height: 95vh;
+    min-height: auto;
+  }
+
+}
+
+.banner-programable {
+  height: 100%;
+}
+
+.banner-programable img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.banner-programable>a {
+  display: block;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
+
+.banner-legal {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  height: fit-content !important;
+}
+
+.legal-icon {
+  width: 40px;
+  height: 40px;
+  color: #ffffff;
+  opacity: 0.85;
+  transition: opacity 0.25s ease, color 0.25s ease;
+}
+
+.banner-legal:hover .legal-icon {
+  opacity: 1;
+  color: #0ea5e9;
+}
+
+.legal-tooltip {
+  position: absolute;
+  bottom: 130%;
+  left: 0;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  width: 260px;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.banner-legal:hover .legal-tooltip {
+  opacity: 1;
+}
+
+.legal-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 8px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+.banner-image {
+  min-height: 100vh;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.banner-home-timer {
+  position: absolute;
+  top: 91%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 31px;
+  height: fit-content !important;
+}
+
+#countdown {
+  transition: opacity 0.6s ease;
+}
+
+.countdown-finished {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translate(-50%, -50%);
+    ;
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+    ;
+  }
+}

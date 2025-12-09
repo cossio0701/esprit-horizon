@@ -101,6 +101,21 @@
     "scheduled_images_rLkyBn": {
       "type": "scheduled-images",
       "blocks": {
+        "scheduled_image_hwfA4j": {
+          "type": "scheduled-image",
+          "name": "Black",
+          "settings": {
+            "date_ranges": "list-date-range-kvepecau",
+            "desktop_image": "shopify://shop_images/20240817_LandingDesktop.jpg",
+            "mobile_image": "shopify://shop_images/20240817_LandingMobile.jpg",
+            "image_alt": "Black",
+            "link_url": "shopify://collections/sale1",
+            "link_new_tab": false,
+            "url_mode": "exclude",
+            "url_list": "/black"
+          },
+          "blocks": {}
+        },
         "scheduled_image_KAQFWX": {
           "type": "scheduled-image",
           "settings": {
@@ -117,6 +132,7 @@
         }
       },
       "block_order": [
+        "scheduled_image_hwfA4j",
         "scheduled_image_KAQFWX"
       ],
       "name": "Imagenes programadas",
