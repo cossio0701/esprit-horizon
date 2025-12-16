@@ -39,13 +39,16 @@
           {% endcase %}
         </div>
       {% endfor %}
-      <div
-        id="countdown"
-        class="banner-home-timer"
-        data-end-date="{{ block.settings.banner_timer }}"
-      >
-        00:00:00:00
-      </div>
+{% if block.settings.banner_timer != blank %}
+  <div
+    id="countdown"
+    class="banner-home-timer"
+    data-end-date="{{ block.settings.banner_timer }}"
+  >
+    00:00:00:00
+  </div>
+{% endif %}
+
 
       {% if block.settings.legal != blank %}
         <div class="banner-legal">

@@ -1,0 +1,286 @@
+{% doc %}
+  @prompt
+    i need to create a breadcrumb for my pdp where the icon separator be a slash and the home page will be "inicio" and also, i need that the active page will be the metafield product_category, but i need that the current page, will be in font-weight in bold, But the active breadcrumb will use a font weight of #000, and the other breadcrumb items will be underlined.
+{% enddoc %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-breadcrumb-{{ ai_gen_id }} {
+    padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-breadcrumb-container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-breadcrumb-list-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: {{ block.settings.item_spacing }}px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: {{ block.settings.font_size }}px;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-breadcrumb-item-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.item_spacing }}px;
+  }
+
+  .ai-breadcrumb-link-{{ ai_gen_id }} {
+    color: {{ block.settings.link_color }};
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .ai-breadcrumb-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+  }
+
+  .ai-breadcrumb-separator-{{ ai_gen_id }} {
+    color: {{ block.settings.separator_color }};
+    font-size: {{ block.settings.font_size }}px;
+  }
+
+  .ai-breadcrumb-active-{{ ai_gen_id }} {
+    color: #000000;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-breadcrumb-{{ ai_gen_id }} {
+      padding: {{ block.settings.padding_top_mobile }}px 0 {{ block.settings.padding_bottom_mobile }}px;
+    }
+
+    .ai-breadcrumb-list-{{ ai_gen_id }} {
+      font-size: {{ block.settings.font_size_mobile }}px;
+    }
+
+    .ai-breadcrumb-separator-{{ ai_gen_id }} {
+      font-size: {{ block.settings.font_size_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+<nav
+  class="ai-breadcrumb-{{ ai_gen_id }}"
+  aria-label="Breadcrumb"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-breadcrumb-container-{{ ai_gen_id }}">
+    <ol class="ai-breadcrumb-list-{{ ai_gen_id }}">
+      <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+        <a
+          href="/"
+          class="ai-breadcrumb-link-{{ ai_gen_id }}"
+        >
+          {{ block.settings.home_text }}
+        </a>
+      </li>
+
+      {% if product %}
+        {% if product.collections.size > 0 %}
+          <li
+            class="ai-breadcrumb-item-{{ ai_gen_id }}"
+            aria-hidden="true"
+          >
+            <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+          </li>
+          <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+            <a
+              href="{{ product.collections.first.url }}"
+              class="ai-breadcrumb-link-{{ ai_gen_id }}"
+            >
+              {{ product.collections.first.title }}
+            </a>
+          </li>
+        {% endif %}
+
+        <li
+          class="ai-breadcrumb-item-{{ ai_gen_id }}"
+          aria-hidden="true"
+        >
+          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        </li>
+        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+          {% if product.metafields.custom.product_category != blank %}
+            <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+              {{ product.metafields.custom.product_category }}
+            </span>
+          {% else %}
+            <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+              {{ product.title }}
+            </span>
+          {% endif %}
+        </li>
+      {% elsif collection %}
+        <li
+          class="ai-breadcrumb-item-{{ ai_gen_id }}"
+          aria-hidden="true"
+        >
+          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        </li>
+        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+          <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+            {{ collection.title }}
+          </span>
+        </li>
+      {% elsif page %}
+        <li
+          class="ai-breadcrumb-item-{{ ai_gen_id }}"
+          aria-hidden="true"
+        >
+          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        </li>
+        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+          <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+            {{ page.title }}
+          </span>
+        </li>
+      {% endif %}
+    </ol>
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Product Breadcrumb",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "home_text",
+      "label": "Home text",
+      "default": "Inicio"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Item spacing",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile top padding",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile bottom padding",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product breadcrumb"
+    }
+  ]
+}
+{% endschema %}

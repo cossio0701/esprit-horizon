@@ -63,6 +63,7 @@
           >
             <legend>
               {{ product_option.name | escape -}}
+              :
               {%- if variant_style == 'swatch' -%}
                 <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
               {%- endif %}
@@ -505,8 +506,8 @@
   }
 
   .variant-option__button-label--has-swatch:hover {
-    outline: var(--focus-outline-width) solid rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
-    outline-offset: var(--focus-outline-offset);
+    /* outline: var(--focus-outline-width) solid rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+    outline-offset: var(--focus-outline-offset); */
   }
 
   .facets__inputs-list--swatches-grid .variant-option__button-label--has-swatch:has(:checked) {
@@ -519,10 +520,12 @@
   }
 
   .variant-option__button-label--has-swatch:has(:checked) {
-    --focus-outline: var(--focus-outline-width) solid var(--color-foreground);
+    /* --focus-outline: var(--focus-outline-width) solid var(--color-foreground);
 
     outline: var(--focus-outline);
-    outline-offset: var(--focus-outline-offset);
+    outline-offset: var(--focus-outline-offset); */
+
+    background-color: red;
   }
 
   /* This triggers iOS < 16.4. The outline bug is not recognized as a lack of @supports */

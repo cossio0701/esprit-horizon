@@ -11,10 +11,22 @@
   {% endif %}
 {% endcapture %}
 
+{% capture video_style_mobile %}
+  {% render 'spacing-style', settings: block_settings %}
+  {% render 'border-override', settings: block_settings %}
+  --size-style-width: {{ block_settings.custom_width }}%; 
+  --size-style-width-mobile: {{ block_settings.custom_width_mobile }}%;
+  --size-style-aspect-ratio: {% if block_settings.source_mobile == 'uploaded' %}{{ block_settings.video_mobile.aspect_ratio | default: 'auto' }}{% elsif block_settings.cover_image_mobile == blank %}{{ block_settings.aspect_ratio }}{% else %}auto{% endif %};
+  {% if block_settings.video_height != 'auto' %}
+    --video-height: {{ block_settings.video_height }};
+  {% endif %}
+{% endcapture %}
+
+{% comment %} Video Desktop {% endcomment %}
 {% if block_settings.source == 'uploaded' %}
   {% render 'video',
     video: block_settings.video,
-    video_class: 'spacing-style size-style border-style video-no-controls',
+    video_class: 'spacing-style size-style border-style video-no-controls video-desktop-only',
     video_loop: block_settings.video_loop,
     video_style: video_style,
     video_preview_image: block_settings.video.preview_image,
@@ -26,7 +38,7 @@
   {% render 'video',
     video_from_url: true,
     video: block_settings.video_url.id,
-    video_class: 'spacing-style size-style border-style video-no-controls',
+    video_class: 'spacing-style size-style border-style video-no-controls video-desktop-only',
     video_type: block_settings.video_url.type,
     video_style: video_style,
     video_alt: block_settings.alt,
@@ -37,9 +49,54 @@
   %}
 {% endif %}
 
+{% comment %} Video Mobile {% endcomment %}
+{% if block_settings.use_mobile_video %}
+  {% if block_settings.source_mobile == 'uploaded' %}
+    {% render 'video',
+      video: block_settings.video_mobile,
+      video_class: 'spacing-style size-style border-style video-no-controls video-mobile-only',
+      video_loop: block_settings.video_loop,
+      video_style: video_style_mobile,
+      video_preview_image: block_settings.video_mobile.preview_image,
+      additional_attributes: block.shopify_attributes,
+      section_id: section.id,
+      disable_controls: true
+    %}
+  {% else %}
+    {% render 'video',
+      video_from_url: true,
+      video: block_settings.video_url_mobile.id,
+      video_class: 'spacing-style size-style border-style video-no-controls video-mobile-only',
+      video_type: block_settings.video_url_mobile.type,
+      video_style: video_style_mobile,
+      video_alt: block_settings.alt_mobile,
+      video_preview_image: block_settings.cover_image_mobile,
+      additional_attributes: block.shopify_attributes,
+      section_id: section.id,
+      disable_controls: true
+    %}
+  {% endif %}
+{% endif %}
+
 {% stylesheet %}
   .placeholder-video {
     aspect-ratio: 5 / 3;
+  }
+  
+  /* Mostrar solo desktop por defecto */
+  .video-mobile-only {
+    display: none !important;
+  }
+  
+  /* En mobile mostrar solo mobile */
+  @media (max-width: 768px) {
+    .video-desktop-only {
+      display: none !important;
+    }
+    
+    .video-mobile-only {
+      display: block !important;
+    }
   }
   
   /* Estilos para altura personalizada */
@@ -172,6 +229,58 @@
       "label": "t:settings.video_alt_text",
       "info": "t:info.video_alt_text",
       "visible_if": "{{ block.settings.source == 'url' }}"
+    },
+    {
+      "type": "header",
+      "content": "Video Mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_mobile_video",
+      "label": "Usar video diferente en mobile",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "source_mobile",
+      "label": "Fuente video mobile",
+      "options": [
+        {
+          "value": "uploaded",
+          "label": "t:options.video_uploaded"
+        },
+        {
+          "value": "url",
+          "label": "t:options.video_external_url"
+        }
+      ],
+      "default": "uploaded",
+      "visible_if": "{{ block.settings.use_mobile_video }}"
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Video mobile",
+      "visible_if": "{{ block.settings.use_mobile_video and block.settings.source_mobile == 'uploaded' }}"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url_mobile",
+      "label": "URL video mobile",
+      "accept": ["youtube", "vimeo"],
+      "visible_if": "{{ block.settings.use_mobile_video and block.settings.source_mobile == 'url' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image_mobile",
+      "label": "Imagen portada mobile",
+      "visible_if": "{{ block.settings.use_mobile_video and block.settings.source_mobile == 'url' }}"
+    },
+    {
+      "type": "text",
+      "id": "alt_mobile",
+      "label": "Texto alternativo mobile",
+      "visible_if": "{{ block.settings.use_mobile_video and block.settings.source_mobile == 'url' }}"
     },
     {
       "type": "header",

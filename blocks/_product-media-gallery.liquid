@@ -1,5 +1,3 @@
-
-
 {% assign block_settings = block.settings %}
 
 {%- if block_settings.zoom -%}
@@ -206,6 +204,7 @@
       object-fit: {{ block_settings.media_fit }};
       width: 100%;
       height: 100%;
+      object-position:top;
     }
 
     /* 3D Models (no object-fit support, just sizing) */
