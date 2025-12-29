@@ -68,6 +68,7 @@
                 <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
               {%- endif %}
             </legend>
+
             {%- for product_option_value in product_option.values -%}
               {% if product_option_value.size > longest_value and option_id_attribute %}
                 {% assign longest_value = product_option_value.size %}
@@ -314,6 +315,7 @@
     white-space: nowrap;
     background-color: var(--color-variant-background);
     color: var(--color-variant-text);
+    width: fit-content;
 
     &:hover,
     &:hover:has([aria-disabled='true']):has([data-option-available='false']) {
@@ -564,7 +566,6 @@
 
     /* set the dimensions to match those of the label */
     inset: 0;
-
     /* hide it */
     opacity: 0;
     margin: 0;

@@ -1,12 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Banner home countdown script loaded");
   const timers = document.querySelectorAll(".banner-home-timer");
 
   if (!timers || timers.length === 0) return;
 
   timers.forEach((el) => {
     const endDateStr = el.getAttribute("data-end-date");
-    console.log(endDateStr, " found end date for timer");
     if (!endDateStr) return;
 
     const endDate = new Date(endDateStr);

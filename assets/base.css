@@ -4291,3 +4291,7 @@ text-component {
     font-size: max(1rem, 100%);
   }
 }
+
+slideshow-slide.hidden {
+  display: none !important;
+}

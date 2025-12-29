@@ -1,0 +1,259 @@
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% assign current_color = current_variant.option1 %}
+{% assign rendered_colors = '' %}
+
+<div class="gallery-main-container">
+  <div class="variant-swipers">
+    {% for variant in product.variants %}
+      {% assign color = variant.option1 %}
+
+      {%- comment -%}
+        Evitar renderizar el mismo color más de una vez
+      {%- endcomment -%}
+      {% unless rendered_colors contains color %}
+        {% assign rendered_colors = rendered_colors | append: color | append: ',' %}
+        {% assign color_gallery = null %}
+
+        {%- comment -%}
+          Buscar UNA galería válida para este color
+        {%- endcomment -%}
+        {% for v in product.variants %}
+          {% if v.option1 == color and v.metafields.custom.gallery.value != blank %}
+            {% assign color_gallery = v.metafields.custom.gallery.value %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+
+        <div
+          class="variant-swiper"
+          data-color="{{ color }}"
+          {% unless color == current_color %}
+            hidden
+          {% endunless %}
+        >
+          {% if color_gallery %}
+            <div class="variant-swiper-layout">
+              <!-- Swiper -->
+              <div class="swiper">
+                <div class="swiper-wrapper">
+                  {% for image in color_gallery %}
+                    <div class="swiper-slide">
+                      <img
+                        src="{{ image | image_url: width: 1200 }}"
+                        alt="{{ product.title }} - {{ color }}"
+                        loading="lazy"
+                      >
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+
+              <!-- Thumbnails -->
+              <div class="variant-thumbs">
+                {% for image in color_gallery %}
+                  <button
+                    class="variant-thumb"
+                    data-index="{{ forloop.index0 }}"
+                  >
+                    <img
+                      src="{{ image | image_url: width: 150 }}"
+                      alt="{{ product.title }} - {{ color }}"
+                      loading="lazy"
+                    >
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <p>No hay galería para el color {{ color }}</p>
+          {% endif %}
+        </div>
+      {% endunless %}
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('variant:update', (event) => {
+    if (!event.detail || !event.detail.resource) return;
+
+    const variant = event.detail.resource;
+    const variantId = String(event.detail.resource.id);
+    document.querySelectorAll('.variant-gallery').forEach((gallery) => {
+      gallery.hidden = gallery.dataset.variantId !== variantId;
+    });
+
+    // Color seleccionado (option1)
+    const selectedColor = variant.option1;
+
+    // Actualizar texto de color
+    const colorEl = document.querySelector('[data-selected-color]');
+    if (colorEl) {
+      colorEl.textContent = selectedColor || '—';
+    }
+
+    // (Opcional) otros textos
+    const skuEl = document.querySelector('[data-selected-sku]');
+    if (skuEl) {
+      skuEl.textContent = variant.sku || 'Sin SKU';
+    }
+  });
+</script>
+
+<script>
+  let activeSwiper = null;
+  let lastColor = null;
+  const slideIndexByColor = {};
+
+  function initSwiper(container, color, startIndex = 0) {
+    const swiperEl = container.querySelector('.swiper');
+    const thumbs = container.querySelectorAll('.variant-thumb');
+
+    if (!swiperEl) return;
+
+    // 🔥 LIMPIEZA TOTAL (clave)
+    thumbs.forEach((t) => t.classList.remove('is-active'));
+
+    activeSwiper = new Swiper(swiperEl, {
+      slidesPerView: 1,
+      spaceBetween: 16,
+      loop: false,
+      initialSlide: startIndex,
+      on: {
+        slideChange(swiper) {
+          slideIndexByColor[color] = swiper.activeIndex;
+
+          thumbs.forEach((t) => t.classList.remove('is-active'));
+          const active = thumbs[swiper.activeIndex];
+          if (active) active.classList.add('is-active');
+        },
+      },
+    });
+
+    // Click thumbs
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const index = Number(thumb.dataset.index);
+        activeSwiper.slideTo(index);
+      });
+    });
+
+    // Estado inicial
+    const initialThumb = thumbs[startIndex];
+    if (initialThumb) initialThumb.classList.add('is-active');
+  }
+
+  function destroySwiper() {
+    if (activeSwiper) {
+      activeSwiper.destroy(true, true);
+      activeSwiper = null;
+    }
+  }
+
+  function showColorSwiper(color) {
+    document.querySelectorAll('.variant-swiper').forEach((block) => {
+      const isActive = block.dataset.color === color;
+      block.hidden = !isActive;
+
+      if (isActive) {
+        const startIndex = slideIndexByColor[color] !== undefined ? slideIndexByColor[color] : 0;
+
+        destroySwiper();
+        initSwiper(block, color, startIndex);
+
+        lastColor = color;
+      }
+    });
+  }
+
+  document.addEventListener('variant:update', (event) => {
+    const variant = event.detail?.resource;
+    if (!variant) return;
+
+    showColorSwiper(variant.option1);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const initial = document.querySelector('.variant-swiper:not([hidden])');
+    if (!initial) return;
+
+    const color = initial.dataset.color;
+    slideIndexByColor[color] = 0;
+
+    initSwiper(initial, color, 0);
+    lastColor = color;
+  });
+</script>
+
+<style>
+  .gallery-main-container {
+    width: 100%;
+  }
+
+  .swiper {
+    width: 100%;
+    height: 100%;
+  }
+  .variant-swiper-layout {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .variant-thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .variant-thumb {
+    padding: 0;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+  }
+
+  .variant-thumb img {
+    width: 100%;
+    display: block;
+  }
+
+  .variant-thumb.is-active {
+    border-color: #000;
+  }
+
+  @media (max-width: 768px) {
+    .variant-swiper-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .variant-thumbs {
+      flex-direction: row;
+      order: 2;
+      overflow-x: auto;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Galería de Variantes",
+  "tag": "section",
+  "class": "section-variant-gallery",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Configuración de la Galería"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Galería de Variantes Personalizada"
+    }
+  ]
+}
+{% endschema %}
