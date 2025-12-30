@@ -45,6 +45,11 @@
     if is_rte
       echo ' rte '
     endif
+    
+    # Agregar clase especial si tiene padding mobile personalizado
+    if block_settings.use_mobile_padding
+      echo ' has-mobile-padding '
+    endif
   endcapture
 %}
 
@@ -55,6 +60,12 @@
 
   style="
     {% render 'spacing-padding', settings: block_settings %}
+    {% if block_settings.use_mobile_padding %}
+      --padding-block-start-mobile: {{ block_settings['padding-block-start-mobile'] }}px;
+      --padding-block-end-mobile: {{ block_settings['padding-block-end-mobile'] }}px;
+      --padding-inline-start-mobile: {{ block_settings['padding-inline-start-mobile'] }}px;
+      --padding-inline-end-mobile: {{ block_settings['padding-inline-end-mobile'] }}px;
+    {% endif %}
     {% render 'typography-style', settings: block_settings %}
     --width: {{ text_width }};
     --max-width: var(--max-width--{{ type }}-{{ block_settings.max_width }});
@@ -214,5 +225,22 @@
   .custom-color,
   .custom-color > :is(h1, h2, h3, h4, h5, h6, p, *) {
     color: var(--color);
+  }
+
+  /* PADDING MOBILE - NUEVO */
+  @media screen and (max-width: 749px) {
+    .text-block.has-mobile-padding {
+      padding-block-start: var(--padding-block-start-mobile, var(--padding-block-start, 0)) !important;
+      padding-block-end: var(--padding-block-end-mobile, var(--padding-block-end, 0)) !important;
+      padding-inline-start: var(--padding-inline-start-mobile, var(--padding-inline-start, 0)) !important;
+      padding-inline-end: var(--padding-inline-end-mobile, var(--padding-inline-end, 0)) !important;
+    }
+
+    .text-block--background.has-mobile-padding {
+      padding-block-start: max(var(--text-padding), var(--padding-block-start-mobile, var(--padding-block-start, 0))) !important;
+      padding-block-end: max(var(--text-padding), var(--padding-block-end-mobile, var(--padding-block-end, 0))) !important;
+      padding-inline-start: max(var(--text-padding), var(--padding-inline-start-mobile, var(--padding-inline-start, 0))) !important;
+      padding-inline-end: max(var(--text-padding), var(--padding-inline-end-mobile, var(--padding-inline-end, 0))) !important;
+    }
   }
 {% endstylesheet %}
