@@ -85,6 +85,7 @@
                     {% if product_option_value.available == false %}
                       aria-disabled="true"
                     {% endif %}
+
                     data-previous-checked="false"
                     data-fieldset-index="{{ fieldset_index }}"
                     data-input-index="{{ forloop.index0 }}"
@@ -119,12 +120,30 @@
                       mode: 'unscaled'
                     %}
                   {% else %}
-                    {% if product_option_value.available == true %}
-                      <span class="variant-option__button-label__pill"></span>
-                    {% endif %}
-                    <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+                    <div class="size-container">
+                      {% if product_option_value.available == true %}
+                        <span class="variant-option__button-label__pill"></span>
+                      {% endif %}
+                      <div class="size-text">
+                        <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+                        {% render 'strikethrough-variant', product_option: product_option_value %}
+                      </div>
+                      {% if product_option_value.available == false %}
+                        <span class="variant-tooltip">
+                          <svg
+                            width="12"
+                            height="13"
+                            viewBox="0 0 12 13"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M7.83333 9.83334H11.1667L10.23 8.89671C9.97603 8.6427 9.83333 8.29819 9.83333 7.93897V5.83334C9.83333 4.09171 8.72026 2.61006 7.16667 2.06094V1.83333C7.16667 1.09695 6.56971 0.5 5.83333 0.5C5.09695 0.5 4.5 1.09695 4.5 1.83333V2.06094C2.94641 2.61006 1.83333 4.09171 1.83333 5.83334V7.93897C1.83333 8.29819 1.69063 8.6427 1.43662 8.89671L0.5 9.83334H3.83333M7.83333 9.83334V10.5C7.83333 11.6046 6.9379 12.5 5.83333 12.5C4.72876 12.5 3.83333 11.6046 3.83333 10.5V9.83334M7.83333 9.83334H3.83333" stroke="#0F0A05" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          <span class="variant-tooltip__text"> Esta talla no está disponible actualmente </span>
+                        </span>
+                      {% endif %}
+                    </div>
                   {% endif %}
-                  {% render 'strikethrough-variant', product_option: product_option_value %}
                 </label>
               {%- endfor -%}
             </div>
@@ -340,15 +359,15 @@
     /* ::after is the unavailable variant border that clips in */
     &:not(.variant-option__button-label--has-swatch)::before,
     &:has([data-option-available='false']):not(.variant-option__button-label--has-swatch)::after {
-      content: '';
+      /* content: '';
       position: absolute;
       inset: 0;
       border: var(--options-border-width) solid var(--color-selected-variant-border);
       border-radius: inherit;
       pointer-events: none;
-      z-index: 2;
+      z-index: 2; */
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-      clip-path: inset(var(--clip, 0 0 0 0));
+      /* clip-path: inset(var(--clip, 0 0 0 0)); */
     }
     &:has([data-option-available='false']):not(.variant-option__button-label--has-swatch)::before {
       inset: 0;
@@ -356,7 +375,7 @@
     &:not(.variant-option__button-label--has-swatch)::before {
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
       clip-path: inset(0 0 0 0);
-      border-color: var(--color-variant-border);
+      border: none;
       inset: calc(var(--options-border-width) * -1);
     }
     &:has(:checked):not(.variant-option__button-label--has-swatch):not(:has([data-option-available='false']))::before {
@@ -448,7 +467,6 @@
     grid-template-columns: repeat(auto-fit, minmax(var(--variant-min-width), 1fr));
 
     .variant-option__button-label {
-      position: relative;
       padding: 0;
       flex: none;
       min-height: auto;
@@ -456,9 +474,10 @@
       border: none;
       border-radius: 0;
       font-size: 16px;
+      overflow: visible;
     }
 
-    .variant-option__button-label::after {
+    .size-text::after {
       content: '';
       position: absolute;
       width: 0%;
@@ -507,10 +526,6 @@
   .variant-option__button-label:has(:checked)::after {
     width: 100%;
     /* border-color: var(--color-selected-variant-border); */
-  }
-
-  .variant-option__button-label:hover::after {
-    width: 100%;
   }
 
   .variant-option__button-label:has(:checked):hover {
@@ -627,16 +642,44 @@
     height: 100%;
   }
 
+  .variant-option__button-label .size-container {
+    display: flex;
+    align-items: center;
+  }
+  .variant-option__button-label .size-container .size-text {
+    position: relative;
+    width: 20px;
+  }
+
+  .size-text .variant-option__button-label__text {
+    width: 100%;
+    display: block;
+  }
+
   .variant-option__button-label svg {
     position: absolute;
     left: var(--options-border-width);
     top: var(--options-border-width);
-    height: calc(100% - (var(--options-border-width) * 2));
     width: calc(100% - (var(--options-border-width) * 2));
-    cursor: pointer;
+    height: calc(100% - (var(--options-border-width) * 2));
     pointer-events: none;
-    stroke-width: var(--style-border-width);
+  }
+
+  .variant-option__button-label svg line {
     stroke: var(--variant-picker-stroke-color);
+    stroke-width: var(--style-border-width);
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+
+    stroke-dasharray: 150;
+    stroke-dashoffset: 150;
+    animation: slashIn 0.25s ease-out forwards;
+  }
+
+  @keyframes slashIn {
+    to {
+      stroke-dashoffset: 0;
+    }
   }
 
   .variant-option__button-label:not(.variant-option__button-label--has-swatch) svg {
@@ -648,8 +691,7 @@
 
     line:last-of-type {
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-      clip-path: inset(var(--clip, 0 0 0 0));
-      stroke: rgb(var(--color-variant-text-rgb) / 1);
+      stroke: #949494;
     }
   }
 
@@ -720,5 +762,9 @@
   .variant-picker--right .variant-option {
     text-align: right;
     justify-content: right;
+  }
+
+  .size-text:hover::after {
+    width: 100%;
   }
 {% endstylesheet %}

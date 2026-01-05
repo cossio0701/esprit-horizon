@@ -4031,6 +4031,10 @@ slideshow-arrows .slideshow-control.slideshow-control--style-none {
   width: 100%;
 }
 
+.product-details .group-block-content {
+  gap: 12px;
+}
+
 /* Container styles */
 .section-content-wrapper.section-content-wrapper:where(.layout-panel-flex) .group-block--fill {
   flex: 1;
@@ -4258,6 +4262,38 @@ text-component {
   z-index: auto;
   transform: none;
   box-shadow: none;
+}
+
+.variant-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 1px;
+  color: #c00;
+  cursor: default;
+  width: 17px;
+  height: 19px;
+  margin-top: -2px;
+}
+
+.variant-tooltip__text {
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.variant-tooltip:hover .variant-tooltip__text {
+  opacity: 1;
 }
 
 /* Prevent iOS zoom on input focus by ensuring minimum 16px font size on mobile */
