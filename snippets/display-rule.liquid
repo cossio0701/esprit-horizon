@@ -1,0 +1,23 @@
+{%- comment -%} Snippet to check display rule based on current URL {%- endcomment -%}
+{%- assign current_path = request.path -%}
+{%- if display_rule == 'all_store' -%}
+  {% echo 'true' %}
+{%- elsif display_rule == 'exclude_urls' -%}
+  {%- assign show = true -%}
+  {%- for url in urls -%}
+    {%- if current_path == url -%}
+      {%- assign show = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ show }}
+{%- elsif display_rule == 'only_urls' -%}
+  {%- assign show = false -%}
+  {%- for url in urls -%}
+    {%- if current_path == url -%}
+      {%- assign show = true -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ show }}
+{%- else -%}
+  {% echo 'false' %}
+{%- endif -%}
