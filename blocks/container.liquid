@@ -1,0 +1,80 @@
+{% comment %}
+  Block: Container
+  Componente contenedor simple que permite agrupar bloques dentro de un div con clase CSS personalizable.
+  Útil para crear layouts y estructuras reutilizables en el tema.
+{% endcomment %}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES (Facade Pattern)
+  ============================================
+{%- endcomment -%}
+
+{%- liquid
+  # Capturar los bloques hijos
+  capture children
+    content_for 'blocks'
+  endcapture
+
+  # Obtener la clase CSS personalizada del schema
+  assign container_class = block.settings.container_class | default: 'container'
+
+  # Verificar si hay contenido para renderizar
+  assign has_content = false
+  assign trimmed_children = children | strip
+  if trimmed_children != blank
+    assign has_content = true
+  endif
+-%}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 2: HTML/ESTRUCTURA
+  ============================================
+{%- endcomment -%}
+
+{% if has_content %}
+  <div class="{{ container_class }}" {{ block.shopify_attributes }}>
+    {{ children }}
+  </div>
+{% endif %}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 3: SCHEMA
+  ============================================
+{%- endcomment -%}
+
+{% schema %}
+{
+  "name": "Container",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "container_class",
+      "label": "CSS Class",
+      "default": "container",
+      "info": "Clase CSS que se aplicará al contenedor. Puedes usar múltiples clases separadas por espacios (ej: 'container mx-auto px-4')."
+    },
+    {
+      "type": "paragraph",
+      "content": "Este bloque actúa como contenedor para otros bloques. Agrega bloques dentro de este para crear estructuras personalizadas."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Container",
+      "category": "Layout"
+    }
+  ]
+}
+{% endschema %}
