@@ -15,9 +15,8 @@
 {% capture children %}
   {% unless closest.product == blank %}
     {% render 'product-card-badges', product: closest.product, settings: settings %}
-    {%  if settings.quick_add or settings.mobile_quick_add %}
-      {% render 'quick-add', product: closest.product, section_id: section.id %}
-    {% endif %}
+    {%- comment -%} Custom Quick Add with hover effect {%- endcomment -%}
+    {% render 'quick-add-custom', product: closest.product, section_id: section.id, block: block %}
   {% endunless %}
 {% endcapture %}
 
