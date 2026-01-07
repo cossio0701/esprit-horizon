@@ -101,6 +101,51 @@
     "scheduled_images_rLkyBn": {
       "type": "scheduled-images",
       "blocks": {
+        "scheduled_image_ypRjmp": {
+          "type": "scheduled-image",
+          "name": "Black",
+          "settings": {
+            "date_ranges": "listado-fechas",
+            "desktop_image": "shopify://shop_images/desktop_image-CarritoDesktop_20241130-1765989592351-212c615c.jpg",
+            "mobile_image": "shopify://shop_images/mobile_image-20240817_LandingMobile-1764194208709-10ce97a1.jpg",
+            "image_alt": "",
+            "link_url": "",
+            "link_new_tab": false,
+            "url_mode": "exclude",
+            "url_list": "/sale"
+          },
+          "blocks": {}
+        },
+        "scheduled_image_pLkzc3": {
+          "type": "scheduled-image",
+          "name": "Imagen responsive",
+          "settings": {
+            "date_ranges": "list-date-range-kvepecau",
+            "desktop_image": "shopify://shop_images/mobile_image-BANNER_3-1764875020693-faa19e8b.jpg",
+            "mobile_image": "shopify://shop_images/desktop_image-BANNER_2-1764875011090-341065d7.jpg",
+            "image_alt": "test",
+            "link_url": "shopify://collections/sale1",
+            "link_new_tab": false,
+            "url_mode": "all",
+            "url_list": "/sale\n/black"
+          },
+          "blocks": {}
+        },
+        "scheduled_image_PpVfEX": {
+          "type": "scheduled-image",
+          "name": "Imagen responsive",
+          "settings": {
+            "date_ranges": "sale",
+            "desktop_image": "shopify://shop_images/mobile_image-BANNER_3-1764875020693-faa19e8b.jpg",
+            "mobile_image": "shopify://shop_images/desktop_image-BANNER_2-1764875011090-341065d7.jpg",
+            "image_alt": "test",
+            "link_url": "shopify://collections/sale",
+            "link_new_tab": false,
+            "url_mode": "include",
+            "url_list": "/sale\n/hot-sale"
+          },
+          "blocks": {}
+        },
         "scheduled_image_hwfA4j": {
           "type": "scheduled-image",
           "name": "Black",
@@ -132,10 +177,13 @@
         }
       },
       "block_order": [
+        "scheduled_image_ypRjmp",
+        "scheduled_image_pLkzc3",
+        "scheduled_image_PpVfEX",
         "scheduled_image_hwfA4j",
         "scheduled_image_KAQFWX"
       ],
-      "name": "Imagenes programadas",
+      "name": "Banner landing",
       "settings": {}
     },
     "main": {

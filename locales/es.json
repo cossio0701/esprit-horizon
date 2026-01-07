@@ -77,7 +77,7 @@
     "clear_all": "Borrar todo",
     "remove": "Eliminar",
     "view_in_your_space": "Ver en tu espacio",
-    "show_filters": "Filtro",
+    "show_filters": "Filtrar",
     "clear": "Borrar",
     "continue_shopping": "Seguir comprando",
     "log_in_html": "¿Tienes una cuenta? <a href=\"{{ link }}\">Inicia sesión</a> para pagar más rápido.",
@@ -150,6 +150,7 @@
     "product_badge_sold_out": "Agotado",
     "product_badge_sale": "Oferta",
     "grid_view": {
+      "label": "Vista",
       "default_view": "Predeterminado",
       "grid_fieldset": "Columna de cuadrícula",
       "single_item": "Única",
@@ -179,7 +180,7 @@
     "product_count": "Recuento de productos",
     "item_count": {
       "one": "{{ count }} artículo",
-      "other": "{{ count }} artículos",
+      "other": "{{ count }} productos",
       "many": "{{ count }} artículos"
     },
     "errors": "Errores",

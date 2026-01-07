@@ -1,0 +1,27 @@
+{%- doc -%}
+  Block for custom quick add with inline size and color selectors.
+  Use this block in product cards to add the fashion-style quick add below the image.
+{%- enddoc -%}
+
+{% unless closest.product == blank %}
+  {% render 'quick-add-custom', product: closest.product, section_id: section.id, block: block %}
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Quick Add Custom",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Adds an inline quick add with size and color selectors below the product image."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quick Add Custom",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

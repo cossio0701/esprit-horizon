@@ -1,0 +1,734 @@
+{%- doc -%}
+  Custom Quick Add component with inline size and color selectors.
+  Displays over the product image with variant selection and direct add to cart.
+  Fully integrated with Horizon theme color schemes (dark/light mode support).
+
+  @param {object} product - The product object
+  @param {string} section_id - The section ID
+  @param {object} [block] - The block object
+{%- enddoc -%}
+
+{% liquid
+  assign product_form_id = 'QuickAddCustom-' | append: product.id | append: '-' | append: block.id
+
+  # Get available options
+  assign size_option = null
+  assign color_option = null
+  assign size_option_index = nil
+  assign color_option_index = nil
+
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'size' or option_name_lower == 'talla' or option_name_lower == 'talle'
+      assign size_option = option
+      assign size_option_index = forloop.index0
+    elsif option_name_lower == 'color' or option_name_lower == 'colour'
+      assign color_option = option
+      assign color_option_index = forloop.index0
+    endif
+  endfor
+
+  # Get default variant
+  assign default_variant = product.selected_or_first_available_variant
+  assign has_multiple_variants = false
+  if product.variants.size > 1
+    assign has_multiple_variants = true
+  endif
+
+  # Get the color scheme from settings (same as quick-add.liquid)
+  assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
+%}
+
+<quick-add-custom-component
+  class="quick-add-custom color-{{ quick_add_color_scheme }}"
+  data-product-id="{{ product.id }}"
+  data-product-url="{{ product.url }}"
+  data-section-id="{{ section_id }}"
+>
+  <div class="quick-add-custom__inner">
+    {%- if has_multiple_variants -%}
+      {%- comment -%} Size Selector {%- endcomment -%}
+      {%- if size_option -%}
+        <div class="quick-add-custom__sizes" data-option-index="{{ size_option_index }}">
+          {%- for value in size_option.values -%}
+            {% liquid
+              assign size_available = false
+              for variant in product.variants
+                assign variant_size = variant.options[size_option_index]
+                if variant_size == value and variant.available
+                  assign size_available = true
+                  break
+                endif
+              endfor
+            %}
+            <button
+              type="button"
+              class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
+              data-option-value="{{ value }}"
+              data-option-index="{{ size_option_index }}"
+              {% unless size_available %}disabled{% endunless %}
+              aria-label="{{ value }}"
+            >
+              {{ value }}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Color Selector {%- endcomment -%}
+      {%- if color_option -%}
+        <div class="quick-add-custom__colors" data-option-index="{{ color_option_index }}">
+          {%- for value in color_option.values -%}
+            {% liquid
+              assign color_available = false
+              assign swatch_color = value.swatch.color
+              assign swatch_image = value.swatch.image
+
+              for variant in product.variants
+                assign variant_color = variant.options[color_option_index]
+                if variant_color == value and variant.available
+                  assign color_available = true
+                  break
+                endif
+              endfor
+            %}
+            <button
+              type="button"
+              class="quick-add-custom__color-btn{% if forloop.first %} is-selected{% endif %}{% unless color_available %} is-unavailable{% endunless %}"
+              data-option-value="{{ value }}"
+              data-option-index="{{ color_option_index }}"
+              {% unless color_available %}disabled{% endunless %}
+              aria-label="{{ value }}"
+              style="
+                {%- if swatch_image -%}
+                  background-image: url('{{ swatch_image | image_url: width: 50 }}');
+                {%- elsif swatch_color -%}
+                  background-color: {{ swatch_color }};
+                {%- else -%}
+                  background-color: {{ value | handleize | replace: '-', '' }};
+                {%- endif -%}
+              "
+              title="{{ value }}"
+            >
+              <span class="visually-hidden">{{ value }}</span>
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- comment -%} Add to Cart Button {%- endcomment -%}
+    <div class="quick-add-custom__action">
+      <form
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        id="{{ product_form_id }}"
+        class="quick-add-custom__form"
+        data-type="add-to-cart-form"
+      >
+        <input type="hidden" name="id" value="{{ default_variant.id }}" data-variant-input>
+        <input type="hidden" name="quantity" value="1">
+
+        <button
+          type="submit"
+          class="quick-add-custom__submit"
+          {% unless default_variant.available %}disabled{% endunless %}
+          data-add-to-cart-btn
+        >
+          <span class="quick-add-custom__submit-text" data-btn-text>
+            {%- if default_variant.available -%}
+              Agregar a la bolsa
+            {%- else -%}
+              Agotado
+            {%- endif -%}
+          </span>
+          <span class="quick-add-custom__submit-arrow">→</span>
+        </button>
+      </form>
+
+      <div class="quick-add-custom__feedback" data-feedback hidden>
+        <span data-feedback-text></span>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} Variants JSON for JavaScript {%- endcomment -%}
+  <script type="application/json" data-variants-json>
+    [
+      {%- for variant in product.variants -%}
+        {
+          "id": {{ variant.id }},
+          "available": {{ variant.available }},
+          "options": {{ variant.options | json }},
+          "title": {{ variant.title | json }},
+          "price": {{ variant.price }},
+          "compare_at_price": {{ variant.compare_at_price | default: 'null' }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+</quick-add-custom-component>
+
+{% stylesheet %}
+  /* =====================================================
+     Quick Add Custom - Horizon Theme Color System
+     Uses theme color variables for full dark/light mode support
+     ===================================================== */
+
+  .quick-add-custom {
+    /* Container positioning - inside card-gallery */
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: var(--padding-sm);
+    z-index: var(--layer-raised);
+
+    /* Theme colors - from color scheme class */
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+
+    /* Padding using theme variables */
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius);
+
+    /* Shadow for depth */
+    box-shadow: var(--shadow-popover);
+
+    /* Hidden by default - show on hover */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+      opacity var(--animation-speed, 0.2s) ease,
+      transform var(--animation-speed, 0.2s) ease,
+      visibility var(--animation-speed, 0.2s) ease;
+    pointer-events: none;
+  }
+
+  /* Show on hover of card-gallery (parent container) */
+  .card-gallery:hover .quick-add-custom,
+  .card-gallery:focus-within .quick-add-custom,
+  .quick-add-custom:hover,
+  .quick-add-custom.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  /* Mobile: always show (no hover on touch devices) */
+  @media (hover: none) {
+    .quick-add-custom {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+  }
+
+  .quick-add-custom__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+  }
+
+  /* =====================================================
+     Size Selector - Minimal text-only style
+     ===================================================== */
+  .quick-add-custom__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .quick-add-custom__size-btn {
+    /* Reset - no background, no border, no box */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+
+    /* Typography - clean editorial style */
+    font-family: var(--font-body--family);
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+
+    /* Muted color by default */
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+
+    cursor: pointer;
+  }
+
+  .quick-add-custom__size-btn:hover:not(.is-unavailable):not(.is-selected) {
+    color: var(--color-foreground);
+  }
+
+  .quick-add-custom__size-btn.is-selected {
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  .quick-add-custom__size-btn.is-unavailable {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  /* =====================================================
+     Color Selector - Small squares with outline
+     ===================================================== */
+  .quick-add-custom__colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .quick-add-custom__color-btn {
+    /* Small square */
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+
+    /* Subtle border */
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+
+    padding: 0;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+
+    /* No outline by default */
+    outline: none;
+    outline-offset: 2px;
+  }
+
+  .quick-add-custom__color-btn.is-selected {
+    /* Selected state - outline only */
+    outline: 1px solid var(--color-foreground);
+  }
+
+  .quick-add-custom__color-btn.is-unavailable {
+    opacity: var(--opacity-35-55);
+    cursor: not-allowed;
+  }
+
+  .quick-add-custom__color-btn.is-unavailable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -1px;
+    right: -1px;
+    height: 1px;
+    background-color: var(--color-foreground);
+    transform: rotate(-45deg);
+  }
+
+  /* =====================================================
+     Action Button - Theme link style
+     ===================================================== */
+  .quick-add-custom__action {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: var(--gap-2xs);
+    position: relative;
+  }
+
+  .quick-add-custom__form {
+    display: contents;
+  }
+
+  .quick-add-custom__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    background: transparent;
+    border: none;
+    padding: var(--padding-2xs) 0;
+
+    /* Typography using theme */
+    font-family: var(--font-body--family);
+    font-size: var(--font-size--sm, 12px);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+
+    /* Use primary color for link-style button */
+    color: var(--color-primary);
+
+    cursor: pointer;
+    transition: color var(--animation-speed, 0.2s) ease;
+    text-decoration: none;
+  }
+
+  .quick-add-custom__submit:hover:not(:disabled) {
+    color: var(--color-primary-hover);
+  }
+
+  .quick-add-custom__submit:disabled {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+    cursor: not-allowed;
+  }
+
+  .quick-add-custom__submit-arrow {
+    transition: transform var(--animation-speed, 0.2s) ease;
+  }
+
+  .quick-add-custom__submit:hover:not(:disabled) .quick-add-custom__submit-arrow {
+    transform: translateX(4px);
+  }
+
+  /* =====================================================
+     Feedback Message
+     ===================================================== */
+  .quick-add-custom__feedback {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-body--family);
+    font-size: var(--font-size--xs, 11px);
+    color: var(--color-foreground-muted);
+  }
+
+  .quick-add-custom__feedback[hidden] {
+    display: none;
+  }
+
+  /* =====================================================
+     Component States
+     ===================================================== */
+  .quick-add-custom.needs-selection .quick-add-custom__submit {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+  }
+
+  .quick-add-custom.is-loading .quick-add-custom__submit-text {
+    opacity: var(--opacity-40-60);
+  }
+
+  .quick-add-custom.is-added .quick-add-custom__submit-text::after {
+    content: ' ✓';
+  }
+
+  /* =====================================================
+     Responsive Adjustments
+     ===================================================== */
+  @media screen and (max-width: 749px) {
+    .quick-add-custom {
+      margin: var(--padding-xs);
+      padding: var(--padding-xs) var(--padding-sm);
+    }
+
+    .quick-add-custom__inner {
+      gap: var(--gap-xs);
+    }
+
+    .quick-add-custom__size-btn {
+      font-size: 10px;
+    }
+
+    .quick-add-custom__color-btn {
+      width: 14px;
+      height: 14px;
+    }
+
+    .quick-add-custom__submit {
+      font-size: 11px;
+    }
+  }
+
+  /* Container query for very small cards */
+  @container card-gallery-container (max-width: 200px) {
+    .quick-add-custom__sizes {
+      gap: 8px;
+    }
+
+    .quick-add-custom__size-btn {
+      font-size: 9px;
+    }
+
+    .quick-add-custom__colors {
+      gap: 4px;
+    }
+
+    .quick-add-custom__color-btn {
+      width: 12px;
+      height: 12px;
+    }
+
+    .quick-add-custom__submit {
+      font-size: 10px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+class QuickAddCustomComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.variants = [];
+    this.selectedOptions = {};
+    this.form = null;
+    this.variantInput = null;
+    this.submitBtn = null;
+    this.btnText = null;
+    this.feedback = null;
+    this.feedbackText = null;
+  }
+
+  connectedCallback() {
+    this.init();
+  }
+
+  init() {
+    // Parse variants JSON
+    const variantsJson = this.querySelector('[data-variants-json]');
+    if (variantsJson) {
+      try {
+        this.variants = JSON.parse(variantsJson.textContent);
+      } catch (e) {
+        console.error('Failed to parse variants JSON:', e);
+      }
+    }
+
+    // Cache DOM elements
+    this.form = this.querySelector('[data-type="add-to-cart-form"]');
+    this.variantInput = this.querySelector('[data-variant-input]');
+    this.submitBtn = this.querySelector('[data-add-to-cart-btn]');
+    this.btnText = this.querySelector('[data-btn-text]');
+    this.feedback = this.querySelector('[data-feedback]');
+    this.feedbackText = this.querySelector('[data-feedback-text]');
+
+    // Initialize selected options from first available or first option
+    this.initializeSelectedOptions();
+
+    // Bind events
+    this.bindEvents();
+  }
+
+  initializeSelectedOptions() {
+    // Get all option buttons and select the first one of each type
+    const sizeContainer = this.querySelector('.quick-add-custom__sizes');
+    const colorContainer = this.querySelector('.quick-add-custom__colors');
+
+    if (sizeContainer) {
+      const firstSize = sizeContainer.querySelector('.quick-add-custom__size-btn.is-selected');
+      if (firstSize) {
+        const index = firstSize.dataset.optionIndex;
+        this.selectedOptions[index] = firstSize.dataset.optionValue;
+      }
+    }
+
+    if (colorContainer) {
+      const firstColor = colorContainer.querySelector('.quick-add-custom__color-btn.is-selected');
+      if (firstColor) {
+        const index = firstColor.dataset.optionIndex;
+        this.selectedOptions[index] = firstColor.dataset.optionValue;
+      }
+    }
+
+    // Update variant based on initial selection
+    this.updateVariant();
+  }
+
+  bindEvents() {
+    // Prevent clicks inside quick-add from navigating to product
+    // Only stop propagation, not default (so form submit works)
+    this.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Size buttons
+    const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleOptionClick(e));
+    });
+
+    // Color buttons
+    const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
+    colorBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleOptionClick(e));
+    });
+
+    // Form submit
+    if (this.form) {
+      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+    }
+  }
+
+  handleOptionClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const btn = event.currentTarget;
+    if (btn.disabled) return;
+
+    const optionIndex = btn.dataset.optionIndex;
+    const optionValue = btn.dataset.optionValue;
+
+    // Update selection in same group
+    const container = btn.parentElement;
+    container.querySelectorAll('button').forEach(b => b.classList.remove('is-selected'));
+    btn.classList.add('is-selected');
+
+    // Update selected options
+    this.selectedOptions[optionIndex] = optionValue;
+
+    // Update variant
+    this.updateVariant();
+
+    // Update availability of other options
+    this.updateOptionAvailability();
+  }
+
+  updateVariant() {
+    // Find matching variant
+    const matchingVariant = this.variants.find(variant => {
+      return Object.keys(this.selectedOptions).every(index => {
+        return variant.options[parseInt(index)] === this.selectedOptions[index];
+      });
+    });
+
+    if (matchingVariant) {
+      this.variantInput.value = matchingVariant.id;
+
+      if (matchingVariant.available) {
+        this.submitBtn.disabled = false;
+        this.btnText.textContent = 'Agregar a la bolsa';
+        this.classList.remove('needs-selection');
+      } else {
+        this.submitBtn.disabled = true;
+        this.btnText.textContent = 'Agotado';
+      }
+    } else {
+      // No matching variant - likely need to select more options
+      this.classList.add('needs-selection');
+    }
+  }
+
+  updateOptionAvailability() {
+    // Update size availability based on selected color
+    const colorIndex = this.querySelector('.quick-add-custom__colors')?.dataset.optionIndex;
+    const sizeIndex = this.querySelector('.quick-add-custom__sizes')?.dataset.optionIndex;
+
+    if (colorIndex !== undefined && sizeIndex !== undefined) {
+      const selectedColor = this.selectedOptions[colorIndex];
+
+      // Update size buttons
+      const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
+      sizeBtns.forEach(btn => {
+        const sizeValue = btn.dataset.optionValue;
+
+        // Check if this size is available with the selected color
+        const isAvailable = this.variants.some(variant => {
+          return variant.options[parseInt(sizeIndex)] === sizeValue &&
+                 variant.options[parseInt(colorIndex)] === selectedColor &&
+                 variant.available;
+        });
+
+        btn.classList.toggle('is-unavailable', !isAvailable);
+        btn.disabled = !isAvailable;
+      });
+
+      // Similarly update color buttons based on selected size
+      const selectedSize = this.selectedOptions[sizeIndex];
+      const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
+      colorBtns.forEach(btn => {
+        const colorValue = btn.dataset.optionValue;
+
+        const isAvailable = this.variants.some(variant => {
+          return variant.options[parseInt(colorIndex)] === colorValue &&
+                 variant.options[parseInt(sizeIndex)] === selectedSize &&
+                 variant.available;
+        });
+
+        btn.classList.toggle('is-unavailable', !isAvailable);
+        btn.disabled = !isAvailable;
+      });
+    }
+  }
+
+  async handleSubmit(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Validate selection
+    if (!this.variantInput.value || this.submitBtn.disabled) {
+      this.showFeedback('Selecciona talla y color');
+      return;
+    }
+
+    // Show loading state
+    this.classList.add('is-loading');
+    const originalText = this.btnText.textContent;
+    this.btnText.textContent = 'Agregando...';
+
+    try {
+      const formData = new FormData(this.form);
+
+      const response = await fetch(window.Shopify?.routes?.root + 'cart/add.js', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Success
+        this.classList.remove('is-loading');
+        this.classList.add('is-added');
+        this.btnText.textContent = 'Agregado';
+
+        // Dispatch cart update event for other components
+        document.dispatchEvent(new CustomEvent('cart:updated', {
+          detail: { item: result }
+        }));
+
+        // Also dispatch the theme's native event if available
+        if (window.Theme?.events?.cartAdd) {
+          document.dispatchEvent(new CustomEvent(window.Theme.events.cartAdd, {
+            detail: { data: result }
+          }));
+        }
+
+        // Reset after delay
+        setTimeout(() => {
+          this.classList.remove('is-added');
+          this.btnText.textContent = originalText;
+        }, 2000);
+      } else {
+        // Error
+        this.classList.remove('is-loading');
+        this.btnText.textContent = originalText;
+        this.showFeedback(result.message || 'Error al agregar');
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      this.classList.remove('is-loading');
+      this.btnText.textContent = originalText;
+      this.showFeedback('Error de conexión');
+    }
+  }
+
+  showFeedback(message) {
+    if (this.feedback && this.feedbackText) {
+      this.feedbackText.textContent = message;
+      this.feedback.hidden = false;
+
+      setTimeout(() => {
+        this.feedback.hidden = true;
+      }, 3000);
+    }
+  }
+}
+
+if (!customElements.get('quick-add-custom-component')) {
+  customElements.define('quick-add-custom-component', QuickAddCustomComponent);
+}
+{% endjavascript %}
