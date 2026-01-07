@@ -253,7 +253,7 @@
 
     /* Typography - clean editorial style */
     font-family: var(--font-body--family);
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1;
@@ -291,8 +291,8 @@
 
   .quick-add-custom__color-btn {
     /* Small square */
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     border-radius: 0;
 
     /* Subtle border */
@@ -538,6 +538,12 @@ class QuickAddCustomComponent extends HTMLElement {
   }
 
   bindEvents() {
+    // Prevent clicks inside quick-add from navigating to product
+    // Only stop propagation, not default (so form submit works)
+    this.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
     // Size buttons
     const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
     sizeBtns.forEach(btn => {
