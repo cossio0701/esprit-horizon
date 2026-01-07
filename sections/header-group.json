@@ -115,6 +115,10 @@
     "17647741440935b179": {
       "type": "_blocks",
       "blocks": {
+        "commons_components_floating_banner_DGPadU": {
+          "type": "shopify://apps/commons-components/blocks/floating-banner/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+          "settings": {}
+        },
         "commons_components_header_complete_zqNcma": {
           "type": "shopify://apps/commons-components/blocks/header-complete/019a5fb5-0369-7d7a-9e19-07bacb81690d",
           "settings": {
@@ -127,6 +131,7 @@
         }
       },
       "block_order": [
+        "commons_components_floating_banner_DGPadU",
         "commons_components_header_complete_zqNcma"
       ],
       "name": "Header",

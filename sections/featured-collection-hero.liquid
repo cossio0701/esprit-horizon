@@ -1,0 +1,421 @@
+{% comment %}
+  Featured Collection Hero Section
+  Two-column layout: hero image with text overlay + product grid from collection
+{% endcomment %}
+
+{% liquid
+  assign color_scheme = section.settings.color_scheme | default: 'scheme-1'
+  assign collection = section.settings.collection
+  assign products_to_show = section.settings.products_count | default: 4
+%}
+
+<div class="featured-collection-hero color-{{ color_scheme }}">
+  <div class="section-background color-{{ color_scheme }}"></div>
+
+  <div
+    class="featured-collection-hero__container section section--{{ section.settings.section_width }} color-{{ color_scheme }} spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {% comment %} LEFT COLUMN: Hero Image {% endcomment %}
+    <div class="featured-collection-hero__image-column">
+      <div class="featured-collection-hero__image-wrapper">
+        {%- if section.settings.image != blank -%}
+          {{
+            section.settings.image
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'lazy',
+              class: 'featured-collection-hero__image',
+              widths: '400, 600, 800, 1000, 1200',
+              sizes: '(max-width: 749px) 100vw, 50vw'
+          }}
+        {%- else -%}
+          <div class="featured-collection-hero__placeholder">
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+        {%- endif -%}
+
+        {% comment %} Text Overlay {% endcomment %}
+        <div class="featured-collection-hero__overlay">
+          <div class="featured-collection-hero__text">
+            {%- if section.settings.title != blank -%}
+              <h2 class="featured-collection-hero__title" style="color: {{ section.settings.title_color }};">
+                {{ section.settings.title }}
+              </h2>
+            {%- endif -%}
+
+            {%- if section.settings.subtitle != blank -%}
+              <p class="featured-collection-hero__subtitle" style="color: {{ section.settings.subtitle_color }};">
+                {%- if collection != blank -%}
+                  <a href="{{ collection.url }}" class="featured-collection-hero__link" style="color: {{ section.settings.subtitle_color }};">
+                    {{ section.settings.subtitle }}
+                  </a>
+                {%- else -%}
+                  {{ section.settings.subtitle }}
+                {%- endif -%}
+              </p>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} RIGHT COLUMN: Product Grid from Collection {% endcomment %}
+    <div class="featured-collection-hero__products-column">
+      <div class="featured-collection-hero__products-grid">
+        {%- if collection != blank and collection.products.size > 0 -%}
+          {%- for product in collection.products limit: products_to_show -%}
+            <div class="featured-collection-hero__product-item">
+              {%- render 'product-card-simple', product: product, section_id: section.id -%}
+            </div>
+          {%- endfor -%}
+
+          {% comment %} Fill remaining if less products than requested {% endcomment %}
+          {%- if collection.products.size < products_to_show -%}
+            {%- assign remaining = products_to_show | minus: collection.products.size -%}
+            {%- for i in (1..remaining) -%}
+              <div class="featured-collection-hero__product-item featured-collection-hero__product-item--placeholder">
+                <div class="featured-collection-hero__product-placeholder">
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        {%- else -%}
+          {% comment %} Placeholders when no collection selected {% endcomment %}
+          {%- for i in (1..products_to_show) -%}
+            <div class="featured-collection-hero__product-item featured-collection-hero__product-item--placeholder">
+              <div class="featured-collection-hero__product-placeholder">
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .featured-collection-hero__container.section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-lg, 24px);
+    align-items: stretch;
+  }
+
+  .featured-collection-hero__container.section--page-width {
+    max-width: calc(var(--page-width) - var(--page-margin) * 2);
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+  }
+
+  .featured-collection-hero__container.section--full-width {
+    max-width: none;
+    padding-inline: var(--page-margin);
+  }
+
+  /* Left Column - Hero Image */
+  .featured-collection-hero__image-column {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .featured-collection-hero__image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    overflow: hidden;
+  }
+
+  .featured-collection-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .featured-collection-hero__placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .featured-collection-hero__placeholder .placeholder-svg {
+    width: 50%;
+    height: auto;
+    opacity: 0.3;
+  }
+
+  /* Text Overlay */
+  .featured-collection-hero__overlay {
+    position: absolute;
+    inset: 0;
+    padding: var(--padding-lg, 32px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .featured-collection-hero__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs, 8px);
+  }
+
+  .featured-collection-hero__title {
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: var(--font-heading--weight, 400);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground);
+    margin: 0;
+  }
+
+  .featured-collection-hero__subtitle {
+    font-family: var(--font-body--family);
+    font-size: var(--font-size--sm, 14px);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--color-foreground);
+    margin: 0;
+  }
+
+  .featured-collection-hero__link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .featured-collection-hero__link:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Right Column - Product Grid */
+  .featured-collection-hero__products-column {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .featured-collection-hero__products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-sm, 12px);
+    height: 100%;
+  }
+
+  .featured-collection-hero__product-item {
+    min-width: 0;
+  }
+
+  .featured-collection-hero__product-item .product-card-simple {
+    height: 100%;
+  }
+
+  /* Product Placeholder */
+  .featured-collection-hero__product-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 3 / 4;
+  }
+
+  .featured-collection-hero__product-placeholder .placeholder-svg {
+    width: 60%;
+    height: auto;
+    opacity: 0.2;
+  }
+
+  /* Responsive - Mobile */
+  @media screen and (max-width: 749px) {
+    .featured-collection-hero__container.section {
+      grid-template-columns: 1fr;
+      gap: var(--gap-md, 16px);
+    }
+
+    .featured-collection-hero__image-column {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .featured-collection-hero__products-column {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .featured-collection-hero__image-wrapper {
+      min-height: 400px;
+    }
+
+    .featured-collection-hero__overlay {
+      padding: var(--padding-md, 20px);
+    }
+
+    .featured-collection-hero__title {
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .featured-collection-hero__products-grid {
+      gap: var(--gap-xs, 8px);
+    }
+  }
+
+  /* Tablet */
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .featured-collection-hero__image-wrapper {
+      min-height: 450px;
+    }
+
+    .featured-collection-hero__title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured Collection Hero",
+  "tag": "section",
+  "class": "section-featured-collection-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "label": "Products to show",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Hero Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Spring Days"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Shop Best Sellers"
+    },
+    {
+      "type": "header",
+      "content": "Text Colors"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "full-width",
+          "label": "Full width"
+        },
+        {
+          "value": "page-width",
+          "label": "Page width"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collection Hero",
+      "category": "Collection",
+      "settings": {
+        "title": "Spring Days",
+        "subtitle": "Shop Best Sellers",
+        "products_count": 4,
+        "section_width": "page-width",
+        "color_scheme": "scheme-1",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    }
+  ]
+}
+{% endschema %}

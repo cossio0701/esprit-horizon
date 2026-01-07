@@ -861,6 +861,23 @@
         "padding-block-end": 0
       }
     },
+    "featured_collection_hero_FiDk6h": {
+      "type": "featured-collection-hero",
+      "name": "Featured Collection Hero",
+      "settings": {
+        "collection": "sale",
+        "products_count": 4,
+        "image": "shopify://shop_images/9e06abd6d6d48e97c06f159a8c5671eb101b9aef.jpg",
+        "title": "Spring Days",
+        "subtitle": "Shop Best Sellers",
+        "title_color": "#ffffff",
+        "subtitle_color": "#ffffff",
+        "section_width": "page-width",
+        "color_scheme": "scheme-1",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
     "product_list_Ut3bJW": {
       "type": "product-list",
       "blocks": {
@@ -1053,6 +1070,59 @@
         "color_scheme": "scheme-1",
         "padding-block-start": 48,
         "padding-block-end": 48
+      }
+    },
+    "17677328072562cb5a": {
+      "type": "_blocks",
+      "blocks": {
+        "instafeed_app_block_DNA74H": {
+          "type": "shopify://apps/instafeed/blocks/app-block/c447db20-095d-4a10-9725-b5977662c9d5",
+          "settings": {
+            "title": "",
+            "title_color": "",
+            "title_size_v2": 24,
+            "alignment": "left",
+            "instafeed_margin_top": 20,
+            "instafeed_margin_bottom": 20,
+            "instafeed_margin_sides": 0,
+            "show_instagram_link": false,
+            "link_alignment": "left",
+            "link_color": "#000000",
+            "background_color": "",
+            "feed_id": "",
+            "html_area": ""
+          }
+        }
+      },
+      "block_order": [
+        "instafeed_app_block_DNA74H"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "section_6qncpE": {
@@ -1358,7 +1428,9 @@
     "1763584284ac7bb19d",
     "section_9GwNEK",
     "section_tmebwi",
+    "featured_collection_hero_FiDk6h",
     "product_list_Ut3bJW",
+    "17677328072562cb5a",
     "section_6qncpE",
     "newsletter_promo_XJK7EL"
   ]
