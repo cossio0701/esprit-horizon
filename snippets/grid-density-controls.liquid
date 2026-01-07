@@ -17,20 +17,6 @@
       <label class="column-options__option">
         <input
           type="radio"
-          name="grid-mobile"
-          value="mobile-single"
-          class="column-options__option-input"
-          aria-label="{{ 'content.grid_view.single_item' | t }}"
-          on:change="results-list/updateLayout"
-        >
-        <span class="column-picker column-picker-mobile--single">
-          {{- 'icon-one-col-mobile.svg' | inline_asset_content -}}
-        </span>
-      </label>
-
-      <label class="column-options__option">
-        <input
-          type="radio"
           class="column-options__option-input"
           name="grid-mobile"
           value="default"
@@ -41,6 +27,34 @@
         >
         <span class="column-picker column-picker-mobile--double">
           {{- 'icon-grid-default.svg' | inline_asset_content -}}
+        </span>
+      </label>
+
+      <label class="column-options__option">
+        <input
+          type="radio"
+          class="column-options__option-input"
+          name="grid-mobile"
+          value="mobile-editorial"
+          aria-label="Vista Editorial"
+          on:change="results-list/updateLayout"
+        >
+        <span class="column-picker column-picker-mobile--editorial">
+          {{- 'icon-editorial-mobile.svg' | inline_asset_content -}}
+        </span>
+      </label>
+
+      <label class="column-options__option">
+        <input
+          type="radio"
+          name="grid-mobile"
+          value="mobile-single"
+          class="column-options__option-input"
+          aria-label="{{ 'content.grid_view.single_item' | t }}"
+          on:change="results-list/updateLayout"
+        >
+        <span class="column-picker column-picker-mobile--single">
+          {{- 'icon-one-col-mobile.svg' | inline_asset_content -}}
         </span>
       </label>
 
@@ -66,14 +80,29 @@
         <input
           type="radio"
           name="grid"
-          value="zoom-out"
+          value="editorial"
           class="column-options__option-input"
-          aria-label="{{ 'content.grid_view.zoom_out' | t }}"
+          aria-label="Vista Editorial"
           on:change="results-list/updateLayout"
           data-skip-node-update
         >
-        <span class="column-picker column-picker--zoom-out">
-          {{- 'icon-grid-dense.svg' | inline_asset_content -}}
+        <span class="column-picker column-picker--editorial">
+          {{- 'icon-editorial-desktop.svg' | inline_asset_content -}}
+        </span>
+      </label>
+
+      <label class="column-options__option">
+        <input
+          type="radio"
+          name="grid"
+          value="3-columns"
+          class="column-options__option-input"
+          aria-label="Vista 3 Columnas"
+          on:change="results-list/updateLayout"
+          data-skip-node-update
+        >
+        <span class="column-picker column-picker--3-col">
+          {{- 'icon-3-col.svg' | inline_asset_content -}}
         </span>
       </label>
     {% endif %}
@@ -128,14 +157,16 @@
   }
 
   .column-options__option:has(.column-picker-mobile--single),
-  .column-options__option:has(.column-picker-mobile--double) {
+  .column-options__option:has(.column-picker-mobile--double),
+  .column-options__option:has(.column-picker-mobile--editorial) {
     @media screen and (max-width: 749px) {
       display: flex;
     }
   }
 
-  .column-options__option:has(.column-picker--default),
-  .column-options__option:has(.column-picker--zoom-out) {
+  .column-options__option:has(.column-picker--3-col),
+  .column-options__option:has(.column-picker--editorial),
+  .column-options__option:has(.column-picker--default) {
     @media screen and (min-width: 750px) {
       display: flex;
     }
