@@ -68,7 +68,45 @@
               </div>
             </div>
           {% else %}
-            <p>No hay galería para el color {{ color }}</p>
+            <div class="variant-swiper-layout">
+              <!-- Swiper -->
+              <div class="swiper">
+                <div class="swiper-wrapper">
+                  {% for media in product.media %}
+                    {% if media.media_type == 'image' %}
+                      <div class="swiper-slide">
+                        <img
+                          src="{{ media | image_url: width: 1200 }}"
+                          alt="{{ product.title }}"
+                          loading="lazy"
+                        >
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+
+              <!-- Thumbnails -->
+              <div class="variant-thumbs">
+                {% for media in product.media %}
+                  {% if media.media_type == 'image' %}
+                    <button
+                      class="variant-thumb"
+                      data-index="{{ forloop.index0 }}"
+                    >
+                      <img
+                        src="{{ media | image_url: width: 150 }}"
+                        alt="{{ product.title }}"
+                        loading="lazy"
+                      >
+                    </button>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
           {% endif %}
         </div>
       {% endunless %}

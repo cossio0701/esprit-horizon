@@ -225,4 +225,288 @@
   .product-card [data-available-count='0'] ~ svg {
     display: block;
   }
+
+  /* ================================
+     PLP QUICK ADD - VARIANT CONTROLLER
+     Overlay sobre la imagen del producto
+     ================================ */
+
+  .card-gallery {
+    position: relative;
+  }
+
+  .plp-variant-controller {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background: rgba(255, 255, 255, 0.98);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    z-index: 10;
+    /* Oculto por defecto, visible en hover */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  /* Mostrar en hover de la card-gallery */
+  .card-gallery:hover .plp-variant-controller {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Filas */
+  .plp-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .plp-row--button {
+    justify-content: flex-end;
+  }
+
+  /* ================================
+     TALLAS - ESTILO REFERENCIA
+     ================================ */
+
+  .plp-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .plp-size {
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 0 0 2px 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: #2c2c2c;
+    cursor: pointer;
+    position: relative;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+    transition: border-color 0.15s ease;
+    line-height: 1.2;
+  }
+
+  .plp-size:hover:not(.out):not(.active) {
+    border-bottom-color: #666;
+  }
+
+  /* Talla activa - subrayado negro */
+  .plp-size.active {
+    color: #1a1a1a;
+    border-bottom-color: #1a1a1a;
+  }
+
+  /* Talla no disponible - línea diagonal completa */
+  .plp-size.out {
+    color: #b5b5b5;
+    cursor: not-allowed;
+  }
+
+  .plp-size.out::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 140%;
+    height: 1px;
+    background-color: #999;
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  /* ================================
+     COLOR SWATCHES - CUADRADOS PEQUEÑOS
+     ================================ */
+
+  .plp-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .plp-color--swatch {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 1px;
+    border: none;
+    background: var(--swatch-bg);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease, outline 0.15s ease;
+    position: relative;
+  }
+
+  .plp-color--swatch:hover:not(.active):not(.out) {
+    transform: scale(1.05);
+  }
+
+  /* Línea debajo en hover (no activo) */
+  .plp-color--swatch:hover:not(.active):not(.out)::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 1px;
+    background-color: #888;
+  }
+
+  /* Color activo - línea negra debajo centrada */
+  .plp-color--swatch.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 1px;
+    background-color: #1a1a1a;
+  }
+
+  .plp-color--swatch:focus-visible {
+    outline: none;
+  }
+
+  .plp-color--swatch:focus-visible::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 1px;
+    background-color: #1a1a1a;
+  }
+
+  /* Color no disponible - tachado */
+  .plp-color--swatch.out {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .plp-color--swatch.out::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140%;
+    height: 1px;
+    background-color: #333;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    z-index: 2;
+  }
+
+  .plp-color--swatch.out:hover {
+    transform: none;
+  }
+
+  /* ================================
+     BOTÓN - MINIMALISTA CON BORDER BOTTOM
+     ================================ */
+
+  .plp-add-to-cart {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 0 0 2px 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .plp-add-to-cart:disabled {
+    cursor: not-allowed;
+    color: #aaa;
+    border-bottom-color: #aaa;
+  }
+
+  .plp-add-to-cart.ready {
+    color: #1a1a1a;
+    border-bottom-color: #1a1a1a;
+  }
+
+  .plp-add-to-cart.ready:hover {
+    color: #000;
+    border-bottom-color: #000;
+  }
+
+  .plp-add-to-cart.success {
+    color: #3d6b4f;
+    border-bottom-color: #3d6b4f;
+  }
+
+  .plp-add-to-cart.error {
+    color: #b44;
+    border-bottom-color: #b44;
+  }
+
+  .plp-add-to-cart.sold-out {
+    color: #999;
+    border-bottom-color: #999;
+    cursor: not-allowed;
+  }
+
+  /* Spinner */
+  .plp-spinner {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #ddd;
+    border-top-color: #2c2c2c;
+    border-radius: 50%;
+    animation: plp-spin 0.6s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes plp-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ================================
+     RESPONSIVE
+     ================================ */
+
+  /* Desktop: ocultar quick-add button original */
+  @media screen and (min-width: 750px) {
+    .product-card .quick-add__button {
+      display: none !important;
+    }
+  }
+
+  /* Mobile: ocultar nuestro variant controller, mostrar quick-add original */
+  @media screen and (max-width: 749px) {
+    .plp-variant-controller {
+      display: none !important;
+    }
+
+    .product-card .quick-add__button {
+      display: flex !important;
+    }
+  }
+
+  /* Ocultar en cards muy pequeñas */
+  @container card-gallery-container (max-width: 180px) {
+    .plp-variant-controller {
+      display: none;
+    }
+  }
 {% endstylesheet %}

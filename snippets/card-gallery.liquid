@@ -241,6 +241,151 @@
     %}
   {%- endif -%}
   {{ children }}
+
+  {%- comment -%} PLP Quick Add - Variant Controller {%- endcomment -%}
+  {%- if product != blank and product.variants.size > 0 -%}
+    {%- liquid
+      # Encontrar la opción de color (con swatches)
+      assign color_option = null
+      assign first_color = null
+      for option in product.options_with_values
+        assign swatch_count = option.values | map: 'swatch' | compact | size
+        if swatch_count > 0
+          assign color_option = option
+          assign first_color = option.values.first.name
+          break
+        endif
+      endfor
+
+      # Filtrar variantes del primer color para pre-renderizar tallas
+      assign initial_variants = product.variants
+      if first_color
+        assign initial_variants = product.variants | where: 'option1', first_color
+        if initial_variants.size == 0
+          assign initial_variants = product.variants | where: 'option2', first_color
+        endif
+        if initial_variants.size == 0
+          assign initial_variants = product.variants
+        endif
+      endif
+    -%}
+    {%- liquid
+      # Encontrar la primera variante disponible para pre-seleccionar
+      assign first_available_variant = null
+      for variant in initial_variants
+        if variant.available and first_available_variant == null
+          assign first_available_variant = variant
+          break
+        endif
+      endfor
+    -%}
+    <div class="plp-variant-controller" data-product-id="{{ product.id }}" data-first-variant-id="{{ first_available_variant.id }}" data-first-color="{{ first_color }}">
+      {%- comment -%} Fila 1: Tallas {%- endcomment -%}
+      <div class="plp-sizes" id="sizes-{{ product.id }}">
+        {%- for variant in initial_variants -%}
+          {%- liquid
+            assign is_selected = false
+            if first_available_variant and variant.id == first_available_variant.id
+              assign is_selected = true
+            endif
+          -%}
+          <button
+            class="plp-size{% unless variant.available %} out{% endunless %}{% if is_selected %} active{% endif %}"
+            {% unless variant.available %}disabled{% endunless %}
+            data-variant-id="{{ variant.id }}"
+          >
+            {{ variant.option2 | default: variant.option1 }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Fila 2: Colores {%- endcomment -%}
+      {%- if color_option -%}
+        <div class="plp-colors">
+          {%- for option_value in color_option.values -%}
+            {%- if option_value.swatch -%}
+              {%- liquid
+                assign swatch_bg = null
+                if option_value.swatch.image
+                  assign swatch_image_url = option_value.swatch.image | image_url: width: 80
+                  assign swatch_bg = 'url(' | append: swatch_image_url | append: ')'
+                elsif option_value.swatch.color
+                  assign swatch_bg = 'rgb(' | append: option_value.swatch.color.rgb | append: ')'
+                endif
+
+                assign is_first = false
+                if forloop.first
+                  assign is_first = true
+                endif
+
+                # Verificar si este color tiene al menos una variante disponible
+                assign color_available = false
+                for variant in product.variants
+                  if variant.option1 == option_value.name or variant.option2 == option_value.name
+                    if variant.available
+                      assign color_available = true
+                      break
+                    endif
+                  endif
+                endfor
+              -%}
+              <button
+                class="plp-color plp-color--swatch{% if is_first and color_available %} active{% endif %}{% unless color_available %} out{% endunless %}"
+                data-color="{{ option_value.name }}"
+                data-product-id="{{ product.id }}"
+                data-available="{{ color_available }}"
+                style="--swatch-bg: {{ swatch_bg }};"
+                title="{{ option_value.name }}"
+              >
+                <span class="visually-hidden">{{ option_value.name }}</span>
+              </button>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Fila 3: Botón alineado derecha {%- endcomment -%}
+      <div class="plp-row plp-row--button">
+        <button
+          class="plp-add-to-cart{% if first_available_variant %} ready{% endif %}"
+          data-product-id="{{ product.id }}"
+          {% unless first_available_variant %}disabled{% endunless %}
+        >
+          Agregar a la bolsa →
+        </button>
+      </div>
+
+      <script>
+        window.PLP = window.PLP || {};
+        window.PLP["{{ product.id }}"] = {
+          variants: [
+            {%- for v in product.variants -%}
+              {
+                id: {{ v.id }},
+                available: {{ v.available | json }},
+                options: {{ v.options | json }},
+                price: {{ v.price }},
+                priceFormatted: "{{ v.price | money }}",
+                compareAtPrice: {{ v.compare_at_price | default: 'null' }},
+                compareAtPriceFormatted: "{{ v.compare_at_price | money }}",
+                featured_media_id: {{ v.featured_media.id | default: 'null' }},
+                gallery: [
+                  {%- if v.metafields.custom.gallery -%}
+                    {%- for file in v.metafields.custom.gallery.value -%}
+                      "{{ file | image_url }}",
+                    {%- endfor -%}
+                  {%- endif -%}
+                ]
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        };
+      </script>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Quick Buy Overlay - Rendered inside card-gallery for correct positioning {%- endcomment -%}
+  {% render 'quick-buy-overlay', product: product %}
 </div>
 
 {% stylesheet %}

@@ -189,6 +189,7 @@ export class QuickAddComponent extends Component {
     morph(modalContent, productGrid);
 
     this.#syncVariantSelection(modalContent);
+    this.#setupVariantImageSync(modalContent);
   }
 
   /**
@@ -209,6 +210,66 @@ export class QuickAddComponent extends Component {
       }
     }
   }
+
+  /**
+   * Sets up variant image synchronization between modal and product card
+   * @param {Element} modalContent - The modal content element
+   */
+  #setupVariantImageSync(modalContent) {
+    const productCard = this.closest('product-card');
+    if (!productCard) return;
+
+    const productId = productCard.dataset.productId;
+    if (!productId) return;
+
+    // Listen for variant changes in the modal
+    const variantInputs = modalContent.querySelectorAll('input[type="radio"][data-variant-id"]');
+    
+    variantInputs.forEach(input => {
+      if (input instanceof HTMLInputElement) {
+        input.addEventListener('change', () => {
+          if (input.checked) {
+            this.#updateProductCardImage(productId, input.dataset.variantId);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Updates the product card image when a variant is selected in the modal
+   * @param {string} productId - The product ID
+   * @param {string} variantId - The selected variant ID
+   */
+  #updateProductCardImage(productId, variantId) {
+    // Check if the plp-variants changeImage function exists
+    if (typeof window.changeImage === 'function') {
+      // Get variant data from window.PLP if available
+      const product = window.PLP?.[productId];
+      if (product) {
+        const variant = product.variants.find(v => v.id.toString() === variantId.toString());
+        if (variant) {
+          window.changeImage(productId, variant);
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles variant changes in the modal
+   * @param {CustomEvent} event - The variant change event
+   */
+  #handleModalVariantChange = (event) => {
+    const productCard = this.closest('product-card');
+    if (!productCard) return;
+
+    const productId = productCard.dataset.productId;
+    const variantId = event.detail.variantId;
+
+    if (productId && variantId) {
+      this.#updateProductCardImage(productId, variantId);
+    }
+  };
 }
 
 if (!customElements.get('quick-add-component')) {
@@ -223,6 +284,7 @@ class QuickAddDialog extends DialogComponent {
 
     this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal: this.#abortController.signal });
     this.addEventListener(ThemeEvents.variantUpdate, this.#updateProductTitleLink);
+    this.addEventListener(ThemeEvents.variantUpdate, this.#handleVariantChange);
 
     this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose);
   }
@@ -254,6 +316,29 @@ class QuickAddDialog extends DialogComponent {
 
     if (viewMoreDetailsLink) viewMoreDetailsLink.href = anchorElement.href;
     if (mobileProductTitle) mobileProductTitle.href = anchorElement.href;
+  };
+
+  #handleVariantChange = (event) => {
+    // Dispatch a custom event for the quick-add-component to listen to
+    const variantInput = this.querySelector('input[type="radio"][data-variant-id]:checked');
+    if (variantInput) {
+      this.dispatchEvent(new CustomEvent('variantChange', {
+        detail: {
+          variantId: variantInput.dataset.variantId
+        },
+        bubbles: true
+      }));
+    }
+
+    // Find the quick-add-component that opened this dialog and update its image
+    const quickAddComponent = document.querySelector('quick-add-component[stay-visible]');
+    if (quickAddComponent && typeof quickAddComponent.#updateProductCardImage === 'function') {
+      const productCard = quickAddComponent.closest('product-card');
+      if (productCard) {
+        const productId = productCard.dataset.productId;
+        quickAddComponent.#updateProductCardImage(productId, variantInput.dataset.variantId);
+      }
+    }
   };
 
   #handleDialogClose = () => {
