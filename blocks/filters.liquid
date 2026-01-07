@@ -1,4 +1,3 @@
-
 {%- doc -%}
   Renders the facet filtering component
 
@@ -158,38 +157,55 @@
 
               {% capture rendered_filters %}
                 {%- for filter in filters -%}
-                  {% case filter.type %}
-                    {% when 'price_range' %}
-                      {%- liquid
-                        if filter.min_value.value != null or filter.max_value.value != null
-                          assign total_active_values = total_active_values | plus: 1
-                          assign is_active = true
-                        endif
+                  {%- comment -%}
+                    En layout horizontal, ocultamos los filtros de Price y Availability
+                    Solo se mostrarán en el drawer de filtros (mobile/overflow)
+                  {%- endcomment -%}
+                  {%- liquid
+                    assign should_skip_filter = false
+                    if block_settings.filter_style == 'horizontal'
+                      if filter.type == 'price_range'
+                        assign should_skip_filter = true
+                      elsif filter.param_name == 'filter.v.availability'
+                        assign should_skip_filter = true
+                      endif
+                    endif
+                  -%}
 
-                        if block_settings.filter_style != 'vertical'
-                          assign should_render_clear = true
-                        else
-                          assign should_render_clear = false
-                        endif
+                  {% unless should_skip_filter %}
+                    {% case filter.type %}
+                      {% when 'price_range' %}
+                        {%- liquid
+                          if filter.min_value.value != null or filter.max_value.value != null
+                            assign total_active_values = total_active_values | plus: 1
+                            assign is_active = true
+                          endif
 
-                        render 'price-filter', filter: filter, filter_style: block_settings.filter_style, should_render_clear: should_render_clear
-                      -%}
-                    {% else %}
-                      {% liquid
-                        if filter.active_values.size > 0
-                          assign is_active = true
-                        endif
+                          if block_settings.filter_style != 'vertical'
+                            assign should_render_clear = true
+                          else
+                            assign should_render_clear = false
+                          endif
 
-                        assign active_value_count = filter.active_values | size
-                        assign total_active_values = total_active_values | plus: active_value_count
-                        if block_settings.filter_style != 'vertical'
-                          assign should_render_clear = true
-                        else
-                          assign should_render_clear = false
-                        endif
-                        render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
-                      %}
-                  {% endcase %}
+                          render 'price-filter', filter: filter, filter_style: block_settings.filter_style, should_render_clear: should_render_clear
+                        -%}
+                      {% else %}
+                        {% liquid
+                          if filter.active_values.size > 0
+                            assign is_active = true
+                          endif
+
+                          assign active_value_count = filter.active_values | size
+                          assign total_active_values = total_active_values | plus: active_value_count
+                          if block_settings.filter_style != 'vertical'
+                            assign should_render_clear = true
+                          else
+                            assign should_render_clear = false
+                          endif
+                          render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
+                        %}
+                    {% endcase %}
+                  {% endunless %}
                 {%- endfor -%}
               {% endcapture %}
 
@@ -220,27 +236,58 @@
               %}
             {% endif %}
             {% if block_settings.filter_style == 'horizontal' %}
-              <div class="products-count-wrapper">
-                <span title="{{ 'content.product_count' | t }}">
-                  {{- 'content.item_count' | t: count: products_count -}}
-                </span>
+              {%- comment -%} Desktop: Lado izquierdo - Botón Filtrar + Ordenamiento {%- endcomment -%}
+              <div class="facets-horizontal-left">
+                {% if block_settings.enable_filtering %}
+                  <button
+                    class="button facets-filter-button button-unstyled button-unstyled--with-icon"
+                    on:click="#filters-drawer/showDialog"
+                    type="button"
+                  >
+                    <span class="svg-wrapper">
+                      {{ 'icon-filter.svg' | inline_asset_content }}
+                    </span>
+                    {{ 'actions.show_filters' | t }}
+                    {% if total_active_values > 0 %}
+                      <div
+                        class="filter-count-bubble"
+                        aria-label="{{ 'accessibility.filter_count' | t: count: total_active_values }}"
+                      >
+                        <span class="filter-count-bubble__background"></span>
+                        <span class="filter-count-bubble__text" aria-hidden="true">
+                          {{ total_active_values }}
+                        </span>
+                      </div>
+                    {% endif %}
+                  </button>
+                {% endif %}
+
+                {% if block_settings.enable_sorting %}
+                  {% render 'sorting',
+                    results: results,
+                    sort_by: sort_by,
+                    filter_style: block_settings.filter_style,
+                    suffix: 'desktop',
+                    sort_position: 'desktop',
+                    should_use_select_on_mobile: false,
+                    section_id: section.id
+                  %}
+                {% endif %}
               </div>
 
-              {% if block_settings.enable_sorting %}
-                {% render 'sorting',
-                  results: results,
-                  sort_by: sort_by,
-                  filter_style: block_settings.filter_style,
-                  suffix: 'desktop',
-                  sort_position: 'desktop',
-                  should_use_select_on_mobile: false,
-                  section_id: section.id
-                %}
-              {% endif %}
+              {%- comment -%} Desktop: Lado derecho - Contador + Texto "Vista" + Controles {%- endcomment -%}
+              <div class="facets-horizontal-right">
+                <div class="products-count-wrapper">
+                  <span title="{{ 'content.product_count' | t }}">
+                    {{- 'content.item_count' | t: count: products_count -}}
+                  </span>
+                </div>
 
-              {% if block_settings.enable_grid_density %}
-                {% render 'grid-density-controls', viewport: 'desktop' %}
-              {% endif %}
+                {% if block_settings.enable_grid_density %}
+                  <span class="grid-view-label">{{ 'content.grid_view.label' | t }}</span>
+                  {% render 'grid-density-controls', viewport: 'desktop' %}
+                {% endif %}
+              </div>
             {% endif %}
           {% endif %}
         </form>
@@ -255,49 +302,50 @@
       {{ facets_margin_style }}
     "
   >
-    {% if block_settings.enable_filtering %}
-      <div class="facets-toggle__wrapper">
-        <button
-          class="button facets-toggle__button button-unstyled button-unstyled--with-icon"
-          on:click="#filters-drawer/showDialog"
-          type="button"
-        >
-          <span class="svg-wrapper">
-            {{ 'icon-filter.svg' | inline_asset_content }}
-          </span>
+    {%- comment -%} Mobile: Primera fila - Botón Filtrar + Ordenamiento {%- endcomment -%}
+    <div class="facets-mobile-row-1">
+      {% if block_settings.enable_filtering %}
+        <div class="facets-toggle__wrapper">
+          <button
+            class="button facets-toggle__button button-unstyled button-unstyled--with-icon"
+            on:click="#filters-drawer/showDialog"
+            type="button"
+          >
+            <span class="svg-wrapper">
+              {{ 'icon-filter.svg' | inline_asset_content }}
+            </span>
 
-          {{ 'actions.show_filters' | t }}
+            {{ 'actions.show_filters' | t }}
 
-          {% if total_active_values > 0 %}
-            <div
-              id="filter-count-bubble-toggle"
-              class="filter-count-bubble"
-              aria-label="{{ 'accessibility.filter_count' | t: count: total_active_values }}"
-            >
-              <span class="filter-count-bubble__background"></span>
-
-              <span
-                ref="cartBubbleText"
-                class="filter-count-bubble__text"
-                aria-hidden="true"
+            {% if total_active_values > 0 %}
+              <div
+                id="filter-count-bubble-toggle"
+                class="filter-count-bubble"
+                aria-label="{{ 'accessibility.filter_count' | t: count: total_active_values }}"
               >
-                {{ total_active_values }}
-              </span>
-            </div>
-          {% endif %}
-        </button>
-      </div>
-    {% endif %}
+                <span class="filter-count-bubble__background"></span>
 
-    <div class="facets-mobile-wrapper facets-controls-wrapper">
-      {% if block_settings.enable_filtering == false and block_settings.enable_sorting %}
+                <span
+                  ref="cartBubbleText"
+                  class="filter-count-bubble__text"
+                  aria-hidden="true"
+                >
+                  {{ total_active_values }}
+                </span>
+              </div>
+            {% endif %}
+          </button>
+        </div>
+      {% endif %}
+
+      {% if block_settings.enable_sorting %}
         <facets-form-component
           section-id="{{ section.id }}"
-          id="FacetFiltersForm--{{ section.id }}-mobile-sorting-only"
+          id="FacetFiltersForm--{{ section.id }}-mobile-sorting"
         >
           <form
             action="{{ results_url }}"
-            id="FacetFiltersForm--{{ section.id }}-mobile-sorting-only"
+            id="FacetFiltersForm--{{ section.id }}-mobile-sorting"
             ref="facetsForm"
           >
             {% render 'sorting',
@@ -311,6 +359,16 @@
           </form>
         </facets-form-component>
       {% endif %}
+    </div>
+
+    {%- comment -%} Mobile: Segunda fila - Contador productos (izq) + Vistas sin texto (der) {%- endcomment -%}
+    <div class="facets-mobile-row-2">
+      <div class="products-count-wrapper">
+        <span title="{{ 'content.product_count' | t }}">
+          {{- 'content.item_count' | t: count: products_count -}}
+        </span>
+      </div>
+
       {% if block_settings.enable_grid_density %}
         {% render 'grid-density-controls', viewport: 'mobile' %}
       {% endif %}
@@ -659,11 +717,7 @@
 
   .facets--horizontal .facets__filters-wrapper {
     @media screen and (min-width: 750px) {
-      max-width: 60%;
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: var(--gap-xl);
-      margin-inline-end: 0;
+      display: none;
     }
   }
 
@@ -701,7 +755,11 @@
     @media screen and (min-width: 750px) {
       font-size: var(--font-paragraph--size);
       justify-content: flex-start;
-      height: var(--minimum-touch-target);
+      height: 36px;
+      border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+      border-radius: var(--style-border-radius-xs);
+      padding-inline: 48px !important;
+      min-width: 120px;
     }
   }
 
@@ -1047,7 +1105,10 @@
   /* Horizontal filter style */
   .facets--horizontal .facets__form {
     @media screen and (min-width: 750px) {
-      gap: 0 var(--facets-form-horizontal-gap);
+      gap: 0;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
     }
   }
 
@@ -1055,6 +1116,210 @@
     @media screen and (min-width: 750px) {
       z-index: var(--facets-open-z-index);
     }
+  }
+
+  /* Nuevos estilos para reorganización de controles */
+
+  /* Desktop: Layout horizontal con dos secciones */
+  .facets-horizontal-left,
+  .facets-horizontal-right {
+    display: none;
+
+    @media screen and (min-width: 750px) {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-md);
+    }
+  }
+
+  .facets-horizontal-left {
+    @media screen and (min-width: 750px) {
+      flex: 0 0 auto;
+      margin-left: 0;
+      padding-left: 0;
+    }
+  }
+
+  .facets-horizontal-right {
+    @media screen and (min-width: 750px) {
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+  }
+
+  /* Botón filtrar en desktop (dentro del formulario horizontal) */
+  .facets-filter-button {
+    @media screen and (min-width: 750px) {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-xs);
+      height: 36px;
+      padding-inline: 48px !important;
+      min-width: 120px;
+      cursor: pointer;
+      color: var(--color-foreground);
+      font-size: var(--font-paragraph--size);
+      border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+      border-radius: var(--style-border-radius-xs);
+    }
+
+    @media screen and (max-width: 749px) {
+      display: none;
+    }
+  }
+
+  .facets-filter-button .svg-wrapper {
+    @media screen and (min-width: 750px) {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+    }
+  }
+
+  .facets-filter-button .filter-count-bubble {
+    @media screen and (min-width: 750px) {
+      margin-left: var(--margin-2xs);
+    }
+  }
+
+  /* Texto "Vista" en desktop */
+  .grid-view-label {
+    display: none;
+
+    @media screen and (min-width: 750px) {
+      display: inline-block;
+      font-size: var(--font-paragraph--size);
+      color: var(--color-foreground-muted);
+      margin-right: var(--margin-xs);
+    }
+  }
+
+  /* Mobile: Primera fila - Botón Filtrar + Ordenamiento */
+  .facets-mobile-row-1 {
+    display: flex;
+    justify-content: space-between;
+
+    @media screen and (min-width: 750px) {
+      display: none;
+    }
+  }
+
+  .facets-mobile-row-1 .facets-toggle__wrapper {
+    flex: 1 1 48% !important;
+    max-width: 48%;
+  }
+
+  /* Estilo del botón Filtrar en mobile */
+  .facets-mobile-row-1 .facets-toggle__button {
+    width: 100%;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20)) !important;
+    border-radius: var(--style-border-radius-xs);
+    padding: var(--padding-xs) var(--padding-md) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-xs);
+    height: var(--minimum-touch-target);
+  }
+
+  .facets-mobile-row-1 facets-form-component {
+    flex: 1 1 48% !important;
+    max-width: 48%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .facets-mobile-row-1 facets-form-component form {
+    width: 100%;
+  }
+
+  /* Estilo del botón/select de ordenamiento en mobile */
+  .facets-mobile-row-1 .sorting-filter {
+    width: 100%;
+  }
+
+  .facets-mobile-row-1 .sorting-filter .facets__panel {
+    width: 100%;
+  }
+
+  .facets-mobile-row-1 .sorting-filter .facets__summary {
+    width: 100% !important;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20)) !important;
+    border-radius: var(--style-border-radius-xs) !important;
+    padding: var(--padding-xs) var(--padding-md) !important;
+    height: var(--minimum-touch-target) !important;
+    justify-content: space-between !important;
+  }
+
+  /* Asegurar que el select de ordenamiento también tenga el border */
+  .facets-mobile-row-1 .sorting-filter__select-wrapper {
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20)) !important;
+    border-radius: var(--style-border-radius-xs) !important;
+  }
+
+  /* Mobile: Segunda fila - Contador + Vistas */
+  .facets-mobile-row-2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @media screen and (min-width: 750px) {
+      display: none;
+    }
+  }
+
+  .facets-mobile-row-2 .products-count-wrapper {
+    display: flex;
+    flex: 0 0 auto;
+  }
+
+  /* Ocultar el contador de productos del layout horizontal en mobile */
+  .facets-horizontal-right .products-count-wrapper {
+    @media screen and (max-width: 749px) {
+      display: none;
+    }
+  }
+
+  /* Contenedor principal de controles mobile - debe ser columna para apilar las dos filas */
+  .facets-toggle {
+    @media screen and (max-width: 749px) {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      height: auto !important;
+      min-height: auto !important;
+    }
+  }
+
+  /* Asegurar que las filas mobile se muestren correctamente */
+  .facets-mobile-row-1,
+  .facets-mobile-row-2 {
+    width: 100%;
+  }
+
+  /* Ajustar el wrapper del botón filtrar en mobile */
+  .facets-mobile-row-1 .facets-toggle__wrapper {
+    flex: 0 0 auto;
+  }
+
+  /* Ajustar el form de ordenamiento en mobile para que ocupe el espacio restante */
+  .facets-mobile-row-1 facets-form-component {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .facets-mobile-row-1 facets-form-component form {
+    width: auto;
+  }
+
+  /* Mostrar los controles de vista en la segunda fila mobile */
+  .facets-mobile-row-2 .column-options-wrapper {
+    display: flex !important;
+  }
+
+  /* Asegurar que el contador de productos se muestre en mobile */
+  .facets-mobile-row-2 .products-count-wrapper {
+    display: flex !important;
   }
 {% endstylesheet %}
 
