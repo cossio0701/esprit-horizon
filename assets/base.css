@@ -4331,3 +4331,8 @@ text-component {
 slideshow-slide.hidden {
   display: none !important;
 }
+
+/* Header border on non-home pages */
+#header-group:not(.template-index) .header-block {
+  border-bottom: 1px solid #e5e5e5;
+}

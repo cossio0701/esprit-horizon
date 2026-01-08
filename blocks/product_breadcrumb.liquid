@@ -1,22 +1,18 @@
-{% doc %}
-  @prompt
-    i need to create a breadcrumb for my pdp where the icon separator be a slash and the home page will be "inicio" and also, i need that the active page will be the metafield product_category, but i need that the current page, will be in font-weight in bold, But the active breadcrumb will use a font weight of #000, and the other breadcrumb items will be underlined.
-{% enddoc %}
-
-{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign breadcrumb_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
-  .ai-breadcrumb-{{ ai_gen_id }} {
+  .product-breadcrumb-{{ breadcrumb_id }} {
+    margin-top: 110px;
     padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
     background-color: {{ block.settings.background_color }};
   }
 
-  .ai-breadcrumb-container-{{ ai_gen_id }} {
+  .product-breadcrumb__container-{{ breadcrumb_id }} {
     max-width: 1200px;
     margin: 0 auto;
   }
 
-  .ai-breadcrumb-list-{{ ai_gen_id }} {
+  .product-breadcrumb__list-{{ breadcrumb_id }} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -28,119 +24,102 @@
     color: {{ block.settings.text_color }};
   }
 
-  .ai-breadcrumb-item-{{ ai_gen_id }} {
+  .product-breadcrumb__item-{{ breadcrumb_id }} {
     display: flex;
     align-items: center;
     gap: {{ block.settings.item_spacing }}px;
   }
 
-  .ai-breadcrumb-link-{{ ai_gen_id }} {
+  .product-breadcrumb__link-{{ breadcrumb_id }} {
     color: {{ block.settings.link_color }};
     text-decoration: underline;
     transition: color 0.2s ease;
   }
 
-  .ai-breadcrumb-link-{{ ai_gen_id }}:hover {
+  .product-breadcrumb__link-{{ breadcrumb_id }}:hover {
     color: {{ block.settings.link_hover_color }};
   }
 
-  .ai-breadcrumb-separator-{{ ai_gen_id }} {
+  .product-breadcrumb__separator-{{ breadcrumb_id }} {
     color: {{ block.settings.separator_color }};
     font-size: {{ block.settings.font_size }}px;
   }
 
-  .ai-breadcrumb-active-{{ ai_gen_id }} {
+  .product-breadcrumb__active-{{ breadcrumb_id }} {
     color: #000000;
     font-weight: bold;
   }
 
   @media screen and (max-width: 749px) {
-    .ai-breadcrumb-{{ ai_gen_id }} {
+    .product-breadcrumb-{{ breadcrumb_id }} {
+      margin-top: 0;
       padding: {{ block.settings.padding_top_mobile }}px 0 {{ block.settings.padding_bottom_mobile }}px;
     }
 
-    .ai-breadcrumb-list-{{ ai_gen_id }} {
+    .product-breadcrumb__list-{{ breadcrumb_id }} {
       font-size: {{ block.settings.font_size_mobile }}px;
     }
 
-    .ai-breadcrumb-separator-{{ ai_gen_id }} {
+    .product-breadcrumb__separator-{{ breadcrumb_id }} {
       font-size: {{ block.settings.font_size_mobile }}px;
     }
   }
 {% endstyle %}
 
 <nav
-  class="ai-breadcrumb-{{ ai_gen_id }}"
+  class="product-breadcrumb-{{ breadcrumb_id }}"
   aria-label="Breadcrumb"
   {{ block.shopify_attributes }}
 >
-  <div class="ai-breadcrumb-container-{{ ai_gen_id }}">
-    <ol class="ai-breadcrumb-list-{{ ai_gen_id }}">
-      <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
-        <a
-          href="/"
-          class="ai-breadcrumb-link-{{ ai_gen_id }}"
-        >
+  <div class="product-breadcrumb__container-{{ breadcrumb_id }}">
+    <ol class="product-breadcrumb__list-{{ breadcrumb_id }}">
+      <li class="product-breadcrumb__item-{{ breadcrumb_id }}">
+        <a href="/" class="product-breadcrumb__link-{{ breadcrumb_id }}">
           {{ block.settings.home_text }}
         </a>
       </li>
 
       {% if product %}
         {% if product.collections.size > 0 %}
-          <li
-            class="ai-breadcrumb-item-{{ ai_gen_id }}"
-            aria-hidden="true"
-          >
-            <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+          <li class="product-breadcrumb__item-{{ breadcrumb_id }}" aria-hidden="true">
+            <span class="product-breadcrumb__separator-{{ breadcrumb_id }}">/</span>
           </li>
-          <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
-            <a
-              href="{{ product.collections.first.url }}"
-              class="ai-breadcrumb-link-{{ ai_gen_id }}"
-            >
+          <li class="product-breadcrumb__item-{{ breadcrumb_id }}">
+            <a href="{{ product.collections.first.url }}" class="product-breadcrumb__link-{{ breadcrumb_id }}">
               {{ product.collections.first.title }}
             </a>
           </li>
         {% endif %}
 
-        <li
-          class="ai-breadcrumb-item-{{ ai_gen_id }}"
-          aria-hidden="true"
-        >
-          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}" aria-hidden="true">
+          <span class="product-breadcrumb__separator-{{ breadcrumb_id }}">/</span>
         </li>
-        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}">
           {% if product.metafields.custom.product_category != blank %}
-            <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+            <span class="product-breadcrumb__active-{{ breadcrumb_id }}">
               {{ product.metafields.custom.product_category }}
             </span>
           {% else %}
-            <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+            <span class="product-breadcrumb__active-{{ breadcrumb_id }}">
               {{ product.title }}
             </span>
           {% endif %}
         </li>
       {% elsif collection %}
-        <li
-          class="ai-breadcrumb-item-{{ ai_gen_id }}"
-          aria-hidden="true"
-        >
-          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}" aria-hidden="true">
+          <span class="product-breadcrumb__separator-{{ breadcrumb_id }}">/</span>
         </li>
-        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
-          <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}">
+          <span class="product-breadcrumb__active-{{ breadcrumb_id }}">
             {{ collection.title }}
           </span>
         </li>
       {% elsif page %}
-        <li
-          class="ai-breadcrumb-item-{{ ai_gen_id }}"
-          aria-hidden="true"
-        >
-          <span class="ai-breadcrumb-separator-{{ ai_gen_id }}">/</span>
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}" aria-hidden="true">
+          <span class="product-breadcrumb__separator-{{ breadcrumb_id }}">/</span>
         </li>
-        <li class="ai-breadcrumb-item-{{ ai_gen_id }}">
-          <span class="ai-breadcrumb-active-{{ ai_gen_id }}">
+        <li class="product-breadcrumb__item-{{ breadcrumb_id }}">
+          <span class="product-breadcrumb__active-{{ breadcrumb_id }}">
             {{ page.title }}
           </span>
         </li>
