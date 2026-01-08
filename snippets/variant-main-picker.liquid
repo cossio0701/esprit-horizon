@@ -16,6 +16,7 @@
       assign strikethrough_color_mix = '#fff'
     endif
   %}
+
   <variant-picker
     class="variant-picker spacing-style variant-picker--{{ block_settings.alignment }}"
     style="--color-strikethrough-mix: {{ strikethrough_color_mix }}; {% render 'spacing-style', settings: block_settings %}"
@@ -63,67 +64,89 @@
           >
             <legend>
               {{ product_option.name | escape -}}
+              :
               {%- if variant_style == 'swatch' -%}
                 <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
               {%- endif %}
             </legend>
-            {%- for product_option_value in product_option.values -%}
-              {% if product_option_value.size > longest_value and option_id_attribute %}
-                {% assign longest_value = product_option_value.size %}
-              {% endif %}
-              <label
-                class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}"
-              >
-                <input
-                  type="radio"
-                  name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
-                  value="{{ product_option_value | escape }}"
-                  aria-label="{{ product_option_value.name }}"
-                  {% if product_option_value.available == false %}
-                    aria-disabled="true"
-                  {% endif %}
-                  data-previous-checked="false"
-                  data-fieldset-index="{{ fieldset_index }}"
-                  data-input-index="{{ forloop.index0 }}"
-                  data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
-                  data-option-value-id="{{ product_option_value.id }}"
-                  data-option-available="{{ product_option_value.available }}"
-                  data-connected-product-url="{{ product_option_value.product_url }}"
-                  {% if product_option_value.variant.id %}
-                    data-variant-id="{{ product_option_value.variant.id }}"
-                  {% endif %}
-                  {% if product_option_value.selected %}
-                    data-current-checked="true"
-                    checked
-                  {% else %}
-                    data-current-checked="false"
-                  {% endif %}
-                >
-                {% if variant_style == 'swatch' %}
-                  {% liquid
-                    assign featured_media = product_option_value.variant.featured_media
-
-                    # If the variant has no featured media, and we have a combined listing product, then fall back to
-                    # using the featured media of the child product that is linked to this option value.
-                    if featured_media == blank and product_option_value.product_url
-                      assign featured_media = product_option_value.variant.product.featured_media
-                    endif
-                  %}
-
-                  {% render 'swatch',
-                    swatch: product_option_value.swatch,
-                    variant_image: featured_media,
-                    mode: 'unscaled'
-                  %}
-                {% else %}
-                  {% if product_option_value.available == true %}
-                    <span class="variant-option__button-label__pill"></span>
-                  {% endif %}
-                  <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+            <div class="variant-options-container {{ product_option.name | escape -}}">
+              {%- for product_option_value in product_option.values -%}
+                {% if product_option_value.size > longest_value and option_id_attribute %}
+                  {% assign longest_value = product_option_value.size %}
                 {% endif %}
-                {% render 'strikethrough-variant', product_option: product_option_value %}
-              </label>
-            {%- endfor -%}
+                <label
+                  class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}"
+                >
+                  <input
+                    type="radio"
+                    name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
+                    value="{{ product_option_value | escape }}"
+                    aria-label="{{ product_option_value.name }}"
+                    {% if product_option_value.available == false %}
+                      aria-disabled="true"
+                    {% endif %}
+
+                    data-previous-checked="false"
+                    data-fieldset-index="{{ fieldset_index }}"
+                    data-input-index="{{ forloop.index0 }}"
+                    data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                    data-option-value-id="{{ product_option_value.id }}"
+                    data-option-available="{{ product_option_value.available }}"
+                    data-connected-product-url="{{ product_option_value.product_url }}"
+                    {% if product_option_value.variant.id %}
+                      data-variant-id="{{ product_option_value.variant.id }}"
+                    {% endif %}
+                    {% if product_option_value.selected %}
+                      data-current-checked="true"
+                      checked
+                    {% else %}
+                      data-current-checked="false"
+                    {% endif %}
+                  >
+                  {% if variant_style == 'swatch' %}
+                    {% liquid
+                      assign featured_media = product_option_value.variant.featured_media
+
+                      # If the variant has no featured media, and we have a combined listing product, then fall back to
+                      # using the featured media of the child product that is linked to this option value.
+                      if featured_media == blank and product_option_value.product_url
+                        assign featured_media = product_option_value.variant.product.featured_media
+                      endif
+                    %}
+
+                    {% render 'swatch',
+                      swatch: product_option_value.swatch,
+                      variant_image: featured_media,
+                      mode: 'unscaled'
+                    %}
+                  {% else %}
+                    <div class="size-container">
+                      {% if product_option_value.available == true %}
+                        <span class="variant-option__button-label__pill"></span>
+                      {% endif %}
+                      <div class="size-text">
+                        <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+                        {% render 'strikethrough-variant', product_option: product_option_value %}
+                      </div>
+                      {% if product_option_value.available == false %}
+                        <span class="variant-tooltip">
+                          <svg
+                            width="12"
+                            height="13"
+                            viewBox="0 0 12 13"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M7.83333 9.83334H11.1667L10.23 8.89671C9.97603 8.6427 9.83333 8.29819 9.83333 7.93897V5.83334C9.83333 4.09171 8.72026 2.61006 7.16667 2.06094V1.83333C7.16667 1.09695 6.56971 0.5 5.83333 0.5C5.09695 0.5 4.5 1.09695 4.5 1.83333V2.06094C2.94641 2.61006 1.83333 4.09171 1.83333 5.83334V7.93897C1.83333 8.29819 1.69063 8.6427 1.43662 8.89671L0.5 9.83334H3.83333M7.83333 9.83334V10.5C7.83333 11.6046 6.9379 12.5 5.83333 12.5C4.72876 12.5 3.83333 11.6046 3.83333 10.5V9.83334M7.83333 9.83334H3.83333" stroke="#0F0A05" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          <span class="variant-tooltip__text"> Esta talla no está disponible actualmente </span>
+                        </span>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </label>
+              {%- endfor -%}
+            </div>
             {% if option_id_attribute %}
               {% style %}
                 [data-option-id="{{ fieldset_id }}"] {
@@ -250,6 +273,12 @@
     margin: 0;
     padding: 0;
     border: none;
+
+    .variant-options-container {
+      display: flex;
+      gap: var(--gap-sm);
+      flex: none;
+    }
   }
 
   .variant-option--buttons legend {
@@ -316,7 +345,7 @@
 
     &:hover,
     &:hover:has([aria-disabled='true']):has([data-option-available='false']) {
-      background-color: var(--color-variant-hover-background);
+      /* background-color: var(--color-variant-hover-background); */
       border-color: var(--color-variant-hover-border);
       color: var(--color-variant-hover-text);
     }
@@ -330,15 +359,15 @@
     /* ::after is the unavailable variant border that clips in */
     &:not(.variant-option__button-label--has-swatch)::before,
     &:has([data-option-available='false']):not(.variant-option__button-label--has-swatch)::after {
-      content: '';
+      /* content: '';
       position: absolute;
       inset: 0;
       border: var(--options-border-width) solid var(--color-selected-variant-border);
       border-radius: inherit;
       pointer-events: none;
-      z-index: 2;
+      z-index: 2; */
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-      clip-path: inset(var(--clip, 0 0 0 0));
+      /* clip-path: inset(var(--clip, 0 0 0 0)); */
     }
     &:has([data-option-available='false']):not(.variant-option__button-label--has-swatch)::before {
       inset: 0;
@@ -346,11 +375,11 @@
     &:not(.variant-option__button-label--has-swatch)::before {
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
       clip-path: inset(0 0 0 0);
-      border-color: var(--color-variant-border);
+      border: none;
       inset: calc(var(--options-border-width) * -1);
     }
     &:has(:checked):not(.variant-option__button-label--has-swatch):not(:has([data-option-available='false']))::before {
-      border-color: var(--color-selected-variant-border);
+      /* border-color: var(--color-selected-variant-border); */
     }
 
     /* setting left/right accounts for variant buttons of different widths */
@@ -392,7 +421,8 @@
     }
 
     &:has([data-previous-checked='true'], [data-current-checked='true']) .variant-option__button-label__pill {
-      width: max(var(--pill-width-current, 100%), var(--pill-width-previous, 100%));
+      /* width: max(var(--pill-width-current, 100%), var(--pill-width-previous, 100%)); */
+      width: fit-content;
     }
     @media screen and (min-width: 750px) {
       padding: var(--padding-xs) var(--variant-option-padding-inline);
@@ -413,13 +443,13 @@
   }
 
   .variant-option__button-label__pill {
-    background: var(--color-selected-variant-background);
+    background: red;
+
     position: absolute;
     top: calc(var(--options-border-width) * -1);
     bottom: calc(var(--options-border-width) * -1);
     border-radius: inherit;
     pointer-events: none;
-    width: 100%;
     transform: translateX(var(--pill-offset, 0));
   }
 
@@ -437,12 +467,48 @@
     grid-template-columns: repeat(auto-fit, minmax(var(--variant-min-width), 1fr));
 
     .variant-option__button-label {
-      min-width: var(--variant-min-width);
+      padding: 0;
+      flex: none;
+      min-height: auto;
+      color: #000;
+      border: none;
+      border-radius: 0;
+      font-size: 16px;
+      overflow: visible;
+    }
+
+    .variant-option__button-label::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 1.5px;
+      bottom: 0;
+      background-color: black;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: width 0.2s ease-in-out;
+    }
+
+    .size-text::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 1.5px;
+      bottom: 0;
+      background-color: black;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: width 0.2s ease-in-out;
     }
 
     .variant-option__button-label__text {
       text-align: center;
       text-wrap: balance;
+    }
+
+    .variant-options-container {
+      display: flex;
+      gap: var(--gap-sm);
     }
   }
 
@@ -465,13 +531,19 @@
   }
 
   .variant-option__button-label:has(:checked) {
-    color: var(--color-selected-variant-text);
-    border-color: var(--color-selected-variant-border);
+    color: #000;
+    /* border-color: var(--color-selected-variant-border); */
+  }
+
+  .variant-option__button-label:has(:checked) .size-text::after {
+    color: #000;
+    width: 100%;
+    /* border-color: var(--color-selected-variant-border); */
   }
 
   .variant-option__button-label:has(:checked):hover {
-    border-color: var(--color-selected-variant-hover-border);
-    color: var(--color-selected-variant-hover-text);
+    /* border-color: var(--color-selected-variant-hover-border); */
+    color: #000;
 
     .variant-option__button-label__pill {
       background-color: var(--color-selected-variant-hover-background);
@@ -504,9 +576,10 @@
     outline: none;
   }
 
-  .variant-option__button-label--has-swatch:hover {
-    outline: var(--focus-outline-width) solid rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
-    outline-offset: var(--focus-outline-offset);
+  .variant-option__button-label--has-swatch:hover::after {
+    /* outline: var(--focus-outline-width) solid rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+    outline-offset: var(--focus-outline-offset); */
+    width: 72%;
   }
 
   .facets__inputs-list--swatches-grid .variant-option__button-label--has-swatch:has(:checked) {
@@ -518,11 +591,23 @@
     outline-offset: var(--focus-outline-offset);
   }
 
-  .variant-option__button-label--has-swatch:has(:checked) {
-    --focus-outline: var(--focus-outline-width) solid var(--color-foreground);
-
+  .variant-option__button-label--has-swatch:has(:checked)::after {
+    /* --focus-outline: var(--focus-outline-width) solid var(--color-foreground);
     outline: var(--focus-outline);
-    outline-offset: var(--focus-outline-offset);
+    outline-offset: var(--focus-outline-offset); */
+    width: 72%;
+  }
+
+  .variant-option__button-label--has-swatch::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 1.5px;
+    bottom: 0;
+    background-color: black;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: width 0.2s ease-in-out;
   }
 
   /* This triggers iOS < 16.4. The outline bug is not recognized as a lack of @supports */
@@ -570,16 +655,44 @@
     height: 100%;
   }
 
+  .variant-option__button-label .size-container {
+    display: flex;
+    align-items: center;
+  }
+  .variant-option__button-label .size-container .size-text {
+    position: relative;
+    width: 20px;
+  }
+
+  .size-text .variant-option__button-label__text {
+    width: 100%;
+    display: block;
+  }
+
   .variant-option__button-label svg {
     position: absolute;
     left: var(--options-border-width);
     top: var(--options-border-width);
-    height: calc(100% - (var(--options-border-width) * 2));
     width: calc(100% - (var(--options-border-width) * 2));
-    cursor: pointer;
+    height: calc(100% - (var(--options-border-width) * 2));
     pointer-events: none;
-    stroke-width: var(--style-border-width);
+  }
+
+  .variant-option__button-label svg line {
     stroke: var(--variant-picker-stroke-color);
+    stroke-width: var(--style-border-width);
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+
+    stroke-dasharray: 150;
+    stroke-dashoffset: 150;
+    animation: slashIn 0.25s ease-out forwards;
+  }
+
+  @keyframes slashIn {
+    to {
+      stroke-dashoffset: 0;
+    }
   }
 
   .variant-option__button-label:not(.variant-option__button-label--has-swatch) svg {
@@ -591,8 +704,7 @@
 
     line:last-of-type {
       /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-      clip-path: inset(var(--clip, 0 0 0 0));
-      stroke: rgb(var(--color-variant-text-rgb) / 1);
+      stroke: #949494;
     }
   }
 
@@ -663,5 +775,9 @@
   .variant-picker--right .variant-option {
     text-align: right;
     justify-content: right;
+  }
+
+  .size-text:hover::after {
+    width: 100%;
   }
 {% endstylesheet %}

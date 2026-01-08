@@ -115,24 +115,41 @@
     "17647741440935b179": {
       "type": "_blocks",
       "blocks": {
+        "container_qmgHiB": {
+          "type": "container",
+          "name": "Container",
+          "settings": {
+            "container_class": "header-block"
+          },
+          "blocks": {
+            "commons_components_top_banner_wNDqcn": {
+              "type": "shopify://apps/commons-components/blocks/top-banner/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+              "settings": {}
+            },
+            "commons_components_header_complete_jbeD8H": {
+              "type": "shopify://apps/commons-components/blocks/header-complete/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+              "settings": {
+                "logo": "shopify://shop_images/new_header_logo.svg",
+                "header_mode": "auto",
+                "enable_search": true,
+                "enable_account": true,
+                "enable_cart": true
+              }
+            }
+          },
+          "block_order": [
+            "commons_components_top_banner_wNDqcn",
+            "commons_components_header_complete_jbeD8H"
+          ]
+        },
         "commons_components_floating_banner_DGPadU": {
           "type": "shopify://apps/commons-components/blocks/floating-banner/019a5fb5-0369-7d7a-9e19-07bacb81690d",
           "settings": {}
-        },
-        "commons_components_header_complete_zqNcma": {
-          "type": "shopify://apps/commons-components/blocks/header-complete/019a5fb5-0369-7d7a-9e19-07bacb81690d",
-          "settings": {
-            "logo": "shopify://shop_images/new_header_logo.svg",
-            "header_mode": "auto",
-            "enable_search": true,
-            "enable_account": true,
-            "enable_cart": true
-          }
         }
       },
       "block_order": [
-        "commons_components_floating_banner_DGPadU",
-        "commons_components_header_complete_zqNcma"
+        "container_qmgHiB",
+        "commons_components_floating_banner_DGPadU"
       ],
       "name": "Header",
       "settings": {
@@ -144,7 +161,7 @@
         "horizontal_alignment_flex_direction_column": "flex-start",
         "vertical_alignment_flex_direction_column": "center",
         "gap": 12,
-        "section_width": "page-width",
+        "section_width": "full-width",
         "section_height": "",
         "section_height_custom": 50,
         "color_scheme": "",

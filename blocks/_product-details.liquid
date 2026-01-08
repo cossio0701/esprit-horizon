@@ -1,5 +1,3 @@
-
-
 {%- assign block_settings = block.settings -%}
 
 <div
@@ -47,6 +45,10 @@
     display: flex;
     align-self: start;
     justify-content: center;
+  }
+
+  .product-details p {
+    max-width: none;
   }
 
   @media screen and (min-width: 750px) {
@@ -117,6 +119,9 @@
     },
     {
       "type": "review"
+    },
+    {
+      "type": "_product-model-fit"
     },
     {
       "type": "accelerated-checkout"

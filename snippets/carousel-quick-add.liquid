@@ -1,0 +1,387 @@
+{%- doc -%}
+  Renders a carousel quick add block for product cards
+  
+  @param {object} product - The product object
+{%- enddoc -%}
+
+{% if product.available and product.variants.size > 0 %}
+  <div class="carousel-quick-add" data-product-id="{{ product.id }}">
+    
+    <!-- Size Selector Row -->
+    <div class="carousel-quick-add__sizes">
+      {% assign size_option = product.options_by_name['Size'] %}
+      {% if size_option == null %}
+        {% assign size_option = product.options_by_name['Talla'] %}
+      {% endif %}
+      {% if size_option %}
+        {% for size_value in size_option.values %}
+          <button 
+            type="button"
+            class="carousel-quick-add__size-btn"
+            data-size="{{ size_value | escape }}"
+            data-product-id="{{ product.id }}"
+          >
+            {{ size_value }}
+          </button>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Color and CTA Row -->
+    <div class="carousel-quick-add__bottom">
+      <!-- Color Swatches -->
+      <div class="carousel-quick-add__colors">
+        {% assign color_option = product.options_by_name['Color'] %}
+        {% if color_option %}
+          {% for color_value in color_option.values %}
+            {% if color_value.swatch %}
+              <button 
+                type="button"
+                class="carousel-quick-add__color-btn"
+                data-color="{{ color_value | escape }}"
+                data-product-id="{{ product.id }}"
+                title="{{ color_value }}"
+              >
+                {% render 'swatch', swatch: color_value.swatch, mode: 'unscaled' %}
+              </button>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Add to Cart Button -->
+      <button 
+        type="button"
+        class="carousel-quick-add__cta"
+        data-product-id="{{ product.id }}"
+        disabled
+      >
+        Agregar a la bolsa →
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const productId = '{{ product.id }}';
+      const quickAddElement = document.querySelector(`.carousel-quick-add[data-product-id="${productId}"]`);
+      
+      if (!quickAddElement) return;
+
+      // Product variants data from existing PLP structure
+      const productData = window.PLP?.[productId];
+      if (!productData?.variants) return;
+
+      // State management
+      const state = {
+        selectedSize: null,
+        selectedColor: null,
+        selectedVariantId: null
+      };
+
+      // Get option positions dynamically
+      const options = {{ product.options | json }};
+      const sizePos = options.findIndex(opt => opt === 'Size' || opt === 'Talla');
+      const colorPos = options.findIndex(opt => opt === 'Color');
+
+      // Helper: Find variant by size and color
+      function findVariant(size, color) {
+        return productData.variants.find(variant => {
+          const variantSize = sizePos >= 0 ? variant.options[sizePos] : null;
+          const variantColor = colorPos >= 0 ? variant.options[colorPos] : null;
+          return variantSize === size && variantColor === color;
+        });
+      }
+
+      // Update size availability based on selected color
+      function updateSizeAvailability(selectedColor) {
+        const sizeButtons = quickAddElement.querySelectorAll('.carousel-quick-add__size-btn');
+        
+        sizeButtons.forEach(btn => {
+          const size = btn.dataset.size;
+          const variant = findVariant(size, selectedColor);
+          const isAvailable = variant?.available;
+          
+          btn.disabled = !isAvailable;
+          btn.classList.toggle('carousel-quick-add__size-btn--disabled', !isAvailable);
+        });
+      }
+
+      // Update add to cart button state
+      function updateCTAButton() {
+        const ctaButton = quickAddElement.querySelector('.carousel-quick-add__cta');
+        const canAdd = state.selectedSize && state.selectedVariantId;
+        ctaButton.disabled = !canAdd;
+      }
+
+      // Handle size selection
+      const sizeButtons = quickAddElement.querySelectorAll('.carousel-quick-add__size-btn');
+      sizeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (this.disabled) return;
+          
+          const size = this.dataset.size;
+          
+          // Update UI
+          sizeButtons.forEach(b => b.classList.remove('carousel-quick-add__size-btn--active'));
+          this.classList.add('carousel-quick-add__size-btn--active');
+          
+          // Update state
+          state.selectedSize = size;
+          
+          // Find and set variant
+          const variant = findVariant(size, state.selectedColor);
+          if (variant?.available) {
+            state.selectedVariantId = variant.id;
+            quickAddElement.dataset.selectedVariantId = variant.id;
+          } else {
+            state.selectedVariantId = null;
+          }
+          
+          updateCTAButton();
+        });
+      });
+
+      // Handle color selection
+      const colorButtons = quickAddElement.querySelectorAll('.carousel-quick-add__color-btn');
+      colorButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const color = this.dataset.color;
+          
+          // Update UI
+          colorButtons.forEach(b => b.classList.remove('carousel-quick-add__color-btn--active'));
+          this.classList.add('carousel-quick-add__color-btn--active');
+          
+          // Update state
+          state.selectedColor = color;
+          
+          // Reset size selection and update availability
+          state.selectedSize = null;
+          state.selectedVariantId = null;
+          sizeButtons.forEach(b => b.classList.remove('carousel-quick-add__size-btn--active'));
+          
+          updateSizeAvailability(color);
+          updateCTAButton();
+        });
+      });
+
+      // Handle add to cart
+      const ctaButton = quickAddElement.querySelector('.carousel-quick-add__cta');
+      ctaButton.addEventListener('click', async function() {
+        if (!state.selectedVariantId) return;
+        
+        this.disabled = true;
+        this.textContent = 'Agregando...';
+        
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: state.selectedVariantId,
+              quantity: 1
+            })
+          });
+          
+          if (response.ok) {
+            this.textContent = '✓ Agregado';
+            // Trigger cart update event
+            document.dispatchEvent(new CustomEvent('cart:updated'));
+            
+            // Reset after success
+            setTimeout(() => {
+              this.textContent = 'Agregar a la bolsa →';
+              // Reset selections
+              colorButtons.forEach(b => b.classList.remove('carousel-quick-add__color-btn--active'));
+              sizeButtons.forEach(b => b.classList.remove('carousel-quick-add__size-btn--active'));
+              state.selectedColor = null;
+              state.selectedSize = null;
+              state.selectedVariantId = null;
+              updateCTAButton();
+            }, 2000);
+          } else {
+            throw new Error('Failed to add to cart');
+          }
+        } catch (error) {
+          this.textContent = 'Error';
+          setTimeout(() => {
+            this.textContent = 'Agregar a la bolsa →';
+            updateCTAButton();
+          }, 2000);
+        }
+      });
+
+      // Auto-select first color if no color selected initially
+      if (colorButtons.length > 0 && !state.selectedColor) {
+        const firstColor = colorButtons[0].dataset.color;
+        state.selectedColor = firstColor;
+        colorButtons[0].classList.add('carousel-quick-add__color-btn--active');
+        updateSizeAvailability(firstColor);
+      }
+    })();
+  </script>
+
+  <style>
+    /* Carousel Quick Add Styles - Fashion Forward Design */
+    .carousel-quick-add {
+      margin: 12px 0;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+    }
+
+    /* Size Selector */
+    .carousel-quick-add__sizes {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .carousel-quick-add__size-btn {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .carousel-quick-add__size-btn:hover:not(:disabled) {
+      border-color: #666;
+      color: #000;
+    }
+
+    .carousel-quick-add__size-btn--active {
+      background: #000;
+      border-color: #000;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .carousel-quick-add__size-btn--disabled {
+      border-color: #f0f0f0;
+      color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    /* Bottom Row - Colors and CTA */
+    .carousel-quick-add__bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Color Swatches */
+    .carousel-quick-add__colors {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .carousel-quick-add__color-btn {
+      width: 24px;
+      height: 24px;
+      border: 2px solid transparent;
+      border-radius: 3px;
+      cursor: pointer;
+      padding: 0;
+      background: none;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .carousel-quick-add__color-btn:hover {
+      transform: scale(1.1);
+      border-color: #666;
+    }
+
+    .carousel-quick-add__color-btn--active {
+      border-color: #000;
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    .carousel-quick-add__color-btn .swatch {
+      width: 100%;
+      height: 100%;
+      border-radius: 1px;
+      display: block;
+    }
+
+    /* Add to Cart Button */
+    .carousel-quick-add__cta {
+      background: transparent;
+      border: none;
+      padding: 8px 0;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+      color: #333;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .carousel-quick-add__cta:hover:not(:disabled) {
+      color: #000;
+      text-decoration-thickness: 2px;
+    }
+
+    .carousel-quick-add__cta:disabled {
+      color: #ccc;
+      cursor: not-allowed;
+      text-decoration: none;
+      opacity: 0.6;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 749px) {
+      .carousel-quick-add {
+        padding: 12px;
+        margin: 8px 0;
+      }
+
+      .carousel-quick-add__sizes {
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      .carousel-quick-add__size-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+        min-width: 28px;
+      }
+
+      .carousel-quick-add__bottom {
+        gap: 12px;
+      }
+
+      .carousel-quick-add__color-btn {
+        width: 20px;
+        height: 20px;
+      }
+
+      .carousel-quick-add__cta {
+        font-size: 12px;
+      }
+    }
+
+    /* Integration with existing card structure */
+    .product-card .carousel-quick-add {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+  </style>
+{% endif %}

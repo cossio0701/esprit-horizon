@@ -1,0 +1,50 @@
+<section class="pdp-main-container">
+  {% for block in section.blocks %}
+    {% render block %}
+  {% endfor %}
+</section>
+
+<style>
+  .pdp-main-container {
+    display: flex;
+    gap: 32px;
+    padding: 40px 0;
+    max-width: 1830px;
+    margin: 0 auto;
+  }
+
+  .pdp-main-container .section-variant-gallery {
+    width: 78%;
+  }
+
+  .pdp-main-container .product-details {
+    width: 39%;
+  }
+
+  @media (max-width: 1024px) {
+    .pdp-main-container {
+      flex-direction: column;
+      padding: 20px 10px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Custom Product Detail",
+  "class": "product-detail",
+
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "_product-gallery-pdp"
+    },
+    {
+      "type": "_product-details"
+    }
+  ],
+  "presets": [{ "name": "Custom Product Detail" }]
+}
+{% endschema %}
