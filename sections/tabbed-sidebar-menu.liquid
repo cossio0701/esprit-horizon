@@ -1,405 +1,257 @@
 {% comment %}
-  Sección: Menú Tab Lateral
-  Renderiza un menú con tabs laterales y contenido dinámico
+  Archivo: sections/tabbed-sidebar-menu.liquid
+  Descripción: Sección contenedora que orquesta el layout de sidebar y tabs.
 {% endcomment %}
 
-{%- comment -%}
-  ============================================
-    SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES
-  ============================================
-{%- endcomment -%}
+{%- style -%}
+  /* --- CSS Scoped para esta sección --- */
+    /* max-width and margin are now handled by the .section wrapper */
+    /* padding is handled by style attribute from settings */
 
-{%- liquid
-  # Configuraciones de la sección
-  assign section_width = section.settings.section_width
-  assign sidebar_width = section.settings.sidebar_width
-  assign tab_alignment = section.settings.tab_alignment
-  assign active_tab_color = section.settings.active_tab_color
-  assign inactive_tab_color = section.settings.inactive_tab_color
-  assign content_bg_color = section.settings.content_bg_color
--%}
-
-{%- comment -%}
-  ============================================
-    SECCIÓN 2: ESTRUCTURA HTML
-  ============================================
-{%- endcomment -%}
-
-<section class="tabbed-sidebar-menu section section--{{ section_width }}">
-  <div class="tabbed-sidebar-container">
-    <!-- Sidebar con tabs -->
-    <div class="tabbed-sidebar" style="width: {{ sidebar_width }}%;">
-      <div class="tab-list" role="tablist">
-        {% for block in section.blocks %}
-          {% if block.type == 'tab' %}
-            <button
-              class="tab-button {% if forloop.first %}active{% endif %}"
-              role="tab"
-              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-              aria-controls="tab-content-{{ block.id }}"
-              data-tab-id="{{ block.id }}"
-            >
-              {{ block.settings.tab_title }}
-            </button>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Contenido de los tabs -->
-    <div class="tab-content-area">
-      {% for block in section.blocks %}
-        {% if block.type == 'tab' %}
-          <div
-            id="tab-content-{{ block.id }}"
-            class="tab-content {% if forloop.first %}active{% endif %}"
-            role="tabpanel"
-            data-tab-id="{{ block.id }}"
-            {{ block.shopify_attributes }}
-          >
-            <div class="tab-content-inner">
-              {% if block.settings.content_title != blank %}
-                <h2 class="tab-content-title">{{ block.settings.content_title }}</h2>
-              {% endif %}
-
-              {% if block.settings.content_text != blank %}
-                <div class="tab-content-text">
-                  {{ block.settings.content_text }}
-                </div>
-              {% endif %}
-
-              {% if block.settings.content_html != blank %}
-                <div class="tab-content-html">
-                  {{ block.settings.content_html }}
-                </div>
-              {% endif %}
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-{%- comment -%}
-  ============================================
-    SECCIÓN 3: JAVASCRIPT
-  ============================================
-{%- endcomment -%}
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const tabButtons = document.querySelectorAll('.tabbed-sidebar-menu .tab-button');
-    const tabContents = document.querySelectorAll('.tabbed-sidebar-menu .tab-content');
-
-    tabButtons.forEach((button) => {
-      button.addEventListener('click', function () {
-        const tabId = this.getAttribute('data-tab-id');
-
-        // Remover clase active de todos los botones y contenidos
-        tabButtons.forEach((btn) => {
-          btn.classList.remove('active');
-          btn.setAttribute('aria-selected', 'false');
-        });
-        tabContents.forEach((content) => {
-          content.classList.remove('active');
-        });
-
-        // Agregar clase active al botón clickeado y su contenido
-        this.classList.add('active');
-        this.setAttribute('aria-selected', 'true');
-
-        const activeContent = document.getElementById('tab-content-' + tabId);
-        if (activeContent) {
-          activeContent.classList.add('active');
-        }
-      });
-    });
-  });
-</script>
-
-{%- comment -%}
-  ============================================
-    SECCIÓN 4: CSS
-  ============================================
-{%- endcomment -%}
-
-<style>
-  .tabbed-sidebar-menu {
-    width: 100%;
-    padding: 2rem 0;
-  }
-
-  .tabbed-sidebar-container {
-    display: flex;
-    gap: 2rem;
-    width: 100%;
-  }
-
-  /* Sidebar con tabs */
-  .tabbed-sidebar {
-    flex-shrink: 0;
-  }
-
-  .tab-list {
+  #shopify-section-{{ section.id }} .sidebar-tabs-layout {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 20px;
   }
 
-  .tab-button {
+  @media (min-width: 768px) {
+    #shopify-section-{{ section.id }} .sidebar-tabs-layout {
+      flex-direction: row;
+      align-items: flex-start; /* Importante para que el sidebar no se estire */
+      gap: 30px;
+    }
+  }
+
+  /* --- Estilos del Sidebar --- */
+  #shopify-section-{{ section.id }} .sidebar-tabs-sidebar {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    padding: 1rem 1.5rem;
-    text-align: {{ tab_alignment }};
-    background: {{ inactive_tab_color }};
-    border: 1px solid #e0e0e0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+  }
+
+  @media (min-width: 768px) {
+    #shopify-section-{{ section.id }} .sidebar-tabs-sidebar {
+        width: 25%;
+        position: sticky; /* Hace que el sidebar se quede fijo al hacer scroll */
+        top: 20px;
+    }
+  }
+
+  /* Botones generados por JS */
+  #shopify-section-{{ section.id }} .tab-sidebar__button {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    outline: none;
   }
 
-  .tab-button:hover {
-    background: {{ active_tab_color }};
-    color: #fff;
-    transform: translateX(4px);
+  #shopify-section-{{ section.id }} .tab-sidebar__button:hover {
+    background-color: #e9ecef;
+    color: #212529;
   }
 
-  .tab-button.active {
-    background: {{ active_tab_color }};
-    color: #fff;
-    border-color: {{ active_tab_color }};
+  #shopify-section-{{ section.id }} .tab-sidebar__button.active {
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    border-left: 4px solid #000000; /* Acento visual */
+    padding-left: 16px; /* Ajuste por el borde */
   }
 
-  /* Área de contenido */
-  .tab-content-area {
+
+  /* --- Estilos del Área Principal --- */
+  #shopify-section-{{ section.id }} .sidebar-tabs-main {
     flex: 1;
-    min-width: 0;
+    background: #ffffff;
+    /* Min height para que no colapse si está vacío */
+    min-height: 300px;
   }
 
-  .tab-content {
-    display: none;
-    animation: fadeIn 0.3s ease;
+  /* Estilos para los paneles de contenido */
+  .tab-content__pane {
+    animation: fadeIn 0.3s ease-in-out;
   }
 
-  .tab-content.active {
-    display: block;
+  /* Un poco de espaciado interno para los bloques anidados */
+  .tab-content__inner-wrapper {
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .tab-content-inner {
-    background: {{ content_bg_color }};
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+  /* Estado de carga inicial para evitar FOUC (Flash of Unstyled Content) */
+  .sidebar-tabs-layout.loading .sidebar-tabs-sidebar,
+  .sidebar-tabs-layout.loading .sidebar-tabs-main {
+    opacity: 0;
+    visibility: hidden;
   }
+{%- endstyle -%}
 
-  .tab-content-title {
-    margin: 0 0 1.5rem 0;
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #333;
-  }
+<div class="section-background color-scheme-1"></div>
+<div
+  class="section spacing-style section--{{ section.settings.section_width }} sidebar-tabs-layout js-tabs-container"
+  data-section-id="{{ section.id }}"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  <aside class="sidebar-tabs-sidebar" role="tablist"></aside>
 
-  .tab-content-text {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-    color: #666;
-  }
+  <main class="sidebar-tabs-main">
+    {%- comment -%}
+      Aquí Shopify renderiza los archivos blocks/tab.liquid.
+      Aunque se renderizan, sus contenidos están ocultos por CSS inicialmente,
+      y sus botones están dentro de etiquetas <template>.
+    {%- endcomment -%}
+    {% content_for 'blocks' %}
+  </main>
+</div>
 
-  .tab-content-html {
-    line-height: 1.6;
-  }
+<script>
+  (function () {
+    const initTabs = () => {
+      const sectionId = '{{ section.id }}';
+      const container = document.querySelector(`.js-tabs-container[data-section-id="${sectionId}"]`);
+      if (!container) return;
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .tabbed-sidebar-container {
-      flex-direction: column;
+      const sidebarTarget = container.querySelector('.sidebar-tabs-sidebar');
+      // CORRECCIÓN: Buscamos el template directamente en el bloque, no dentro del pane
+      const portals = container.querySelectorAll('.js-tab-portal-source');
+
+      // Limpiamos el sidebar por si acaso (evita duplicados en el editor)
+      sidebarTarget.innerHTML = '';
+
+      if (portals.length === 0) {
+        container.classList.remove('loading');
+        return;
+      }
+
+      function activateTab(buttonElement) {
+        sidebarTarget.querySelectorAll('.tab-sidebar__button').forEach((btn) => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+
+        container.querySelectorAll('.tab-content__pane').forEach((pane) => {
+          pane.style.display = 'none';
+        });
+
+        buttonElement.classList.add('active');
+        buttonElement.setAttribute('aria-selected', 'true');
+
+        const targetId = buttonElement.dataset.targetId;
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) {
+          targetPane.style.display = 'block';
+        }
+      }
+
+      portals.forEach((portal, index) => {
+        // Accedemos al contenido del template
+        const button = portal.content.querySelector('.tab-sidebar__button').cloneNode(true);
+
+        button.addEventListener('click', function () {
+          activateTab(this);
+        });
+
+        sidebarTarget.appendChild(button);
+
+        if (index === 0) {
+          activateTab(button);
+        }
+      });
+
+      container.classList.remove('loading');
+    };
+
+    // Ejecutar al cargar el DOM
+    document.addEventListener('DOMContentLoaded', initTabs);
+
+    // Ejecutar específicamente para el Editor de Shopify (cuando se re-renderiza la sección)
+    document.addEventListener('shopify:section:load', initTabs);
+
+    // Ejecución inmediata por si el DOM ya está listo
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initTabs();
     }
-
-    .tabbed-sidebar {
-      width: 100% !important;
-    }
-
-    .tab-list {
-      flex-direction: row;
-      overflow-x: auto;
-      gap: 0.5rem;
-      padding-bottom: 0.5rem;
-    }
-
-    .tab-button {
-      white-space: nowrap;
-      min-width: 120px;
-    }
-
-    .tab-button:hover {
-      transform: none;
-    }
-
-    .tab-content-inner {
-      padding: 1.5rem;
-    }
-
-    .tab-content-title {
-      font-size: 1.5rem;
-    }
-  }
-</style>
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Menú Tab Lateral",
+  "name": "Menú Lateral Anidado",
   "tag": "section",
-  "class": "section-tabbed-sidebar-menu",
+  "class": "section",
   "settings": [
-    {
-      "type": "header",
-      "content": "Diseño de la Sección"
-    },
     {
       "type": "select",
       "id": "section_width",
-      "label": "Ancho de la sección",
+      "label": "t:settings.section_width",
       "options": [
         {
           "value": "page-width",
-          "label": "Ancho de página"
+          "label": "t:options.page"
         },
         {
           "value": "full-width",
-          "label": "Ancho completo"
+          "label": "t:options.full"
         }
       ],
       "default": "page-width"
     },
     {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
       "type": "range",
-      "id": "sidebar_width",
-      "min": 20,
-      "max": 40,
-      "step": 5,
-      "label": "Ancho del sidebar (%)",
-      "default": 30
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
     },
     {
-      "type": "header",
-      "content": "Estilo de Tabs"
-    },
-    {
-      "type": "select",
-      "id": "tab_alignment",
-      "label": "Alineación del texto",
-      "options": [
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        },
-        {
-          "value": "right",
-          "label": "Derecha"
-        }
-      ],
-      "default": "left"
-    },
-    {
-      "type": "color",
-      "id": "active_tab_color",
-      "label": "Color tab activo",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "inactive_tab_color",
-      "label": "Color tab inactivo",
-      "default": "#f5f5f5"
-    },
-    {
-      "type": "header",
-      "content": "Estilo de Contenido"
-    },
-    {
-      "type": "color",
-      "id": "content_bg_color",
-      "label": "Color de fondo del contenido",
-      "default": "#ffffff"
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
     }
   ],
   "blocks": [
     {
-      "type": "tab",
-      "name": "Tab",
-      "settings": [
-        {
-          "type": "text",
-          "id": "tab_title",
-          "label": "Título del tab",
-          "default": "Tab"
-        },
-        {
-          "type": "text",
-          "id": "content_title",
-          "label": "Título del contenido",
-          "default": "Título del contenido"
-        },
-        {
-          "type": "richtext",
-          "id": "content_text",
-          "label": "Texto del contenido",
-          "default": "<p>Contenido del tab</p>"
-        },
-        {
-          "type": "html",
-          "id": "content_html",
-          "label": "HTML personalizado",
-          "info": "HTML adicional para contenido avanzado"
-        }
-      ]
+      "type": "tab"
     }
   ],
   "presets": [
     {
-      "name": "Menú Tab Lateral",
+      "name": "Menú Lateral Anidado",
       "blocks": [
-        {
-          "type": "tab",
-          "settings": {
-            "tab_title": "Tab 1",
-            "content_title": "Contenido Tab 1",
-            "content_text": "<p>Este es el contenido del primer tab.</p>"
-          }
-        },
-        {
-          "type": "tab",
-          "settings": {
-            "tab_title": "Tab 2",
-            "content_title": "Contenido Tab 2",
-            "content_text": "<p>Este es el contenido del segundo tab.</p>"
-          }
-        },
-        {
-          "type": "tab",
-          "settings": {
-            "tab_title": "Tab 3",
-            "content_title": "Contenido Tab 3",
-            "content_text": "<p>Este es el contenido del tercer tab.</p>"
-          }
-        }
+        { "type": "tab", "settings": { "title": "Introducción" } },
+        { "type": "tab", "settings": { "title": "Características" } },
+        { "type": "tab", "settings": { "title": "Contacto" } }
       ]
     }
   ]
