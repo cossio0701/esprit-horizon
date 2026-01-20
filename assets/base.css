@@ -3647,8 +3647,8 @@ slideshow-component[autoplay] slideshow-controls {
   align-items: center;
   justify-content: center;
   aspect-ratio: 1 / 1;
-  background-color: var(--color-primary-button-background);
-  color: var(--color-primary-button-text);
+  background-color: #fff;
+  color: #000;
 }
 
 .button-unstyled.slideshow-control.slideshow-control--shape-circle {
@@ -4330,4 +4330,9 @@ text-component {
 
 slideshow-slide.hidden {
   display: none !important;
+}
+
+/* Header border on non-home pages */
+#header-group:not(.template-index) .header-block {
+  border-bottom: 1px solid #e5e5e5;
 }

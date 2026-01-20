@@ -9,10 +9,10 @@
  */
 {
   "sections": {
-    "blocks_yarYRi": {
+    "blocks_bqpCi6": {
       "type": "_blocks",
       "blocks": {
-        "product_breadcrumb_FxPEKy": {
+        "product_breadcrumb_KymTtU": {
           "type": "product_breadcrumb",
           "settings": {
             "home_text": "Inicio",
@@ -33,7 +33,7 @@
         }
       },
       "block_order": [
-        "product_breadcrumb_FxPEKy"
+        "product_breadcrumb_KymTtU"
       ],
       "name": "Product breadcrumb",
       "settings": {
@@ -60,7 +60,7 @@
         "overlay_color": "#00000026",
         "overlay_style": "solid",
         "gradient_direction": "to top",
-        "padding-block-start": 93,
+        "padding-block-start": 0,
         "padding-block-end": 0
       }
     },
@@ -170,7 +170,7 @@
                   "name": "Product reference",
                   "settings": {
                     "font_size": 14,
-                    "text_color": "#000000",
+                    "text_color": "#c6c6c6",
                     "font_weight": "400"
                   },
                   "blocks": {}
@@ -181,7 +181,7 @@
                     "show_sale_price_first": true,
                     "show_installments": false,
                     "show_tax_info": false,
-                    "type_preset": "paragraph",
+                    "type_preset": "h4",
                     "width": "100%",
                     "alignment": "left",
                     "font": "var(--font-body--family)",
@@ -284,6 +284,45 @@
               },
               "block_order": []
             },
+            "installments_banner_hLzt6J": {
+              "type": "installments_banner",
+              "name": "Installments Banner",
+              "settings": {
+                "message": "<p>Compra a <strong>4 cuotas mensuales de $84.606,77</strong> con tu <strong>Credito</strong></p>",
+                "icon": "shopify://shop_images/logosumas_20240416_1_1.svg",
+                "icon_height": 18,
+                "icon_height_mobile": 16,
+                "link_text": "Ver cuotas",
+                "link_url": "",
+                "link_opens_new_tab": false,
+                "start_date": "",
+                "end_date": "",
+                "collection_handles": "",
+                "font_size": 14,
+                "font_size_mobile": 12,
+                "text_color": "#000000",
+                "separator_color": "#666666",
+                "link_color": "#000000",
+                "link_hover_color": "#333333",
+                "padding_top": 8,
+                "padding_bottom": 8,
+                "padding_top_mobile": 4,
+                "padding_bottom_mobile": 4
+              },
+              "blocks": {}
+            },
+            "divider_A4UTje": {
+              "type": "_divider",
+              "name": "t:names.divider",
+              "settings": {
+                "thickness": 1,
+                "corner_radius": "square",
+                "width_percent": 100,
+                "padding-block-start": 0,
+                "padding-block-end": 0
+              },
+              "blocks": {}
+            },
             "text_xWt7wD": {
               "type": "text",
               "name": "Product description",
@@ -322,6 +361,8 @@
             "variant_picker_EQ4gcg",
             "product_model_fit_dmTpMP",
             "buy_buttons_JqjPaM",
+            "installments_banner_hLzt6J",
+            "divider_A4UTje",
             "text_xWt7wD"
           ]
         },
@@ -757,7 +798,7 @@
     }
   },
   "order": [
-    "blocks_yarYRi",
+    "blocks_bqpCi6",
     "product_detail_kyYc9C",
     "main",
     "product_recommendations_qggXJq"

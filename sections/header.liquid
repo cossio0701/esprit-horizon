@@ -171,6 +171,10 @@
   if collapse_header_paddings_class
     assign class = class | append: ' ' | append: collapse_header_paddings_class
   endif
+
+  unless template.name == 'index'
+    assign class = class | append: ' header--with-shadow'
+  endunless
 %}
 
 <script type="application/ld+json">
@@ -590,6 +594,10 @@
   .header {
     --header-padding: var(--padding-sm);
     --font-paragraph--line-height: 1;
+  }
+
+  .header-section:has(.header--with-shadow) {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   }
 
   .header.header--compact {
