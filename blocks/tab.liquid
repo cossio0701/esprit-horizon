@@ -4,22 +4,33 @@
   Usa el patrón de <template> para enviar su botón a la sección padre.
 {% endcomment %}
 
-<div class="tab-block-instance" id="block-{{ block.id }}" {{ block.shopify_attributes }}>
+{%- liquid
+  # --- Variables de Fachada ---
+  assign block_id = block.id
+  assign title = block.settings.title | escape
+  assign category_slug = block.settings.category
+  assign shopify_attributes = block.shopify_attributes
+
+  # Calculated variables
+  assign tab_content_id = 'tab-content-' | append: block_id
+-%}
+
+<div class="tab-block-instance" id="block-{{ block_id }}" {{ shopify_attributes }}>
   <template class="js-tab-portal-source">
     <button
-      id="{{ block.settings.category }}"
+      id="{{ category_slug }}"
       type="button"
       class="tab-sidebar__button"
       role="tab"
       aria-selected="false"
-      data-target-id="tab-content-{{ block.id }}"
+      data-target-id="{{ tab_content_id }}"
     >
-      {{ block.settings.title | escape }}
+      {{ title }}
     </button>
   </template>
 
   <div
-    id="tab-content-{{ block.id }}"
+    id="{{ tab_content_id }}"
     class="tab-content__pane"
     role="tabpanel"
     style="display: none;"

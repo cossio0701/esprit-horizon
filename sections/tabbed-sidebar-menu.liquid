@@ -3,27 +3,39 @@
   Descripción: Sección contenedora que orquesta el layout de sidebar y tabs.
 {% endcomment %}
 
+{%- liquid
+  # --- Variables de Fachada ---
+  assign section_id = section.id
+  assign section_settings = section.settings
+  assign section_width = section_settings.section_width
+
+  # --- Construcción de Clases y Estilos ---
+  assign container_classes = 'section spacing-style sidebar-tabs-layout js-tabs-container' | append: ' section--' | append: section_width
+
+  # Captura de estilos de padding
+  capture padding_style
+    render 'spacing-padding', settings: section_settings
+  endcapture
+-%}
+
 {%- style -%}
   /* --- CSS Scoped para esta sección --- */
-    /* max-width and margin are now handled by the .section wrapper */
-    /* padding is handled by style attribute from settings */
-
-  #shopify-section-{{ section.id }} .sidebar-tabs-layout {
+  #shopify-section-{{ section_id }} .sidebar-tabs-layout {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
   @media (min-width: 768px) {
-    #shopify-section-{{ section.id }} .sidebar-tabs-layout {
+    #shopify-section-{{ section_id }} .sidebar-tabs-layout {
       flex-direction: row;
-      align-items: flex-start; /* Importante para que el sidebar no se estire */
+      align-items: flex-start;
       gap: 30px;
     }
   }
 
   /* --- Estilos del Sidebar --- */
-  #shopify-section-{{ section.id }} .sidebar-tabs-sidebar {
+  #shopify-section-{{ section_id }} .sidebar-tabs-sidebar {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -34,15 +46,15 @@
   }
 
   @media (min-width: 768px) {
-    #shopify-section-{{ section.id }} .sidebar-tabs-sidebar {
-        width: 25%;
-        position: sticky; /* Hace que el sidebar se quede fijo al hacer scroll */
-        top: 20px;
+    #shopify-section-{{ section_id }} .sidebar-tabs-sidebar {
+      width: 25%;
+      position: sticky;
+      top: 20px;
     }
   }
 
   /* Botones generados por JS */
-  #shopify-section-{{ section.id }} .tab-sidebar__button {
+  #shopify-section-{{ section_id }} .tab-sidebar__button {
     appearance: none;
     background: transparent;
     border: none;
@@ -58,25 +70,23 @@
     outline: none;
   }
 
-  #shopify-section-{{ section.id }} .tab-sidebar__button:hover {
+  #shopify-section-{{ section_id }} .tab-sidebar__button:hover {
     background-color: #e9ecef;
     color: #212529;
   }
 
-  #shopify-section-{{ section.id }} .tab-sidebar__button.active {
+  #shopify-section-{{ section_id }} .tab-sidebar__button.active {
     background-color: #ffffff;
     color: #000000;
     font-weight: 700;
-    border-left: 4px solid #000000; /* Acento visual */
-    padding-left: 16px; /* Ajuste por el borde */
+    border-left: 4px solid #000000;
+    padding-left: 16px;
   }
 
-
   /* --- Estilos del Área Principal --- */
-  #shopify-section-{{ section.id }} .sidebar-tabs-main {
+  #shopify-section-{{ section_id }} .sidebar-tabs-main {
     flex: 1;
     background: #ffffff;
-    /* Min height para que no colapse si está vacío */
     min-height: 300px;
   }
 
@@ -97,7 +107,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Estado de carga inicial para evitar FOUC (Flash of Unstyled Content) */
+  /* Estado de carga inicial */
   .sidebar-tabs-layout.loading .sidebar-tabs-sidebar,
   .sidebar-tabs-layout.loading .sidebar-tabs-main {
     opacity: 0;
@@ -107,17 +117,16 @@
 
 <div class="section-background color-scheme-1"></div>
 <div
-  class="section spacing-style section--{{ section.settings.section_width }} sidebar-tabs-layout js-tabs-container"
-  data-section-id="{{ section.id }}"
-  style="{% render 'spacing-padding', settings: section.settings %}"
+  class="{{ container_classes }}"
+  data-section-id="{{ section_id }}"
+  style="{{ padding_style }}"
 >
   <aside class="sidebar-tabs-sidebar" role="tablist"></aside>
 
   <main class="sidebar-tabs-main">
     {%- comment -%}
       Aquí Shopify renderiza los archivos blocks/tab.liquid.
-      Aunque se renderizan, sus contenidos están ocultos por CSS inicialmente,
-      y sus botones están dentro de etiquetas <template>.
+      Sus botones se mueven vía JS al sidebar.
     {%- endcomment -%}
     {% content_for 'blocks' %}
   </main>
@@ -126,15 +135,13 @@
 <script>
   (function () {
     const initTabs = () => {
-      const sectionId = '{{ section.id }}';
+      const sectionId = '{{ section_id }}';
       const container = document.querySelector(`.js-tabs-container[data-section-id="${sectionId}"]`);
       if (!container) return;
 
       const sidebarTarget = container.querySelector('.sidebar-tabs-sidebar');
-      // CORRECCIÓN: Buscamos el template directamente en el bloque, no dentro del pane
       const portals = container.querySelectorAll('.js-tab-portal-source');
 
-      // Limpiamos el sidebar por si acaso (evita duplicados en el editor)
       sidebarTarget.innerHTML = '';
 
       if (portals.length === 0) {
@@ -176,7 +183,6 @@
       let initialTabButton = null;
 
       portals.forEach((portal, index) => {
-        // Accedemos al contenido del template
         const button = portal.content.querySelector('.tab-sidebar__button').cloneNode(true);
 
         button.addEventListener('click', function () {
@@ -185,28 +191,18 @@
 
         sidebarTarget.appendChild(button);
 
-        // Verificar si este botón coincide con el parámetro de URL
         if (initialCategory && button.id === initialCategory) {
           initialTabButton = button;
         }
 
-        // Si no hay parámetro, por defecto el primero
         if (index === 0 && !initialTabButton) {
-          // Solo asignamos si no hemos encontrado uno por URL aún (aunque el loop sigue,
-          // la lógica de abajo prioriza initialTabButton si existe)
-          // Pero ojo: si el loop continua y luego encontramos uno con URL, initialTabButton se sobreescribe correctamente.
-          // Lo que necesitamos es un default.
           if (!initialCategory) {
             initialTabButton = button;
           }
         }
       });
 
-      // Si después de recorrer todos no encontramos el de la URL (o no había URL),
-      // y tenemos uno por defecto (el primero), usamos ese.
-      // Si había URL pero no coincidió con ninguno, initialTabButton podría ser null si no manejamos el fallback.
       if (!initialTabButton && portals.length > 0) {
-        // Fallback al primer botón ya insertado en el DOM
         initialTabButton = sidebarTarget.querySelector('.tab-sidebar__button');
       }
 
@@ -217,13 +213,8 @@
       container.classList.remove('loading');
     };
 
-    // Ejecutar al cargar el DOM
     document.addEventListener('DOMContentLoaded', initTabs);
-
-    // Ejecutar específicamente para el Editor de Shopify (cuando se re-renderiza la sección)
     document.addEventListener('shopify:section:load', initTabs);
-
-    // Ejecución inmediata por si el DOM ya está listo
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       initTabs();
     }
