@@ -1,0 +1,407 @@
+{% comment %}
+  Sección: Menú Tab Lateral
+  Renderiza un menú con tabs laterales y contenido dinámico
+{% endcomment %}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES
+  ============================================
+{%- endcomment -%}
+
+{%- liquid
+  # Configuraciones de la sección
+  assign section_width = section.settings.section_width
+  assign sidebar_width = section.settings.sidebar_width
+  assign tab_alignment = section.settings.tab_alignment
+  assign active_tab_color = section.settings.active_tab_color
+  assign inactive_tab_color = section.settings.inactive_tab_color
+  assign content_bg_color = section.settings.content_bg_color
+-%}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 2: ESTRUCTURA HTML
+  ============================================
+{%- endcomment -%}
+
+<section class="tabbed-sidebar-menu section section--{{ section_width }}">
+  <div class="tabbed-sidebar-container">
+    <!-- Sidebar con tabs -->
+    <div class="tabbed-sidebar" style="width: {{ sidebar_width }}%;">
+      <div class="tab-list" role="tablist">
+        {% for block in section.blocks %}
+          {% if block.type == 'tab' %}
+            <button
+              class="tab-button {% if forloop.first %}active{% endif %}"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-controls="tab-content-{{ block.id }}"
+              data-tab-id="{{ block.id }}"
+            >
+              {{ block.settings.tab_title }}
+            </button>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Contenido de los tabs -->
+    <div class="tab-content-area">
+      {% for block in section.blocks %}
+        {% if block.type == 'tab' %}
+          <div
+            id="tab-content-{{ block.id }}"
+            class="tab-content {% if forloop.first %}active{% endif %}"
+            role="tabpanel"
+            data-tab-id="{{ block.id }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="tab-content-inner">
+              {% if block.settings.content_title != blank %}
+                <h2 class="tab-content-title">{{ block.settings.content_title }}</h2>
+              {% endif %}
+
+              {% if block.settings.content_text != blank %}
+                <div class="tab-content-text">
+                  {{ block.settings.content_text }}
+                </div>
+              {% endif %}
+
+              {% if block.settings.content_html != blank %}
+                <div class="tab-content-html">
+                  {{ block.settings.content_html }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 3: JAVASCRIPT
+  ============================================
+{%- endcomment -%}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tabButtons = document.querySelectorAll('.tabbed-sidebar-menu .tab-button');
+    const tabContents = document.querySelectorAll('.tabbed-sidebar-menu .tab-content');
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', function () {
+        const tabId = this.getAttribute('data-tab-id');
+
+        // Remover clase active de todos los botones y contenidos
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+        tabContents.forEach((content) => {
+          content.classList.remove('active');
+        });
+
+        // Agregar clase active al botón clickeado y su contenido
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+
+        const activeContent = document.getElementById('tab-content-' + tabId);
+        if (activeContent) {
+          activeContent.classList.add('active');
+        }
+      });
+    });
+  });
+</script>
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 4: CSS
+  ============================================
+{%- endcomment -%}
+
+<style>
+  .tabbed-sidebar-menu {
+    width: 100%;
+    padding: 2rem 0;
+  }
+
+  .tabbed-sidebar-container {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+  }
+
+  /* Sidebar con tabs */
+  .tabbed-sidebar {
+    flex-shrink: 0;
+  }
+
+  .tab-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab-button {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    text-align: {{ tab_alignment }};
+    background: {{ inactive_tab_color }};
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .tab-button:hover {
+    background: {{ active_tab_color }};
+    color: #fff;
+    transform: translateX(4px);
+  }
+
+  .tab-button.active {
+    background: {{ active_tab_color }};
+    color: #fff;
+    border-color: {{ active_tab_color }};
+  }
+
+  /* Área de contenido */
+  .tab-content-area {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .tab-content-inner {
+    background: {{ content_bg_color }};
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .tab-content-title {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .tab-content-text {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #666;
+  }
+
+  .tab-content-html {
+    line-height: 1.6;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .tabbed-sidebar-container {
+      flex-direction: column;
+    }
+
+    .tabbed-sidebar {
+      width: 100% !important;
+    }
+
+    .tab-list {
+      flex-direction: row;
+      overflow-x: auto;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-button {
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .tab-button:hover {
+      transform: none;
+    }
+
+    .tab-content-inner {
+      padding: 1.5rem;
+    }
+
+    .tab-content-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Menú Tab Lateral",
+  "tag": "section",
+  "class": "section-tabbed-sidebar-menu",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Diseño de la Sección"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Ancho de la sección",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Ancho de página"
+        },
+        {
+          "value": "full-width",
+          "label": "Ancho completo"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "sidebar_width",
+      "min": 20,
+      "max": 40,
+      "step": 5,
+      "label": "Ancho del sidebar (%)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Estilo de Tabs"
+    },
+    {
+      "type": "select",
+      "id": "tab_alignment",
+      "label": "Alineación del texto",
+      "options": [
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        },
+        {
+          "value": "right",
+          "label": "Derecha"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "active_tab_color",
+      "label": "Color tab activo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "inactive_tab_color",
+      "label": "Color tab inactivo",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "header",
+      "content": "Estilo de Contenido"
+    },
+    {
+      "type": "color",
+      "id": "content_bg_color",
+      "label": "Color de fondo del contenido",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Título del tab",
+          "default": "Tab"
+        },
+        {
+          "type": "text",
+          "id": "content_title",
+          "label": "Título del contenido",
+          "default": "Título del contenido"
+        },
+        {
+          "type": "richtext",
+          "id": "content_text",
+          "label": "Texto del contenido",
+          "default": "<p>Contenido del tab</p>"
+        },
+        {
+          "type": "html",
+          "id": "content_html",
+          "label": "HTML personalizado",
+          "info": "HTML adicional para contenido avanzado"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Menú Tab Lateral",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "Tab 1",
+            "content_title": "Contenido Tab 1",
+            "content_text": "<p>Este es el contenido del primer tab.</p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "Tab 2",
+            "content_title": "Contenido Tab 2",
+            "content_text": "<p>Este es el contenido del segundo tab.</p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "Tab 3",
+            "content_title": "Contenido Tab 3",
+            "content_text": "<p>Este es el contenido del tercer tab.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
