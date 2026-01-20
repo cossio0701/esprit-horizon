@@ -160,7 +160,20 @@
         if (targetPane) {
           targetPane.style.display = 'block';
         }
+
+        // Actualizar URL
+        const tabId = buttonElement.id;
+        if (tabId) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('category', tabId);
+          window.history.replaceState({}, '', newUrl);
+        }
       }
+
+      // Obtener parámetro de URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialCategory = urlParams.get('category');
+      let initialTabButton = null;
 
       portals.forEach((portal, index) => {
         // Accedemos al contenido del template
@@ -172,10 +185,34 @@
 
         sidebarTarget.appendChild(button);
 
-        if (index === 0) {
-          activateTab(button);
+        // Verificar si este botón coincide con el parámetro de URL
+        if (initialCategory && button.id === initialCategory) {
+          initialTabButton = button;
+        }
+
+        // Si no hay parámetro, por defecto el primero
+        if (index === 0 && !initialTabButton) {
+          // Solo asignamos si no hemos encontrado uno por URL aún (aunque el loop sigue,
+          // la lógica de abajo prioriza initialTabButton si existe)
+          // Pero ojo: si el loop continua y luego encontramos uno con URL, initialTabButton se sobreescribe correctamente.
+          // Lo que necesitamos es un default.
+          if (!initialCategory) {
+            initialTabButton = button;
+          }
         }
       });
+
+      // Si después de recorrer todos no encontramos el de la URL (o no había URL),
+      // y tenemos uno por defecto (el primero), usamos ese.
+      // Si había URL pero no coincidió con ninguno, initialTabButton podría ser null si no manejamos el fallback.
+      if (!initialTabButton && portals.length > 0) {
+        // Fallback al primer botón ya insertado en el DOM
+        initialTabButton = sidebarTarget.querySelector('.tab-sidebar__button');
+      }
+
+      if (initialTabButton) {
+        activateTab(initialTabButton);
+      }
 
       container.classList.remove('loading');
     };
