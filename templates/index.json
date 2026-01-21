@@ -50,34 +50,33 @@
     "section_payTgk": {
       "type": "section",
       "blocks": {
-        "text_j8ePWD": {
-          "type": "text",
-          "name": "t:names.heading",
+        "ai_gen_block_8969bbd_RCJnmd": {
+          "type": "ai_gen_block_8969bbd",
+          "name": "Custom text",
           "settings": {
-            "text": "<h4>Forever Essentials</h4>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "custom",
-            "font": "var(--font-heading--family)",
-            "font_size": "1.5rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 12,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "use_mobile_padding": false,
-            "padding-block-start-mobile": 0,
-            "padding-block-end-mobile": 0,
-            "padding-inline-start-mobile": 0,
-            "padding-inline-end-mobile": 0
+            "text": "Forever Essentials",
+            "enable_line_breaks": false,
+            "custom_break_marker": "",
+            "font_size": 18,
+            "font_size_mobile": 14,
+            "font_weight": "700",
+            "line_height": 1.5,
+            "text_alignment": "left",
+            "text_color": "#000000"
+          },
+          "blocks": {}
+        },
+        "spacer_yiy3QR": {
+          "type": "spacer",
+          "name": "t:names.spacer",
+          "settings": {
+            "size": "pixel",
+            "percent_size": 100,
+            "pixel_size": 8,
+            "custom_mobile_size": false,
+            "size_mobile": "percent",
+            "percent_size_mobile": 100,
+            "pixel_size_mobile": 120
           },
           "blocks": {}
         },
@@ -87,8 +86,8 @@
             "text": "MODA Y ESTILO",
             "enable_line_breaks": false,
             "custom_break_marker": "",
-            "font_size": 32,
-            "font_size_mobile": 14,
+            "font_size": 24,
+            "font_size_mobile": 18,
             "font_weight": "400",
             "line_height": 1,
             "text_alignment": "left",
@@ -102,8 +101,8 @@
             "text": "PARA CADA MUJER",
             "enable_line_breaks": false,
             "custom_break_marker": "",
-            "font_size": 32,
-            "font_size_mobile": 14,
+            "font_size": 24,
+            "font_size_mobile": 18,
             "font_weight": "400",
             "line_height": 1,
             "text_alignment": "left",
@@ -113,7 +112,8 @@
         }
       },
       "block_order": [
-        "text_j8ePWD",
+        "ai_gen_block_8969bbd_RCJnmd",
+        "spacer_yiy3QR",
         "ai_gen_block_8969bbd_9jme4A",
         "ai_gen_block_8969bbd_Gm6Hxj"
       ],
@@ -183,29 +183,19 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
+            "ai_gen_block_8969bbd_ALVmA6": {
+              "type": "ai_gen_block_8969bbd",
+              "name": "Custom text",
               "settings": {
-                "text": "<h4>NEW ARRIVALS</h4>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "text": "NEW ARRIVALS",
+                "enable_line_breaks": false,
+                "custom_break_marker": "",
+                "font_size": 16,
+                "font_size_mobile": 14,
+                "font_weight": "700",
+                "line_height": 1.5,
+                "text_alignment": "left",
+                "text_color": "#000000"
               },
               "blocks": {}
             },
@@ -225,7 +215,7 @@
             }
           },
           "block_order": [
-            "product_list_text_YFtzcL",
+            "ai_gen_block_8969bbd_ALVmA6",
             "product_list_button_MWeP9V"
           ]
         },
@@ -330,14 +320,14 @@
         "mobile_card_size": "44cqw",
         "columns_gap": 8,
         "rows_gap": 24,
-        "icons_style": "arrow",
+        "icons_style": "chevron",
         "icons_shape": "square",
         "section_width": "page-width",
         "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "gap": 10,
+        "color_scheme": "scheme-14c3f7b7-7164-4c7e-b9ef-193aaa526fd6",
+        "padding-block-start": 20,
+        "padding-block-end": 20
       }
     },
     "1763584284ac7bb19d": {
