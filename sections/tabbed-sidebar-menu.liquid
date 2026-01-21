@@ -39,10 +39,14 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: {{ section_settings.sidebar_background }};
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #e9ecef;
+    {%- if section_settings.sidebar_show_border -%}
+      border: 1px solid {{ section_settings.sidebar_border_color }};
+    {%- else -%}
+      border: none;
+    {%- endif -%}
   }
 
   @media (min-width: 768px) {
@@ -68,6 +72,7 @@
     transition: all 0.2s ease;
     width: 100%;
     outline: none;
+    font-family: inherit;
   }
 
   #shopify-section-{{ section_id }} .tab-sidebar__button:hover {
@@ -79,7 +84,7 @@
     background-color: #ffffff;
     color: #000000;
     font-weight: 700;
-    border-left: 4px solid #000000;
+    border-left: {{ section_settings.sidebar_active_border_width }}px solid {{ section_settings.sidebar_active_border_color }};
     padding-left: 16px;
   }
 
@@ -98,7 +103,12 @@
   /* Un poco de espaciado interno para los bloques anidados */
   .tab-content__inner-wrapper {
       padding: 20px;
-      border: 1px solid #e9ecef;
+      padding: 20px;
+      {%- if section_settings.content_show_border -%}
+        border: 1px solid {{ section_settings.content_border_color }};
+      {%- else -%}
+        border: none;
+      {%- endif -%}
       border-radius: 8px;
   }
 
@@ -266,6 +276,60 @@
       "step": 1,
       "unit": "px",
       "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Estilos del Sidebar"
+    },
+    {
+      "type": "color",
+      "id": "sidebar_background",
+      "label": "Fondo del Sidebar",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "checkbox",
+      "id": "sidebar_show_border",
+      "label": "Mostrar borde del Sidebar",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "sidebar_border_color",
+      "label": "Color del borde del Sidebar",
+      "default": "#e9ecef"
+    },
+    {
+      "type": "color",
+      "id": "sidebar_active_border_color",
+      "label": "Color del borde activo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "sidebar_active_border_width",
+      "label": "Grosor del borde activo",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Estilos del Contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "content_show_border",
+      "label": "Mostrar borde del Contenido",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "content_border_color",
+      "label": "Color del borde del Contenido",
+      "default": "#e9ecef"
     }
   ],
   "blocks": [
