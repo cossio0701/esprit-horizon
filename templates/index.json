@@ -333,36 +333,81 @@
     "1763584284ac7bb19d": {
       "type": "_blocks",
       "blocks": {
-        "text_hXfWhH": {
-          "type": "text",
-          "name": "t:names.heading",
+        "group_KE7aiP": {
+          "type": "group",
+          "name": "t:names.group",
           "settings": {
-            "text": "<h4>¿QUÉ ESTAS BUSCANDO?</h4>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 30,
-            "padding-block-end": 15,
-            "padding-inline-start": 40,
-            "padding-inline-end": 0,
-            "use_mobile_padding": false,
-            "padding-block-start-mobile": 0,
-            "padding-block-end-mobile": 0,
-            "padding-inline-start-mobile": 0,
-            "padding-inline-end-mobile": 0
+            "content_direction": "row",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "align_baseline": false,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 0,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 72,
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "toggle_overlay": false,
+            "overlay_color": "#00000026",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
+            "link": "",
+            "open_in_new_tab": false,
+            "placeholder": "",
+            "padding-block-start": 12,
+            "padding-block-end": 12,
+            "padding-inline-start": 20,
+            "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "spacer_3iEnFz": {
+              "type": "spacer",
+              "name": "t:names.spacer",
+              "settings": {
+                "size": "pixel",
+                "percent_size": 100,
+                "pixel_size": 12,
+                "custom_mobile_size": false,
+                "size_mobile": "percent",
+                "percent_size_mobile": 100,
+                "pixel_size_mobile": 120
+              },
+              "blocks": {}
+            },
+            "ai_gen_block_8969bbd_9qem8G": {
+              "type": "ai_gen_block_8969bbd",
+              "name": "Custom text",
+              "settings": {
+                "text": "¿QUÉ ESTAS BUSCANDO?",
+                "enable_line_breaks": false,
+                "custom_break_marker": "",
+                "font_size": 16,
+                "font_size_mobile": 14,
+                "font_weight": "700",
+                "line_height": 1.5,
+                "text_alignment": "left",
+                "text_color": "#000000"
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "spacer_3iEnFz",
+            "ai_gen_block_8969bbd_9qem8G"
+          ]
         },
         "ai_gen_block_5d9738d_7rRXqK": {
           "type": "ai_gen_block_5d9738d",
@@ -375,8 +420,8 @@
             "section_padding_top": 0,
             "section_padding_bottom": 40,
             "grid_gap": 10,
-            "image_aspect_width": 3,
-            "image_aspect_height": 4,
+            "image_aspect_width": 4,
+            "image_aspect_height": 5,
             "mobile_slide_width": 85,
             "mobile_gap": 10,
             "mobile_aspect_width": 3,
@@ -413,7 +458,7 @@
         }
       },
       "block_order": [
-        "text_hXfWhH",
+        "group_KE7aiP",
         "ai_gen_block_5d9738d_7rRXqK"
       ],
       "settings": {
@@ -441,7 +486,7 @@
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "padding-block-start": 0,
-        "padding-block-end": 20
+        "padding-block-end": 10
       }
     },
     "section_9GwNEK": {
@@ -732,7 +777,7 @@
                 "width_mobile": "custom",
                 "custom_width_mobile": 100,
                 "height": "custom",
-                "custom_height": 800,
+                "custom_height": 560,
                 "custom_height_mobile": 360,
                 "border": "none",
                 "border_width": 1,
@@ -784,6 +829,23 @@
         "padding-block-end": 0
       }
     },
+    "featured_collection_hero_FiDk6h": {
+      "type": "featured-collection-hero",
+      "name": "Featured Collection Hero",
+      "settings": {
+        "collection": "sale",
+        "products_count": 4,
+        "image": "shopify://shop_images/9e06abd6d6d48e97c06f159a8c5671eb101b9aef.jpg",
+        "title": "Spring Days",
+        "subtitle": "Shop Best Sellers",
+        "title_color": "#ffffff",
+        "subtitle_color": "#ffffff",
+        "section_width": "page-width",
+        "color_scheme": "scheme-1",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
     "section_tmebwi": {
       "type": "section",
       "blocks": {
@@ -802,7 +864,7 @@
             "video_mobile": "shopify://files/videos/BANNERPRINCIPALABRILMOB.mp4",
             "video_url_mobile": "",
             "alt_mobile": "",
-            "video_height": "auto",
+            "video_height": "mediano",
             "custom_width": 100,
             "custom_width_mobile": 100,
             "aspect_ratio": "auto",
@@ -847,25 +909,8 @@
         "overlay_color": "#00000026",
         "overlay_style": "solid",
         "gradient_direction": "to top",
-        "padding-block-start": 60,
+        "padding-block-start": 0,
         "padding-block-end": 0
-      }
-    },
-    "featured_collection_hero_FiDk6h": {
-      "type": "featured-collection-hero",
-      "name": "Featured Collection Hero",
-      "settings": {
-        "collection": "sale",
-        "products_count": 4,
-        "image": "shopify://shop_images/9e06abd6d6d48e97c06f159a8c5671eb101b9aef.jpg",
-        "title": "Spring Days",
-        "subtitle": "Shop Best Sellers",
-        "title_color": "#ffffff",
-        "subtitle_color": "#ffffff",
-        "section_width": "page-width",
-        "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
       }
     },
     "product_list_Ut3bJW": {
@@ -905,29 +950,19 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "product_list_text_NDWUrC": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
+            "ai_gen_block_8969bbd_4DiCKG": {
+              "type": "ai_gen_block_8969bbd",
+              "name": "Custom text",
               "settings": {
-                "text": "<h4>NEW ARRIVALS</h4>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "text": "NEW ARRIVALS",
+                "enable_line_breaks": false,
+                "custom_break_marker": "",
+                "font_size": 16,
+                "font_size_mobile": 14,
+                "font_weight": "700",
+                "line_height": 1.5,
+                "text_alignment": "left",
+                "text_color": "#000000"
               },
               "blocks": {}
             },
@@ -947,7 +982,7 @@
             }
           },
           "block_order": [
-            "product_list_text_NDWUrC",
+            "ai_gen_block_8969bbd_4DiCKG",
             "product_list_button_mPiJJh"
           ]
         },
@@ -1056,10 +1091,10 @@
         "icons_shape": "square",
         "section_width": "page-width",
         "horizontal_alignment": "center",
-        "gap": 28,
+        "gap": 10,
         "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-start": 20,
+        "padding-block-end": 20
       }
     },
     "17677328072562cb5a": {
@@ -1118,34 +1153,19 @@
     "section_6qncpE": {
       "type": "section",
       "blocks": {
-        "text_TFfVeh": {
-          "type": "text",
-          "name": "t:names.heading",
+        "ai_gen_block_8969bbd_eyhXfL": {
+          "type": "ai_gen_block_8969bbd",
+          "name": "Custom text",
           "settings": {
-            "text": "<h4>BÚSQUEDAS EN TENDENCIA</h4>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "use_mobile_padding": false,
-            "padding-block-start-mobile": 0,
-            "padding-block-end-mobile": 0,
-            "padding-inline-start-mobile": 0,
-            "padding-inline-end-mobile": 0
+            "text": "BÚSQUEDAS EN TENDENCIA",
+            "enable_line_breaks": false,
+            "custom_break_marker": "",
+            "font_size": 16,
+            "font_size_mobile": 14,
+            "font_weight": "700",
+            "line_height": 1.5,
+            "text_alignment": "left",
+            "text_color": "#000000"
           },
           "blocks": {}
         },
@@ -1162,7 +1182,7 @@
             "vertical_alignment_flex_direction_column": "center",
             "gap": 12,
             "width": "custom",
-            "custom_width": 65,
+            "custom_width": 100,
             "width_mobile": "fit-content",
             "custom_width_mobile": 100,
             "height": "fit",
@@ -1198,7 +1218,7 @@
                 "open_in_new_tab": false,
                 "style_class": "button-secondary",
                 "width": "fit-content",
-                "custom_width": 100,
+                "custom_width": 16,
                 "width_mobile": "fit-content",
                 "custom_width_mobile": 100
               },
@@ -1355,8 +1375,11 @@
         }
       },
       "block_order": [
-        "text_TFfVeh",
+        "ai_gen_block_8969bbd_eyhXfL",
         "group_dBHVr3"
+      ],
+      "custom_css": [
+        ".button-secondary {font-size: 13px; /* Ajusta el tamaño que necesites */}"
       ],
       "name": "t:names.custom_section",
       "settings": {
@@ -1417,8 +1440,8 @@
     "product_list_fa6P9H",
     "1763584284ac7bb19d",
     "section_9GwNEK",
-    "section_tmebwi",
     "featured_collection_hero_FiDk6h",
+    "section_tmebwi",
     "product_list_Ut3bJW",
     "17677328072562cb5a",
     "section_6qncpE",

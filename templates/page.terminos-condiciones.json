@@ -2041,7 +2041,14 @@
       "settings": {
         "section_width": "page-width",
         "padding-block-start": 40,
-        "padding-block-end": 40
+        "padding-block-end": 40,
+        "sidebar_background": "#ffffff",
+        "sidebar_show_border": false,
+        "sidebar_border_color": "#e9ecef",
+        "sidebar_active_border_color": "#c2c2c2",
+        "sidebar_active_border_width": 3,
+        "content_show_border": false,
+        "content_border_color": "#e9ecef"
       }
     }
   },
