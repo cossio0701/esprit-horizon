@@ -3647,8 +3647,8 @@ slideshow-component[autoplay] slideshow-controls {
   align-items: center;
   justify-content: center;
   aspect-ratio: 1 / 1;
-  background-color: var(--color-primary-button-background);
-  color: var(--color-primary-button-text);
+  background-color: #fff;
+  color: #000;
 }
 
 .button-unstyled.slideshow-control.slideshow-control--shape-circle {

@@ -1,0 +1,351 @@
+{% comment %}
+  Archivo: sections/tabbed-sidebar-menu.liquid
+  Descripción: Sección contenedora que orquesta el layout de sidebar y tabs.
+{% endcomment %}
+
+{%- liquid
+  # --- Variables de Fachada ---
+  assign section_id = section.id
+  assign section_settings = section.settings
+  assign section_width = section_settings.section_width
+
+  # --- Construcción de Clases y Estilos ---
+  assign container_classes = 'section spacing-style sidebar-tabs-layout js-tabs-container' | append: ' section--' | append: section_width
+
+  # Captura de estilos de padding
+  capture padding_style
+    render 'spacing-padding', settings: section_settings
+  endcapture
+-%}
+
+{%- style -%}
+  /* --- CSS Scoped para esta sección --- */
+  #shopify-section-{{ section_id }} .sidebar-tabs-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  @media (min-width: 768px) {
+    #shopify-section-{{ section_id }} .sidebar-tabs-layout {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 30px;
+    }
+  }
+
+  /* --- Estilos del Sidebar --- */
+  #shopify-section-{{ section_id }} .sidebar-tabs-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: {{ section_settings.sidebar_background }};
+    border-radius: 8px;
+    overflow: hidden;
+    {%- if section_settings.sidebar_show_border -%}
+      border: 1px solid {{ section_settings.sidebar_border_color }};
+    {%- else -%}
+      border: none;
+    {%- endif -%}
+  }
+
+  @media (min-width: 768px) {
+    #shopify-section-{{ section_id }} .sidebar-tabs-sidebar {
+      width: 25%;
+      position: sticky;
+      top: 20px;
+    }
+  }
+
+  /* Botones generados por JS */
+  #shopify-section-{{ section_id }} .tab-sidebar__button {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+  }
+
+  #shopify-section-{{ section_id }} .tab-sidebar__button:hover {
+    background-color: #e9ecef;
+    color: #212529;
+  }
+
+  #shopify-section-{{ section_id }} .tab-sidebar__button.active {
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    border-left: {{ section_settings.sidebar_active_border_width }}px solid {{ section_settings.sidebar_active_border_color }};
+    padding-left: 16px;
+  }
+
+  /* --- Estilos del Área Principal --- */
+  #shopify-section-{{ section_id }} .sidebar-tabs-main {
+    flex: 1;
+    background: #ffffff;
+    min-height: 300px;
+  }
+
+  /* Estilos para los paneles de contenido */
+  .tab-content__pane {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  /* Un poco de espaciado interno para los bloques anidados */
+  .tab-content__inner-wrapper {
+      padding: 20px;
+      padding: 20px;
+      {%- if section_settings.content_show_border -%}
+        border: 1px solid {{ section_settings.content_border_color }};
+      {%- else -%}
+        border: none;
+      {%- endif -%}
+      border-radius: 8px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Estado de carga inicial */
+  .sidebar-tabs-layout.loading .sidebar-tabs-sidebar,
+  .sidebar-tabs-layout.loading .sidebar-tabs-main {
+    opacity: 0;
+    visibility: hidden;
+  }
+{%- endstyle -%}
+
+<div class="section-background color-scheme-1"></div>
+<div
+  class="{{ container_classes }}"
+  data-section-id="{{ section_id }}"
+  style="{{ padding_style }}"
+>
+  <aside class="sidebar-tabs-sidebar" role="tablist"></aside>
+
+  <main class="sidebar-tabs-main">
+    {%- comment -%}
+      Aquí Shopify renderiza los archivos blocks/tab.liquid.
+      Sus botones se mueven vía JS al sidebar.
+    {%- endcomment -%}
+    {% content_for 'blocks' %}
+  </main>
+</div>
+
+<script>
+  (function () {
+    const initTabs = () => {
+      const sectionId = '{{ section_id }}';
+      const container = document.querySelector(`.js-tabs-container[data-section-id="${sectionId}"]`);
+      if (!container) return;
+
+      const sidebarTarget = container.querySelector('.sidebar-tabs-sidebar');
+      const portals = container.querySelectorAll('.js-tab-portal-source');
+
+      sidebarTarget.innerHTML = '';
+
+      if (portals.length === 0) {
+        container.classList.remove('loading');
+        return;
+      }
+
+      function activateTab(buttonElement) {
+        sidebarTarget.querySelectorAll('.tab-sidebar__button').forEach((btn) => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+
+        container.querySelectorAll('.tab-content__pane').forEach((pane) => {
+          pane.style.display = 'none';
+        });
+
+        buttonElement.classList.add('active');
+        buttonElement.setAttribute('aria-selected', 'true');
+
+        const targetId = buttonElement.dataset.targetId;
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) {
+          targetPane.style.display = 'block';
+        }
+
+        // Actualizar URL
+        const tabId = buttonElement.id;
+        if (tabId) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('category', tabId);
+          window.history.replaceState({}, '', newUrl);
+        }
+      }
+
+      // Obtener parámetro de URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialCategory = urlParams.get('category');
+      let initialTabButton = null;
+
+      portals.forEach((portal, index) => {
+        const button = portal.content.querySelector('.tab-sidebar__button').cloneNode(true);
+
+        button.addEventListener('click', function () {
+          activateTab(this);
+        });
+
+        sidebarTarget.appendChild(button);
+
+        if (initialCategory && button.id === initialCategory) {
+          initialTabButton = button;
+        }
+
+        if (index === 0 && !initialTabButton) {
+          if (!initialCategory) {
+            initialTabButton = button;
+          }
+        }
+      });
+
+      if (!initialTabButton && portals.length > 0) {
+        initialTabButton = sidebarTarget.querySelector('.tab-sidebar__button');
+      }
+
+      if (initialTabButton) {
+        activateTab(initialTabButton);
+      }
+
+      container.classList.remove('loading');
+    };
+
+    document.addEventListener('DOMContentLoaded', initTabs);
+    document.addEventListener('shopify:section:load', initTabs);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initTabs();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Menú Lateral Anidado",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Estilos del Sidebar"
+    },
+    {
+      "type": "color",
+      "id": "sidebar_background",
+      "label": "Fondo del Sidebar",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "checkbox",
+      "id": "sidebar_show_border",
+      "label": "Mostrar borde del Sidebar",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "sidebar_border_color",
+      "label": "Color del borde del Sidebar",
+      "default": "#e9ecef"
+    },
+    {
+      "type": "color",
+      "id": "sidebar_active_border_color",
+      "label": "Color del borde activo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "sidebar_active_border_width",
+      "label": "Grosor del borde activo",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Estilos del Contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "content_show_border",
+      "label": "Mostrar borde del Contenido",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "content_border_color",
+      "label": "Color del borde del Contenido",
+      "default": "#e9ecef"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Menú Lateral Anidado",
+      "blocks": [
+        { "type": "tab", "settings": { "title": "Introducción" } },
+        { "type": "tab", "settings": { "title": "Características" } },
+        { "type": "tab", "settings": { "title": "Contacto" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,682 @@
+{%- comment -%}
+  ============================================
+  SECCIÓN: Collection Long Description
+  ============================================
+
+  Renderiza una descripción larga de colección desde un metafield Rich Text.
+  Diseñado para usarse después del grid de productos en una PLP.
+
+  Características:
+  - Usa `metafield_tag` para renderizado seguro de Rich Text (SEO-friendly)
+  - Funcionalidad "Ver más / Ver menos" basada en altura real del contenido
+  - Configuración completa desde el Customizer
+  - Responsive con settings separados para desktop y mobile
+  - Graceful degradation: sin JS muestra todo el contenido
+  - Safe fail: no renderiza nada si el metafield está vacío
+
+  Metafield esperado: collection.metafields.custom.long_description (Rich Text)
+{%- endcomment -%}
+
+{%- liquid
+  # ============================================
+  # SECCIÓN 1: OBTENCIÓN DEL METAFIELD
+  # ============================================
+  assign metafield = collection.metafields.custom.long_description
+
+  # Safe check: verificamos que el metafield exista y tenga contenido
+  assign has_content = false
+  if metafield != blank and metafield.value != blank
+    assign has_content = true
+  endif
+
+  # ============================================
+  # SECCIÓN 2: ASIGNACIÓN DE SETTINGS
+  # ============================================
+  # Tipografía
+  assign font_size_desktop = section.settings.font_size_desktop
+  assign font_size_mobile = section.settings.font_size_mobile
+  assign text_color = section.settings.text_color
+
+  # Layout
+  assign padding_top_desktop = section.settings.padding_top_desktop
+  assign padding_bottom_desktop = section.settings.padding_bottom_desktop
+  assign padding_top_mobile = section.settings.padding_top_mobile
+  assign padding_bottom_mobile = section.settings.padding_bottom_mobile
+
+  # Ver más / Ver menos
+  assign enable_collapse = section.settings.enable_collapse
+  assign collapsed_height_desktop = section.settings.collapsed_height_desktop
+  assign collapsed_height_mobile = section.settings.collapsed_height_mobile
+  assign button_text_more = section.settings.button_text_more
+  assign button_text_less = section.settings.button_text_less
+  assign button_color = section.settings.button_color
+-%}
+
+{%- comment -%}
+  ============================================
+  SECCIÓN 3: RENDERIZADO HTML
+  ============================================
+  Estructura:
+  - article: wrapper principal con clase BEM
+  - __inner: contenedor con max-width
+  - __wrapper: contenedor colapsable (controla altura)
+  - __content: contenido RTE renderizado server-side (SEO)
+  - __toggle: botón Ver más/menos (oculto por defecto, JS lo muestra si necesario)
+
+  Graceful degradation:
+  - Sin JS: el contenido se muestra completo (no hay clase .is-collapsible)
+  - Con JS: se detecta si el contenido excede la altura y se activa el colapso
+{%- endcomment -%}
+
+{%- if has_content -%}
+  <article
+    class="collection-long-description collection-long-description--{{ section.id }}"
+    {{ section.shopify_attributes }}
+    data-section-id="{{ section.id }}"
+    {% if enable_collapse %}data-enable-collapse="true"{% endif %}
+  >
+    <div class="collection-long-description__inner">
+      {%- comment -%}
+        Wrapper colapsable: controla la altura máxima visible.
+        La clase .is-collapsible se agrega via JS solo si el contenido excede el límite.
+        La clase .is-expanded se togglea para expandir/contraer.
+      {%- endcomment -%}
+      <div class="collection-long-description__wrapper">
+        {%- comment -%}
+          Contenido renderizado server-side para SEO.
+          Usamos metafield_tag para sanitización y soporte Rich Text.
+        {%- endcomment -%}
+        <div class="collection-long-description__content rte">
+          {{ metafield | metafield_tag }}
+        </div>
+
+        {%- comment -%}
+          Gradiente de fade: solo visible cuando está colapsado.
+          Se oculta via CSS cuando .is-expanded está activo.
+        {%- endcomment -%}
+        {%- if enable_collapse -%}
+          <div class="collection-long-description__fade" aria-hidden="true"></div>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+        Botón Ver más/menos:
+        - Oculto por defecto (display: none)
+        - JS lo muestra solo si el contenido excede la altura colapsada
+        - Atributos data-* para los textos configurables
+      {%- endcomment -%}
+      {%- if enable_collapse -%}
+        <button
+          type="button"
+          class="collection-long-description__toggle"
+          aria-expanded="false"
+          aria-controls="cld-content-{{ section.id }}"
+          data-text-more="{{ button_text_more }}"
+          data-text-less="{{ button_text_less }}"
+        >
+          <span class="collection-long-description__toggle-text">{{ button_text_more }}</span>
+          <span class="collection-long-description__toggle-icon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+      {%- endif -%}
+    </div>
+  </article>
+{%- endif -%}
+
+{%- comment -%}
+  ============================================
+  SECCIÓN 4: CSS VARIABLES (Scoped)
+  ============================================
+  Variables CSS específicas de esta instancia.
+  Permite múltiples instancias con diferentes configuraciones.
+{%- endcomment -%}
+
+<style>
+  .collection-long-description--{{ section.id }} {
+    /* Tipografía */
+    --cld-font-size-desktop: {{ font_size_desktop }}px;
+    --cld-font-size-mobile: {{ font_size_mobile }}px;
+    --cld-text-color: {{ text_color }};
+
+    /* Layout */
+    --cld-padding-top-desktop: {{ padding_top_desktop }}px;
+    --cld-padding-bottom-desktop: {{ padding_bottom_desktop }}px;
+    --cld-padding-top-mobile: {{ padding_top_mobile }}px;
+    --cld-padding-bottom-mobile: {{ padding_bottom_mobile }}px;
+
+    /* Colapso - Alturas configurables */
+    --cld-collapsed-height-desktop: {{ collapsed_height_desktop }}px;
+    --cld-collapsed-height-mobile: {{ collapsed_height_mobile }}px;
+
+    /* Botón */
+    --cld-button-color: {{ button_color }};
+  }
+</style>
+
+{%- comment -%}
+  ============================================
+  SECCIÓN 5: STYLESHEET (CSS BASE)
+  ============================================
+  Estilos base cacheados por Shopify.
+  Incluye estados de colapso y animaciones.
+{%- endcomment -%}
+
+{% stylesheet %}
+  /* ========================================
+   * Collection Long Description - Base Styles
+   * Nomenclatura: BEM (Block Element Modifier)
+   * ======================================== */
+
+  .collection-long-description {
+    width: 100%;
+    display: block;
+
+    /* Spacing - Mobile first */
+    padding-block-start: var(--cld-padding-top-mobile);
+    padding-block-end: var(--cld-padding-bottom-mobile);
+    padding-inline: var(--page-margin, 1rem);
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-long-description {
+      padding-block-start: var(--cld-padding-top-desktop);
+      padding-block-end: var(--cld-padding-bottom-desktop);
+    }
+  }
+
+  /* Inner container - ancho completo */
+  .collection-long-description__inner {
+    width: 100%;
+  }
+
+  /* ========================================
+   * Wrapper Colapsable
+   * ======================================== */
+
+  .collection-long-description__wrapper {
+    position: relative;
+    /* Sin JS: muestra todo el contenido (graceful degradation) */
+    overflow: visible;
+  }
+
+  /* Estado colapsable: activado por JS cuando contenido excede altura */
+  .collection-long-description__wrapper.is-collapsible {
+    max-height: var(--cld-collapsed-height-mobile);
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-long-description__wrapper.is-collapsible {
+      max-height: var(--cld-collapsed-height-desktop);
+    }
+  }
+
+  /* Estado expandido */
+  .collection-long-description__wrapper.is-collapsible.is-expanded {
+    max-height: var(--cld-content-height, 2000px);
+  }
+
+  /* ========================================
+   * Gradiente Fade
+   * ======================================== */
+
+
+
+  /* Mostrar fade solo cuando está colapsado */
+  .collection-long-description__wrapper.is-collapsible .collection-long-description__fade {
+    display: block;
+  }
+
+  /* Ocultar fade cuando está expandido */
+  .collection-long-description__wrapper.is-collapsible.is-expanded .collection-long-description__fade {
+    opacity: 0;
+  }
+
+  /* ========================================
+   * Content - Tipografía
+   * ======================================== */
+
+  .collection-long-description__content {
+    /* Tipografía - Mobile first */
+    font-size: var(--cld-font-size-mobile);
+    line-height: 1.6;
+    color: var(--cld-text-color);
+    /* IMPORTANTE: Siempre alineado a la izquierda */
+    text-align: left;
+    font-family: var(--font-body--family, inherit);
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-long-description__content {
+      font-size: var(--cld-font-size-desktop);
+      line-height: 1.7;
+    }
+  }
+
+  /* ========================================
+   * Rich Text Editor (RTE) Styles
+   * ======================================== */
+
+  .collection-long-description__content.rte > *:first-child {
+    margin-block-start: 0;
+  }
+
+  .collection-long-description__content.rte > *:last-child {
+    margin-block-end: 0;
+  }
+
+  .collection-long-description__content p {
+    margin-block: 1em;
+    /* Asegurar alineación izquierda en párrafos */
+    text-align: left;
+  }
+
+  .collection-long-description__content :is(h1, h2, h3, h4, h5, h6) {
+    margin-block-start: 1em;
+    margin-block-end: 0.5em;
+    line-height: 1.3;
+    color: var(--cld-text-color);
+    text-align: left;
+  }
+
+  .collection-long-description__content :is(ul, ol) {
+    margin-block: 1em;
+    padding-inline-start: 1.5em;
+    text-align: left;
+    list-style-position: outside;
+  }
+
+  .collection-long-description__content ul {
+    list-style-type: disc;
+  }
+
+  .collection-long-description__content ol {
+    list-style-type: decimal;
+  }
+
+  .collection-long-description__content li {
+    margin-block: 0.25em;
+    display: list-item;
+    text-align: left;
+  }
+
+  .collection-long-description__content a {
+    color: var(--color-primary, currentColor);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: opacity 0.2s ease;
+  }
+
+  .collection-long-description__content a:hover {
+    opacity: 0.8;
+  }
+
+  .collection-long-description__content strong {
+    font-weight: 700;
+  }
+
+  .collection-long-description__content em {
+    font-style: italic;
+  }
+
+  .collection-long-description__content blockquote {
+    margin-block: 1.5em;
+    margin-inline: 0;
+    padding-inline-start: 1em;
+    border-inline-start: 3px solid var(--cld-text-color);
+    opacity: 0.85;
+    font-style: italic;
+    text-align: left;
+  }
+
+  /* ========================================
+   * Botón Toggle (Ver más / Ver menos)
+   * ======================================== */
+
+  .collection-long-description__toggle {
+    /* Oculto por defecto - JS lo muestra si necesario */
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin-block-start: 4px;
+    padding: 8px 0;
+
+    /* Reset button styles */
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    /* Tipografía */
+    font-family: var(--font-body--family, inherit);
+    font-size: var(--cld-font-size-mobile);
+    font-weight: 500;
+    color: var(--cld-button-color);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    transition: opacity 0.2s ease;
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-long-description__toggle {
+      font-size: var(--cld-font-size-desktop);
+    }
+  }
+
+  /* Mostrar botón solo cuando wrapper es colapsable */
+  .collection-long-description__wrapper.is-collapsible ~ .collection-long-description__toggle {
+    display: flex;
+  }
+
+  .collection-long-description__toggle:hover {
+    opacity: 0.7;
+  }
+
+  .collection-long-description__toggle:focus-visible {
+    outline: 2px solid var(--cld-button-color);
+    outline-offset: 2px;
+  }
+
+  /* Icono del botón */
+  .collection-long-description__toggle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .collection-long-description__toggle-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Rotar icono cuando está expandido */
+  .collection-long-description__toggle[aria-expanded="true"] .collection-long-description__toggle-icon {
+    transform: rotate(180deg);
+  }
+{% endstylesheet %}
+
+{%- comment -%}
+  ============================================
+  SECCIÓN 6: JAVASCRIPT
+  ============================================
+  Script mínimo sin dependencias externas.
+
+  Lógica:
+  1. Espera a que el DOM esté listo
+  2. Mide el contenido real (scrollHeight) vs altura colapsada
+  3. Si scrollHeight > collapsed height: activa el colapso
+  4. Maneja el toggle con clases CSS
+
+  Graceful degradation:
+  - Si JS falla o está deshabilitado, el contenido se muestra completo
+  - El botón permanece oculto (display: none por CSS)
+{%- endcomment -%}
+
+{%- if has_content and enable_collapse -%}
+<script>
+  (function() {
+    'use strict';
+
+    /**
+     * Inicializa la funcionalidad de colapso para la sección.
+     * Se ejecuta cuando el DOM está listo.
+     */
+    function initCollapsibleDescription() {
+      var section = document.querySelector('.collection-long-description--{{ section.id }}');
+      if (!section) return;
+
+      var wrapper = section.querySelector('.collection-long-description__wrapper');
+      var content = section.querySelector('.collection-long-description__content');
+      var toggle = section.querySelector('.collection-long-description__toggle');
+
+      if (!wrapper || !content || !toggle) return;
+
+      /**
+       * Obtiene la altura colapsada según el breakpoint actual.
+       * Usa getComputedStyle para leer la variable CSS.
+       */
+      function getCollapsedHeight() {
+        var styles = getComputedStyle(section);
+        var heightVar = window.innerWidth >= 750
+          ? '--cld-collapsed-height-desktop'
+          : '--cld-collapsed-height-mobile';
+        return parseInt(styles.getPropertyValue(heightVar), 10) || 150;
+      }
+
+      /**
+       * Verifica si el contenido excede la altura colapsada.
+       * Compara scrollHeight (altura real) con la altura máxima configurada.
+       */
+      function shouldCollapse() {
+        var collapsedHeight = getCollapsedHeight();
+        var contentHeight = content.scrollHeight;
+        return contentHeight > collapsedHeight + 20; /* 20px de tolerancia */
+      }
+
+      /**
+       * Configura el estado inicial del colapso.
+       * Solo activa el colapso si el contenido lo amerita.
+       */
+      function setupCollapse() {
+        if (shouldCollapse()) {
+          /* Guardar altura real para la transición */
+          wrapper.style.setProperty('--cld-content-height', content.scrollHeight + 'px');
+          wrapper.classList.add('is-collapsible');
+        } else {
+          /* Contenido corto: remover colapso si existía */
+          wrapper.classList.remove('is-collapsible', 'is-expanded');
+        }
+      }
+
+      /**
+       * Maneja el click en el botón toggle.
+       * Alterna entre estado expandido y colapsado.
+       */
+      function handleToggle() {
+        var isExpanded = wrapper.classList.contains('is-expanded');
+        var textMore = toggle.getAttribute('data-text-more');
+        var textLess = toggle.getAttribute('data-text-less');
+        var toggleText = toggle.querySelector('.collection-long-description__toggle-text');
+
+        if (isExpanded) {
+          /* Colapsar */
+          wrapper.classList.remove('is-expanded');
+          toggle.setAttribute('aria-expanded', 'false');
+          if (toggleText) toggleText.textContent = textMore;
+
+          /* Scroll suave al inicio de la sección si está fuera de vista */
+          var rect = section.getBoundingClientRect();
+          if (rect.top < 0) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else {
+          /* Expandir */
+          wrapper.classList.add('is-expanded');
+          toggle.setAttribute('aria-expanded', 'true');
+          if (toggleText) toggleText.textContent = textLess;
+        }
+      }
+
+      /* Event listener para el botón */
+      toggle.addEventListener('click', handleToggle);
+
+      /* Setup inicial */
+      setupCollapse();
+
+      /* Re-evaluar en resize (debounced) */
+      var resizeTimeout;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+          /* Actualizar altura del contenido */
+          wrapper.style.setProperty('--cld-content-height', content.scrollHeight + 'px');
+          setupCollapse();
+        }, 250);
+      });
+    }
+
+    /* Ejecutar cuando el DOM esté listo */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCollapsibleDescription);
+    } else {
+      initCollapsibleDescription();
+    }
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Long Description",
+  "tag": "section",
+  "class": "section-collection-long-description",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "label": "Tamaño de fuente (Desktop)",
+      "info": "Tamaño en píxeles para pantallas >= 750px",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "label": "Tamaño de fuente (Mobile)",
+      "info": "Tamaño en píxeles para pantallas < 750px",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Ver más / Ver menos"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_collapse",
+      "label": "Habilitar colapso de contenido",
+      "info": "Muestra botón 'Ver más' si el contenido excede la altura configurada",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "collapsed_height_desktop",
+      "label": "Altura visible inicial (Desktop)",
+      "info": "Altura máxima antes de mostrar 'Ver más'",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "collapsed_height_mobile",
+      "label": "Altura visible inicial (Mobile)",
+      "info": "Altura máxima antes de mostrar 'Ver más'",
+      "min": 80,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "text",
+      "id": "button_text_more",
+      "label": "Texto botón 'Ver más'",
+      "default": "Ver más"
+    },
+    {
+      "type": "text",
+      "id": "button_text_less",
+      "label": "Texto botón 'Ver menos'",
+      "default": "Ver menos"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del botón",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado Desktop"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Padding superior (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding inferior (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Espaciado Mobile"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior (Mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior (Mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Long Description",
+      "category": "Collection"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["collection"]
+  }
+}
+{% endschema %}
