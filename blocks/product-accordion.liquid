@@ -1,0 +1,254 @@
+{%- liquid
+  assign s = block.settings
+  assign uid = block.id
+-%}
+
+<div
+  class="pda pda--{{ uid }}"
+  data-pda
+  data-mode="{{ s.accordion_mode }}"
+  style="
+    --pda-text-color: {{ s.text_color }};
+    --pda-font-weight: {{ s.font_weight }};
+    --pda-padding-top: {{ s.padding_top }}px;
+    --pda-padding-bottom: {{ s.padding_bottom }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .pda {
+    --pda-duration: 300ms;
+    --pda-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+    padding-top: var(--pda-padding-top, 0);
+    padding-bottom: var(--pda-padding-bottom, 0);
+  }
+
+  .pda__header {
+    margin-bottom: 0px;
+  }
+
+  /* =========================
+   ITEM
+========================= */
+
+  .pda__item {
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  /* =========================
+   TRIGGER
+========================= */
+
+  .pda__trigger {
+    width: 100%;
+    padding: 16px 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    text-align: left;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: var(--pda-font-weight, 500);
+    color: var(--pda-text-color, #0f0a05);
+  }
+
+  .pda__icon {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* PLUS / MINUS */
+  .pda__icon-plus,
+  .pda__icon-minus {
+    position: absolute;
+    inset: 0;
+    transition: opacity var(--pda-duration) var(--pda-ease);
+  }
+
+  .pda__icon-minus {
+    opacity: 0;
+  }
+
+  /* Abierto */
+  .pda__item.is-open .pda__icon-plus {
+    opacity: 0;
+  }
+
+  .pda__item.is-open .pda__icon-minus {
+    opacity: 1;
+  }
+
+  /* =========================
+   PANEL
+========================= */
+
+  .pda__panel {
+    height: 0;
+    overflow: hidden;
+    transition: height var(--pda-duration) var(--pda-ease);
+  }
+
+  .pda__panel-inner {
+    padding-bottom: 16px;
+  }
+
+  .pda__content {
+    color: var(--pda-text-color, inherit);
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    function initAccordion(container) {
+      if (container.dataset.init) return;
+      container.dataset.init = 'true';
+
+      const mode = container.dataset.mode || 'single';
+      const items = Array.from(container.querySelectorAll('.pda__item'));
+
+      function openItem(item) {
+        const panel = item.querySelector('.pda__panel');
+        item.classList.add('is-open');
+        panel.style.height = panel.scrollHeight + 'px';
+
+        panel.addEventListener(
+          'transitionend',
+          () => {
+            if (item.classList.contains('is-open')) {
+              panel.style.height = 'auto';
+            }
+          },
+          { once: true }
+        );
+      }
+
+      function closeItem(item) {
+        const panel = item.querySelector('.pda__panel');
+        panel.style.height = panel.scrollHeight + 'px';
+
+        requestAnimationFrame(() => {
+          panel.style.height = '0px';
+          item.classList.remove('is-open');
+        });
+      }
+
+      items.forEach((item) => {
+        const trigger = item.querySelector('.pda__trigger');
+        const panel = item.querySelector('.pda__panel');
+        if (!trigger || !panel) return;
+
+        // Estado inicial
+        if (item.classList.contains('is-open')) {
+          panel.style.height = panel.scrollHeight + 'px';
+        }
+
+        trigger.addEventListener('click', () => {
+          const isOpen = item.classList.contains('is-open');
+
+          if (!isOpen && mode === 'single') {
+            items.forEach((other) => {
+              if (other !== item && other.classList.contains('is-open')) {
+                closeItem(other);
+              }
+            });
+          }
+
+          isOpen ? closeItem(item) : openItem(item);
+        });
+      });
+    }
+
+    function initAll() {
+      document.querySelectorAll('[data-pda]').forEach(initAccordion);
+    }
+
+    document.addEventListener('DOMContentLoaded', initAll);
+
+    if (Shopify.designMode) {
+      document.addEventListener('shopify:section:load', initAll);
+      document.addEventListener('shopify:block:select', initAll);
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Acordeón Producto",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }, { "type": "_product-accordion-item" }],
+  "settings": [
+    {
+      "type": "select",
+      "id": "accordion_mode",
+      "label": "Modo",
+      "options": [
+        { "value": "single", "label": "Solo uno abierto" },
+        { "value": "multiple", "label": "Múltiples abiertos" }
+      ],
+      "default": "single"
+    },
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color de texto",
+      "default": "#0f0a05"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Peso de fuente",
+      "options": [
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Regular (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Acordeón Producto"
+    }
+  ]
+}
+{% endschema %}

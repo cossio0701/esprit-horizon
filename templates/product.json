@@ -115,6 +115,11 @@
                   "name": "Product title",
                   "settings": {
                     "text": "<h1>{{ closest.product.title }}</h1>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -304,6 +309,11 @@
               "name": "Product description",
               "settings": {
                 "text": "<p>{{ closest.product.description }}</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -329,6 +339,84 @@
                 "padding-inline-end-mobile": 0
               },
               "blocks": {}
+            },
+            "product_accordion_fzURLG": {
+              "type": "product-accordion",
+              "name": "Acordeón Producto",
+              "settings": {
+                "accordion_mode": "single",
+                "text_color": "#0f0a05",
+                "font_weight": "500",
+                "padding_top": 0,
+                "padding_bottom": 0
+              },
+              "blocks": {
+                "product_accordion_item_Xmn7aQ": {
+                  "type": "_product-accordion-item",
+                  "name": "Acordeon item",
+                  "settings": {
+                    "title": "Composicion y fabricacion",
+                    "open_by_default": false,
+                    "heading_tag": "h3"
+                  },
+                  "blocks": {
+                    "product_composition_hjhmUM": {
+                      "type": "_product-composition",
+                      "name": "Product Composition",
+                      "settings": {},
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "product_composition_hjhmUM"
+                  ]
+                },
+                "product_accordion_item_6WdHM6": {
+                  "type": "_product-accordion-item",
+                  "name": "Acordeon item",
+                  "settings": {
+                    "title": "Cuidados",
+                    "open_by_default": false,
+                    "heading_tag": "h3"
+                  },
+                  "blocks": {
+                    "product_garment_care_Qgwhrk": {
+                      "type": "_product-garment-care",
+                      "name": "Cuidados de la prenda",
+                      "settings": {},
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "product_garment_care_Qgwhrk"
+                  ]
+                },
+                "product_accordion_item_VMbefz": {
+                  "type": "_product-accordion-item",
+                  "name": "Acordeon item",
+                  "settings": {
+                    "title": "Título",
+                    "open_by_default": false,
+                    "heading_tag": "h3"
+                  },
+                  "blocks": {
+                    "product_fit_Gy397Y": {
+                      "type": "_product-fit",
+                      "name": "Fit de la prenda",
+                      "settings": {},
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "product_fit_Gy397Y"
+                  ]
+                }
+              },
+              "block_order": [
+                "product_accordion_item_Xmn7aQ",
+                "product_accordion_item_6WdHM6",
+                "product_accordion_item_VMbefz"
+              ]
             }
           },
           "block_order": [
@@ -339,7 +427,8 @@
             "buy_buttons_JqjPaM",
             "installments_banner_hLzt6J",
             "divider_A4UTje",
-            "text_xWt7wD"
+            "text_xWt7wD",
+            "product_accordion_fzURLG"
           ]
         },
         "product_gallery_pdp_gJaXqW": {
@@ -459,6 +548,11 @@
                   "name": "Product title",
                   "settings": {
                     "text": "<h1>{{ closest.product.title }}</h1>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -578,6 +672,11 @@
               "name": "Product description",
               "settings": {
                 "text": "{{ closest.product.description }}",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -634,6 +733,11 @@
           "name": "t:names.header",
           "settings": {
             "text": "<h3>You may also like </h3>",
+            "enable_collapse": false,
+            "collapsed_height": 50,
+            "show_more_text": "Ver más",
+            "show_less_text": "Ver menos",
+            "enable_fade": true,
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",

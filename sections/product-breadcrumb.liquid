@@ -136,9 +136,8 @@
   .product-breadcrumb-section-{{ section_id }} {
     padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
     background-color: {{ section.settings.background_color }};
-    width:100%;
-    padding-left: 40px;
-    padding-right: 40px;
+    max-width: 1830px;
+    margin: 0 auto;
   }
 
   .product-breadcrumb__wrapper-{{ section_id }} {
@@ -625,7 +624,7 @@
       "id": "truncate_on_mobile",
       "label": "Truncar texto largo en móvil",
       "default": true
-    }, 
+    },
     {
       "type": "header",
       "content": "SEO"

@@ -1,0 +1,92 @@
+{%- liquid
+  assign s = block.settings
+  assign is_open = s.open_by_default
+  assign heading = s.heading_tag | default: 'h3'
+-%}
+
+{%- capture block_content -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+{%- assign block_content_stripped = block_content | strip -%}
+
+{% if block_content_stripped != blank %}
+  <div class="pda__item{% if is_open %} is-open{% endif %}" {{ block.shopify_attributes }}>
+    <{{ heading }} class="pda__header">
+      <button type="button" class="pda__trigger button">
+        <span class="pda__title">{{ s.title }}</span>
+
+        <span class="pda__icon" aria-hidden="true">
+          <!-- PLUS -->
+          <svg class="pda__icon-plus" viewBox="0 0 20 20" fill="none">
+            <path d="M9.999 16.667V3.333M3.333 10h13.334"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+
+          <!-- MINUS -->
+          <svg class="pda__icon-minus" viewBox="0 0 20 20" fill="none">
+            <path d="M3.333 10h13.334"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </button>
+    </{{ heading }}>
+
+    <div class="pda__panel">
+      <div class="pda__panel-inner">
+        <div class="pda__content">
+          {{ block_content }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Item Acordeón",
+  "blocks": [
+    { "type": "@theme" },
+    { "type": "@app" },
+    {
+      "type": "_product-composition"
+    },
+    {
+      "type": "_product-fit"
+    },
+    {
+      "type": "_product-garment-care"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Título"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Abierto por defecto",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "DIV" }
+      ],
+      "default": "h3"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Acordeon item"
+    }
+  ]
+}
+{% endschema %}

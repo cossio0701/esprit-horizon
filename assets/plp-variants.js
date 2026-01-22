@@ -474,6 +474,111 @@
   }
 
   // =====================
+  // GALERÍA / SLIDESHOW POR COLOR
+  // =====================
+
+  /**
+   * Obtiene la galería de imágenes para un color específico.
+   * Busca en todas las variantes del color y retorna la primera galería válida.
+   * Regla de negocio: solo UNA variante por color tiene la galería configurada.
+   *
+   * @param {string} productId
+   * @param {string} color
+   * @returns {string[]|null} Array de URLs de imágenes o null si no hay galería
+   */
+  function getColorGallery(productId, color) {
+    const product = window.PLP?.[productId];
+    if (!product) return null;
+
+    // Buscar variantes de este color
+    const colorVariants = product.variants.filter(v => v.options.includes(color));
+
+    // Encontrar la primera variante que tenga galería configurada
+    for (const variant of colorVariants) {
+      if (variant.gallery && variant.gallery.length > 0) {
+        return variant.gallery;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Reconstruye el slideshow del product card con las imágenes de la galería del color.
+   * Si no hay galería, mantiene el comportamiento actual (no modifica el slideshow).
+   *
+   * @param {string} productId
+   * @param {string} color
+   */
+  function rebuildSlideshowForColor(productId, color) {
+    const gallery = getColorGallery(productId, color);
+
+    // Si no hay galería específica, no modificamos el slideshow
+    if (!gallery || gallery.length === 0) return;
+
+    const cache = getProductCache(productId);
+    if (!cache?.cardGallery) return;
+
+    const slideshow = cache.cardGallery.querySelector(CONFIG.SELECTORS.slideshow);
+    if (!slideshow) return;
+
+    const scroller = slideshow.querySelector('[ref="scroller"]');
+    if (!scroller) return;
+
+    // Crear fragment con los nuevos slides
+    const fragment = document.createDocumentFragment();
+
+    gallery.forEach((src, index) => {
+      const slide = document.createElement('slideshow-slide');
+      slide.setAttribute('ref', 'slides[]');
+      slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
+      slide.setAttribute('slide-id', `variant-gallery-${productId}-${index}`);
+      slide.className = 'product-media-container media-fit product-media-container--image';
+      slide.style.cssText = `view-timeline-name: --slide-${index}; --product-media-fit: cover;`;
+
+      // Ocultar slides extras para performance (solo mostrar primeros 5)
+      if (index >= 5) {
+        slide.setAttribute('hidden', '');
+      }
+
+      const img = document.createElement('img');
+      img.src = getImageUrl(src, 800);
+      img.srcset = generateSrcset(src);
+      img.sizes = '(min-width: 750px) 50vw, 100vw';
+      img.loading = index === 0 ? 'eager' : 'lazy';
+      img.alt = `${color} - Image ${index + 1}`;
+      img.className = 'product-media';
+
+      slide.appendChild(img);
+      fragment.appendChild(slide);
+    });
+
+    // Reemplazar contenido del scroller
+    scroller.innerHTML = '';
+    scroller.appendChild(fragment);
+
+    // Actualizar el contador de slides si existe
+    slideshow.setAttribute('slide-count', String(gallery.length));
+
+    // Resetear al primer slide
+    slideshow.setAttribute('initial-slide', '0');
+
+    // Forzar re-inicialización del slideshow
+    // El componente Slideshow observa el atributo 'initial-slide'
+    // y se re-sincroniza automáticamente
+    if (typeof slideshow.select === 'function') {
+      // Si el slideshow ya está inicializado, seleccionar el primer slide
+      requestAnimationFrame(() => {
+        try {
+          slideshow.select(0, null, { animate: false });
+        } catch (e) {
+          // Silently fail if slideshow not ready
+        }
+      });
+    }
+  }
+
+  // =====================
   // CARRITO
   // =====================
 
@@ -564,6 +669,9 @@
     changeImage(productId, variants[0]);
     updatePrice(productId, variants[0]);
     updateAddButton(productId, controller, colorAvailable);
+
+    // ★ Reconstruir el slideshow/carrusel con las imágenes del color
+    rebuildSlideshowForColor(productId, color);
 
     // Actualizar enlaces
     const targetVariant = state.variantId || variants.find(v => v.available)?.id;
@@ -780,6 +888,17 @@
         }
 
         updateProductLinks(productId, firstVariantId);
+
+        // ★ Reconstruir slideshow con las imágenes del primer color
+        if (firstColor) {
+          // Diferir para no bloquear el render inicial
+          const rebuild = () => rebuildSlideshowForColor(productId, firstColor);
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(rebuild, { timeout: 500 });
+          } else {
+            setTimeout(rebuild, 100);
+          }
+        }
       }
     });
 
@@ -804,7 +923,10 @@
   window.PLPVariants = {
     invalidateCache,
     updateProductLinks,
-    getState: (productId) => selectedState[productId]
+    getState: (productId) => selectedState[productId],
+    // API de galería
+    getColorGallery,
+    rebuildSlideshowForColor
   };
 
 })();
