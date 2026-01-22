@@ -4336,3 +4336,42 @@ slideshow-slide.hidden {
 #header-group:not(.template-index) .header-block {
   border-bottom: 1px solid #e5e5e5;
 }
+
+
+/* 4. Asegurar 4 columnas matemáticas */
+@media (min-width: 1025px) {
+  /* 1. Reset del sistema de gutters */
+  .ui-test-product-list .resource-list__carousel {
+    --column-count: 4;
+    --resource-list-column-gap: 16px;
+    --gutter-slide-width: 0px !important;
+    --peek-next-slide-size: 0px !important;
+  }
+
+  /* Margen visual únicamente para el track */
+  .ui-test-product-list .resource-list.resource-list__carousel {
+    padding-inline: 38px;
+  }
+
+  /* 2. Viewport exacto al contenedor */
+  .ui-test-product-list .resource-list__carousel slideshow-slides {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+    width: 100% !important;
+  }
+
+  /* 3. Evitar que el track se desborde */
+  .ui-test-product-list .resource-list__carousel slideshow-slides>* {
+    max-width: 100% !important;
+  }
+
+  .resource-list__carousel product-card .product-media-container,
+  .resource-list__carousel product-card .product-media {
+    height: 100%;
+    max-height: 470px;
+  }
+
+  .resource-list__carousel .product-media__image {
+    object-position: center top;
+  }
+}
