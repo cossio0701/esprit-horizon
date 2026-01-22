@@ -1,0 +1,47 @@
+{%- liquid
+  assign product_fit = product.metafields.custom.product_fit.value
+-%}
+
+{% if product_fit != blank %}
+  <ul class="product-fit">
+    {% for item in product_fit %}
+      {% if item.value != blank %}
+        <li class="product-fit__item">
+          {{ item.value }}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <style>
+    .product-fit {
+      margin: 0;
+      padding-left: 16px; /* espacio para bullets */
+      list-style: disc;
+    }
+
+    .product-fit__item {
+      font-size: 14px;
+      line-height: 1.4;
+      color: inherit;
+      margin-bottom: 8px;
+    }
+
+    .product-fit__item:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Fit de la prenda",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Fit de la prenda"
+    }
+  ]
+}
+{% endschema %}

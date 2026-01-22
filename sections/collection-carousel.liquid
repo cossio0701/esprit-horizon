@@ -1,0 +1,444 @@
+{% comment %}
+  Sección: Carrusel de Colección
+  Renderiza un carrusel basado en el metafield custom.collection_carousel
+  que contiene un metaobjeto "media" con: key, title, file, link
+{% endcomment %}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES (FACHADA)
+  ============================================
+{%- endcomment -%}
+
+{%- liquid
+  # Obtener la colección desde el contexto de la página
+  assign current_collection = collection
+
+  # Obtener el metafield del carrusel
+  assign carousel_metafield = current_collection.metafields.custom.collection_carousel
+
+  # Verificar si el metafield existe y tiene valores
+  assign has_carousel_items = false
+  if carousel_metafield != blank and carousel_metafield.value != blank
+    assign has_carousel_items = true
+    assign carousel_items = carousel_metafield.value
+  endif
+
+  # Configuraciones de la sección
+  assign section_width = section.settings.section_width
+  assign show_arrows = section.settings.show_arrows
+  assign show_dots = section.settings.show_dots
+  assign arrows_color = section.settings.arrows_color
+  assign dots_color = section.settings.dots_color
+  assign dots_active_color = section.settings.dots_active_color
+  assign slides_per_view_mobile = section.settings.slides_per_view_mobile
+  assign slides_per_view_desktop = section.settings.slides_per_view_desktop
+  assign space_between = section.settings.space_between
+  assign loop_enabled = section.settings.loop_enabled
+  assign autoplay_enabled = section.settings.autoplay_enabled
+  assign autoplay_delay = section.settings.autoplay_delay
+-%}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 2: ESTRUCTURA HTML
+  ============================================
+{%- endcomment -%}
+
+{% if has_carousel_items %}
+  <section class="collection-carousel-section section section--{{ section_width }}">
+    <div class="swiper collection-carousel-swiper">
+      <div class="swiper-wrapper">
+        {% for item in carousel_items %}
+          {%- liquid
+            assign item_title = item.title
+            assign item_file = item.file
+            assign item_link = item.link.url
+          -%}
+
+          <div class="swiper-slide collection-carousel-slide">
+            {% if item_link != blank %}
+              <a href="{{ item_link }}" class="carousel-item-link">
+            {% endif %}
+
+            {% if item_file != blank %}
+              <div class="carousel-item-image">
+                {{ item_file | image_url: width: 800 | image_tag: loading: 'lazy', class: 'carousel-image' }}
+              </div>
+            {% endif %}
+
+            {% if item_title != blank %}
+              <div class="carousel-item-title">
+                {{ item.title | metafield_tag }}
+              </div>
+            {% endif %}
+
+            {% if item_link != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if show_arrows %}
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      {% endif %}
+
+      {% if show_dots %}
+        <div class="swiper-pagination"></div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{%- comment -%}
+  ============================================
+    SECCIÓN 3: JAVASCRIPT Y CSS
+  ============================================
+{%- endcomment -%}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const carouselSwiper = new Swiper('.collection-carousel-swiper', {
+      loop: {{ loop_enabled }},
+      slidesPerView: {{ slides_per_view_mobile }},
+      spaceBetween: {{ space_between }},
+      slidesOffsetBefore: 0,
+      slidesOffsetAfter: 0,
+
+      breakpoints: {
+        768: {
+          slidesPerView: {{ slides_per_view_desktop }},
+          spaceBetween: {{ space_between }}
+        }
+      },
+
+      {% if show_dots %}
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+      },
+      {% endif %}
+
+      {% if show_arrows %}
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+      },
+      {% endif %}
+
+      {% if autoplay_enabled %}
+      autoplay: {
+        delay: {{ autoplay_delay }},
+        disableOnInteraction: false
+      }
+      {% endif %}
+    });
+  });
+</script>
+
+<style>
+  .collection-carousel-section {
+    width: 100%;
+    padding: 2rem 0;
+  }
+
+  .collection-carousel-swiper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 3rem;
+  }
+
+  /* Prevenir FOUC: establecer ancho inicial de slides antes de que Swiper se inicialice */
+  .collection-carousel-swiper .swiper-wrapper {
+    display: flex;
+    gap: {{ space_between }}px;
+  }
+
+  .collection-carousel-slide {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    flex-shrink: 0;
+    /* Ancho inicial para móvil basado en slidesPerView */
+    width: calc((100% - ({{ space_between }}px * ({{ slides_per_view_mobile }} - 1))) / {{ slides_per_view_mobile }});
+  }
+
+  @media (min-width: 768px) {
+    .collection-carousel-slide {
+      /* Ancho inicial para desktop basado en slidesPerView */
+      width: calc((100% - ({{ space_between }}px * ({{ slides_per_view_desktop }} - 1))) / {{ slides_per_view_desktop }});
+    }
+  }
+
+  /* Eliminar margen del último slide visible para alineación correcta */
+  .collection-carousel-swiper .swiper-slide:last-child {
+    margin-right: 0 !important;
+  }
+
+  .carousel-item-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+    flex: 1;
+  }
+
+  .carousel-item-link:hover {
+    transform: translateY(-4px);
+  }
+
+  .carousel-item-image {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 0;
+    margin-bottom: 1rem;
+    background: transparent;
+  }
+
+  .carousel-image {
+    min-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .carousel-item-link:hover .carousel-image {
+    transform: scale(1.05);
+  }
+
+  .carousel-item-title {
+    width: 100%;
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #333;
+    background: transparent;
+  }
+
+  .carousel-item-title p {
+    margin: 0;
+    background: transparent;
+  }
+
+  {% if show_arrows %}
+  .collection-carousel-swiper .swiper-button-next,
+  .collection-carousel-swiper .swiper-button-prev {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    margin-top: -22px;
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ arrows_color }};
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .collection-carousel-swiper .swiper-button-next::after,
+  .collection-carousel-swiper .swiper-button-prev::after {
+    font-family: swiper-icons;
+    font-size: 24px;
+    text-transform: none !important;
+    letter-spacing: 0;
+    font-variant: initial;
+    line-height: 1;
+  }
+
+  .collection-carousel-swiper .swiper-button-prev {
+    left: 10px;
+  }
+
+  .collection-carousel-swiper .swiper-button-next {
+    right: 10px;
+  }
+
+  .collection-carousel-swiper .swiper-button-next:hover,
+  .collection-carousel-swiper .swiper-button-prev:hover {
+    opacity: 1;
+  }
+
+  .collection-carousel-swiper .swiper-button-disabled {
+    opacity: 0.35;
+    cursor: auto;
+    pointer-events: none;
+  }
+  {% endif %}
+
+  {% if show_dots %}
+  .collection-carousel-swiper .swiper-pagination {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .collection-carousel-swiper .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 50%;
+    background: {{ dots_color }};
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.3s, background 0.3s, transform 0.3s;
+  }
+
+  .collection-carousel-swiper .swiper-pagination-bullet:hover {
+    opacity: 0.7;
+  }
+
+  .collection-carousel-swiper .swiper-pagination-bullet-active {
+    background: {{ dots_active_color }};
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  {% endif %}
+
+  @media (max-width: 767px) {
+    .carousel-item-title {
+      font-size: 0.875rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Carrusel de Colección",
+  "tag": "section",
+  "class": "section-collection-carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Configuración del Carrusel"
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_mobile",
+      "min": 1,
+      "max": 3,
+      "step": 0.5,
+      "label": "Slides visibles (móvil)",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Slides visibles (escritorio)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "space_between",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "label": "Espacio entre slides (px)",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "loop_enabled",
+      "label": "Loop infinito",
+      "info": "El carrusel volverá al inicio automáticamente al llegar al final",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "arrows_color",
+      "label": "Color de flechas",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Mostrar paginación",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "dots_color",
+      "label": "Color dots (inactivos)",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "dots_active_color",
+      "label": "Color dot activo",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_enabled",
+      "label": "Activar autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "min": 2000,
+      "max": 9000,
+      "step": 1000,
+      "label": "Delay autoplay (ms)",
+      "default": 5000
+    },
+    {
+      "type": "header",
+      "content": "Diseño de la Sección"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Ancho",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Ancho de página"
+        },
+        {
+          "value": "full-width",
+          "label": "Ancho completo"
+        }
+      ],
+      "default": "page-width"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel de Colección"
+    }
+  ]
+}
+{% endschema %}

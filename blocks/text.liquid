@@ -1,4 +1,24 @@
-{% render 'text', block: block %}
+{%- liquid
+  assign block_settings = block.settings
+  assign enable_collapse = block_settings.enable_collapse | default: false
+-%}
+
+{%- if enable_collapse and block_settings.text != blank -%}
+  {%- capture text_content -%}
+    {%- render 'text', block: block -%}
+  {%- endcapture -%}
+
+  {%- render 'product-description-collapsible',
+    content: text_content,
+    collapsed_height: block_settings.collapsed_height,
+    show_more_text: block_settings.show_more_text,
+    show_less_text: block_settings.show_less_text,
+    enable_fade: block_settings.enable_fade,
+    block_id: block.id
+  -%}
+{%- else -%}
+  {%- render 'text', block: block -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -9,6 +29,49 @@
       "type": "richtext",
       "id": "text",
       "label": "t:settings.text"
+    },
+    {
+      "type": "header",
+      "content": "Colapsar texto"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_collapse",
+      "label": "Habilitar Ver más / Ver menos",
+      "default": false,
+      "info": "Colapsa textos largos con un botón para expandir"
+    },
+    {
+      "type": "range",
+      "id": "collapsed_height",
+      "label": "Altura colapsada",
+      "min": 30,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 50,
+      "visible_if": "{{ block.settings.enable_collapse }}"
+    },
+    {
+      "type": "text",
+      "id": "show_more_text",
+      "label": "Texto \"Ver más\"",
+      "default": "Ver más",
+      "visible_if": "{{ block.settings.enable_collapse }}"
+    },
+    {
+      "type": "text",
+      "id": "show_less_text",
+      "label": "Texto \"Ver menos\"",
+      "default": "Ver menos",
+      "visible_if": "{{ block.settings.enable_collapse }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fade",
+      "label": "Mostrar degradado al colapsar",
+      "default": true,
+      "visible_if": "{{ block.settings.enable_collapse }}"
     },
     {
       "type": "header",

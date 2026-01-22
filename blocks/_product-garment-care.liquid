@@ -1,0 +1,68 @@
+{%- liquid
+  assign garment_care = product.metafields.custom.garment_care.value
+-%}
+
+{% if garment_care != blank %}
+  <ul class="garment-care">
+    {% for item in garment_care %}
+      <li class="garment-care__item">
+        {% if item.icon_url != blank %}
+          <img
+            class="garment-care__icon"
+            src="{{ item.icon_url }}"
+            alt="{{ item.value | escape }}"
+            width="24"
+            height="24"
+            loading="lazy"
+          >
+        {% endif %}
+        {% if item.value != blank %}
+          <span class="garment-care__text">{{ item.value }}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <style>
+    .garment-care {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .garment-care__item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .garment-care__icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .garment-care__text {
+      font-size: 14px;
+      line-height: 1.4;
+      color: inherit;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Cuidados de la prenda",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Cuidados de la prenda"
+    }
+  ]
+}
+{% endschema %}
