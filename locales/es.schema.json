@@ -154,6 +154,7 @@
     "hero_marquee": "Hero: marquesina",
     "input_fields": "Campos de entrada",
     "local_pickup": "Retiro en tienda",
+    "localization": "Localización",
     "marquee_section": "Marquesina",
     "media_with_text": "Multimedia con texto",
     "page": "Página",
@@ -1060,5 +1061,10 @@
     "other_sections": "Otro",
     "storytelling": "Narración",
     "text": "Texto"
+  },
+  "content": {
+    "search_icon": "Ícono de búsqueda",
+    "search": "Buscar",
+    "localization_info": "Los selectores de país/región e idioma solo aparecerán si se configuran múltiples opciones en tu tienda."
   }
 }

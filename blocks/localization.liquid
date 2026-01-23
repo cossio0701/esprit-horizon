@@ -1,0 +1,144 @@
+{% liquid
+  # Facade variables
+  assign block_settings = block.settings
+
+  # Check if we should show country/language selectors
+  assign show_language = block_settings.show_language
+  if localization.available_languages.size <= 1
+    assign show_language = false
+  endif
+
+  assign show_country = block_settings.show_country
+  if localization.available_countries.size <= 1
+    assign show_country = false
+  endif
+%}
+
+{% if show_country or show_language %}
+  <div
+    class="localization-block spacing-style"
+    style="{% render 'spacing-style', settings: block_settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {% render 'dropdown-localization',
+      show_country: show_country,
+      show_language: show_language,
+      country_style: block_settings.country_selector_style,
+      localization_position: block_settings.localization_position
+    %}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .localization-block {
+    display: flex;
+    align-items: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.localization",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.localization_info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "t:settings.country_region",
+      "info": "t:info.manage_countries_regions",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "country_selector_style",
+      "label": "t:settings.flag",
+      "default": true,
+      "visible_if": "{{ block.settings.show_country }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language",
+      "label": "t:settings.language_selector",
+      "info": "t:info.manage_languages",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "localization_position",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "right",
+      "visible_if": "{{ block.settings.show_country or block.settings.show_language }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.localization",
+      "category": "t:categories.basic",
+      "settings": {
+        "show_country": true,
+        "show_language": true,
+        "country_selector_style": true,
+        "localization_position": "right"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -9,6 +9,8 @@
  */
 {
   "current": {
+    "logo": "shopify://shop_images/new_header_logo.svg",
+    "logo_inverse": "shopify://shop_images/new_header_logo2_1.svg",
     "logo_height": 36,
     "logo_height_mobile": 28,
     "type_body_font": "montserrat_n4",
