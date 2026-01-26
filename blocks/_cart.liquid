@@ -3,16 +3,33 @@
   assign block_settings = block.settings
 %}
 
+<script
+  type="module"
+  src="{{ 'cart-icon.js' | asset_url }}"
+  fetchpriority="low"
+></script>
+
 <div
-  class="search-block spacing-style"
+  class="cart-block spacing-style"
   style="{% render 'spacing-style', settings: block_settings %}"
   {{ block.shopify_attributes }}
 >
-  {% render 'search', style: 'modal', class: 'header__icon--search' %}
+  {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+    {% render 'cart-drawer' %}
+  {% else %}
+    <a
+      href="{{ routes.cart_url }}"
+      class="header-actions__action action__cart"
+      aria-label="{{ 'accessibility.cart' | t }}"
+      aria-describedby="cart-bubble-text"
+    >
+      {% render 'cart-icon-component' %}
+    </a>
+  {% endif %}
 </div>
 
 {% stylesheet %}
-  .search-block {
+  .cart-block {
     display: flex;
     align-items: center;
   }
@@ -20,13 +37,9 @@
 
 {% schema %}
 {
-  "name": "t:names.search",
+  "name": "t:names.cart",
   "tag": null,
   "settings": [
-    {
-      "type": "paragraph",
-      "content": "t:content.search_icon"
-    },
     {
       "type": "header",
       "content": "t:content.padding"
@@ -74,7 +87,7 @@
   ],
   "presets": [
     {
-      "name": "t:names.search"
+      "name": "t:names.cart"
     }
   ]
 }

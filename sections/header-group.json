@@ -50,6 +50,7 @@
           "name": "t:names.logo",
           "settings": {
             "inverse": false,
+            "link": "/",
             "font": "heading",
             "unit": "pixel",
             "percent_width": 100,
@@ -64,6 +65,12 @@
             "padding-inline-end": 0
           },
           "blocks": {}
+        },
+        "commons_components_header_dynamic_menu_xxmi63": {
+          "type": "shopify://apps/commons-components/blocks/header-dynamic-menu/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+          "settings": {
+            "menu_enabled": true
+          }
         },
         "localization_9cRiwg": {
           "type": "_localization",
@@ -90,19 +97,52 @@
             "padding-inline-end": 0
           },
           "blocks": {}
+        },
+        "customer_account_WTRN8C": {
+          "type": "_customer_account",
+          "name": "t:names.customer_account",
+          "settings": {
+            "popover_color_scheme": "",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "cart_HybkJt": {
+          "type": "_cart",
+          "name": "t:names.cart",
+          "settings": {
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
         }
       },
       "block_order": [
         "logo_wtA9Yq",
+        "commons_components_header_dynamic_menu_xxmi63",
         "localization_9cRiwg",
-        "search_bHccCm"
+        "search_bHccCm",
+        "customer_account_WTRN8C",
+        "cart_HybkJt"
       ],
       "settings": {
         "section_width": "page-width",
         "section_height": "standard",
         "enable_sticky_header": "always",
         "border_width": 0,
-        "color_scheme": ""
+        "color_scheme": "",
+        "color_scheme_transparent": "",
+        "enable_transparent_header_home": true,
+        "home_color_scheme": "default",
+        "enable_transparent_header_product": false,
+        "product_color_scheme": "default",
+        "enable_transparent_header_collection": false,
+        "collection_color_scheme": "default"
       }
     }
   },

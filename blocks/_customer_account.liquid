@@ -3,16 +3,19 @@
   assign block_settings = block.settings
 %}
 
-<div
-  class="search-block spacing-style"
-  style="{% render 'spacing-style', settings: block_settings %}"
-  {{ block.shopify_attributes }}
->
-  {% render 'search', style: 'modal', class: 'header__icon--search' %}
-</div>
+{% if shop.customer_accounts_enabled %}
+  <div
+    class="customer-account-block spacing-style"
+    style="{% render 'spacing-style', settings: block_settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {% render 'account-popover', settings: block_settings %}
+    {% render 'account-drawer', settings: block_settings %}
+  </div>
+{% endif %}
 
 {% stylesheet %}
-  .search-block {
+  .customer-account-block {
     display: flex;
     align-items: center;
   }
@@ -20,12 +23,18 @@
 
 {% schema %}
 {
-  "name": "t:names.search",
+  "name": "t:names.customer_account",
   "tag": null,
   "settings": [
     {
       "type": "paragraph",
-      "content": "t:content.search_icon"
+      "content": "t:content.manage_customer_accounts"
+    },
+    {
+      "type": "color_scheme",
+      "id": "popover_color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
     },
     {
       "type": "header",
@@ -74,7 +83,7 @@
   ],
   "presets": [
     {
-      "name": "t:names.search"
+      "name": "t:names.customer_account"
     }
   ]
 }

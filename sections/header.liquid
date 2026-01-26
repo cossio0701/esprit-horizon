@@ -2,11 +2,36 @@
   # Facade variables
   assign section_settings = section.settings
 
+  # Transparency logic
+  if section.settings.enable_transparent_header_home and template.name == 'index'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.home_color_scheme
+  elsif section.settings.enable_transparent_header_product and template.name == 'product'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.product_color_scheme
+  elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.collection_color_scheme
+  endif
+
   # Sticky header logic
   if section.settings.enable_sticky_header == 'always'
     assign sticky = 'always'
   elsif section.settings.enable_sticky_header == 'scroll-up'
     assign sticky = 'scroll-up'
+  endif
+
+  # Handle transparency when sticky
+  if transparent and sticky
+    assign transparent = 'not-sticky'
+  endif
+
+  if transparent
+    if transparent_color_scheme == 'inverse'
+      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_transparent
+    else
+      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme
+    endif
   endif
 
   # Height class
@@ -16,6 +41,10 @@
 
   # Build header classes
   assign header_class = 'header'
+
+  if transparent_color_scheme
+    assign header_class = header_class | append: ' ' | append: transparent_color_scheme
+  endif
 
   if header_height_class
     assign header_class = header_class | append: ' ' | append: header_height_class
@@ -28,7 +57,10 @@
 
 <header-component
   id="header-component"
-  class="{{ header_class }}"
+  class="{{ header_class }} tae-header{% if transparent %} tae-header--transparent{% endif %}"
+  {% if transparent %}
+    transparent="{{ transparent }}"
+  {% endif %}
   {% if sticky %}
     sticky="{{ sticky }}"
   {% endif %}
@@ -39,8 +71,12 @@
     <h1 class="visually-hidden">{{ shop.name }}</h1>
   {%- endif -%}
 
+  <div ref="headerMenu" class="hidden" style="display: none;"></div>
+  <div ref="headerDrawerContainer" class="hidden" style="display: none;"></div>
+
   <div
     class="header__row color-{{ section.settings.color_scheme }} section section--{{ section.settings.section_width }}"
+    ref="headerRowTop"
     style="--border-bottom-width: {{ section.settings.border_width }}px;"
   >
     <div class="header__content spacing-style">
@@ -56,14 +92,89 @@
   body {
     --header-height: 0px;
     --header-group-height: var(--header-height);
+    --transparent-header-offset-boolean: 0;
   }
 
-  body:has(> #header-group > header) {
+  body:has(> #header-group > header-component) {
     --header-height: 60px;
   }
 
   body:has(> #header-group:empty) {
     --header-group-height: 0px;
+  }
+
+  /* Header transparency styles */
+  .header[transparent] {
+    --language-button-background-color: transparent;
+    --language-button-border-color: transparent;
+
+    /* used to apply transparency to .header__row, will only ever be transparent or unset */
+    --header-bg-color: transparent;
+
+    /* used to display the appropriate logo based on transparency state */
+    --header-logo-display: none;
+    --header-logo-inverse-display: block;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    /* transparent color scheme on .header should never apply its background color */
+    background-color: transparent;
+    z-index: var(--layer-overlay);
+
+    &[transparent='not-sticky'][data-sticky-state='active'],
+    /* Only show opaque background when hovering over menu items with children (mega menu) */
+    &:has(.mega-menu__list:hover),
+    &:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating])),
+    &:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])) {
+      --header-logo-display: unset;
+      --header-logo-inverse-display: unset;
+      --header-bg-color: unset;
+      --color-foreground: inherit;
+      --color-foreground-rgb: inherit;
+      --color-background: inherit;
+      --color-background-rgb: inherit;
+      --color-border: inherit;
+      --color-border-rgb: inherit;
+
+      .header__row {
+        transition: color var(--animation-values-fast), border-color var(--animation-values-fast),
+          background-color var(--animation-values-fast);
+      }
+    }
+
+    .header__row {
+      transition: color var(--animation-values-slow), border-color var(--animation-values-slow),
+        background-color var(--animation-values-slow);
+    }
+
+    &:not([data-sticky-state='active']) {
+      .logo-block__image {
+        filter: brightness(0) invert(1);
+      }
+
+      .dropdown-localization__button {
+        color: #fff;
+      }
+    }
+  }
+
+  :is(.header[transparent]:not([data-sticky-state='active']), .header[transparent='always'][data-sticky-state='active'])
+    .header__row:not(
+      :has(
+          .mega-menu__list:hover,
+          .menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating]),
+          .menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])
+        )
+    ) {
+    --color-foreground: inherit;
+    --color-foreground-rgb: inherit;
+    --color-border: inherit;
+    --color-border-rgb: inherit;
+    --color-primary-button-background: inherit;
+    --color-primary-button-text: inherit;
   }
 
   /* Header section positioning */
@@ -100,7 +211,7 @@
   /* Header row styling */
   .header__row {
     position: relative;
-    background-color: var(--color-background);
+    background-color: var(--header-bg-color, var(--color-background));
     border-bottom: var(--border-bottom-width) solid var(--color-border);
   }
 
@@ -131,6 +242,26 @@
   /* Header shadow */
   .header-section:has(.header--with-shadow) {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Main content offset for transparent header */
+  .header-section:has(.header[transparent]) + .shopify-section {
+    margin-top: var(--header-height);
+  }
+
+  main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
+    &.spacing-style,
+    .spacing-style {
+      --section-top-offset: calc(var(--header-height) * var(--transparent-header-offset-boolean));
+
+      :is(.spacing-style, .inherit-spacing) {
+        --section-top-offset: 0px;
+      }
+    }
+
+    .sticky-content {
+      margin-top: calc(var(--header-height) * var(--transparent-header-offset-boolean) * -1);
+    }
   }
 {% endstylesheet %}
 
@@ -215,11 +346,105 @@
       "id": "color_scheme",
       "label": "t:settings.default",
       "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme_transparent",
+      "label": "t:settings.inverse",
+      "default": "scheme-1",
+      "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.home_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_home",
+      "label": "t:settings.transparent_background",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "home_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_home }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.product_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_product",
+      "label": "t:settings.transparent_background",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "product_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_product }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.collection_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_collection",
+      "label": "t:settings.transparent_background",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collection_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
     }
   ],
   "blocks": [
     {
       "type": "_localization"
+    },
+    {
+      "type": "_customer_account"
+    },
+    {
+      "type": "_cart"
     },
     {
       "type": "_search"
