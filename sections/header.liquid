@@ -44,9 +44,7 @@
     style="--border-bottom-width: {{ section.settings.border_width }}px;"
   >
     <div class="header__content spacing-style">
-      {% for block in section.blocks %}
-        {% render block %}
-      {% endfor %}
+      {% content_for 'blocks' %}
     </div>
   </div>
 </header-component>
@@ -220,6 +218,12 @@
     }
   ],
   "blocks": [
+    {
+      "type": "_localization"
+    },
+    {
+      "type": "_search"
+    },
     {
       "type": "@theme"
     },
