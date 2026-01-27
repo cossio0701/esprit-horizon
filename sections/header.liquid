@@ -150,7 +150,7 @@
         background-color var(--animation-values-slow);
     }
 
-    &:not([data-sticky-state='active']) {
+    &:not([data-sticky-state='active']):not(:hover) {
       .logo-block__image {
         filter: brightness(0) invert(1);
       }
@@ -353,6 +353,33 @@
       "label": "t:settings.inverse",
       "default": "scheme-1",
       "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "t:names.cart"
+    },
+    {
+      "type": "select",
+      "id": "cart_type",
+      "label": "t:settings.cart_type",
+      "options": [
+        {
+          "value": "page",
+          "label": "t:options.page"
+        },
+        {
+          "value": "drawer",
+          "label": "t:options.drawer"
+        }
+      ],
+      "default": "drawer"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_open_cart_drawer",
+      "label": "t:settings.auto_open_cart_drawer",
+      "default": false,
+      "visible_if": "{{ section.settings.cart_type == 'drawer' }}"
     },
     {
       "type": "header",

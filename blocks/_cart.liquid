@@ -14,7 +14,10 @@
   style="{% render 'spacing-style', settings: block_settings %}"
   {{ block.shopify_attributes }}
 >
-  {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+  {% liquid
+    assign cart_type = section.settings.cart_type | default: settings.cart_type
+  %}
+  {% if cart_type == 'drawer' and template.name != 'cart' %}
     {% render 'cart-drawer' %}
   {% else %}
     <a

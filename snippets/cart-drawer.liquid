@@ -14,10 +14,14 @@
   fetchpriority="low"
 ></script>
 
+{% liquid
+  assign auto_open_cart_drawer = section.settings.auto_open_cart_drawer | default: settings.auto_open_cart_drawer, allow_false: true
+%}
+
 <cart-drawer-component
   class="cart-drawer"
   {{ block.shopify_attributes }}
-  {% if settings.auto_open_cart_drawer %}
+  {% if auto_open_cart_drawer %}
     auto-open
   {% endif %}
 >
