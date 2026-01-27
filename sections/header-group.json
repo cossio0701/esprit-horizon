@@ -45,6 +45,22 @@
     "header_section": {
       "type": "header",
       "blocks": {
+        "localization_9cRiwg": {
+          "type": "_localization",
+          "name": "t:names.localization",
+          "settings": {
+            "show_country": true,
+            "country_selector_style": true,
+            "show_language": true,
+            "localization_position": "right",
+            "only_show_flag": true,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
         "logo_wtA9Yq": {
           "type": "logo",
           "name": "t:names.logo",
@@ -71,22 +87,6 @@
           "settings": {
             "menu_enabled": true
           }
-        },
-        "localization_9cRiwg": {
-          "type": "_localization",
-          "name": "t:names.localization",
-          "settings": {
-            "show_country": true,
-            "country_selector_style": true,
-            "show_language": true,
-            "localization_position": "right",
-            "only_show_flag": true,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
         },
         "search_bHccCm": {
           "type": "_search",
@@ -124,12 +124,17 @@
         }
       },
       "block_order": [
+        "localization_9cRiwg",
         "logo_wtA9Yq",
         "commons_components_header_dynamic_menu_xxmi63",
-        "localization_9cRiwg",
         "search_bHccCm",
         "customer_account_WTRN8C",
         "cart_HybkJt"
+      ],
+      "custom_css": [
+        "[data-sticky-state=\"inactive\"].tae-header--transparent [data-block-handle=\"header-dynamic-menu\"] {order: 4; width: 100%;}",
+        "[data-sticky-state=\"active\"] .localization-block {display: none;}",
+        "[data-sticky-state=\"inactive\"] .header__content {flex-wrap: wrap; justify-content: space-between;}"
       ],
       "settings": {
         "section_width": "page-width",

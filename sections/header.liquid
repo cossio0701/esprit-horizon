@@ -49,15 +49,11 @@
   if header_height_class
     assign header_class = header_class | append: ' ' | append: header_height_class
   endif
-
-  unless template.name == 'index'
-    assign header_class = header_class | append: ' header--with-shadow'
-  endunless
 %}
 
 <header-component
   id="header-component"
-  class="{{ header_class }} tae-header{% if transparent %} tae-header--transparent{% endif %}"
+  class="{{ header_class }} {% if transparent %} header--transparent{% endif %}"
   {% if transparent %}
     transparent="{{ transparent }}"
   {% endif %}
@@ -125,9 +121,12 @@
     z-index: var(--layer-overlay);
 
     &[transparent='not-sticky'][data-sticky-state='active'],
+    &:hover,
     /* Only show opaque background when hovering over menu items with children (mega menu) */
     &:has(.mega-menu__list:hover),
     &:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating])),
+    &:has(.tae-item:hover),
+    &:has(.tae-item-link:is(:hover, [aria-expanded='true'])),
     &:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])) {
       --header-logo-display: unset;
       --header-logo-inverse-display: unset;
@@ -155,17 +154,45 @@
         filter: brightness(0) invert(1);
       }
 
-      .dropdown-localization__button {
-        color: #fff;
+      .dropdown-localization__button,
+      .tae-item-title-dynamic-color,
+      .header-actions__action {
+        color: #fff !important;
+      }
+    }
+
+    .logo-block__image,
+    .dropdown-localization__button,
+    .tae-item-title-dynamic-color,
+    .header-actions__action {
+      transition: color var(--animation-values-slow), filter var(--animation-values-slow);
+    }
+
+    &:not([data-sticky-state='active']) {
+      .header__content {
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      [data-block-handle='header-dynamic-menu'] {
+        order: 4;
+        width: 100%;
+      }
+
+      .localization-block {
+        display: flex !important;
       }
     }
   }
 
   :is(.header[transparent]:not([data-sticky-state='active']), .header[transparent='always'][data-sticky-state='active'])
     .header__row:not(
+      &:hover,
       :has(
           .mega-menu__list:hover,
           .menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating]),
+          .tae-item:hover,
+          .tae-item-link:is(:hover, [aria-expanded='true']),
           .menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])
         )
     ) {
@@ -180,6 +207,14 @@
   /* Header section positioning */
   .header-section {
     position: relative;
+  }
+
+  .header-utils {
+    display: flex;
+  }
+
+  :is(.header[data-sticky-state='active'], .header:not(.header--transparent)) .header-utils {
+    margin-left: auto;
   }
 
   #header-group:has(#header-component[sticky]) {
@@ -208,6 +243,31 @@
     opacity: 0;
   }
 
+  /* Localization block default hidden state */
+  .localization-block {
+    display: none !important;
+  }
+
+  /* Cart bubble styling */
+  .cart-bubble {
+    color: var(--color-background) !important;
+  }
+
+  .cart-bubble__background {
+    background-color: var(--color-foreground) !important;
+  }
+
+  /* When the header is transparent and not hovered/sticky, text is often white.
+     We want the bubble to be white background with black text for clarity. */
+  .header[transparent]:not([data-sticky-state='active']):not(:hover) {
+    .cart-bubble {
+      color: #000 !important;
+    }
+    .cart-bubble__background {
+      background-color: #fff !important;
+    }
+  }
+
   /* Header row styling */
   .header__row {
     position: relative;
@@ -218,7 +278,6 @@
   /* Header content */
   .header__content {
     display: flex;
-    justify-content: center;
     align-items: center;
     width: 100%;
     gap: var(--gap-xl);
@@ -239,8 +298,8 @@
     --padding-block-end: var(--header-padding);
   }
 
-  /* Header shadow */
-  .header-section:has(.header--with-shadow) {
+  /* Header shadow only when sticky */
+  .header-section:has(> #header-component[data-sticky-state='active']) {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   }
 
