@@ -5,6 +5,7 @@
   @param {boolean} [show_language] - Whether to show the language selector.
   @param {string} [country_style] - The style of the country selector.
   @param {string} localization_position - { 'right' | 'left' } The position of the localization picker.
+  @param {boolean} [only_show_flag] - Whether to show only the flag icon and hide text.
 {%- enddoc -%}
 
 {% liquid
@@ -36,6 +37,8 @@
 
   assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
   assign form_style = localization_font | append: localization_font_size | append: color_shadow
+
+  assign only_show_flag = only_show_flag | default: false
 %}
 
 {% if show_language and show_country == false %}
@@ -72,12 +75,14 @@
             "
           ></span>
         {% endif %}
-        <span
-          class="currency-code"
-          data-testid="localization-currency-code"
-        >
-          {{- localization.country.currency.iso_code -}}
-        </span>
+        {% unless only_show_flag %}
+          <span
+            class="currency-code"
+            data-testid="localization-currency-code"
+          >
+            {{- localization.country.currency.iso_code -}}
+          </span>
+        {% endunless %}
       {% endif %}
       <span
         class="visually-hidden"
@@ -86,18 +91,20 @@
         {{- 'accessibility.localization_region_and_language' | t -}}
       </span>
 
-      {%- if show_country and show_language -%}
+      {%- if show_country and show_language and only_show_flag == false -%}
         <span>/</span>
       {%- endif -%}
 
-      {%- if show_language -%}
+      {%- if show_language and only_show_flag == false -%}
         <span>
           {{ localization.language.iso_code | upcase }}
         </span>
       {%- endif -%}
-      <span class="svg-wrapper icon-caret">
-        {{- 'icon-caret.svg' | inline_asset_content -}}
-      </span>
+      {% unless only_show_flag %}
+        <span class="svg-wrapper icon-caret">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      {% endunless %}
     </button>
 
     <div

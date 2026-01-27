@@ -24,7 +24,8 @@
       show_country: show_country,
       show_language: show_language,
       country_style: block_settings.country_selector_style,
-      localization_position: block_settings.localization_position
+      localization_position: block_settings.localization_position,
+      only_show_flag: block_settings.only_show_flag
     %}
   </div>
 {% endif %}
@@ -81,6 +82,13 @@
         }
       ],
       "default": "right",
+      "visible_if": "{{ block.settings.show_country or block.settings.show_language }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "only_show_flag",
+      "label": "t:settings.only_show_flag",
+      "default": false,
       "visible_if": "{{ block.settings.show_country or block.settings.show_language }}"
     },
     {
