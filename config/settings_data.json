@@ -81,6 +81,13 @@
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
     "content_for_index": [],
+    "blocks": {
+      "8459273577915461739": {
+        "type": "shopify://apps/way-store-locator/blocks/app-embed-block/119482d4-58b5-4974-94b9-d8297a9404c8",
+        "disabled": false,
+        "settings": {}
+      }
+    },
     "color_schemes": {
       "scheme-1": {
         "settings": {

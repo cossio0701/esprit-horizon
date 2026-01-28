@@ -136,8 +136,6 @@
   .product-breadcrumb-section-{{ section_id }} {
     padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
     background-color: {{ section.settings.background_color }};
-    max-width: 1830px;
-    margin: 0 auto;
   }
 
   .product-breadcrumb__wrapper-{{ section_id }} {
@@ -269,7 +267,7 @@
 {%- endif -%}
 
 <nav
-  class="product-breadcrumb-section-{{ section_id }}"
+  class="product-breadcrumb-section-{{ section_id }} section section--{{ section.settings.section_width }}"
   aria-label="{{ section.settings.aria_label | default: 'Breadcrumb' }}"
   data-collection-source="{{ collection_source }}"
 >
@@ -618,6 +616,22 @@
     {
       "type": "header",
       "content": "Contenedor"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Full"
+        }
+      ],
+      "default": "page-width"
     },
     {
       "type": "checkbox",

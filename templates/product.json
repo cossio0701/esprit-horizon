@@ -351,16 +351,16 @@
                 "padding_bottom": 0
               },
               "blocks": {
-                "product_accordion_item_Xmn7aQ": {
+                "product_accordion_item_Uyr6wt": {
                   "type": "_product-accordion-item",
-                  "name": "Acordeon item",
+                  "name": "Detalle del producto",
                   "settings": {
                     "title": "Composicion y fabricacion",
                     "open_by_default": false,
                     "heading_tag": "h3"
                   },
                   "blocks": {
-                    "product_composition_hjhmUM": {
+                    "product_composition_KnzdHH": {
                       "type": "_product-composition",
                       "name": "Product Composition",
                       "settings": {},
@@ -368,19 +368,19 @@
                     }
                   },
                   "block_order": [
-                    "product_composition_hjhmUM"
+                    "product_composition_KnzdHH"
                   ]
                 },
-                "product_accordion_item_6WdHM6": {
+                "product_accordion_item_fijA6F": {
                   "type": "_product-accordion-item",
-                  "name": "Acordeon item",
+                  "name": "Detalle del producto",
                   "settings": {
-                    "title": "Cuidados",
+                    "title": "Cuidados de la prenda",
                     "open_by_default": false,
                     "heading_tag": "h3"
                   },
                   "blocks": {
-                    "product_garment_care_Qgwhrk": {
+                    "product_garment_care_nHpbAU": {
                       "type": "_product-garment-care",
                       "name": "Cuidados de la prenda",
                       "settings": {},
@@ -388,19 +388,19 @@
                     }
                   },
                   "block_order": [
-                    "product_garment_care_Qgwhrk"
+                    "product_garment_care_nHpbAU"
                   ]
                 },
-                "product_accordion_item_VMbefz": {
+                "product_accordion_item_mDYTge": {
                   "type": "_product-accordion-item",
-                  "name": "Acordeon item",
+                  "name": "Detalle del producto",
                   "settings": {
-                    "title": "Título",
+                    "title": "Fit",
                     "open_by_default": false,
                     "heading_tag": "h3"
                   },
                   "blocks": {
-                    "product_fit_Gy397Y": {
+                    "product_fit_zqCQMD": {
                       "type": "_product-fit",
                       "name": "Fit de la prenda",
                       "settings": {},
@@ -408,14 +408,14 @@
                     }
                   },
                   "block_order": [
-                    "product_fit_Gy397Y"
+                    "product_fit_zqCQMD"
                   ]
                 }
               },
               "block_order": [
-                "product_accordion_item_Xmn7aQ",
-                "product_accordion_item_6WdHM6",
-                "product_accordion_item_VMbefz"
+                "product_accordion_item_Uyr6wt",
+                "product_accordion_item_fijA6F",
+                "product_accordion_item_mDYTge"
               ]
             }
           },
