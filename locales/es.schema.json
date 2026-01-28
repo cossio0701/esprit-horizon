@@ -332,6 +332,8 @@
     "corner_radius": "Radio de esquina",
     "country_region": "País o región",
     "only_show_flag": "Solo mostrar ícono del país",
+    "mobile_logo_height": "Altura del logo móvil",
+    "mobile_logo_unit": "Unidad del logo móvil",
     "currency_code": "Código de moneda",
     "custom_height": "Altura personalizada",
     "desktop_height": "Altura del escritorio",

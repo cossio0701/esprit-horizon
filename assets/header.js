@@ -20,7 +20,7 @@ import { onDocumentLoaded, changeMetaThemeColor } from '@theme/utilities';
  */
 
 class HeaderComponent extends Component {
-  requiredRefs = ['headerDrawerContainer', 'headerMenu', 'headerRowTop'];
+  requiredRefs = ['headerDrawerContainer', 'headerMenu', 'headerRowTop', 'mobileMenuToggle', 'mobileMenuDrawer', 'mobileMenuClose', 'mobileMenuOverlay', 'mobileMenuBody'];
 
   /**
    * Width of window when header drawer was hidden
@@ -181,6 +181,31 @@ class HeaderComponent extends Component {
     this.#lastScrollTop = scrollTop;
   };
 
+  /**
+   * Opens the mobile menu drawer and moves dynamic content if needed
+   */
+  #openMobileMenu = () => {
+    const drawer = Array.isArray(this.refs.mobileMenuDrawer) ? this.refs.mobileMenuDrawer[0] : this.refs.mobileMenuDrawer;
+    if (drawer) drawer.setAttribute('open', '');
+    document.body.classList.add('overflow-hidden');
+
+    // Move dynamic menu content if it exists and hasn't been moved yet
+    const dynamicContent = document.querySelector('[data-mobile-menu-content]');
+    const body = Array.isArray(this.refs.mobileMenuBody) ? this.refs.mobileMenuBody[0] : this.refs.mobileMenuBody;
+    if (dynamicContent && body && !body.contains(dynamicContent)) {
+      body.appendChild(dynamicContent);
+    }
+  };
+
+  /**
+   * Closes the mobile menu drawer
+   */
+  #closeMobileMenu = () => {
+    const drawer = Array.isArray(this.refs.mobileMenuDrawer) ? this.refs.mobileMenuDrawer[0] : this.refs.mobileMenuDrawer;
+    if (drawer) drawer.removeAttribute('open');
+    document.body.classList.remove('overflow-hidden');
+  };
+
   connectedCallback() {
     super.connectedCallback();
     this.#resizeObserver.observe(this);
@@ -194,6 +219,15 @@ class HeaderComponent extends Component {
         document.addEventListener('scroll', this.#handleWindowScroll);
       }
     }
+
+    // Mobile menu events
+    const toggle = Array.isArray(this.refs.mobileMenuToggle) ? this.refs.mobileMenuToggle[0] : this.refs.mobileMenuToggle;
+    const close = Array.isArray(this.refs.mobileMenuClose) ? this.refs.mobileMenuClose[0] : this.refs.mobileMenuClose;
+    const overlay = Array.isArray(this.refs.mobileMenuOverlay) ? this.refs.mobileMenuOverlay[0] : this.refs.mobileMenuOverlay;
+
+    toggle?.addEventListener('click', this.#openMobileMenu);
+    close?.addEventListener('click', this.#closeMobileMenu);
+    overlay?.addEventListener('click', this.#closeMobileMenu);
   }
 
   disconnectedCallback() {

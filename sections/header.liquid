@@ -1,6 +1,6 @@
 {% liquid
   # Facade variables
-  assign section_settings = section.settings
+  # section_settings is used implicitly by content_for blocks and sub-components
 
   # Transparency logic
   if section.settings.enable_transparent_header_home and template.name == 'index'
@@ -62,6 +62,7 @@
   {% endif %}
   data-skip-node-update
   data-scroll-direction="none"
+  style="--mobile-logo-height: {{ section.settings.mobile_logo_height }}{{ section.settings.mobile_logo_unit }};"
 >
   {%- if request.page_type == 'index' -%}
     <h1 class="visually-hidden">{{ shop.name }}</h1>
@@ -76,7 +77,41 @@
     style="--border-bottom-width: {{ section.settings.border_width }}px;"
   >
     <div class="header__content spacing-style">
+      <button
+        type="button"
+        class="header__icon header__icon--menu desktop:hidden button button-unstyled"
+        aria-label="{{ 'accessibility.menu' | t }}"
+        ref="mobileMenuToggle"
+      >
+        <span class="svg-wrapper">
+          {{- 'icon-menu.svg' | inline_asset_content -}}
+        </span>
+      </button>
+
       {% content_for 'blocks' %}
+    </div>
+  </div>
+
+  {%- comment -%} Mobile Menu Drawer {%- endcomment -%}
+  <div class="mobile-menu-drawer" ref="mobileMenuDrawer" id="MobileMenuDrawer">
+    <div class="mobile-menu-drawer__overlay" ref="mobileMenuOverlay"></div>
+    <div class="mobile-menu-drawer__content">
+      <div class="mobile-menu-drawer__header">
+        {% render 'header-logo', class: 'mobile-menu-drawer__logo' %}
+        <button
+          type="button"
+          class="mobile-menu-drawer__close button button-unstyled"
+          aria-label="{{ 'actions.close' | t }}"
+          ref="mobileMenuClose"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+      <div class="mobile-menu-drawer__body" ref="mobileMenuBody">
+        {%- comment -%} Content will be shown here {%- endcomment -%}
+      </div>
     </div>
   </div>
 </header-component>
@@ -321,6 +356,162 @@
       margin-top: calc(var(--header-height) * var(--transparent-header-offset-boolean) * -1);
     }
   }
+  /* Mobile Menu Drawer (Horizon) */
+  .mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--layer-menu-drawer);
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility var(--animation-values-fast);
+  }
+
+  .mobile-menu-drawer[open] {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobile-menu-drawer__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity var(--animation-values-fast);
+  }
+
+  .mobile-menu-drawer[open] .mobile-menu-drawer__overlay {
+    opacity: 1;
+  }
+
+  .mobile-menu-drawer__content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 85%;
+    max-width: 400px;
+    height: 100%;
+    background: var(--color-background);
+    transform: translateX(-100%);
+    transition: transform var(--animation-values-fast);
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+  }
+
+  .mobile-menu-drawer[open] .mobile-menu-drawer__content {
+    transform: translateX(0);
+  }
+
+  .mobile-menu-drawer__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding-md) var(--padding-inline);
+    border-bottom: 1px solid var(--color-border);
+    min-height: 60px;
+  }
+
+  .mobile-menu-drawer__logo img {
+    max-height: var(--mobile-logo-height);
+    width: auto;
+  }
+
+  .mobile-menu-drawer__close {
+    padding: var(--padding-sm);
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-menu-drawer__close svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-menu-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  /* Adjusting Commons items within Horizon drawer */
+  .tae-mobile-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tae-mobile-menu-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tae-mobile-menu-item-button,
+  .tae-mobile-menu-item-link {
+    width: 100%;
+    padding: var(--padding-md) var(--padding-inline);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-foreground);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .tae-mobile-menu-item-button[data-submenu-trigger] .tae-mobile-menu-item-text::after {
+    display: none;
+  }
+
+  .tae-mobile-submenu.is-active {
+    background: var(--color-background);
+  }
+
+  .mobile-menu-drawer__logo.header-logo {
+    margin-inline: 0; /* reset negative margin */
+    justify-content: flex-start;
+  }
+
+  /* Ensure Commons content is visible when moved/rendered within the drawer */
+  .mobile-menu-drawer .tae-mobile-menu-content,
+  .tae-mobile-menu-drawer .tae-mobile-menu-content {
+    position: static;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    transform: none;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Hamburger button styles */
+  .header__icon--menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--padding-xs);
+    color: var(--color-foreground);
+    width: 44px;
+    height: 44px;
+  }
+
+  .header__icon--menu svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .header__icon--menu {
+      display: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -332,6 +523,31 @@
     {
       "type": "header",
       "content": "t:content.appearance"
+    },
+    {
+      "type": "range",
+      "id": "mobile_logo_height",
+      "label": "t:settings.mobile_logo_height",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "mobile_logo_unit",
+      "label": "t:settings.mobile_logo_unit",
+      "options": [
+        {
+          "value": "px",
+          "label": "t:options.pixel"
+        },
+        {
+          "value": "%",
+          "label": "t:options.percent"
+        }
+      ],
+      "default": "px"
     },
     {
       "type": "select",

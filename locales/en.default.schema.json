@@ -798,6 +798,8 @@
     "corner_radius": "Corner radius",
     "country_region": "Country/Region",
     "only_show_flag": "Show only flag icon",
+    "mobile_logo_height": "Mobile logo height",
+    "mobile_logo_unit": "Mobile logo unit",
     "cover_image": "Cover image",
     "cover_image_size": "Cover image size",
     "currency_code": "Currency code",
