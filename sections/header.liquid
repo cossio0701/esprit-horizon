@@ -244,6 +244,16 @@
     :is(.header[data-sticky-state='active'], .header:not(.header--transparent)) .header-utils {
       margin-left: auto;
     }
+
+    .header[transparent]:not([data-sticky-state='active']) .header__content {
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .header[transparent]:not([data-sticky-state='active']) [data-block-handle='header-dynamic-menu'] {
+      width: 100%;
+      order: 4;
+    }
   }
 
   #header-group:has(#header-component[sticky]) {
