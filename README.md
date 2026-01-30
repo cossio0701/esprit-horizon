@@ -115,7 +115,7 @@ When your work is ready and tested, follow this flow to merge into the main bran
 
 ## � Git & Commit Standards
 
-This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification for clear and automated versioning.
+This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification. **All commit messages MUST be written in English.**
 
 ### Format
 `<type>(<scope>): <description>`
