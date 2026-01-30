@@ -1,13 +1,5 @@
-{% comment %}
-  Block: Container
-  Componente contenedor simple que permite agrupar bloques dentro de un div con clase CSS personalizable.
-  Útil para crear layouts y estructuras reutilizables en el tema.
-{% endcomment %}
-
 {%- comment -%}
-  ============================================
-    SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES (Facade Pattern)
-  ============================================
+  SECCIÓN 1: LÓGICA Y ASIGNACIÓN DE VARIABLES (Facade Pattern)
 {%- endcomment -%}
 
 {%- liquid
@@ -16,8 +8,16 @@
     content_for 'blocks'
   endcapture
 
+  # Importa snippet CSS custom
+  capture styles
+    render 'theme-editor-styles', block: block
+  endcapture
+
+  # Tag personalizado (opcional)
+  assign tag = block.settings.html_tag | default: 'div'
+
   # Obtener la clase CSS personalizada del schema
-  assign container_class = block.settings.container_class | default: 'container'
+  assign container_class = block.settings.container_class
 
   # Verificar si hay contenido para renderizar
   assign has_content = false
@@ -28,21 +28,17 @@
 -%}
 
 {%- comment -%}
-  ============================================
-    SECCIÓN 2: HTML/ESTRUCTURA
-  ============================================
+  SECCIÓN 2: HTML/ESTRUCTURA
 {%- endcomment -%}
 
 {% if has_content %}
-  <div class="{{ container_class }}" {{ block.shopify_attributes }}>
+  <{{ tag }} class="gco-container {{ container_class }}" style="{{ styles }}" {{ block.shopify_attributes }}>
     {{ children }}
-  </div>
+  </{{ tag }}>
 {% endif %}
 
 {%- comment -%}
-  ============================================
-    SECCIÓN 3: SCHEMA
-  ============================================
+  SECCIÓN 3: SCHEMA
 {%- endcomment -%}
 
 {% schema %}
@@ -50,36 +46,190 @@
   "name": "Container",
   "tag": null,
   "blocks": [
-    {
-      "type": "_localization"
-    },
-    {
-      "type": "_customer_account"
-    },
-    {
-      "type": "_cart"
-    },
-    {
-      "type": "_search"
-    },
-    {
-      "type": "@theme"
-    },
-    {
-      "type": "@app"
-    }
+    { "type": "@theme" },
+    { "type": "@app" },
+    { "type": "_localization" },
+    { "type": "_customer_account" },
+    { "type": "_cart" },
+    { "type": "_search" }
   ],
   "settings": [
     {
-      "type": "text",
-      "id": "container_class",
-      "label": "CSS Class",
-      "default": "container",
-      "info": "Clase CSS que se aplicará al contenedor. Puedes usar múltiples clases separadas por espacios (ej: 'container mx-auto px-4')."
+      "type": "paragraph",
+      "content": "Este bloque actúa como contenedor principal, anidando otros bloques para crear estructuras personalizadas."
     },
     {
-      "type": "paragraph",
-      "content": "Este bloque actúa como contenedor para otros bloques. Agrega bloques dentro de este para crear estructuras personalizadas."
+      "type": "header",
+      "content": "SEO"
+    },
+    {
+      "type": "select",
+      "id": "html_tag",
+      "label": "Etiqueta HTML",
+      "options": [
+        { "value": "div", "label": "div" },
+        { "value": "section", "label": "section" },
+        { "value": "article", "label": "article" },
+        { "value": "main", "label": "main" }
+      ],
+      "default": "div"
+    },
+    {
+      "type": "header",
+      "content": "Diseño"
+    },
+    {
+      "type": "select",
+      "id": "desktop_direction",
+      "label": "Dirección escritorio",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "mobile_direction",
+      "label": "Dirección móvil",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Espaciado entre elementos",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Apariencia"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "Bordes",
+      "options": [
+        {
+          "value": "none",
+          "label": "Ninguno"
+        },
+        {
+          "value": "solid",
+          "label": "Color sólido"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.2,
+      "unit": "px",
+      "label": "Ancho del borde",
+      "default": 1,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Radio del borde",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Color del borde",
+      "alpha": true,
+      "default": "#000000",
+      "visible_if": "{{ block.settings.border != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado interno"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Arriba",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abajo",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Izquierda",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Derecha",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Personalización"
+    },
+    {
+      "type": "text",
+      "id": "container_class",
+      "label": "Clases CSS del contenedor",
+      "default": "container",
+      "info": "Puedes usar múltiples clases separadas por espacios (ej: 'container mx-auto px-4')."
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "CSS personalizado",
+      "info": "Líneas de CSS directo al contenedor."
     }
   ],
   "presets": [
