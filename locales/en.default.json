@@ -320,6 +320,8 @@
       "quantity_error_max": "This item has a maximum of {{ maximum }}",
       "sold_out": "Sold out",
       "unavailable": "Unavailable",
+      "size": "Size",
+      "color": "Color",
       "quantity": "Quantity",
       "quantity_increments": "Increments of {{ increment }}",
       "quantity_minimum": "Minimum of {{ minimum }}",

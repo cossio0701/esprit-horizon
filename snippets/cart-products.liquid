@@ -156,8 +156,37 @@
                       {{- item.product.title -}}
                     </a>
                   </p>
+
+                  <div class="cart-items__price-container">
+                    {% if item.original_price != item.final_price %}
+                      <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
+                      <span class="cart-items__price-current">{{ item.final_price | money }}</span>
+                      <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
+                      <s class="compare-at-price">
+                        {% if item.variant.compare_at_price > item.original_price %}
+                          {{ item.variant.compare_at_price | money }}
+                        {% else %}
+                          {{ item.original_price | money }}
+                        {% endif %}
+                      </s>
+                    {% else %}
+                      {% if item.variant.compare_at_price > item.original_price %}
+                        <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
+                      {% else %}
+                        <span class="visually-hidden">{{ 'content.price' | t }}</span>
+                      {% endif %}
+
+                      <span class="cart-items__price-current">{{ item.original_price | money }}</span>
+
+                      {% if item.variant.compare_at_price > item.original_price %}
+                        <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
+                        <s class="compare-at-price">{{ item.variant.compare_at_price | money }}</s>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+
                   {% if item.product.vendor and block_settings.vendor %}
-                    <p>
+                    <p class="cart-items__vendor">
                       {{ item.product.vendor }}
                     </p>
                   {% endif %}
@@ -181,14 +210,44 @@
                   -%}
                     <dl class="cart-items__variants">
                       {%- if item.product.has_only_default_variant == false and item.item_components.size == 0 -%}
-                        {%- for option in item.options_with_values -%}
+                        {%- liquid
+                          assign size_option = null
+                          assign color_option = null
+                          for option in item.options_with_values
+                            assign name_downcase = option.name | downcase
+                            if name_downcase contains 'talla' or name_downcase contains 'size'
+                              assign size_option = option
+                            elsif name_downcase contains 'color'
+                              assign color_option = option
+                            endif
+                          endfor
+                        -%}
+
+                        {%- if size_option -%}
                           <div class="cart-items__variant">
-                            <dt class="visually-hidden">{{ option.name }}:</dt>
-                            <dd>
-                              {{- option.value -}}
-                              {%- if forloop.last != true %},&nbsp;{% endif -%}
-                            </dd>
+                            <dt>{{ 'products.product.size' | t }}:</dt>
+                            <dd>{{ size_option.value }}</dd>
                           </div>
+                        {%- endif -%}
+
+                        {%- if color_option -%}
+                          <div class="cart-items__variant">
+                            <dt>{{ 'products.product.color' | t }}:</dt>
+                            <dd>{{ color_option.value }}</dd>
+                          </div>
+                        {%- endif -%}
+
+                        {%- for option in item.options_with_values -%}
+                          {%- assign name_downcase = option.name | downcase -%}
+                          {%- unless name_downcase contains 'talla'
+                            or name_downcase contains 'size'
+                            or name_downcase contains 'color'
+                          -%}
+                            <div class="cart-items__variant">
+                              <dt>{{ option.name }}:</dt>
+                              <dd>{{ option.value }}</dd>
+                            </div>
+                          {%- endunless -%}
                         {%- endfor -%}
                       {%- endif -%}
 
@@ -213,48 +272,9 @@
                       <p>{{ item.selling_plan_allocation.selling_plan.name }}</p>
                     {% endif %}
                   {%- endif -%}
-
-                  {% if item.line_level_discount_allocations.size > 0 %}
-                    <ul
-                      class="list-unstyled"
-                      role="list"
-                    >
-                      {%- for discount in item.line_level_discount_allocations -%}
-                        <li>{{ discount.discount_application.title | escape }}</li>
-                      {%- endfor -%}
-                    </ul>
-                  {% endif %}
-
-                  <div>
-                    {% if item.original_price != item.final_price %}
-                      <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
-                      <span>{{ item.final_price | money }}</span>
-                      <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                      <s class="compare-at-price">
-                        {% if item.variant.compare_at_price > item.original_price %}
-                          {{ item.variant.compare_at_price | money }}
-                        {% else %}
-                          {{ item.original_price | money }}
-                        {% endif %}
-                      </s>
-                    {% else %}
-                      {% if item.variant.compare_at_price > item.original_price %}
-                        <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
-                      {% else %}
-                        <span class="visually-hidden">{{ 'content.price' | t }}</span>
-                      {% endif %}
-
-                      <span>{{ item.original_price | money }}</span>
-
-                      {% if item.variant.compare_at_price > item.original_price %}
-                        <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                        <s class="compare-at-price">{{ item.variant.compare_at_price | money }}</s>
-                      {% endif %}
-                    {% endif %}
-                  </div>
                 </td>
                 <td
-                  class="cart-items__quantity"
+                  class="cart-items__quantity-remove-wrapper"
                   role="cell"
                   headers="quantity"
                 >
@@ -281,8 +301,7 @@
                       hidden
                     {% endif %}
                   >
-                    {{- 'icon-delete.svg' | inline_asset_content -}}
-                    <span class="visually-hidden">Remove</span>
+                    <span>{{ 'actions.remove' | t }}</span>
                   </button>
                 </td>
                 <td
@@ -305,7 +324,7 @@
                   </div>
                 </td>
                 <td
-                  class="cart-items__price cart-secondary-typography"
+                  class="cart-items__price cart-secondary-typography visually-hidden"
                   role="cell"
                   headers="productTotal"
                 >
@@ -357,15 +376,13 @@
   }
 
   .cart-items__table-row {
-    --cart-item-price-width: 6rem;
-
     display: grid;
-    grid-template-columns: clamp(2.5rem, 15cqi, 7.5rem) minmax(0, 1fr) minmax(var(--cart-item-price-width), auto);
+    grid-template-columns: clamp(2.5rem, 25cqi, 7.5rem) 1fr;
     grid-template-areas:
-      'media details price'
-      'media quantity price'
-      'media error error';
-    column-gap: var(--gap-md);
+      'media details'
+      'media quantity-remove'
+      'media error';
+    column-gap: var(--gap-xs);
     align-items: start;
     padding-bottom: var(--cart-items-gap);
     margin-bottom: var(--margin-lg);
@@ -440,45 +457,84 @@
   }
 
   .cart-items__title {
-    font-size: var(--cart-font-size--md);
+    font-size: 0.85rem;
     color: var(--color-foreground);
     text-transform: var(--product-title-case);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .cart-items__price-container {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cart-items__price-current {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-foreground);
+  }
+
+  .cart-items__price-container .compare-at-price {
+    font-weight: 400;
+    font-size: 0.9rem;
+    opacity: 0.6;
   }
 
   .cart-items__variant {
     display: inline-block;
   }
 
-  .cart-items__quantity {
-    grid-area: quantity;
-    margin-block-start: var(--margin-xs);
+  .cart-items__quantity-remove-wrapper {
+    grid-area: quantity-remove;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: var(--gap-xs);
-    width: fit-content;
+    justify-content: space-between;
+    width: 100%;
   }
 
-  .cart-items__quantity .quantity-selector {
+  .cart-items__quantity-remove-wrapper .quantity-selector {
     display: inline-flex;
-    flex: 0 1 var(--quantity-selector-width);
+    flex: 0 1 auto;
     font-size: var(--cart-font-size--sm);
     height: auto;
+    border: 1px solid #e6e6e6;
+    --quantity-selector-width: 90px;
+    --minimum-touch-target: 28px;
+    --icon-size-xs: 0.7rem;
+    line-height: 1;
+  }
+
+  .cart-items__quantity-remove-wrapper .quantity-selector input {
+    font-size: 0.8rem;
   }
 
   .cart-items__remove {
     background-color: transparent;
     color: var(--color-foreground);
-    width: var(--minimum-touch-target);
-    height: var(--minimum-touch-target);
+    height: auto;
     justify-content: center;
     box-shadow: none;
     padding: 0;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .cart-items__remove:hover {
+    opacity: 1;
+    background-color: transparent;
+    text-decoration: underline;
   }
 
   .cart-items__media {
     grid-area: media;
     padding: 0;
+    display: flex;
+    align-self: stretch;
   }
 
   .cart-items__price {
@@ -499,15 +555,16 @@
     aspect-ratio: var(--ratio);
     position: relative;
     width: 100%;
+    height: 100%;
     overflow: hidden;
   }
 
   .cart-items__media-image {
-    aspect-ratio: inherit;
+    aspect-ratio: unset;
     object-fit: cover;
     object-position: center center;
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 
   .cart-items__empty-button {
@@ -553,30 +610,15 @@
 
   @container cart-items (min-width: 720px) {
     .cart-items__table-row {
-      --cart-item-price-width: 6rem;
-
-      grid-template-columns: 7.5rem 1fr 1fr minmax(var(--cart-item-price-width), auto);
-      grid-template-rows: min-content 1fr;
+      grid-template-columns: 7.5rem 1fr;
       grid-template-areas:
-        'media details quantity price'
-        'media details error error';
-    }
-
-    .cart-items__quantity,
-    .cart-items__price {
-      grid-area: initial;
-    }
-
-    .cart-items__quantity {
-      margin-top: 0;
+        'media details'
+        'media quantity-remove'
+        'media error';
     }
 
     .cart-items__price {
-      min-height: var(--minimum-touch-target);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: center;
+      display: none;
     }
   }
 
@@ -601,7 +643,7 @@
   .cart__summary-totals {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xl);
+    gap: var(--gap-3xs);
     width: 100%;
     border-block-start: none;
 
@@ -629,7 +671,7 @@
   }
 
   .cart__total-value {
-    font-size: var(--cart-font-size--2xl);
+    font-size: var(--cart-font-size--sm);
   }
 
   .cart-primary-typography {
@@ -758,13 +800,28 @@
     }
   }
 
-  .cart-items__properties {
-    display: block;
-    margin-block-start: var(--margin-2xs);
+  .cart-items__variants {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: var(--color-foreground);
+    opacity: 0.8;
   }
 
-  .cart-items__properties dt,
-  .cart-items__properties dd {
-    display: inline;
+  .cart-items__variant {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .cart-items__variant dt {
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+
+  .cart-items__variant dd {
+    margin: 0;
+    font-size: 0.75rem;
   }
 {% endstylesheet %}
