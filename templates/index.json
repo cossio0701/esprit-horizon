@@ -577,6 +577,11 @@
                   "name": "t:names.heading",
                   "settings": {
                     "text": "<h4>Meet our New Collection<br/></h4>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -608,6 +613,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Spring ’25</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -645,6 +655,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h3>Nomad</h3>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -676,6 +691,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<p>La colección perfecta para cualquier ocasión, este drop incluye camisas de botones de ajuste fácil, pantalones ligeros y chaquetas de lino transpirable, todo diseñado para ofrecer comodidad y estilo.</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "100%",
                 "max_width": "none",
                 "alignment": "left",
@@ -1169,9 +1189,194 @@
           },
           "blocks": {}
         },
+        "container_hxFPGG": {
+          "type": "container",
+          "name": "Container",
+          "settings": {
+            "html_tag": "div",
+            "desktop_direction": "row",
+            "mobile_direction": "row",
+            "gap": 12,
+            "border": "none",
+            "border_width": 1,
+            "border_radius": 0,
+            "border_color": "#000000",
+            "padding_top": 0,
+            "padding_bottom": 12,
+            "padding_left": 0,
+            "padding_right": 0,
+            "container_class": "container",
+            "custom_css": "overflow: auto;\nwidth: 100%;\nwhite-space: nowrap;"
+          },
+          "blocks": {
+            "button_NHHWzV": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CAMISAS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_wxWqUF": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "PANTALONES",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_XA3qfi": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "VESTIDOS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_zFce4G": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CHAQUETAS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_pc4BUf": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "BLUSAS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_ddE3Rn": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CAMISETAS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_3iJB3a": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "ENTERIZO DENIM",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_hhmGDA": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CHAQUETA",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_cDYNRr": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CHAQUETA DENIM",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "button_X7TeEt": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "CHALECOS",
+                "link": "shopify://collections/all",
+                "open_in_new_tab": false,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "button_NHHWzV",
+            "button_wxWqUF",
+            "button_XA3qfi",
+            "button_zFce4G",
+            "button_pc4BUf",
+            "button_ddE3Rn",
+            "button_3iJB3a",
+            "button_hhmGDA",
+            "button_cDYNRr",
+            "button_X7TeEt"
+          ]
+        },
         "group_dBHVr3": {
           "type": "group",
           "name": "t:names.group",
+          "disabled": true,
           "settings": {
             "content_direction": "row",
             "vertical_on_mobile": false,
@@ -1376,10 +1581,11 @@
       },
       "block_order": [
         "ai_gen_block_8969bbd_eyhXfL",
+        "container_hxFPGG",
         "group_dBHVr3"
       ],
       "custom_css": [
-        ".button-secondary {font-size: 13px; /* Ajusta el tamaño que necesites */}"
+        ".button-secondary {font-size: 13px;}"
       ],
       "name": "t:names.custom_section",
       "settings": {

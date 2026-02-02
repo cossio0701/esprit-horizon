@@ -1,0 +1,11 @@
+/* Contenedor custom */
+.gco-container {
+  display: flex;
+  flex-direction: var(--direction-desktop);
+}
+
+@media (max-width: 640px) {
+  .gco-container {
+    flex-direction: var(--direction-mobile);
+  }
+}

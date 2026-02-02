@@ -20,6 +20,9 @@
       "block_order": [
         "commons_components_banner_landing_hw3iyc"
       ],
+      "custom_css": [
+        "div[id*=\"Some:Same\"][id$=\"commons_components_banner_landing\"] {}"
+      ],
       "name": "Banner Landing ",
       "settings": {
         "content_direction": "column",
@@ -76,6 +79,7 @@
         "padding_bottom": 8,
         "padding_top_mobile": 12,
         "padding_bottom_mobile": 12,
+        "section_width": "page-width",
         "truncate_on_mobile": true,
         "enable_json_ld": true
       }
@@ -88,6 +92,11 @@
           "name": "Title",
           "settings": {
             "text": "<h1>{{ closest.collection.title }}</h1>",
+            "enable_collapse": false,
+            "collapsed_height": 50,
+            "show_more_text": "Ver más",
+            "show_less_text": "Ver menos",
+            "enable_fade": true,
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -119,6 +128,11 @@
           "name": "Description",
           "settings": {
             "text": "{{ closest.collection.description }}",
+            "enable_collapse": false,
+            "collapsed_height": 50,
+            "show_more_text": "Ver más",
+            "show_less_text": "Ver menos",
+            "enable_fade": true,
             "width": "100%",
             "max_width": "none",
             "alignment": "left",
@@ -371,6 +385,7 @@
         "padding_bottom": 8,
         "padding_top_mobile": 12,
         "padding_bottom_mobile": 12,
+        "section_width": "page-width",
         "truncate_on_mobile": true,
         "enable_json_ld": true
       }

@@ -1,32 +1,50 @@
 {% liquid
+  # Facade variables
   assign block_settings = block.settings
 %}
 
-{% render 'header-logo', block_settings: block_settings %}
+{% if shop.customer_accounts_enabled %}
+  <div
+    class="customer-account-block spacing-style"
+    style="{% render 'spacing-style', settings: block_settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {% render 'account-popover', settings: block_settings %}
+    {% render 'account-drawer', settings: block_settings %}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .customer-account-block {
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 989px) {
+    .customer-account-block {
+      display: none;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.logo",
+  "name": "t:names.customer_account",
   "tag": null,
-  "class": "header-logo",
   "settings": [
     {
       "type": "paragraph",
-      "content": "t:content.edit_logo_in_theme_settings"
+      "content": "t:content.manage_customer_accounts"
+    },
+    {
+      "type": "color_scheme",
+      "id": "popover_color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
     },
     {
       "type": "header",
-      "content": "t:content.visibility"
-    },
-    {
-      "type": "checkbox",
-      "id": "hide_logo_on_home_page",
-      "label": "t:settings.hide_logo_on_home_page",
-      "info": "t:info.hide_logo_on_home_page_help"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding_desktop"
+      "content": "t:content.padding"
     },
     {
       "type": "range",
@@ -67,6 +85,11 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.customer_account"
     }
   ]
 }

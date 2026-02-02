@@ -1,32 +1,35 @@
 {% liquid
+  # Facade variables
   assign block_settings = block.settings
 %}
 
-{% render 'header-logo', block_settings: block_settings %}
+<div
+  class="search-block spacing-style"
+  style="{% render 'spacing-style', settings: block_settings %}"
+  {{ block.shopify_attributes }}
+>
+  {% render 'search', style: 'modal', class: 'header__icon--search' %}
+</div>
+
+{% stylesheet %}
+  .search-block {
+    display: flex;
+    align-items: center;
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.logo",
+  "name": "t:names.search",
   "tag": null,
-  "class": "header-logo",
   "settings": [
     {
       "type": "paragraph",
-      "content": "t:content.edit_logo_in_theme_settings"
+      "content": "t:content.search_icon"
     },
     {
       "type": "header",
-      "content": "t:content.visibility"
-    },
-    {
-      "type": "checkbox",
-      "id": "hide_logo_on_home_page",
-      "label": "t:settings.hide_logo_on_home_page",
-      "info": "t:info.hide_logo_on_home_page_help"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding_desktop"
+      "content": "t:content.padding"
     },
     {
       "type": "range",
@@ -67,6 +70,11 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.search"
     }
   ]
 }
