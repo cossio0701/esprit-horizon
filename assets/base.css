@@ -2136,7 +2136,7 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6)>*:not(.tax-note) {
 .compare-at-price {
   opacity: 0.4;
   text-decoration-line: line-through;
-  text-decoration-thickness: 1.5px;
+  text-decoration-thickness: 1px;
 }
 
 .card-gallery {
@@ -4340,6 +4340,7 @@ slideshow-slide.hidden {
 
 /* 4. Asegurar 4 columnas matemáticas */
 @media (min-width: 1025px) {
+
   /* 1. Reset del sistema de gutters */
   .ui-test-product-list .resource-list__carousel {
     --column-count: 4;

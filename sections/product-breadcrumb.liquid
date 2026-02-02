@@ -3,9 +3,8 @@
 
   Características:
   - Detección inteligente de colección de origen
-  - SEO con JSON-LD estructurado
   - Compatible con Customizer
-  - Fallback robusto para todos los escenarios
+  - Comportamiento especial para /cart
   - Sin dependencias externas
 {%- endcomment -%}
 
@@ -16,14 +15,6 @@
   # ============================================
   # DETECCIÓN INTELIGENTE DE COLECCIÓN
   # ============================================
-  # Prioridad:
-  # 1. Parámetro URL ?collection=handle
-  # 2. Colección en URL canónica /collections/X/products/Y
-  # 3. Variable collection global (si existe)
-  # 4. Colección del Customizer (section.settings)
-  # 5. Primera colección del producto
-  # 6. Fallback: ninguna colección
-
   assign breadcrumb_collection = null
   assign breadcrumb_collection_title = ''
   assign breadcrumb_collection_url = ''
@@ -71,15 +62,7 @@
     assign collection_source = 'global_var'
   endif
 
-  # 4. Verificar colección configurada en Customizer
-  if breadcrumb_collection == blank and section.settings.fallback_collection != blank
-    assign breadcrumb_collection = section.settings.fallback_collection
-    assign breadcrumb_collection_title = section.settings.fallback_collection.title
-    assign breadcrumb_collection_url = section.settings.fallback_collection.url
-    assign collection_source = 'customizer'
-  endif
-
-  # 5. Usar primera colección del producto
+  # 4. Usar primera colección del producto
   if breadcrumb_collection == blank and product != blank and product.collections.size > 0
     assign breadcrumb_collection = product.collections.first
     assign breadcrumb_collection_title = product.collections.first.title
@@ -96,12 +79,7 @@
 
   if product != blank
     assign final_item_type = 'product'
-    # Usar metafield de categoría si está configurado
-    if section.settings.use_category_metafield and product.metafields.custom.product_category != blank
-      assign final_item_title = product.metafields.custom.product_category
-    else
-      assign final_item_title = product.title
-    endif
+    assign final_item_title = product.title
     assign final_item_url = product.url
   elsif collection != blank
     assign final_item_type = 'collection'
@@ -139,7 +117,7 @@
   }
 
   .product-breadcrumb__wrapper-{{ section_id }} {
-    padding: 0 ;
+    padding: 0;
   }
 
   .product-breadcrumb__list-{{ section_id }} {
@@ -150,7 +128,6 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    font-family: {{ section.settings.font_family }};
     font-size: {{ section.settings.font_size }}px;
     line-height: 1.4;
   }
@@ -181,7 +158,7 @@
 
   .product-breadcrumb__current-{{ section_id }} {
     color: {{ section.settings.current_color }};
-    font-weight: {{ section.settings.current_font_weight }};
+    font-weight: 600;
   }
 
   {%- if section.settings.show_home_icon -%}
@@ -199,13 +176,38 @@
   }
   {%- endif -%}
 
+  /* Estilos para link del carrito */
+  .product-breadcrumb__cart-link-{{ section_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: {{ section.settings.link_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-weight:500;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2px;
+    transition: color 0.3s ease;
+  }
+
+  .product-breadcrumb__cart-link-{{ section_id }}:hover {
+    color: {{ section.settings.link_hover_color }};
+  }
+
+  .product-breadcrumb__cart-link-{{ section_id }} svg {
+    transition: transform 0.3s ease;
+  }
+
+  .product-breadcrumb__cart-link-{{ section_id }}:hover svg {
+    transform: translateX(-4px);
+  }
+
   @media screen and (max-width: 749px) {
-    .product-breadcrumb-section-{{ section_id }} {
-      padding: {{ section.settings.padding_top_mobile }}px 0 {{ section.settings.padding_bottom_mobile }}px;
+    .product-breadcrumb__cart-link-{{ section_id }} {
+      font-size: {{ section.settings.font_size_mobile }}px;
     }
 
-    .product-breadcrumb__wrapper-{{ section_id }} {
-      padding: 0 {{ section.settings.horizontal_padding_mobile }}px;
+    .product-breadcrumb-section-{{ section_id }} {
+      padding: {{ section.settings.padding_top_mobile }}px 0 {{ section.settings.padding_bottom_mobile }}px;
     }
 
     .product-breadcrumb__list-{{ section_id }} {
@@ -220,15 +222,6 @@
     .product-breadcrumb__separator-{{ section_id }} {
       font-size: {{ section.settings.font_size_mobile }}px;
     }
-
-    {%- if section.settings.truncate_on_mobile -%}
-    .product-breadcrumb__current-{{ section_id }} {
-      max-width: 200px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    {%- endif -%}
   }
 {%- endstyle -%}
 
@@ -271,126 +264,109 @@
   aria-label="{{ section.settings.aria_label | default: 'Breadcrumb' }}"
   data-collection-source="{{ collection_source }}"
 >
+  <pre style="background:#f5f5f5;padding:12px;border:1px solid #ddd;">
+  request.path: {{ request.path }}
+  request.query_string: {{ request.query_string }}
+  template: {{ template }}
+  </pre>
+
   <div class="product-breadcrumb__wrapper-{{ section_id }}">
-    <ol class="product-breadcrumb__list-{{ section_id }}" itemscope itemtype="https://schema.org/BreadcrumbList">
-      {%- comment -%} Home {%- endcomment -%}
-      <li
-        class="product-breadcrumb__item-{{ section_id }}"
-        itemprop="itemListElement"
-        itemscope
-        itemtype="https://schema.org/ListItem"
-      >
-        <a
-          href="{{ routes.root_url }}"
-          class="product-breadcrumb__link-{{ section_id }}"
-          itemprop="item"
+    {%- if request.path == '/cart' -%}
+      <a href="{{ routes.all_products_collection_url }}" class="product-breadcrumb__cart-link-{{ section_id }}">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
-          {%- if section.settings.show_home_icon -%}
-            <span class="product-breadcrumb__home-icon-{{ section_id }}" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-              </svg>
-            </span>
-            <span class="visually-hidden">{{ section.settings.home_text }}</span>
-          {%- else -%}
-            <span itemprop="name">{{ section.settings.home_text }}</span>
-          {%- endif -%}
-        </a>
-        <meta itemprop="position" content="1">
-      </li>
-
-      {%- comment -%} Collection (si existe) {%- endcomment -%}
-      {%- if breadcrumb_collection != blank -%}
-        <li class="product-breadcrumb__item-{{ section_id }}" aria-hidden="true">
-          <span class="product-breadcrumb__separator-{{ section_id }}">{{ separator }}</span>
-        </li>
+          <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ section.settings.home_text }}</span>
+      </a>
+    {%- else -%}
+      <ol class="product-breadcrumb__list-{{ section_id }}" itemscope itemtype="https://schema.org/BreadcrumbList">
+        {%- comment -%} Home {%- endcomment -%}
         <li
           class="product-breadcrumb__item-{{ section_id }}"
           itemprop="itemListElement"
           itemscope
           itemtype="https://schema.org/ListItem"
         >
-          {%- if final_item_type == 'product' or final_item_type == 'page' -%}
-            <a
-              href="{{ breadcrumb_collection_url }}"
-              class="product-breadcrumb__link-{{ section_id }}"
-              itemprop="item"
-            >
-              <span itemprop="name">{{ breadcrumb_collection_title }}</span>
-            </a>
-          {%- else -%}
-            <span class="product-breadcrumb__current-{{ section_id }}" itemprop="name">
-              {{ breadcrumb_collection_title }}
-            </span>
-          {%- endif -%}
-          <meta itemprop="position" content="2">
-        </li>
-      {%- endif -%}
-
-      {%- comment -%} Elemento final (Producto/Página/Búsqueda) {%- endcomment -%}
-      {%- if final_item_title != blank and final_item_type != 'collection' -%}
-        <li class="product-breadcrumb__item-{{ section_id }}" aria-hidden="true">
-          <span class="product-breadcrumb__separator-{{ section_id }}">{{ separator }}</span>
-        </li>
-        <li
-          class="product-breadcrumb__item-{{ section_id }}"
-          itemprop="itemListElement"
-          itemscope
-          itemtype="https://schema.org/ListItem"
-        >
-          <span
-            class="product-breadcrumb__current-{{ section_id }}"
-            itemprop="name"
-            aria-current="page"
+          <a
+            href="{{ routes.root_url }}"
+            class="product-breadcrumb__link-{{ section_id }}"
+            itemprop="item"
           >
-            {{ final_item_title }}
-          </span>
-          <link itemprop="item" href="{{ shop.url }}{{ final_item_url }}">
-          <meta itemprop="position" content="{% if breadcrumb_collection != blank %}3{% else %}2{% endif %}">
+            {%- if section.settings.show_home_icon -%}
+              <span class="product-breadcrumb__home-icon-{{ section_id }}" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+              </span>
+              <span class="visually-hidden">{{ section.settings.home_text }}</span>
+            {%- else -%}
+              <span itemprop="name">{{ section.settings.home_text }}</span>
+            {%- endif -%}
+          </a>
+          <meta itemprop="position" content="1">
         </li>
-      {%- endif -%}
-    </ol>
+
+        {%- comment -%} Collection (si existe) {%- endcomment -%}
+        {%- if breadcrumb_collection != blank -%}
+          <li class="product-breadcrumb__item-{{ section_id }}" aria-hidden="true">
+            <span class="product-breadcrumb__separator-{{ section_id }}">{{ separator }}</span>
+          </li>
+          <li
+            class="product-breadcrumb__item-{{ section_id }}"
+            itemprop="itemListElement"
+            itemscope
+            itemtype="https://schema.org/ListItem"
+          >
+            {%- if final_item_type == 'product' or final_item_type == 'page' -%}
+              <a
+                href="{{ breadcrumb_collection_url }}"
+                class="product-breadcrumb__link-{{ section_id }}"
+                itemprop="item"
+              >
+                <span itemprop="name">{{ breadcrumb_collection_title }}</span>
+              </a>
+            {%- else -%}
+              <span class="product-breadcrumb__current-{{ section_id }}" itemprop="name">
+                {{ breadcrumb_collection_title }}
+              </span>
+            {%- endif -%}
+            <meta itemprop="position" content="2">
+          </li>
+        {%- endif -%}
+
+        {%- comment -%} Elemento final (Producto/Página/Búsqueda) {%- endcomment -%}
+        {%- if final_item_title != blank and final_item_type != 'collection' -%}
+          <li class="product-breadcrumb__item-{{ section_id }}" aria-hidden="true">
+            <span class="product-breadcrumb__separator-{{ section_id }}">{{ separator }}</span>
+          </li>
+          <li
+            class="product-breadcrumb__item-{{ section_id }}"
+            itemprop="itemListElement"
+            itemscope
+            itemtype="https://schema.org/ListItem"
+          >
+            <span
+              class="product-breadcrumb__current-{{ section_id }}"
+              itemprop="name"
+              aria-current="page"
+            >
+              {{ final_item_title }}
+            </span>
+            <link itemprop="item" href="{{ shop.url }}{{ final_item_url }}">
+            <meta itemprop="position" content="{% if breadcrumb_collection != blank %}3{% else %}2{% endif %}">
+          </li>
+        {%- endif -%}
+      </ol>
+    {%- endif -%}
   </div>
 </nav>
-
-{%- comment -%}
-  JavaScript para persistencia de navegación via sessionStorage
-  Solo se incluye si está habilitado en settings
-{%- endcomment -%}
-{%- if section.settings.enable_navigation_tracking -%}
-  <script>
-    (function () {
-      const STORAGE_KEY = 'shopify_breadcrumb_collection';
-      const currentPath = window.location.pathname;
-
-      // Si estamos en una página de colección, guardar en sessionStorage
-      if (currentPath.includes('/collections/') && !currentPath.includes('/products/')) {
-        const pathParts = currentPath.split('/');
-        const collectionIndex = pathParts.indexOf('collections');
-        if (collectionIndex !== -1 && pathParts[collectionIndex + 1]) {
-          const collectionHandle = pathParts[collectionIndex + 1];
-          sessionStorage.setItem(STORAGE_KEY, collectionHandle);
-        }
-      }
-
-      // Si estamos en PDP sin parámetro de colección, añadir desde sessionStorage
-      if (currentPath.includes('/products/') && !window.location.search.includes('collection=')) {
-        const savedCollection = sessionStorage.getItem(STORAGE_KEY);
-        if (savedCollection) {
-          // Actualizar links de navegación internos si es necesario
-          document.addEventListener('DOMContentLoaded', function () {
-            const breadcrumbNav = document.querySelector('[data-collection-source="product_first"]');
-            if (breadcrumbNav && savedCollection) {
-              // El breadcrumb ya está renderizado server-side,
-              // pero podemos usar esto para analytics o futuras mejoras
-              breadcrumbNav.setAttribute('data-tracked-collection', savedCollection);
-            }
-          });
-        }
-      }
-    })();
-  </script>
-{%- endif -%}
 
 {% schema %}
 {
@@ -423,30 +399,6 @@
     },
     {
       "type": "header",
-      "content": "Detección de colección"
-    },
-    {
-      "type": "collection",
-      "id": "fallback_collection",
-      "label": "Colección de respaldo",
-      "info": "Se usa si no se detecta colección de navegación"
-    },
-    {
-      "type": "checkbox",
-      "id": "use_category_metafield",
-      "label": "Usar metafield de categoría",
-      "default": false,
-      "info": "Usa product.metafields.custom.product_category como título final"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_navigation_tracking",
-      "label": "Habilitar tracking de navegación",
-      "default": true,
-      "info": "Guarda la última colección visitada en sessionStorage"
-    },
-    {
-      "type": "header",
       "content": "Separador"
     },
     {
@@ -464,18 +416,6 @@
     {
       "type": "header",
       "content": "Tipografía"
-    },
-    {
-      "type": "select",
-      "id": "font_family",
-      "label": "Familia de fuente",
-      "options": [
-        { "value": "inherit", "label": "Heredar del tema" },
-        { "value": "var(--font-body--family)", "label": "Fuente del cuerpo" },
-        { "value": "var(--font-primary--family)", "label": "Fuente primaria" },
-        { "value": "system-ui, sans-serif", "label": "Sistema" }
-      ],
-      "default": "inherit"
     },
     {
       "type": "range",
@@ -496,18 +436,6 @@
       "unit": "px",
       "label": "Tamaño de fuente móvil",
       "default": 12
-    },
-    {
-      "type": "select",
-      "id": "current_font_weight",
-      "label": "Peso del elemento actual",
-      "options": [
-        { "value": "400", "label": "Normal" },
-        { "value": "500", "label": "Medio" },
-        { "value": "600", "label": "Semi-bold" },
-        { "value": "700", "label": "Bold" }
-      ],
-      "default": "600"
     },
     {
       "type": "header",
@@ -615,7 +543,7 @@
     },
     {
       "type": "header",
-      "content": "Contenedor"
+      "content": "Avanzado"
     },
     {
       "type": "select",
@@ -656,7 +584,6 @@
       "name": "Breadcrumb de Producto",
       "category": "Navegación"
     }
-  ],
-  "templates": ["product", "collection", "page", "search"]
+  ]
 }
 {% endschema %}

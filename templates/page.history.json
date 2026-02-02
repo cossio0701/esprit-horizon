@@ -85,10 +85,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_9qA9qb",
-        "image_WEM4qF"
-      ],
+      "block_order": ["text_9qA9qb", "image_WEM4qF"],
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -197,10 +194,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_UxKP6p",
-        "text_gDMVxH"
-      ],
+      "block_order": ["text_UxKP6p", "text_gDMVxH"],
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -329,10 +323,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_7XeraJ",
-            "text_9YiiNH"
-          ]
+          "block_order": ["text_7XeraJ", "text_9YiiNH"]
         }
       },
       "name": "t:names.editorial_jumbo_text",
@@ -446,10 +437,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_TGQMVJ",
-            "text_C4fNLA"
-          ]
+          "block_order": ["text_TGQMVJ", "text_C4fNLA"]
         }
       },
       "name": "t:names.editorial_jumbo_text",
@@ -754,10 +742,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_ReVDjt",
-            "text_bHFFap"
-          ]
+          "block_order": ["text_ReVDjt", "text_bHFFap"]
         }
       },
       "name": "t:names.editorial_jumbo_text",
@@ -910,16 +895,10 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_UG9zHJ",
-            "text_X8wAkx"
-          ]
+          "block_order": ["text_UG9zHJ", "text_X8wAkx"]
         }
       },
-      "block_order": [
-        "image_qRLhLJ",
-        "group_J4i9mM"
-      ],
+      "block_order": ["image_qRLhLJ", "group_J4i9mM"],
       "name": "t:names.image_with_text",
       "settings": {
         "content_direction": "row",
@@ -1239,10 +1218,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_cJc43f",
-            "text_gQD8cQ"
-          ]
+          "block_order": ["text_cJc43f", "text_gQD8cQ"]
         }
       },
       "name": "t:names.editorial_jumbo_text",
@@ -1332,10 +1308,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_4FR6H3",
-        "text_ajpbVK"
-      ],
+      "block_order": ["text_4FR6H3", "text_ajpbVK"],
       "name": "t:names.pull_quote",
       "settings": {
         "content_direction": "column",
@@ -1433,9 +1406,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "image_dydBtX"
-          ]
+          "block_order": ["image_dydBtX"]
         },
         "group_C9j3xK": {
           "type": "group",
@@ -1502,9 +1473,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "image_aVK7Hm"
-          ]
+          "block_order": ["image_aVK7Hm"]
         },
         "group_6AVVr8": {
           "type": "group",
@@ -1571,16 +1540,10 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "image_xjbDmV"
-          ]
+          "block_order": ["image_xjbDmV"]
         }
       },
-      "block_order": [
-        "group_Unr63N",
-        "group_C9j3xK",
-        "group_6AVVr8"
-      ],
+      "block_order": ["group_Unr63N", "group_C9j3xK", "group_6AVVr8"],
       "name": "t:names.custom_section",
       "settings": {
         "content_direction": "row",
@@ -1726,10 +1689,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_KQjrf4",
-            "text_BMhD7V"
-          ]
+          "block_order": ["text_KQjrf4", "text_BMhD7V"]
         },
         "video_rQr8AJ": {
           "type": "video",
@@ -1758,10 +1718,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "group_Mdpmrq",
-        "video_rQr8AJ"
-      ],
+      "block_order": ["group_Mdpmrq", "video_rQr8AJ"],
       "name": "t:names.custom_section",
       "settings": {
         "content_direction": "row",
@@ -1851,9 +1808,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "ai_gen_block_8969bbd_a7UDtW"
-          ]
+          "block_order": ["ai_gen_block_8969bbd_a7UDtW"]
         },
         "ai_gen_block_5d9738d_taPwCW": {
           "type": "ai_gen_block_5d9738d",
@@ -1903,10 +1858,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "group_7pFTdw",
-        "ai_gen_block_5d9738d_taPwCW"
-      ],
+      "block_order": ["group_7pFTdw", "ai_gen_block_5d9738d_taPwCW"],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
