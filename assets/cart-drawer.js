@@ -1,5 +1,5 @@
 import { DialogComponent } from '@theme/dialog';
-import { CartAddEvent } from '@theme/events';
+import { CartAddEvent, CartUpdateEvent } from '@theme/events';
 
 /**
  * A custom element that manages a cart drawer.
@@ -45,7 +45,10 @@ class CartDrawerComponent extends DialogComponent {
     });
   };
 
-  #handleCartAdd = () => {
+  /** @param {CartUpdateEvent} event */
+  #handleCartAdd = (event) => {
+    if (event.detail?.data?.skipOpen) return;
+
     if (this.hasAttribute('auto-open')) {
       this.#switchTab('cart');
       this.showDialog();

@@ -129,6 +129,7 @@ export class CartUpdateEvent extends Event {
    * @param {string} [data.productId] - The id of the product card that was updated
    * @param {number} [data.itemCount] - The number of items in the cart
    * @param {string} [data.variantId] - The id of the product variant that was updated
+   * @param {boolean} [data.skipOpen] - Whether to skip opening the cart drawer
    * @param {Record<string, string>} [data.sections] - The sections affected by the cart operation
    */
   constructor(resource, sourceId, data) {

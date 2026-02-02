@@ -348,6 +348,14 @@
             {% endfor %}
           </tbody>
         </table>
+
+        <button
+          class="button button--tertiary cart-items__empty-cart"
+          type="button"
+          on:click="cart-items-component/onEmptyCart"
+        >
+          <span>Vaciar bolsa</span>
+        </button>
       </div>
     </form>
   {%- endif -%}
@@ -528,6 +536,27 @@
     opacity: 1;
     background-color: transparent;
     text-decoration: underline;
+  }
+
+  .cart-items__empty-cart {
+    background-color: transparent;
+    color: var(--color-foreground);
+    height: auto;
+    width: fit-content;
+    padding: 0;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: block;
+    border: none;
+    font-weight: 400;
+  }
+
+  .cart-items__empty-cart:hover {
+    opacity: 1;
   }
 
   .cart-items__media {
