@@ -16,20 +16,10 @@
 
   assign discount_codes = discount_codes | uniq
 
-  # Evaluate the boolean expression for the disclosure state
-  if discount_codes.size == 0
-    assign disclosure_expanded = false
-  else
-    assign disclosure_expanded = true
-  endif
+  # Always keep discount input visible
+  assign disclosure_expanded = true
 %}
-<disclosure-custom class="cart-discount">
-  {% render 'disclosure-trigger',
-    controls_id: 'cart-discount-disclosure',
-    is_expanded: disclosure_expanded,
-    disclosure_name: 'accessibility.discount_menu',
-    label_text: 'content.discount'
-  %}
+<disclosure-custom class="cart-discount cart-discount--always-open">
   {% capture discount_content %}
     <cart-discount-component
       data-section-id="{{ section_id }}"
@@ -121,7 +111,7 @@
     border-width: var(--style-border-width-inputs);
     border-color: var(--color-input-border);
     border-style: solid;
-    border-radius: var(--style-border-radius-inputs);
+    border-radius: 0;
     padding: var(--padding-sm) var(--padding-md);
     height: 100%;
     flex-grow: 1;
@@ -210,5 +200,97 @@
 
   .cart-discount__error-text {
     margin-block-start: var(--margin-3xs);
+  }
+
+  /* Always show discount input */
+  .cart-discount--always-open .details-content {
+    display: block;
+    height: auto;
+    opacity: 1;
+    overflow: visible;
+  }
+
+  /* ========== ANIMACIONES MODERNAS CUPÓN ========== */
+
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animación de entrada del formulario */
+  .cart-discount__form {
+    animation: fadeSlideUp 0.4s ease forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  /* Animación del input */
+  .cart-discount__input {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .cart-discount__input:focus {
+    border-color: #000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    outline: none;
+  }
+
+  /* Animación del botón aplicar */
+  .cart-discount__button {
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .cart-discount__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .cart-discount__button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Animación de las pills de descuento */
+  @keyframes pillPop {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .cart-discount__pill {
+    animation: pillPop 0.3s ease forwards;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .cart-discount__pill:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Animación del botón remover pill */
+  .cart-discount__pill-remove {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.6;
+  }
+
+  .cart-discount__pill:hover .cart-discount__pill-remove {
+    opacity: 1;
+  }
+
+  .cart-discount__pill-remove:hover {
+    transform: scale(1.2);
   }
 {% endstylesheet %}

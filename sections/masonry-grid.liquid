@@ -1,0 +1,160 @@
+{%- style -%}
+  .masonry-grid-{{ section.id }} {
+    column-count: 1; /* Mobile default */
+    column-gap: {{ section.settings.gap }}px;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 750px) {
+    .masonry-grid-{{ section.id }} {
+      column-count: 2; /* Tablet default */
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .masonry-grid-{{ section.id }} {
+      column-count: {{ section.settings.column_count_desktop }};
+    }
+  }
+
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: {{ section.settings.gap }}px;
+    background-color: rgb(var(--color-background));
+    border-radius: var(--media-radius, 0px);
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+  }
+
+  .masonry-item > * {
+    max-width: 100%;
+  }
+
+  .masonry-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .masonry-card__content {
+    padding: 1.5rem;
+  }
+
+  .masonry-valid-link {
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .masonry-valid-link:hover {
+    opacity: 0.9;
+  }
+
+  /* Optional: Card shadow/border styles based on theme */
+  .masonry-item--card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+{%- endstyle -%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="masonry-section spacing-style section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  <div class="masonry-grid-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="masonry-item" {{ block.shopify_attributes }}>
+        {%- render block -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Masonry Grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "column_count_desktop",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Desktop Columns"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "default": 16,
+      "unit": "px",
+      "label": "Grid Gap"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Masonry Grid",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}

@@ -125,21 +125,10 @@
             "commons_components_top_banner_wNDqcn": {
               "type": "shopify://apps/commons-components/blocks/top-banner/019a5fb5-0369-7d7a-9e19-07bacb81690d",
               "settings": {}
-            },
-            "commons_components_header_complete_jbeD8H": {
-              "type": "shopify://apps/commons-components/blocks/header-complete/019a5fb5-0369-7d7a-9e19-07bacb81690d",
-              "settings": {
-                "logo": "shopify://shop_images/new_header_logo.svg",
-                "header_mode": "auto",
-                "enable_search": true,
-                "enable_account": true,
-                "enable_cart": true
-              }
             }
           },
           "block_order": [
-            "commons_components_top_banner_wNDqcn",
-            "commons_components_header_complete_jbeD8H"
+            "commons_components_top_banner_wNDqcn"
           ]
         },
         "commons_components_floating_banner_DGPadU": {
