@@ -246,8 +246,27 @@
     }
 
     .header[transparent]:not([data-sticky-state='active']) .header__content {
+      display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: flex-start;
+      position: relative;
+    }
+
+    .header[transparent]:not([data-sticky-state='active']) :is(.header-logo, .logo-block) {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--header-padding) !important;
+      height: 44px !important;
+      display: flex !important;
+      align-items: center !important;
+      transform: translateX(-50%) !important;
+      margin-inline: 0 !important;
+      z-index: 2;
+    }
+
+    .header[transparent]:not([data-sticky-state='active']) .localization-block {
+      margin-right: auto;
+      display: flex !important;
     }
 
     .header[transparent]:not([data-sticky-state='active']) [data-block-handle='header-dynamic-menu'] {
