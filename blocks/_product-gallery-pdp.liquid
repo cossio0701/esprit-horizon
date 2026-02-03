@@ -2,7 +2,7 @@
 {% assign current_color = current_variant.option1 %}
 {% assign rendered_colors = '' %}
 
-<div class="gallery-main-container">
+<div class="gallery-main-container" data-mobile-style="{{ block.settings.mobile_gallery_style }}">
   <div class="variant-swipers">
     {% for variant in product.variants %}
       {% assign color = variant.option1 %}
@@ -49,6 +49,7 @@
 
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
+                <div class="swiper-pagination"></div>
               </div>
 
               <!-- Thumbnails -->
@@ -87,6 +88,7 @@
 
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
+                <div class="swiper-pagination"></div>
               </div>
 
               <!-- Thumbnails -->
@@ -155,19 +157,71 @@
     // 🔥 LIMPIEZA TOTAL (clave)
     thumbs.forEach((t) => t.classList.remove('is-active'));
 
+    const paginationEl = swiperEl.querySelector('.swiper-pagination');
+
+    function updateIndicator(swiper) {
+      if (!paginationEl) return;
+      let indicator = paginationEl.querySelector('.swiper-pagination-indicator');
+      if (!indicator && swiper.pagination.bullets.length > 0) {
+        indicator = document.createElement('div');
+        indicator.className = 'swiper-pagination-indicator';
+        paginationEl.appendChild(indicator);
+      }
+
+      if (indicator && swiper.pagination.bullets.length > 1) {
+        const bullets = swiper.pagination.bullets;
+        const firstBullet = bullets[0];
+        const lastBullet = bullets[bullets.length - 1];
+        const totalDistance = lastBullet.offsetLeft - firstBullet.offsetLeft;
+
+        // Swiper progress goes from 0 to 1
+        const currentPos = firstBullet.offsetLeft + swiper.progress * totalDistance;
+
+        // Liquid Stretch Effect Logic
+        const bulletCount = bullets.length - 1;
+        const localProgress = (swiper.progress * bulletCount) % 1;
+        const stretchAmount = Math.sin(localProgress * Math.PI) * 0.8;
+        const scaleX = 1 + stretchAmount;
+
+        // Apply transform: translateX + scaleX
+        indicator.style.transform = `translateX(${currentPos}px) scaleX(${scaleX})`;
+        indicator.style.transformOrigin = localProgress > 0.5 ? 'left center' : 'right center';
+      } else if (indicator && swiper.pagination.bullets[0]) {
+        indicator.style.transform = `translateX(${swiper.pagination.bullets[0].offsetLeft}px) scaleX(1)`;
+      }
+    }
+
     activeSwiper = new Swiper(swiperEl, {
       slidesPerView: 1,
-      spaceBetween: 16,
+      spaceBetween: 0,
       loop: false,
+      speed: 600,
       initialSlide: startIndex,
       on: {
+        init(swiper) {
+          setTimeout(() => updateIndicator(swiper), 100); // Wait for bullets to render
+        },
+        progress(swiper) {
+          updateIndicator(swiper);
+        },
+        setTranslate(swiper) {
+          updateIndicator(swiper);
+        },
         slideChange(swiper) {
           slideIndexByColor[color] = swiper.activeIndex;
-
           thumbs.forEach((t) => t.classList.remove('is-active'));
           const active = thumbs[swiper.activeIndex];
           if (active) active.classList.add('is-active');
         },
+      },
+      pagination: {
+        el: paginationEl,
+        clickable: true,
+        dynamicBullets: false,
+      },
+      effect: 'fade',
+      fadeEffect: {
+        crossFade: true,
       },
     });
 
@@ -235,17 +289,25 @@
     width: 100%;
     height: 100%;
   }
+
+  /* Base Styles: Mobile */
   .variant-swiper-layout {
     display: grid;
-    grid-template-columns: 1fr 80px;
+    grid-template-columns: 1fr;
     gap: 16px;
     align-items: flex-start;
   }
 
   .variant-thumbs {
-    display: flex;
-    flex-direction: column;
+    display: none;
+    flex-direction: row;
     gap: 8px;
+    overflow-x: auto;
+    order: 2;
+  }
+
+  .gallery-main-container[data-mobile-style='thumbs'] .variant-thumbs {
+    display: flex;
   }
 
   .variant-thumb {
@@ -253,6 +315,8 @@
     border: 1px solid transparent;
     background: none;
     cursor: pointer;
+    flex-shrink: 0;
+    width: 80px;
   }
 
   .variant-thumb img {
@@ -264,15 +328,70 @@
     border-color: #000;
   }
 
-  @media (max-width: 768px) {
+  .swiper-pagination {
+    position: absolute;
+    bottom: 16px !important;
+    left: 16px !important;
+    transform: none !important;
+    z-index: 10;
+    display: none;
+    width: auto !important;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .gallery-main-container[data-mobile-style='dots'] .swiper-pagination {
+    display: block;
+  }
+
+  .swiper-pagination-bullet {
+    background: #fff !important;
+    opacity: 0.5;
+    width: 8px !important;
+    height: 8px !important;
+    margin: 0 4px !important;
+    border-radius: 50% !important;
+    transition: opacity 0.3s;
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 0.5 !important;
+  }
+
+  .swiper-pagination-indicator {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    z-index: 11;
+    pointer-events: none;
+    margin-top: -4px; /* Center vertically */
+    transition: transform 0.05s linear, opacity 0.3s; /* Even faster for liquid feel */
+    will-change: transform;
+  }
+
+  /* Desktop Styles */
+  @media (min-width: 769px) {
     .variant-swiper-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 80px;
     }
 
     .variant-thumbs {
-      flex-direction: row;
-      order: 2;
-      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      order: unset;
+      overflow-x: visible;
+    }
+
+    .variant-thumb {
+      width: 100%;
+    }
+
+    .swiper-pagination {
+      display: none !important;
     }
   }
 </style>
@@ -286,6 +405,22 @@
     {
       "type": "header",
       "content": "Configuración de la Galería"
+    },
+    {
+      "type": "select",
+      "id": "mobile_gallery_style",
+      "label": "Estilo de galería en movil",
+      "options": [
+        {
+          "value": "thumbs",
+          "label": "Miniaturas (Thumbs)"
+        },
+        {
+          "value": "dots",
+          "label": "Puntos (Dots)"
+        }
+      ],
+      "default": "thumbs"
     }
   ],
   "presets": [
