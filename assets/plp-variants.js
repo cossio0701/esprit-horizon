@@ -618,15 +618,28 @@
     try {
       const response = await fetch('/cart.js');
       const cart = await response.json();
+      const count = cart.item_count;
 
-      const countBadge = document.querySelector(CONFIG.SELECTORS.cartBadge);
-      if (countBadge) {
-        countBadge.textContent = String(cart.item_count);
+      // Update cart bubble DOM directly
+      const bubbleCount = document.querySelector('[ref="cartBubbleCount"]');
+      const bubble = document.querySelector('[ref="cartBubble"]');
+      if (bubbleCount) {
+        bubbleCount.textContent = count < 100 ? String(count) : '';
+        bubbleCount.classList.toggle('hidden', count === 0);
+      }
+      if (bubble) {
+        bubble.classList.toggle('visually-hidden', count === 0);
       }
 
+      // Update sessionStorage for cart-icon consistency
       sessionStorage.setItem('cart-count', JSON.stringify({
-        value: String(cart.item_count),
+        value: String(count),
         timestamp: Date.now()
+      }));
+
+      // Also dispatch theme event in case cart-icon picks it up
+      document.dispatchEvent(new CustomEvent('cart:update', {
+        detail: { data: { itemCount: count, source: 'plp-variants' } }
       }));
     } catch (err) {
       console.error('Error updating cart count:', err);

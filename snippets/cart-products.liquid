@@ -162,7 +162,7 @@
                         {{ item.product.vendor }}
                       </p>
                     {% endif %}
-                    <div class="cart-items__price-amount">
+                    <div class="cart-items__price-amount hidde-desktop">
                       {% if item.original_price != item.final_price %}
                         <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
                         <span class="item__final-price">{{ item.final_price | money }}</span>
@@ -245,14 +245,29 @@
                   {% assign can_update_quantity = item.instructions.can_update_quantity
                     | default: true, allow_false: true
                   %}
-                  {% render 'quantity-selector',
-                    product: item.product,
-                    variant: item.variant,
-                    in_cart_quantity: item.quantity,
-                    line_index: item.index,
-                    class: 'cart-primary-typography',
-                    can_update_quantity: can_update_quantity
-                  %}
+                  <div class="quantity-remove-container">
+                    {% render 'quantity-selector',
+                      product: item.product,
+                      variant: item.variant,
+                      in_cart_quantity: item.quantity,
+                      line_index: item.index,
+                      class: 'cart-primary-typography',
+                      can_update_quantity: can_update_quantity
+                    %}
+                    <button
+                      class="button button--tertiary cart-items__remove hidde-desktop"
+                      type="button"
+                      aria-label="{{ 'accessibility.remove_item' | t: title: item.title | escape }}"
+                      on:click="/onLineItemRemove/{{ item.index | plus: 1 }}"
+                      {% assign can_remove = item.instructions.can_remove | default: true, allow_false: true %}
+                      {% if can_remove == false %}
+                        hidden
+                      {% endif %}
+                    >
+                      Eliminar
+                      <span class="visually-hidden">Remove</span>
+                    </button>
+                  </div>
                 </td>
 
                 {% comment %}
@@ -594,6 +609,13 @@
   .cart-items__properties dt,
   .cart-items__properties dd {
     display: inline;
+  }
+
+  .quantity-remove-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .cart-items__quantity {
@@ -950,6 +972,10 @@
 
     .cart-items__title {
       font-size: var(--cart-font-size--md);
+    }
+
+    .hidde-desktop {
+      display: none;
     }
   }
 

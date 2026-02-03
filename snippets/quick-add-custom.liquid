@@ -685,16 +685,33 @@ class QuickAddCustomComponent extends HTMLElement {
         this.classList.add('is-added');
         this.btnText.textContent = 'Agregado';
 
-        // Dispatch cart update event for other components
-        document.dispatchEvent(new CustomEvent('cart:updated', {
-          detail: { item: result }
-        }));
+        // Fetch real cart count and update cart bubble
+        try {
+          const cartResponse = await fetch(window.Shopify?.routes?.root + 'cart.js');
+          const cart = await cartResponse.json();
+          const count = cart.item_count;
 
-        // Also dispatch the theme's native event if available
-        if (window.Theme?.events?.cartAdd) {
-          document.dispatchEvent(new CustomEvent(window.Theme.events.cartAdd, {
-            detail: { data: result }
+          // Update cart bubble DOM directly
+          const bubbleCount = document.querySelector('[ref="cartBubbleCount"]');
+          const bubble = document.querySelector('[ref="cartBubble"]');
+          if (bubbleCount) {
+            bubbleCount.textContent = count < 100 ? String(count) : '';
+            bubbleCount.classList.toggle('hidden', count === 0);
+          }
+          if (bubble) {
+            bubble.classList.toggle('visually-hidden', count === 0);
+          }
+
+          sessionStorage.setItem('cart-count', JSON.stringify({
+            value: String(count),
+            timestamp: Date.now()
           }));
+
+          document.dispatchEvent(new CustomEvent('cart:update', {
+            detail: { data: { itemCount: count, source: 'quick-add-custom' } }
+          }));
+        } catch (e) {
+          console.error('Error updating cart count:', e);
         }
 
         // Reset after delay
