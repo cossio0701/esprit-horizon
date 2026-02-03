@@ -60,16 +60,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-xl);
+    gap: var(--gap-2xl);
     container-type: inline-size;
     padding: 0;
     position: sticky;
     top: 0;
     align-self: start;
-    background-color: transparent;
 
     @media screen and (min-width: 750px) {
-      padding-top: 0;
+      padding: var(--padding-5xl);
       grid-row: 1 / -1;
     }
   }
@@ -85,7 +84,7 @@
 
     @media screen and (min-width: 750px) {
       display: grid;
-      /* grid-template-rows: subgrid; */
+      grid-template-rows: subgrid;
       grid-row: 1 / -1;
     }
   }
@@ -115,11 +114,11 @@
 
   .cart__container--extend .cart__summary-inner {
     height: 100%;
-    padding: 0;
+    padding: var(--padding-md) 0 var(--padding-4xl);
 
     @media screen and (min-width: 750px) {
       grid-row: 2 / -1;
-      padding-inline: 0;
+      padding-inline: var(--page-margin);
       width: var(--sidebar-width);
     }
   }

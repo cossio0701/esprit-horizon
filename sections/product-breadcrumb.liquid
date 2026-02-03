@@ -20,8 +20,9 @@
   # 1. Parámetro URL ?collection=handle
   # 2. Colección en URL canónica /collections/X/products/Y
   # 3. Variable collection global (si existe)
-  # 4. Primera colección del producto
-  # 5. Fallback: ninguna colección
+  # 4. Colección del Customizer (section.settings)
+  # 5. Primera colección del producto
+  # 6. Fallback: ninguna colección
 
   assign breadcrumb_collection = null
   assign breadcrumb_collection_title = ''
@@ -70,15 +71,21 @@
     assign collection_source = 'global_var'
   endif
 
-  # 4. Usar primera colección del producto
+  # 4. Verificar colección configurada en Customizer
+  if breadcrumb_collection == blank and section.settings.fallback_collection != blank
+    assign breadcrumb_collection = section.settings.fallback_collection
+    assign breadcrumb_collection_title = section.settings.fallback_collection.title
+    assign breadcrumb_collection_url = section.settings.fallback_collection.url
+    assign collection_source = 'customizer'
+  endif
+
+  # 5. Usar primera colección del producto
   if breadcrumb_collection == blank and product != blank and product.collections.size > 0
     assign breadcrumb_collection = product.collections.first
     assign breadcrumb_collection_title = product.collections.first.title
     assign breadcrumb_collection_url = product.collections.first.url
     assign collection_source = 'product_first'
   endif
-
-  # 5. Fallback: ninguna colección
 
   # ============================================
   # DETERMINAR ELEMENTO FINAL DEL BREADCRUMB
@@ -89,7 +96,12 @@
 
   if product != blank
     assign final_item_type = 'product'
-    assign final_item_title = product.title
+    # Usar metafield de categoría si está configurado
+    if section.settings.use_category_metafield and product.metafields.custom.product_category != blank
+      assign final_item_title = product.metafields.custom.product_category
+    else
+      assign final_item_title = product.title
+    endif
     assign final_item_url = product.url
   elsif collection != blank
     assign final_item_type = 'collection'
@@ -220,7 +232,8 @@
   }
 {%- endstyle -%}
 
-{%- comment -%} SEO: JSON-LD Structured Data (siempre activo) {%- endcomment -%}
+{%- comment -%} SEO: JSON-LD Structured Data {%- endcomment -%}
+{%- if section.settings.enable_json_ld -%}
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -251,6 +264,7 @@
       ]
     }
   </script>
+{%- endif -%}
 
 <nav
   class="product-breadcrumb-section-{{ section_id }} section section--{{ section.settings.section_width }}"
@@ -340,8 +354,10 @@
 </nav>
 
 {%- comment -%}
-  JavaScript para persistencia de navegación via sessionStorage (siempre activo)
+  JavaScript para persistencia de navegación via sessionStorage
+  Solo se incluye si está habilitado en settings
 {%- endcomment -%}
+{%- if section.settings.enable_navigation_tracking -%}
   <script>
     (function () {
       const STORAGE_KEY = 'shopify_breadcrumb_collection';
@@ -374,6 +390,7 @@
       }
     })();
   </script>
+{%- endif -%}
 
 {% schema %}
 {
@@ -403,6 +420,30 @@
       "id": "aria_label",
       "label": "Etiqueta de accesibilidad",
       "default": "Navegación de migas de pan"
+    },
+    {
+      "type": "header",
+      "content": "Detección de colección"
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Colección de respaldo",
+      "info": "Se usa si no se detecta colección de navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_category_metafield",
+      "label": "Usar metafield de categoría",
+      "default": false,
+      "info": "Usa product.metafields.custom.product_category como título final"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_navigation_tracking",
+      "label": "Habilitar tracking de navegación",
+      "default": true,
+      "info": "Guarda la última colección visitada en sessionStorage"
     },
     {
       "type": "header",
@@ -598,6 +639,17 @@
       "label": "Truncar texto largo en móvil",
       "default": true
     },
+    {
+      "type": "header",
+      "content": "SEO"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_json_ld",
+      "label": "Habilitar JSON-LD",
+      "default": true,
+      "info": "Genera datos estructurados para Google"
+    }
   ],
   "presets": [
     {

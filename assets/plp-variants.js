@@ -7,8 +7,8 @@
  * @version 2.0.0 - Optimizado
  */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // =====================
   // CONSTANTES
@@ -17,37 +17,37 @@
     FEEDBACK_DURATION: 2000,
     MESSAGE_DURATION: 1500,
     SELECTORS: {
-      controller: '.plp-variant-controller',
-      colorBtn: '.plp-color',
-      sizeBtn: '.plp-size',
-      addToCartBtn: '.plp-add-to-cart',
-      sizesContainer: '.plp-sizes',
-      colorsContainer: '.plp-colors',
-      productCard: 'product-card',
-      productCardLink: 'product-card-link',
+      controller: ".plp-variant-controller",
+      colorBtn: ".plp-color",
+      sizeBtn: ".plp-size",
+      addToCartBtn: ".plp-add-to-cart",
+      sizesContainer: ".plp-sizes",
+      colorsContainer: ".plp-colors",
+      productCard: "product-card",
+      productCardLink: "product-card-link",
       priceContainer: '[ref="priceContainer"]',
-      price: '.price',
-      compareAtPrice: '.compare-at-price',
-      cardGallery: '.card-gallery',
-      slideshow: 'slideshow-component',
-      slide: 'slideshow-slide',
-      cartBadge: '.tae-cart-count-badge'
+      price: ".price",
+      compareAtPrice: ".compare-at-price",
+      cardGallery: ".card-gallery",
+      slideshow: "slideshow-component",
+      slide: "slideshow-slide",
+      cartBadge: ".tae-cart-count-badge",
     },
     CLASSES: {
-      active: 'active',
-      out: 'out',
-      ready: 'ready',
-      success: 'success',
-      error: 'error',
-      soldOut: 'sold-out'
+      active: "active",
+      out: "out",
+      ready: "ready",
+      success: "success",
+      error: "error",
+      soldOut: "sold-out",
     },
     MESSAGES: {
-      selectVariant: 'Selecciona talla y color',
-      addToBag: 'Agregar a la bolsa →',
-      added: '¡Agregado! ✓',
-      soldOut: 'Agotado',
-      error: 'Error'
-    }
+      selectVariant: "Selecciona talla y color",
+      addToBag: "Agregar a la bolsa →",
+      added: "¡Agregado! ✓",
+      soldOut: "Agotado",
+      error: "Error",
+    },
   };
 
   // Estado de selección por producto
@@ -73,7 +73,9 @@
    */
   function getProductCache(productId) {
     if (!domCache.has(productId)) {
-      const card = document.querySelector(`${CONFIG.SELECTORS.productCard}[data-product-id="${productId}"]`);
+      const card = document.querySelector(
+        `${CONFIG.SELECTORS.productCard}[data-product-id="${productId}"]`,
+      );
       if (!card) return null;
 
       domCache.set(productId, {
@@ -81,7 +83,7 @@
         cardLink: card.closest(CONFIG.SELECTORS.productCardLink),
         priceContainer: card.querySelector(CONFIG.SELECTORS.priceContainer),
         cardGallery: card.querySelector(CONFIG.SELECTORS.cardGallery),
-        links: null // Se calculará lazy
+        links: null, // Se calculará lazy
       });
     }
     return domCache.get(productId);
@@ -102,10 +104,10 @@
    * @returns {string} URL con tamaño
    */
   function getImageUrl(src, width) {
-    if (!src) return '';
+    if (!src) return "";
 
     // Si ya tiene parámetros de Shopify CDN, reemplazar el tamaño
-    if (src.includes('cdn.shopify.com')) {
+    if (src.includes("cdn.shopify.com")) {
       // Patrón: _WIDTHx. o _WIDTHxHEIGHT.
       const sizePattern = /_\d+x\d*\./;
       if (sizePattern.test(src)) {
@@ -117,7 +119,7 @@
 
     // Para otras URLs, agregar parámetro width
     const url = new URL(src, window.location.origin);
-    url.searchParams.set('width', width);
+    url.searchParams.set("width", width);
     return url.toString();
   }
 
@@ -127,8 +129,10 @@
    * @returns {string} srcset
    */
   function generateSrcset(src) {
-    if (!src) return '';
-    return [400, 800, 1200].map(w => `${getImageUrl(src, w)} ${w}w`).join(', ');
+    if (!src) return "";
+    return [400, 800, 1200]
+      .map((w) => `${getImageUrl(src, w)} ${w}w`)
+      .join(", ");
   }
 
   /**
@@ -164,7 +168,7 @@
     if (!product) return;
 
     // Encontrar variantes de este color
-    const variants = product.variants.filter(v => v.options.includes(color));
+    const variants = product.variants.filter((v) => v.options.includes(color));
     if (!variants.length) return;
 
     // Precargar usando requestIdleCallback si está disponible
@@ -173,14 +177,14 @@
       const variant = variants[0];
       if (variant.gallery?.length) {
         // Precargar las primeras 2 imágenes de la galería
-        variant.gallery.slice(0, 2).forEach(src => preloadImage(src));
+        variant.gallery.slice(0, 2).forEach((src) => preloadImage(src));
       } else if (variant.featured_media?.src) {
         preloadImage(variant.featured_media.src);
       }
     };
 
     // Usar requestIdleCallback para no bloquear el hilo principal
-    if ('requestIdleCallback' in window) {
+    if ("requestIdleCallback" in window) {
       requestIdleCallback(preload, { timeout: 100 });
     } else {
       setTimeout(preload, 0);
@@ -197,13 +201,13 @@
 
     // Obtener colores únicos
     const colors = new Set();
-    product.variants.forEach(v => {
+    product.variants.forEach((v) => {
       if (v.options[0]) colors.add(v.options[0]);
     });
 
     // Precargar primera imagen de cada color con delay escalonado
     let delay = 0;
-    colors.forEach(color => {
+    colors.forEach((color) => {
       setTimeout(() => preloadColorImages(productId, color), delay);
       delay += 50; // Escalonar para no saturar
     });
@@ -215,8 +219,8 @@
    * @returns {string}
    */
   function escapeHtml(str) {
-    if (typeof str !== 'string') return String(str);
-    const div = document.createElement('div');
+    if (typeof str !== "string") return String(str);
+    const div = document.createElement("div");
     div.textContent = str;
     return div.innerHTML;
   }
@@ -228,10 +232,15 @@
    * @param {string[]} classesToRemove - Clases a remover
    * @param {number} delay - Delay en ms
    */
-  function resetButtonState(btn, originalContent, classesToRemove = [], delay = CONFIG.FEEDBACK_DURATION) {
+  function resetButtonState(
+    btn,
+    originalContent,
+    classesToRemove = [],
+    delay = CONFIG.FEEDBACK_DURATION,
+  ) {
     setTimeout(() => {
       btn.innerHTML = originalContent;
-      classesToRemove.forEach(cls => btn.classList.remove(cls));
+      classesToRemove.forEach((cls) => btn.classList.remove(cls));
       btn.disabled = false;
     }, delay);
   }
@@ -250,7 +259,7 @@
       selectedState[productId] = {
         color: null,
         size: null,
-        variantId: null
+        variantId: null,
       };
     }
     return selectedState[productId];
@@ -280,11 +289,11 @@
       cache.links = [...new Set([...cardLinks, ...parentLinks])];
     }
 
-    cache.links.forEach(link => {
+    cache.links.forEach((link) => {
       try {
         const url = new URL(link.href, window.location.origin);
-        if (url.pathname.includes('/products/')) {
-          url.searchParams.set('variant', variantId);
+        if (url.pathname.includes("/products/")) {
+          url.searchParams.set("variant", variantId);
           link.href = url.toString();
         }
       } catch (e) {
@@ -307,17 +316,17 @@
     const container = controller.querySelector(CONFIG.SELECTORS.sizesContainer);
     if (!container) return;
 
-    const firstAvailable = variants.find(v => v.available);
+    const firstAvailable = variants.find((v) => v.available);
     const state = initProductState(productId);
 
     // Usar DocumentFragment para mejor performance
     const fragment = document.createDocumentFragment();
 
-    variants.forEach(v => {
+    variants.forEach((v) => {
       const isFirstAvailable = firstAvailable && v.id === firstAvailable.id;
-      const btn = document.createElement('button');
+      const btn = document.createElement("button");
 
-      btn.className = `plp-size${v.available ? '' : ' ' + CONFIG.CLASSES.out}${isFirstAvailable ? ' ' + CONFIG.CLASSES.active : ''}`;
+      btn.className = `plp-size${v.available ? "" : " " + CONFIG.CLASSES.out}${isFirstAvailable ? " " + CONFIG.CLASSES.active : ""}`;
       btn.disabled = !v.available;
       btn.dataset.variantId = v.id;
       btn.textContent = v.options[1];
@@ -325,7 +334,7 @@
       fragment.appendChild(btn);
     });
 
-    container.innerHTML = '';
+    container.innerHTML = "";
     container.appendChild(fragment);
 
     // Actualizar estado
@@ -353,11 +362,13 @@
     if (!btn) return;
 
     const state = selectedState[productId];
-    const hasColors = controller.querySelector(CONFIG.SELECTORS.colorsContainer)?.children.length > 0;
+    const hasColors =
+      controller.querySelector(CONFIG.SELECTORS.colorsContainer)?.children
+        .length > 0;
 
     const isComplete = hasColors
-      ? (state?.color && state?.size && state?.variantId)
-      : (state?.size && state?.variantId);
+      ? state?.color && state?.size && state?.variantId
+      : state?.size && state?.variantId;
 
     if (!colorAvailable) {
       btn.disabled = true;
@@ -391,16 +402,21 @@
     if (!cache?.priceContainer) return;
 
     const priceEl = cache.priceContainer.querySelector(CONFIG.SELECTORS.price);
-    const compareAtPriceEl = cache.priceContainer.querySelector(CONFIG.SELECTORS.compareAtPrice);
+    const compareAtPriceEl = cache.priceContainer.querySelector(
+      CONFIG.SELECTORS.compareAtPrice,
+    );
 
     if (priceEl) {
       priceEl.textContent = variant.priceFormatted;
     }
 
     if (compareAtPriceEl?.parentElement) {
-      const hasCompare = variant.compareAtPrice && variant.compareAtPrice > variant.price;
-      compareAtPriceEl.textContent = hasCompare ? variant.compareAtPriceFormatted : '';
-      compareAtPriceEl.parentElement.style.display = hasCompare ? '' : 'none';
+      const hasCompare =
+        variant.compareAtPrice && variant.compareAtPrice > variant.price;
+      compareAtPriceEl.textContent = hasCompare
+        ? variant.compareAtPriceFormatted
+        : "";
+      compareAtPriceEl.parentElement.style.display = hasCompare ? "" : "none";
     }
   }
 
@@ -413,26 +429,28 @@
     const cache = getProductCache(productId);
     if (!cache?.cardGallery) return;
 
-    const slideshow = cache.cardGallery.querySelector(CONFIG.SELECTORS.slideshow);
+    const slideshow = cache.cardGallery.querySelector(
+      CONFIG.SELECTORS.slideshow,
+    );
     if (!slideshow) return;
 
     const slides = slideshow.querySelectorAll(CONFIG.SELECTORS.slide);
     if (slides.length < 1) return;
 
     const [firstSlide, secondSlide] = slides;
-    const baseImg = firstSlide?.querySelector('img');
-    const hoverImg = secondSlide?.querySelector('img');
+    const baseImg = firstSlide?.querySelector("img");
+    const hoverImg = secondSlide?.querySelector("img");
 
     if (!baseImg) return;
 
     // Reset slides visibility
     if (firstSlide) {
-      firstSlide.setAttribute('aria-hidden', 'false');
-      firstSlide.removeAttribute('hidden');
+      firstSlide.setAttribute("aria-hidden", "false");
+      firstSlide.removeAttribute("hidden");
     }
     if (secondSlide) {
-      secondSlide.setAttribute('aria-hidden', 'true');
-      secondSlide.removeAttribute('hidden');
+      secondSlide.setAttribute("aria-hidden", "true");
+      secondSlide.removeAttribute("hidden");
     }
 
     // Usar galería del metafield si existe
@@ -491,7 +509,9 @@
     if (!product) return null;
 
     // Buscar variantes de este color
-    const colorVariants = product.variants.filter(v => v.options.includes(color));
+    const colorVariants = product.variants.filter((v) =>
+      v.options.includes(color),
+    );
 
     // Encontrar la primera variante que tenga galería configurada
     for (const variant of colorVariants) {
@@ -519,7 +539,9 @@
     const cache = getProductCache(productId);
     if (!cache?.cardGallery) return;
 
-    const slideshow = cache.cardGallery.querySelector(CONFIG.SELECTORS.slideshow);
+    const slideshow = cache.cardGallery.querySelector(
+      CONFIG.SELECTORS.slideshow,
+    );
     if (!slideshow) return;
 
     const scroller = slideshow.querySelector('[ref="scroller"]');
@@ -529,44 +551,45 @@
     const fragment = document.createDocumentFragment();
 
     gallery.forEach((src, index) => {
-      const slide = document.createElement('slideshow-slide');
-      slide.setAttribute('ref', 'slides[]');
-      slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
-      slide.setAttribute('slide-id', `variant-gallery-${productId}-${index}`);
-      slide.className = 'product-media-container media-fit product-media-container--image';
+      const slide = document.createElement("slideshow-slide");
+      slide.setAttribute("ref", "slides[]");
+      slide.setAttribute("aria-hidden", index === 0 ? "false" : "true");
+      slide.setAttribute("slide-id", `variant-gallery-${productId}-${index}`);
+      slide.className =
+        "product-media-container media-fit product-media-container--image";
       slide.style.cssText = `view-timeline-name: --slide-${index}; --product-media-fit: cover;`;
 
       // Ocultar slides extras para performance (solo mostrar primeros 5)
       if (index >= 5) {
-        slide.setAttribute('hidden', '');
+        slide.setAttribute("hidden", "");
       }
 
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = getImageUrl(src, 800);
       img.srcset = generateSrcset(src);
-      img.sizes = '(min-width: 750px) 50vw, 100vw';
-      img.loading = index === 0 ? 'eager' : 'lazy';
+      img.sizes = "(min-width: 750px) 50vw, 100vw";
+      img.loading = index === 0 ? "eager" : "lazy";
       img.alt = `${color} - Image ${index + 1}`;
-      img.className = 'product-media';
+      img.className = "product-media";
 
       slide.appendChild(img);
       fragment.appendChild(slide);
     });
 
     // Reemplazar contenido del scroller
-    scroller.innerHTML = '';
+    scroller.innerHTML = "";
     scroller.appendChild(fragment);
 
     // Actualizar el contador de slides si existe
-    slideshow.setAttribute('slide-count', String(gallery.length));
+    slideshow.setAttribute("slide-count", String(gallery.length));
 
     // Resetear al primer slide
-    slideshow.setAttribute('initial-slide', '0');
+    slideshow.setAttribute("initial-slide", "0");
 
     // Forzar re-inicialización del slideshow
     // El componente Slideshow observa el atributo 'initial-slide'
     // y se re-sincroniza automáticamente
-    if (typeof slideshow.select === 'function') {
+    if (typeof slideshow.select === "function") {
       // Si el slideshow ya está inicializado, seleccionar el primer slide
       requestAnimationFrame(() => {
         try {
@@ -594,11 +617,11 @@
     }
     currentFetchController = new AbortController();
 
-    const response = await fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/cart/add.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: variantId, quantity: 1 }),
-      signal: currentFetchController.signal
+      signal: currentFetchController.signal,
     });
 
     currentFetchController = null;
@@ -616,7 +639,7 @@
    */
   async function updateCartCount() {
     try {
-      const response = await fetch('/cart.js');
+      const response = await fetch("/cart.js");
       const cart = await response.json();
       const count = cart.item_count;
 
@@ -624,25 +647,30 @@
       const bubbleCount = document.querySelector('[ref="cartBubbleCount"]');
       const bubble = document.querySelector('[ref="cartBubble"]');
       if (bubbleCount) {
-        bubbleCount.textContent = count < 100 ? String(count) : '';
-        bubbleCount.classList.toggle('hidden', count === 0);
+        bubbleCount.textContent = count < 100 ? String(count) : "";
+        bubbleCount.classList.toggle("hidden", count === 0);
       }
       if (bubble) {
-        bubble.classList.toggle('visually-hidden', count === 0);
+        bubble.classList.toggle("visually-hidden", count === 0);
       }
 
       // Update sessionStorage for cart-icon consistency
-      sessionStorage.setItem('cart-count', JSON.stringify({
-        value: String(count),
-        timestamp: Date.now()
-      }));
+      sessionStorage.setItem(
+        "cart-count",
+        JSON.stringify({
+          value: String(count),
+          timestamp: Date.now(),
+        }),
+      );
 
       // Also dispatch theme event in case cart-icon picks it up
-      document.dispatchEvent(new CustomEvent('cart:update', {
-        detail: { data: { itemCount: count, source: 'plp-variants' } }
-      }));
+      document.dispatchEvent(
+        new CustomEvent("cart:update", {
+          detail: { data: { itemCount: count, source: "plp-variants" } },
+        }),
+      );
     } catch (err) {
-      console.error('Error updating cart count:', err);
+      console.error("Error updating cart count:", err);
     }
   }
 
@@ -657,7 +685,7 @@
   function handleColorClick(btn) {
     const productId = btn.dataset.productId;
     const color = btn.dataset.color;
-    const colorAvailable = btn.dataset.available === 'true';
+    const colorAvailable = btn.dataset.available === "true";
     const product = window.PLP?.[productId];
 
     if (!product) return;
@@ -669,13 +697,13 @@
 
     // Marcar color activo
     const controller = btn.closest(CONFIG.SELECTORS.controller);
-    controller.querySelectorAll(CONFIG.SELECTORS.colorBtn).forEach(c => {
+    controller.querySelectorAll(CONFIG.SELECTORS.colorBtn).forEach((c) => {
       c.classList.remove(CONFIG.CLASSES.active);
     });
     btn.classList.add(CONFIG.CLASSES.active);
 
     // Filtrar variantes por color y renderizar tallas
-    const variants = product.variants.filter(v => v.options.includes(color));
+    const variants = product.variants.filter((v) => v.options.includes(color));
     renderSizes(productId, variants, controller);
 
     // Actualizar UI
@@ -687,7 +715,8 @@
     rebuildSlideshowForColor(productId, color);
 
     // Actualizar enlaces
-    const targetVariant = state.variantId || variants.find(v => v.available)?.id;
+    const targetVariant =
+      state.variantId || variants.find((v) => v.available)?.id;
     if (targetVariant) {
       updateProductLinks(productId, targetVariant);
     }
@@ -705,7 +734,9 @@
     if (!productId) return;
 
     const product = window.PLP?.[productId];
-    const variant = product?.variants.find(v => v.id === Number(variantId) || v.id === variantId);
+    const variant = product?.variants.find(
+      (v) => v.id === Number(variantId) || v.id === variantId,
+    );
 
     const state = initProductState(productId);
     state.size = btn.textContent.trim();
@@ -713,7 +744,7 @@
 
     // Marcar talla activa
     const sizesContainer = btn.closest(CONFIG.SELECTORS.sizesContainer);
-    sizesContainer.querySelectorAll(CONFIG.SELECTORS.sizeBtn).forEach(s => {
+    sizesContainer.querySelectorAll(CONFIG.SELECTORS.sizeBtn).forEach((s) => {
       s.classList.remove(CONFIG.CLASSES.active);
     });
     btn.classList.add(CONFIG.CLASSES.active);
@@ -758,9 +789,9 @@
 
       resetButtonState(btn, originalContent, [CONFIG.CLASSES.success]);
     } catch (err) {
-      if (err.name === 'AbortError') return; // Ignorar cancelaciones
+      if (err.name === "AbortError") return; // Ignorar cancelaciones
 
-      console.error('Add to cart error:', err);
+      console.error("Add to cart error:", err);
       btn.innerHTML = err.message || CONFIG.MESSAGES.error;
       btn.classList.add(CONFIG.CLASSES.error);
 
@@ -788,7 +819,9 @@
     }
 
     // Click en talla (no deshabilitada)
-    const sizeBtn = target.closest(`${CONFIG.SELECTORS.sizeBtn}:not(.${CONFIG.CLASSES.out})`);
+    const sizeBtn = target.closest(
+      `${CONFIG.SELECTORS.sizeBtn}:not(.${CONFIG.CLASSES.out})`,
+    );
     if (sizeBtn) {
       handleSizeClick(sizeBtn);
       return;
@@ -824,10 +857,12 @@
     const slideshow = card.querySelector(CONFIG.SELECTORS.slideshow);
     if (!slideshow) return;
 
-    const active = slideshow.querySelector(`${CONFIG.SELECTORS.slide}[aria-hidden='false']`);
+    const active = slideshow.querySelector(
+      `${CONFIG.SELECTORS.slide}[aria-hidden='false']`,
+    );
     if (!active) return;
 
-    const img = active.querySelector('img');
+    const img = active.querySelector("img");
     if (!img) return;
 
     const src = isEnter ? hoverImage : baseImage;
@@ -885,49 +920,54 @@
 
   function init() {
     // Inicializar estado para productos con variante pre-seleccionada
-    document.querySelectorAll(CONFIG.SELECTORS.controller).forEach(controller => {
-      const productId = controller.dataset.productId;
-      const firstVariantId = controller.dataset.firstVariantId;
-      const firstColor = controller.dataset.firstColor;
+    document
+      .querySelectorAll(CONFIG.SELECTORS.controller)
+      .forEach((controller) => {
+        const productId = controller.dataset.productId;
+        const firstVariantId = controller.dataset.firstVariantId;
+        const firstColor = controller.dataset.firstColor;
 
-      if (productId && firstVariantId) {
-        const state = initProductState(productId);
-        state.variantId = firstVariantId;
-        state.color = firstColor || null;
+        if (productId && firstVariantId) {
+          const state = initProductState(productId);
+          state.variantId = firstVariantId;
+          state.color = firstColor || null;
 
-        const activeSize = controller.querySelector(`${CONFIG.SELECTORS.sizeBtn}.${CONFIG.CLASSES.active}`);
-        if (activeSize) {
-          state.size = activeSize.textContent.trim();
-        }
+          const activeSize = controller.querySelector(
+            `${CONFIG.SELECTORS.sizeBtn}.${CONFIG.CLASSES.active}`,
+          );
+          if (activeSize) {
+            state.size = activeSize.textContent.trim();
+          }
 
-        updateProductLinks(productId, firstVariantId);
+          updateProductLinks(productId, firstVariantId);
 
-        // ★ Reconstruir slideshow con las imágenes del primer color
-        if (firstColor) {
-          // Diferir para no bloquear el render inicial
-          const rebuild = () => rebuildSlideshowForColor(productId, firstColor);
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(rebuild, { timeout: 500 });
-          } else {
-            setTimeout(rebuild, 100);
+          // ★ Reconstruir slideshow con las imágenes del primer color
+          if (firstColor) {
+            // Diferir para no bloquear el render inicial
+            const rebuild = () =>
+              rebuildSlideshowForColor(productId, firstColor);
+            if ("requestIdleCallback" in window) {
+              requestIdleCallback(rebuild, { timeout: 500 });
+            } else {
+              setTimeout(rebuild, 100);
+            }
           }
         }
-      }
-    });
+      });
 
     // Event listeners consolidados
-    document.addEventListener('click', handleDocumentClick);
-    document.addEventListener('mouseover', e => {
+    document.addEventListener("click", handleDocumentClick);
+    document.addEventListener("mouseover", (e) => {
       handleImageHover(e, true);
-      handleColorHover(e);  // Preload en hover de color
-      handleCardHover(e);   // Preload en hover de card
+      handleColorHover(e); // Preload en hover de color
+      handleCardHover(e); // Preload en hover de card
     });
-    document.addEventListener('mouseout', e => handleImageHover(e, false));
+    document.addEventListener("mouseout", (e) => handleImageHover(e, false));
   }
 
   // Iniciar cuando el DOM esté listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
@@ -939,7 +979,6 @@
     getState: (productId) => selectedState[productId],
     // API de galería
     getColorGallery,
-    rebuildSlideshowForColor
+    rebuildSlideshowForColor,
   };
-
 })();

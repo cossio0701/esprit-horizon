@@ -246,8 +246,31 @@
     }
 
     .header[transparent]:not([data-sticky-state='active']) .header__content {
+<<<<<<< HEAD
       flex-wrap: wrap;
       justify-content: space-between;
+=======
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .header[transparent]:not([data-sticky-state='active']) :is(.header-logo, .logo-block) {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--header-padding) !important;
+      height: 44px !important;
+      display: flex !important;
+      align-items: center !important;
+      transform: translateX(-50%) !important;
+      margin-inline: 0 !important;
+      z-index: 2;
+    }
+
+    .header[transparent]:not([data-sticky-state='active']) .localization-block {
+      margin-right: auto;
+      display: flex !important;
+>>>>>>> 877f5afd49d7a3f54c7641ebfab40e82419b9b66
     }
 
     .header[transparent]:not([data-sticky-state='active']) [data-block-handle='header-dynamic-menu'] {

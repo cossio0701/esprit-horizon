@@ -14,8 +14,8 @@
   # Get available options
   assign size_option = null
   assign color_option = null
-  assign size_option_index = nil
-  assign color_option_index = nil
+  assign size_option_index = null
+  assign color_option_index = null
 
   for option in product.options_with_values
     assign option_name_lower = option.name | downcase
@@ -66,7 +66,9 @@
               class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
               data-option-value="{{ value }}"
               data-option-index="{{ size_option_index }}"
-              {% unless size_available %}disabled{% endunless %}
+              {% unless size_available %}
+                disabled
+              {% endunless %}
               aria-label="{{ value }}"
             >
               {{ value }}
@@ -97,7 +99,9 @@
               class="quick-add-custom__color-btn{% if forloop.first %} is-selected{% endif %}{% unless color_available %} is-unavailable{% endunless %}"
               data-option-value="{{ value }}"
               data-option-index="{{ color_option_index }}"
-              {% unless color_available %}disabled{% endunless %}
+              {% unless color_available %}
+                disabled
+              {% endunless %}
               aria-label="{{ value }}"
               style="
                 {%- if swatch_image -%}
@@ -132,7 +136,9 @@
         <button
           type="submit"
           class="quick-add-custom__submit"
-          {% unless default_variant.available %}disabled{% endunless %}
+          {% unless default_variant.available %}
+            disabled
+          {% endunless %}
           data-add-to-cart-btn
         >
           <span class="quick-add-custom__submit-text" data-btn-text>
@@ -200,9 +206,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
-    transition:
-      opacity var(--animation-speed, 0.2s) ease,
-      transform var(--animation-speed, 0.2s) ease,
+    transition: opacity var(--animation-speed, 0.2s) ease, transform var(--animation-speed, 0.2s) ease,
       visibility var(--animation-speed, 0.2s) ease;
     pointer-events: none;
   }
@@ -469,283 +473,274 @@
 {% endstylesheet %}
 
 {% javascript %}
-class QuickAddCustomComponent extends HTMLElement {
-  constructor() {
-    super();
-    this.variants = [];
-    this.selectedOptions = {};
-    this.form = null;
-    this.variantInput = null;
-    this.submitBtn = null;
-    this.btnText = null;
-    this.feedback = null;
-    this.feedbackText = null;
-  }
-
-  connectedCallback() {
-    this.init();
-  }
-
-  init() {
-    // Parse variants JSON
-    const variantsJson = this.querySelector('[data-variants-json]');
-    if (variantsJson) {
-      try {
-        this.variants = JSON.parse(variantsJson.textContent);
-      } catch (e) {
-        console.error('Failed to parse variants JSON:', e);
-      }
+  class QuickAddCustomComponent extends HTMLElement {
+    constructor() {
+      super();
+      this.variants = [];
+      this.selectedOptions = {};
+      this.form = null;
+      this.variantInput = null;
+      this.submitBtn = null;
+      this.btnText = null;
+      this.feedback = null;
+      this.feedbackText = null;
     }
 
-    // Cache DOM elements
-    this.form = this.querySelector('[data-type="add-to-cart-form"]');
-    this.variantInput = this.querySelector('[data-variant-input]');
-    this.submitBtn = this.querySelector('[data-add-to-cart-btn]');
-    this.btnText = this.querySelector('[data-btn-text]');
-    this.feedback = this.querySelector('[data-feedback]');
-    this.feedbackText = this.querySelector('[data-feedback-text]');
-
-    // Initialize selected options from first available or first option
-    this.initializeSelectedOptions();
-
-    // Bind events
-    this.bindEvents();
-  }
-
-  initializeSelectedOptions() {
-    // Get all option buttons and select the first one of each type
-    const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-    const colorContainer = this.querySelector('.quick-add-custom__colors');
-
-    if (sizeContainer) {
-      const firstSize = sizeContainer.querySelector('.quick-add-custom__size-btn.is-selected');
-      if (firstSize) {
-        const index = firstSize.dataset.optionIndex;
-        this.selectedOptions[index] = firstSize.dataset.optionValue;
-      }
+    connectedCallback() {
+      this.init();
     }
 
-    if (colorContainer) {
-      const firstColor = colorContainer.querySelector('.quick-add-custom__color-btn.is-selected');
-      if (firstColor) {
-        const index = firstColor.dataset.optionIndex;
-        this.selectedOptions[index] = firstColor.dataset.optionValue;
-      }
-    }
-
-    // Update variant based on initial selection
-    this.updateVariant();
-  }
-
-  bindEvents() {
-    // Prevent clicks inside quick-add from navigating to product
-    // Only stop propagation, not default (so form submit works)
-    this.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    // Size buttons
-    const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
-    sizeBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => this.handleOptionClick(e));
-    });
-
-    // Color buttons
-    const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
-    colorBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => this.handleOptionClick(e));
-    });
-
-    // Form submit
-    if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-    }
-  }
-
-  handleOptionClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const btn = event.currentTarget;
-    if (btn.disabled) return;
-
-    const optionIndex = btn.dataset.optionIndex;
-    const optionValue = btn.dataset.optionValue;
-
-    // Update selection in same group
-    const container = btn.parentElement;
-    container.querySelectorAll('button').forEach(b => b.classList.remove('is-selected'));
-    btn.classList.add('is-selected');
-
-    // Update selected options
-    this.selectedOptions[optionIndex] = optionValue;
-
-    // Update variant
-    this.updateVariant();
-
-    // Update availability of other options
-    this.updateOptionAvailability();
-  }
-
-  updateVariant() {
-    // Find matching variant
-    const matchingVariant = this.variants.find(variant => {
-      return Object.keys(this.selectedOptions).every(index => {
-        return variant.options[parseInt(index)] === this.selectedOptions[index];
-      });
-    });
-
-    if (matchingVariant) {
-      this.variantInput.value = matchingVariant.id;
-
-      if (matchingVariant.available) {
-        this.submitBtn.disabled = false;
-        this.btnText.textContent = 'Agregar a la bolsa';
-        this.classList.remove('needs-selection');
-      } else {
-        this.submitBtn.disabled = true;
-        this.btnText.textContent = 'Agotado';
-      }
-    } else {
-      // No matching variant - likely need to select more options
-      this.classList.add('needs-selection');
-    }
-  }
-
-  updateOptionAvailability() {
-    // Update size availability based on selected color
-    const colorIndex = this.querySelector('.quick-add-custom__colors')?.dataset.optionIndex;
-    const sizeIndex = this.querySelector('.quick-add-custom__sizes')?.dataset.optionIndex;
-
-    if (colorIndex !== undefined && sizeIndex !== undefined) {
-      const selectedColor = this.selectedOptions[colorIndex];
-
-      // Update size buttons
-      const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
-      sizeBtns.forEach(btn => {
-        const sizeValue = btn.dataset.optionValue;
-
-        // Check if this size is available with the selected color
-        const isAvailable = this.variants.some(variant => {
-          return variant.options[parseInt(sizeIndex)] === sizeValue &&
-                 variant.options[parseInt(colorIndex)] === selectedColor &&
-                 variant.available;
-        });
-
-        btn.classList.toggle('is-unavailable', !isAvailable);
-        btn.disabled = !isAvailable;
-      });
-
-      // Similarly update color buttons based on selected size
-      const selectedSize = this.selectedOptions[sizeIndex];
-      const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
-      colorBtns.forEach(btn => {
-        const colorValue = btn.dataset.optionValue;
-
-        const isAvailable = this.variants.some(variant => {
-          return variant.options[parseInt(colorIndex)] === colorValue &&
-                 variant.options[parseInt(sizeIndex)] === selectedSize &&
-                 variant.available;
-        });
-
-        btn.classList.toggle('is-unavailable', !isAvailable);
-        btn.disabled = !isAvailable;
-      });
-    }
-  }
-
-  async handleSubmit(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    // Validate selection
-    if (!this.variantInput.value || this.submitBtn.disabled) {
-      this.showFeedback('Selecciona talla y color');
-      return;
-    }
-
-    // Show loading state
-    this.classList.add('is-loading');
-    const originalText = this.btnText.textContent;
-    this.btnText.textContent = 'Agregando...';
-
-    try {
-      const formData = new FormData(this.form);
-
-      const response = await fetch(window.Shopify?.routes?.root + 'cart/add.js', {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // Success
-        this.classList.remove('is-loading');
-        this.classList.add('is-added');
-        this.btnText.textContent = 'Agregado';
-
-        // Fetch real cart count and update cart bubble
+    init() {
+      // Parse variants JSON
+      const variantsJson = this.querySelector('[data-variants-json]');
+      if (variantsJson) {
         try {
-          const cartResponse = await fetch(window.Shopify?.routes?.root + 'cart.js');
-          const cart = await cartResponse.json();
-          const count = cart.item_count;
-
-          // Update cart bubble DOM directly
-          const bubbleCount = document.querySelector('[ref="cartBubbleCount"]');
-          const bubble = document.querySelector('[ref="cartBubble"]');
-          if (bubbleCount) {
-            bubbleCount.textContent = count < 100 ? String(count) : '';
-            bubbleCount.classList.toggle('hidden', count === 0);
-          }
-          if (bubble) {
-            bubble.classList.toggle('visually-hidden', count === 0);
-          }
-
-          sessionStorage.setItem('cart-count', JSON.stringify({
-            value: String(count),
-            timestamp: Date.now()
-          }));
-
-          document.dispatchEvent(new CustomEvent('cart:update', {
-            detail: { data: { itemCount: count, source: 'quick-add-custom' } }
-          }));
+          this.variants = JSON.parse(variantsJson.textContent);
         } catch (e) {
-          console.error('Error updating cart count:', e);
+          console.error('Failed to parse variants JSON:', e);
         }
+      }
 
-        // Reset after delay
-        setTimeout(() => {
-          this.classList.remove('is-added');
-          this.btnText.textContent = originalText;
-        }, 2000);
+      // Cache DOM elements
+      this.form = this.querySelector('[data-type="add-to-cart-form"]');
+      this.variantInput = this.querySelector('[data-variant-input]');
+      this.submitBtn = this.querySelector('[data-add-to-cart-btn]');
+      this.btnText = this.querySelector('[data-btn-text]');
+      this.feedback = this.querySelector('[data-feedback]');
+      this.feedbackText = this.querySelector('[data-feedback-text]');
+
+      // Initialize selected options from first available or first option
+      this.initializeSelectedOptions();
+
+      // Bind events
+      this.bindEvents();
+    }
+
+    initializeSelectedOptions() {
+      // Get all option buttons and select the first one of each type
+      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
+      const colorContainer = this.querySelector('.quick-add-custom__colors');
+
+      if (sizeContainer) {
+        const firstSize = sizeContainer.querySelector('.quick-add-custom__size-btn.is-selected');
+        if (firstSize) {
+          const index = firstSize.dataset.optionIndex;
+          this.selectedOptions[index] = firstSize.dataset.optionValue;
+        }
+      }
+
+      if (colorContainer) {
+        const firstColor = colorContainer.querySelector('.quick-add-custom__color-btn.is-selected');
+        if (firstColor) {
+          const index = firstColor.dataset.optionIndex;
+          this.selectedOptions[index] = firstColor.dataset.optionValue;
+        }
+      }
+
+      // Update variant based on initial selection
+      this.updateVariant();
+    }
+
+    bindEvents() {
+      // Prevent clicks inside quick-add from navigating to product
+      // Only stop propagation, not default (so form submit works)
+      this.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Size buttons
+      const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
+      sizeBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => this.handleOptionClick(e));
+      });
+
+      // Color buttons
+      const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
+      colorBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => this.handleOptionClick(e));
+      });
+
+      // Form submit
+      if (this.form) {
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      }
+    }
+
+    handleOptionClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const btn = event.currentTarget;
+      if (btn.disabled) return;
+
+      const optionIndex = btn.dataset.optionIndex;
+      const optionValue = btn.dataset.optionValue;
+
+      // Update selection in same group
+      const container = btn.parentElement;
+      container.querySelectorAll('button').forEach((b) => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+
+      // Update selected options
+      this.selectedOptions[optionIndex] = optionValue;
+
+      // Update variant
+      this.updateVariant();
+
+      // Update availability of other options
+      this.updateOptionAvailability();
+    }
+
+    updateVariant() {
+      // Find matching variant
+      const matchingVariant = this.variants.find((variant) => {
+        return Object.keys(this.selectedOptions).every((index) => {
+          return variant.options[parseInt(index)] === this.selectedOptions[index];
+        });
+      });
+
+      if (matchingVariant) {
+        this.variantInput.value = matchingVariant.id;
+
+        if (matchingVariant.available) {
+          this.submitBtn.disabled = false;
+          this.btnText.textContent = 'Agregar a la bolsa';
+          this.classList.remove('needs-selection');
+        } else {
+          this.submitBtn.disabled = true;
+          this.btnText.textContent = 'Agotado';
+        }
       } else {
-        // Error
+        // No matching variant - likely need to select more options
+        this.classList.add('needs-selection');
+      }
+    }
+
+    updateOptionAvailability() {
+      // Update size availability based on selected color
+      const colorIndex = this.querySelector('.quick-add-custom__colors')?.dataset.optionIndex;
+      const sizeIndex = this.querySelector('.quick-add-custom__sizes')?.dataset.optionIndex;
+
+      if (colorIndex !== undefined && sizeIndex !== undefined) {
+        const selectedColor = this.selectedOptions[colorIndex];
+
+        // Update size buttons
+        const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
+        sizeBtns.forEach((btn) => {
+          const sizeValue = btn.dataset.optionValue;
+
+          // Check if this size is available with the selected color
+          const isAvailable = this.variants.some((variant) => {
+            return (
+              variant.options[parseInt(sizeIndex)] === sizeValue &&
+              variant.options[parseInt(colorIndex)] === selectedColor &&
+              variant.available
+            );
+          });
+
+          btn.classList.toggle('is-unavailable', !isAvailable);
+          btn.disabled = !isAvailable;
+        });
+
+        // Similarly update color buttons based on selected size
+        const selectedSize = this.selectedOptions[sizeIndex];
+        const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
+        colorBtns.forEach((btn) => {
+          const colorValue = btn.dataset.optionValue;
+
+          const isAvailable = this.variants.some((variant) => {
+            return (
+              variant.options[parseInt(colorIndex)] === colorValue &&
+              variant.options[parseInt(sizeIndex)] === selectedSize &&
+              variant.available
+            );
+          });
+
+          btn.classList.toggle('is-unavailable', !isAvailable);
+          btn.disabled = !isAvailable;
+        });
+      }
+    }
+
+    async handleSubmit(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Validate selection
+      if (!this.variantInput.value || this.submitBtn.disabled) {
+        this.showFeedback('Selecciona talla y color');
+        return;
+      }
+
+      // Show loading state
+      this.classList.add('is-loading');
+      const originalText = this.btnText.textContent;
+      this.btnText.textContent = 'Agregando...';
+
+      try {
+        const formData = new FormData(this.form);
+
+        const response = await fetch(window.Shopify?.routes?.root + 'cart/add.js', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // Success
+          this.classList.remove('is-loading');
+          this.classList.add('is-added');
+          this.btnText.textContent = 'Agregado';
+
+          // Dispatch cart update event for other components
+          document.dispatchEvent(
+            new CustomEvent('cart:updated', {
+              detail: { item: result },
+            })
+          );
+
+          // Also dispatch the theme's native event if available
+          if (window.Theme?.events?.cartAdd) {
+            document.dispatchEvent(
+              new CustomEvent(window.Theme.events.cartAdd, {
+                detail: { data: result },
+              })
+            );
+          }
+
+          // Reset after delay
+          setTimeout(() => {
+            this.classList.remove('is-added');
+            this.btnText.textContent = originalText;
+          }, 2000);
+        } else {
+          // Error
+          this.classList.remove('is-loading');
+          this.btnText.textContent = originalText;
+          this.showFeedback(result.message || 'Error al agregar');
+        }
+      } catch (error) {
+        console.error('Add to cart error:', error);
         this.classList.remove('is-loading');
         this.btnText.textContent = originalText;
-        this.showFeedback(result.message || 'Error al agregar');
+        this.showFeedback('Error de conexión');
       }
-    } catch (error) {
-      console.error('Add to cart error:', error);
-      this.classList.remove('is-loading');
-      this.btnText.textContent = originalText;
-      this.showFeedback('Error de conexión');
+    }
+
+    showFeedback(message) {
+      if (this.feedback && this.feedbackText) {
+        this.feedbackText.textContent = message;
+        this.feedback.hidden = false;
+
+        setTimeout(() => {
+          this.feedback.hidden = true;
+        }, 3000);
+      }
     }
   }
 
-  showFeedback(message) {
-    if (this.feedback && this.feedbackText) {
-      this.feedbackText.textContent = message;
-      this.feedback.hidden = false;
-
-      setTimeout(() => {
-        this.feedback.hidden = true;
-      }, 3000);
-    }
+  if (!customElements.get('quick-add-custom-component')) {
+    customElements.define('quick-add-custom-component', QuickAddCustomComponent);
   }
-}
-
-if (!customElements.get('quick-add-custom-component')) {
-  customElements.define('quick-add-custom-component', QuickAddCustomComponent);
-}
 {% endjavascript %}

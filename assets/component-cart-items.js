@@ -1,14 +1,20 @@
-import { Component } from '@theme/component';
-import { fetchConfig, debounce, onAnimationEnd, prefersReducedMotion, resetShimmer } from '@theme/utilities';
-import { morphSection, sectionRenderer } from '@theme/section-renderer';
+import { Component } from "@theme/component";
+import {
+  fetchConfig,
+  debounce,
+  onAnimationEnd,
+  prefersReducedMotion,
+  resetShimmer,
+} from "@theme/utilities";
+import { morphSection, sectionRenderer } from "@theme/section-renderer";
 import {
   ThemeEvents,
   CartUpdateEvent,
   QuantitySelectorUpdateEvent,
   CartAddEvent,
   DiscountUpdateEvent,
-} from '@theme/events';
-import { cartPerformance } from '@theme/performance';
+} from "@theme/events";
+import { cartPerformance } from "@theme/performance";
 
 /** @typedef {import('./utilities').TextComponent} TextComponent */
 
@@ -29,15 +35,58 @@ class CartItemsComponent extends Component {
     super.connectedCallback();
 
     document.addEventListener(ThemeEvents.cartUpdate, this.#handleCartUpdate);
-    document.addEventListener(ThemeEvents.discountUpdate, this.handleDiscountUpdate);
-    document.addEventListener(ThemeEvents.quantitySelectorUpdate, this.#debouncedOnChange);
+    document.addEventListener(
+      ThemeEvents.discountUpdate,
+      this.handleDiscountUpdate,
+    );
+    document.addEventListener(
+      ThemeEvents.quantitySelectorUpdate,
+      this.#debouncedOnChange,
+    );
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    document.removeEventListener(ThemeEvents.cartUpdate, this.#handleCartUpdate);
-    document.removeEventListener(ThemeEvents.quantitySelectorUpdate, this.#debouncedOnChange);
+    document.removeEventListener(
+      ThemeEvents.cartUpdate,
+      this.#handleCartUpdate,
+    );
+    document.removeEventListener(
+      ThemeEvents.quantitySelectorUpdate,
+      this.#debouncedOnChange,
+    );
+  }
+
+  /**
+   * Clears the entire cart.
+   * @param {Event} event - The click event.
+   */
+  async onEmptyCart(event) {
+    event.stopPropagation();
+    this.#disableCartItems();
+    const { cartTotal } = this.refs;
+
+    cartTotal?.shimmer();
+
+    try {
+      await fetch(`${Theme.routes.cart_clear_url}`, fetchConfig("json"));
+
+      this.dispatchEvent(
+        new CartUpdateEvent({}, this.sectionId, {
+          itemCount: 0,
+          source: "cart-items-component",
+          skipOpen: true,
+        }),
+      );
+
+      await sectionRenderer.renderSection(this.sectionId, { cache: false });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      resetShimmer(this);
+      this.#enableCartItems();
+    }
   }
 
   /**
@@ -56,13 +105,15 @@ class CartItemsComponent extends Component {
     this.updateQuantity({
       line,
       quantity,
-      action: 'change',
+      action: "change",
     });
     const lineItemRow = this.refs.cartItemRows[line - 1];
 
     if (!lineItemRow) return;
 
-    const textComponent = /** @type {TextComponent | undefined} */ (lineItemRow.querySelector('text-component'));
+    const textComponent = /** @type {TextComponent | undefined} */ (
+      lineItemRow.querySelector("text-component")
+    );
     textComponent?.shimmer();
   }
 
@@ -74,7 +125,7 @@ class CartItemsComponent extends Component {
     this.updateQuantity({
       line,
       quantity: 0,
-      action: 'clear',
+      action: "clear",
     });
 
     const cartItemRowToRemove = this.refs.cartItemRows[line - 1];
@@ -84,7 +135,9 @@ class CartItemsComponent extends Component {
     const rowsToRemove = [
       cartItemRowToRemove,
       // Get all nested lines of the row to remove
-      ...this.refs.cartItemRows.filter((row) => row.dataset.parentKey === cartItemRowToRemove.dataset.key),
+      ...this.refs.cartItemRows.filter(
+        (row) => row.dataset.parentKey === cartItemRowToRemove.dataset.key,
+      ),
     ];
 
     // Add class to the row to trigger the animation
@@ -93,8 +146,8 @@ class CartItemsComponent extends Component {
 
       if (prefersReducedMotion()) return remove();
 
-      row.style.setProperty('--row-height', `${row.clientHeight}px`);
-      row.classList.add('removing');
+      row.style.setProperty("--row-height", `${row.clientHeight}px`);
+      row.classList.add("removing");
 
       // Remove the row after the animation ends
       onAnimationEnd(row, remove);
@@ -109,14 +162,18 @@ class CartItemsComponent extends Component {
    * @param {string} config.action - The action.
    */
   updateQuantity(config) {
-    const cartPerformaceUpdateMarker = cartPerformance.createStartingMarker(`${config.action}:user-action`);
+    const cartPerformaceUpdateMarker = cartPerformance.createStartingMarker(
+      `${config.action}:user-action`,
+    );
 
     this.#disableCartItems();
 
     const { line, quantity } = config;
     const { cartTotal } = this.refs;
 
-    const cartItemsComponents = document.querySelectorAll('cart-items-component');
+    const cartItemsComponents = document.querySelectorAll(
+      "cart-items-component",
+    );
     const sectionsToUpdate = new Set([this.sectionId]);
     cartItemsComponents.forEach((item) => {
       if (item instanceof HTMLElement && item.dataset.sectionId) {
@@ -127,13 +184,13 @@ class CartItemsComponent extends Component {
     const body = JSON.stringify({
       line: line,
       quantity: quantity,
-      sections: Array.from(sectionsToUpdate).join(','),
+      sections: Array.from(sectionsToUpdate).join(","),
       sections_url: window.location.pathname,
     });
 
     cartTotal?.shimmer();
 
-    fetch(`${Theme.routes.cart_change_url}`, fetchConfig('json', { body }))
+    fetch(`${Theme.routes.cart_change_url}`, fetchConfig("json", { body }))
       .then((response) => {
         return response.text();
       })
@@ -149,12 +206,16 @@ class CartItemsComponent extends Component {
 
         const newSectionHTML = new DOMParser().parseFromString(
           parsedResponseText.sections[this.sectionId],
-          'text/html'
+          "text/html",
         );
 
         // Grab the new cart item count from a hidden element
-        const newCartHiddenItemCount = newSectionHTML.querySelector('[ref="cartItemCount"]')?.textContent;
-        const newCartItemCount = newCartHiddenItemCount ? parseInt(newCartHiddenItemCount, 10) : 0;
+        const newCartHiddenItemCount = newSectionHTML.querySelector(
+          '[ref="cartItemCount"]',
+        )?.textContent;
+        const newCartItemCount = newCartHiddenItemCount
+          ? parseInt(newCartHiddenItemCount, 10)
+          : 0;
 
         // Update data-cart-quantity for all matching variants
         this.#updateQuantitySelectors(parsedResponseText);
@@ -162,12 +223,15 @@ class CartItemsComponent extends Component {
         this.dispatchEvent(
           new CartUpdateEvent({}, this.sectionId, {
             itemCount: newCartItemCount,
-            source: 'cart-items-component',
+            source: "cart-items-component",
             sections: parsedResponseText.sections,
-          })
+          }),
         );
 
-        morphSection(this.sectionId, parsedResponseText.sections[this.sectionId]);
+        morphSection(
+          this.sectionId,
+          parsedResponseText.sections[this.sectionId],
+        );
 
         this.#updateCartQuantitySelectorButtonStates();
       })
@@ -196,20 +260,22 @@ class CartItemsComponent extends Component {
    */
   #handleCartError = (line, parsedResponseText) => {
     const quantitySelector = this.refs.quantitySelectors[line - 1];
-    const quantityInput = quantitySelector?.querySelector('input');
+    const quantityInput = quantitySelector?.querySelector("input");
 
-    if (!quantityInput) throw new Error('Quantity input not found');
+    if (!quantityInput) throw new Error("Quantity input not found");
 
     quantityInput.value = quantityInput.defaultValue;
 
     const cartItemError = this.refs[`cartItemError-${line}`];
     const cartItemErrorContainer = this.refs[`cartItemErrorContainer-${line}`];
 
-    if (!(cartItemError instanceof HTMLElement)) throw new Error('Cart item error not found');
-    if (!(cartItemErrorContainer instanceof HTMLElement)) throw new Error('Cart item error container not found');
+    if (!(cartItemError instanceof HTMLElement))
+      throw new Error("Cart item error not found");
+    if (!(cartItemErrorContainer instanceof HTMLElement))
+      throw new Error("Cart item error container not found");
 
     cartItemError.textContent = parsedResponseText.errors;
-    cartItemErrorContainer.classList.remove('hidden');
+    cartItemErrorContainer.classList.remove("hidden");
   };
 
   /**
@@ -239,14 +305,14 @@ class CartItemsComponent extends Component {
    * Disables the cart items.
    */
   #disableCartItems() {
-    this.classList.add('cart-items-disabled');
+    this.classList.add("cart-items-disabled");
   }
 
   /**
    * Enables the cart items.
    */
   #enableCartItems() {
-    this.classList.remove('cart-items-disabled');
+    this.classList.remove("cart-items-disabled");
   }
 
   /**
@@ -260,17 +326,20 @@ class CartItemsComponent extends Component {
     for (const item of updatedCart.items) {
       const variantId = item.variant_id.toString();
       const selectors = document.querySelectorAll(
-        `quantity-selector-component[data-variant-id="${variantId}"], cart-quantity-selector-component[data-variant-id="${variantId}"]`
+        `quantity-selector-component[data-variant-id="${variantId}"], cart-quantity-selector-component[data-variant-id="${variantId}"]`,
       );
 
       for (const selector of selectors) {
-        const input = selector.querySelector('input[data-cart-quantity]');
+        const input = selector.querySelector("input[data-cart-quantity]");
         if (!input) continue;
 
-        input.setAttribute('data-cart-quantity', item.quantity.toString());
+        input.setAttribute("data-cart-quantity", item.quantity.toString());
 
         // Update the quantity selector's internal state
-        if ('updateCartQuantity' in selector && typeof selector.updateCartQuantity === 'function') {
+        if (
+          "updateCartQuantity" in selector &&
+          typeof selector.updateCartQuantity === "function"
+        ) {
           selector.updateCartQuantity();
         }
       }
@@ -281,9 +350,14 @@ class CartItemsComponent extends Component {
    * Updates button states for all cart quantity selector components.
    */
   #updateCartQuantitySelectorButtonStates() {
-    const cartQuantitySelectors = document.querySelectorAll('cart-quantity-selector-component');
+    const cartQuantitySelectors = document.querySelectorAll(
+      "cart-quantity-selector-component",
+    );
     for (const selector of cartQuantitySelectors) {
-      if ('updateButtonStates' in selector && typeof selector.updateButtonStates === 'function') {
+      if (
+        "updateButtonStates" in selector &&
+        typeof selector.updateButtonStates === "function"
+      ) {
         selector.updateButtonStates();
       }
     }
@@ -296,12 +370,12 @@ class CartItemsComponent extends Component {
   get sectionId() {
     const { sectionId } = this.dataset;
 
-    if (!sectionId) throw new Error('Section id missing');
+    if (!sectionId) throw new Error("Section id missing");
 
     return sectionId;
   }
 }
 
-if (!customElements.get('cart-items-component')) {
-  customElements.define('cart-items-component', CartItemsComponent);
+if (!customElements.get("cart-items-component")) {
+  customElements.define("cart-items-component", CartItemsComponent);
 }

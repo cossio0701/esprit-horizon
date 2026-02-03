@@ -8,14 +8,102 @@
   "
   data-testid="cart-icon"
 >
-  <span
-    class="svg-wrapper"
-    aria-hidden="true"
-  >
-    {{ 'icon-cart.svg' | inline_asset_content }}
-  </span>
+  <style>
+    .cart-icon-component {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      overflow: visible !important;
+    }
+    .cart-icon-component .svg-wrapper {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      overflow: visible !important;
+    }
+    .cart-icon-component .svg-wrapper svg {
+      width: 24px;
+      height: 24px;
+      display: block !important;
+      overflow: visible !important;
+    }
+    .cart-icon-component .cart-bubble {
+      position: absolute;
+      bottom: 4px;
+      right: 2px;
+      top: auto;
+      left: auto;
+      background: black;
+      color: white;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      line-height: 1;
+      z-index: 5;
+      padding: 0;
+      min-width: 17px;
+      min-height: 17px;
+      aspect-ratio: 1 / 1;
+      flex-shrink: 0;
+    }
+    .cart-icon-component .cart-bubble__background {
+      display: none !important;
+    }
+    .cart-icon-component .heart-icon {
+      position: absolute;
+      top: 8px;
+      right: 0px;
+      width: 12px;
+      height: 12px;
+      z-index: 20;
+      display: block;
+      flex-shrink: 0;
+    }
+    .cart-icon-component .heart-icon svg {
+      width: 12px;
+      height: 12px;
+      display: block;
+      overflow: visible;
+    }
+    .cart-icon-component .heart-icon svg path {
+      fill: #ff0000; /* Extremely red */
+      stroke: none;
+    }
 
-  {% render 'cart-bubble', limit: 100, live_region: true, test_id: test_id %}
+    /* Transparent header support */
+    header-component[transparent]:not([data-sticky-state='active']):not(:hover) .cart-icon-component .cart-bubble {
+      background: white !important;
+      color: black !important;
+    }
+    header-component[transparent]:not([data-sticky-state='active']):not(:hover)
+      .cart-icon-component
+      .heart-icon
+      svg
+      path {
+      fill: #ff0000;
+    }
+  </style>
+
+  <div class="cart-icon-component">
+    <span class="heart-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </span>
+    <span class="svg-wrapper" aria-hidden="true">
+      {{ 'icon-cart.svg' | inline_asset_content }}
+    </span>
+    {% render 'cart-bubble', limit: 100, live_region: true, test_id: test_id %}
+  </div>
 </cart-icon>
 
 {% stylesheet %}

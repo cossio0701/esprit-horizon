@@ -90,7 +90,20 @@
           "type": "container",
           "name": "Container",
           "settings": {
-            "container_class": "header-utils"
+            "html_tag": "div",
+            "desktop_direction": "row",
+            "mobile_direction": "row",
+            "gap": 0,
+            "border": "none",
+            "border_width": 1,
+            "border_radius": 0,
+            "border_color": "#000000",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "padding_right": 0,
+            "container_class": "header-utils",
+            "custom_css": ""
           },
           "blocks": {
             "search_efCAcT": {

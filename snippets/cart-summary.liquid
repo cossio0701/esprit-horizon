@@ -4,165 +4,115 @@
   @param {string} [accelerated_checkout_buttons_layout] - { 'vertical' } Forced layout of the additional checkout buttons, instead of relying on platform's layout.
 {%- enddoc -%}
 
-{% if settings.show_add_discount_code %}
-  <div class="cart-discount-wrapper">
-    <span class="cart-discount-wrapper__label">¿Tienes un cupón de descuento?</span>
-    {% render 'cart-discount', section_id: section.id %}
+<div class="cart__summary-totals">
+  <div class="cart__summary-item cart-primary-typography">
+    <span>Subtotal</span>
+    <span class="cart-secondary-typography">{{ cart.original_total_price | money }}</span>
   </div>
-{% endif %}
 
-{% if settings.show_cart_note %}
-  <div class="cart-actions">
-    {% render 'cart-note' %}
-  </div>
-{% endif %}
-
-<div class="cart__summary-content">
-  <div class="cart__summary-totals">
-    {% # We need to keep this node in place to allow morphing to work properly # %}
-    <h5 class="summary__title">RESUMEN DE LA COMPRA</h5>
-
-    {%- liquid
-      if settings.currency_code_enabled_cart_total
-        assign total_price = cart.total_price | money_with_currency
-        assign subtotal_price = cart.original_total_price | money_with_currency
-      else
-        assign total_price = cart.total_price | money
-        assign subtotal_price = cart.original_total_price | money
-      endif
-    -%}
-
-    {%- liquid
-      # Calcular descuentos a nivel de línea (productos)
-      assign line_discounts_total = 0
-      for item in cart.items
-        for discount in item.line_level_discount_allocations
-          assign line_discounts_total = line_discounts_total | plus: discount.amount
-        endfor
-      endfor
-    -%}
-
-    <div class="cart__summary-lines cart-primary-typography">
-      {%- comment -%} Subtotal {%- endcomment -%}
-      <span class="cart__summary-item cart__subtotal">
-        <span class="cart__subtotal-label">Subtotal</span>
-        <span class="cart__subtotal-value cart-secondary-typography">
-          {{- subtotal_price -}}
-        </span>
-      </span>
-
-      {%- comment -%} Descuentos a nivel de línea (productos) {%- endcomment -%}
-      {%- if line_discounts_total > 0 -%}
-        <span class="cart__summary-item cart__discount">
-          <span class="cart__discount-label">Descuento</span>
-          <span class="cart__discount-value cart-secondary-typography"> -{{ line_discounts_total | money }} </span>
-        </span>
-      {%- endif -%}
-
-      {%- comment -%} Descuentos a nivel de carrito (códigos y automáticos) {%- endcomment -%}
-      {%- for discount in cart.cart_level_discount_applications -%}
-        <span class="cart__summary-item cart__discount">
-          <span class="cart__discount-label">
-            {{ discount.title | escape }}
-          </span>
-          <span class="cart__discount-value cart-secondary-typography">
-            -{{ discount.total_allocated_amount | money }}
-          </span>
-        </span>
-      {%- endfor -%}
-
-      {%- comment -%} Gastos de envío {%- endcomment -%}
-      <span class="cart__summary-item cart__shipping">
-        <span class="cart__shipping-label">Gastos de envío</span>
-        <span class="cart__shipping-value cart-secondary-typography">A calcular</span>
-      </span>
+  {%- if cart.total_discount > 0 -%}
+    <div class="cart__summary-item cart-primary-typography">
+      <span>Descuentos</span>
+      <span class="cart-secondary-typography">-{{ cart.total_discount | money }}</span>
     </div>
+  {%- endif -%}
 
-    {%- comment -%} Total {%- endcomment -%}
-    <div class="cart__total-container">
-      <span
-        class="cart__summary-item cart__total"
-        role="status"
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <div class="cart__summary-discounts">
+      <ul
+        class="discounts list-unstyled"
+        role="list"
+        aria-label="{{ 'content.discounts' | t }}"
       >
-        <span class="cart__total-label cart-primary-typography">Total</span>
-        <text-component
-          ref="cartTotal"
-          value="{{ total_price | strip_html }}"
-          class="cart__total-value cart-secondary-typography"
-          {% comment %} Used by payment_terms web component {% endcomment %}
-          data-cart-subtotal
-        >
-          {{ total_price }}
-        </text-component>
-      </span>
-      {% if settings.show_installments %}
-        <span class="cart__summary-item cart__installments">
-          {% form 'cart', cart %}
-            {{ form | payment_terms }}
-          {% endform %}
-        </span>
-      {% endif %}
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <li class="cart__summary-item cart__discount" style="font-size: 0.8rem; opacity: 0.7;">
+            <span class="cart__discount-label">
+              {{- 'icon-discount.svg' | inline_asset_content -}}
+              {{ discount.title | escape }}
+            </span>
+            <span class="cart-secondary-typography">-{{ discount.total_allocated_amount | money -}}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
     </div>
-  </div>
+  {%- endif -%}
 
-  <div class="cart__ctas">
-    <div class="cart__terms">
-      <input type="checkbox" id="terms-checkbox" name="terms" required>
-      <div class="label__container">
-        <label for="terms-checkbox" class="terms-label">
-          Acepto los
-          <a href="/pages/terminos-condiciones?category=terminos-condiciones" target="_blank" class="terms-link"
-            >Términos y Condiciones,Política de datos personales</a
-          >
-          y confirmo que soy mayor de edad<span class="required">*</span>
-        </label>
-        <span class="label__second-text"
-          >*Lo anterior, en cumplimiento a la Ley 1480 de 2011 Artículo 52: Protección de niños, niñas y adolescentes en
-          comercio electrónico.</span
-        >
-      </div>
-    </div>
-    <div class="cart__summary-item tax-note cart-primary-typography">
-      {% render 'tax-info', has_discounts_enabled: settings.show_add_discount_code %}
-    </div>
-    <button
-      type="submit"
-      id="checkout"
-      class="cart__checkout-button button"
-      name="checkout"
-      {% if cart == empty %}
-        disabled
+  {% if settings.show_cart_note or settings.show_add_discount_code %}
+    <div class="cart-actions">
+      {% if settings.show_cart_note %}
+        {% render 'cart-note' %}
       {% endif %}
-      form="cart-form"
+      {% if settings.show_cart_note and settings.show_add_discount_code %}
+        <div class="cart-actions__divider"></div>
+      {% endif %}
+      {% if settings.show_add_discount_code %}
+        {% render 'cart-discount', section_id: section.id %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- liquid
+    if settings.currency_code_enabled_cart_total
+      assign total_price = cart.total_price | money_with_currency
+    else
+      assign total_price = cart.total_price | money
+    endif
+  -%}
+
+  <div class="cart__total-container">
+    <div
+      class="cart__summary-item cart__total"
+      role="status"
     >
-      {{ 'content.checkout' | t }}
-    </button>
-
-    <a href="/collections/all" class="cart__continue-shopping-button">
-      <span class="cart__continue-shopping-text">Elegir más productos</span>
-      <svg width="10" height="9" viewBox="0 0 10 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8.83333 4.5L4.83333 8.5M0.5 4.5H8.83333H0.5ZM8.83333 4.5L4.83333 0.5L8.83333 4.5Z" stroke="#21272A" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-
-    {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
-      <div
-        class="
-          additional-checkout-buttons
-          {% if accelerated_checkout_buttons_layout == 'vertical' %}additional-checkout-buttons--vertical{% endif %}
-        "
+      <span class="cart__total-label cart-primary-typography" style="font-weight: 700;">Total</span>
+      <text-component
+        ref="cartTotal"
+        value="{{ total_price | strip_html }}"
+        class="cart__total-value cart-secondary-typography"
+        style="font-weight: 700;"
+        {% comment %} Used by payment_terms web component {% endcomment %}
+        data-cart-subtotal
       >
-        {{ content_for_additional_checkout_buttons }}
-      </div>
+        {{ total_price }}
+      </text-component>
+    </div>
+    {% if settings.show_installments %}
+      <span class="cart__summary-item cart__installments">
+        {% form 'cart', cart %}
+          {{ form | payment_terms }}
+        {% endform %}
+      </span>
     {% endif %}
   </div>
 </div>
 
+<div class="cart__ctas">
+  <button
+    type="submit"
+    id="checkout"
+    class="cart__checkout-button button"
+    name="checkout"
+    {% if cart == empty %}
+      disabled
+    {% endif %}
+    form="cart-form"
+  >
+    {{ 'content.checkout' | t }}
+  </button>
+
+  {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
+    <div
+      class="
+        additional-checkout-buttons
+        {% if accelerated_checkout_buttons_layout == 'vertical' %}additional-checkout-buttons--vertical{% endif %}
+      "
+    >
+      {{ content_for_additional_checkout_buttons }}
+    </div>
+  {% endif %}
+</div>
+
 {% stylesheet %}
-  .cart__summary-content {
-    border: 1px solid #ddd;
-    padding: 16px 20px;
-  }
   .cart-actions {
     display: flex;
     flex-direction: column;
@@ -176,39 +126,6 @@
     border-block-start: 1px solid var(--color-border);
   }
 
-  .cart-discount-wrapper {
-    width: 100%;
-    background: transparent;
-    padding: 0;
-    padding-top: var(--padding-sm);
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-sm);
-    animation: fadeSlideUp 0.4s ease forwards;
-    animation-delay: 0.1s;
-    opacity: 0;
-  }
-
-  @keyframes fadeSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(15px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .cart-discount-wrapper__label {
-    font-weight: 600;
-    transition: color 0.3s ease;
-  }
-
-  .cart-discount-wrapper__label:hover {
-    color: #555;
-  }
-
   .cart__summary-totals:not(:has(.cart-actions)) {
     margin-block-start: var(--margin-3xs);
     border-block-start: 1px solid var(--color-border);
@@ -218,249 +135,4 @@
   .cart__installments {
     color: var(--color-foreground);
   }
-  .cart__terms {
-    display: flex;
-    align-items: flex-start;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 12px;
-    margin-bottom: 0px;
-  }
-
-  .cart__terms input[type='checkbox'] {
-    accent-color: black;
-    border-radius: 0;
-    width: 16px;
-    height: 16px;
-    margin-top: 2px; /* Pequeño ajuste para alinear con la primera línea de texto */
-    flex-shrink: 0; /* Evita que el checkbox se comprima */
-  }
-
-  .cart__terms a {
-    text-decoration: underline;
-  }
-
-  .cart__terms-error {
-    display: none;
-    color: rgb(var(--color-error, 200 0 0));
-    font-size: var(--font-size-sm);
-    margin-top: var(--margin-xs);
-  }
-
-  .label__container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .terms-label {
-    font-size: 11px;
-  }
-
-  .label__second-text {
-    font-size: 10px;
-    color: #787878;
-    font-weight: 400;
-  }
-  .cart__terms input[type='checkbox'] {
-    accent-color: black;
-    width: 16px;
-    height: 16px;
-  }
-  .cart__terms input[type='checkbox'] {
-    accent-color: black;
-    width: 16px;
-    height: 16px;
-  }
-
-  .cart__total-label,
-  .cart__total-value {
-    font-weight: 600;
-  }
-
-  .cart__total-value {
-    font-size: 14px;
-  }
-
-  /* Summary lines (Subtotal, Descuentos, Envío) */
-  .cart__summary-lines {
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
-    padding-bottom: var(--padding-sm);
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: var(--margin-sm);
-  }
-
-  .cart__summary-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .cart__subtotal,
-  .cart__shipping {
-    font-size: var(--font-size--sm);
-  }
-
-  .cart__summary-discounts {
-    margin: 0;
-  }
-
-  .cart__summary-discounts .discounts {
-    margin: 0;
-    padding: 0;
-  }
-
-  .cart__discount {
-    font-size: var(--font-size--sm);
-    color: black;
-  }
-
-  .cart__discount-label {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-  }
-
-  .cart__discount-label .svg-wrapper {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
-  }
-
-  .cart__total-container {
-  }
-
-  .cart__continue-shopping-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid black;
-    width: fit-content;
-    font-weight: 500;
-    margin: 4px auto 0;
-    font-size: 14px;
-  }
-
-  .cart__continue-shopping-button svg,
-  .cart__continue-shopping-text {
-    transition: transform 0.3s ease;
-  }
-
-  .cart__continue-shopping-button:hover .cart__continue-shopping-text {
-    transform: translateX(-3px);
-  }
-
-  .cart__continue-shopping-button:hover svg {
-    transform: translateX(3px);
-  }
-
-  /* ========== ANIMACIONES MODERNAS SUMMARY ========== */
-
-  /* Animación de entrada del contenedor */
-  @keyframes fadeSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(15px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .cart__summary-content {
-    animation: fadeSlideUp 0.5s ease forwards;
-    animation-delay: 0.3s;
-    opacity: 0;
-  }
-
-  /* Animación escalonada para líneas del summary */
-  .cart__summary-item {
-    animation: fadeSlideUp 0.4s ease forwards;
-    opacity: 0;
-  }
-
-  .cart__summary-lines .cart__summary-item:nth-child(1) {
-    animation-delay: 0.4s;
-  }
-  .cart__summary-lines .cart__summary-item:nth-child(2) {
-    animation-delay: 0.5s;
-  }
-  .cart__summary-lines .cart__summary-item:nth-child(3) {
-    animation-delay: 0.6s;
-  }
-  .cart__summary-lines .cart__summary-item:nth-child(4) {
-    animation-delay: 0.7s;
-  }
-
-  .cart__total-container .cart__summary-item {
-    animation-delay: 0.7s;
-  }
-
-  /* Hover sutil en líneas del summary */
-  .cart__summary-lines .cart__summary-item {
-    padding: 4px 8px;
-    margin: 0 -8px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-
-  .cart__summary-lines .cart__summary-item:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-  }
-
-  /* Animación del botón checkout */
-  .cart__checkout-button {
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-  }
-
-  .cart__checkout-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .cart__checkout-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Animación checkbox términos */
-  .cart__terms input[type='checkbox'] {
-    transition: transform 0.2s ease;
-  }
-
-  .cart__terms input[type='checkbox']:hover {
-    transform: scale(1.1);
-  }
-
-  .cart__terms input[type='checkbox']:checked {
-    animation: checkPop 0.3s ease;
-  }
-
-  @keyframes checkPop {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-
-  /* Animación en el total */
-  .cart__total-value {
-    transition: transform 0.3s ease;
-  }
-
-  .cart__total-container:hover .cart__total-value {
-    transform: scale(1.02);
-  }
 {% endstylesheet %}
-
-<script src="{{ 'cart-terms.js' | asset_url }}" defer></script>
