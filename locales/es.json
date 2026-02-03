@@ -77,7 +77,7 @@
     "clear_all": "Borrar todo",
     "remove": "Eliminar",
     "view_in_your_space": "Ver en tu espacio",
-    "show_filters": "Filtro",
+    "show_filters": "Filtrar",
     "clear": "Borrar",
     "continue_shopping": "Seguir comprando",
     "log_in_html": "¿Tienes una cuenta? <a href=\"{{ link }}\">Inicia sesión</a> para pagar más rápido.",
@@ -137,7 +137,7 @@
     "duties_included_taxes_at_checkout_shipping_at_checkout_without_policy": "Aranceles incluidos. Impuestos, descuentos y envío calculados en la página de pago.",
     "taxes_at_checkout_shipping_at_checkout_with_policy_html": "Impuestos, descuentos y <a href=\"{{ link }}\">envío</a> calculados en la página de pago.",
     "taxes_at_checkout_shipping_at_checkout_without_policy": "Impuestos, descuentos y envío calculados en la página de pago.",
-    "checkout": "Pagar",
+    "checkout": "FINALIZAR COMPRA",
     "cart_title": "Carrito",
     "price": "Precio",
     "price_regular": "Precio habitual",
@@ -150,6 +150,7 @@
     "product_badge_sold_out": "Agotado",
     "product_badge_sale": "Oferta",
     "grid_view": {
+      "label": "Vista",
       "default_view": "Predeterminado",
       "grid_fieldset": "Columna de cuadrícula",
       "single_item": "Única",
@@ -179,7 +180,7 @@
     "product_count": "Recuento de productos",
     "item_count": {
       "one": "{{ count }} artículo",
-      "other": "{{ count }} artículos",
+      "other": "{{ count }} productos",
       "many": "{{ count }} artículos"
     },
     "errors": "Errores",
@@ -282,6 +283,8 @@
       "add_to_cart_error": "Error al agregar al carrito",
       "sold_out": "Agotado",
       "unavailable": "No disponible",
+      "size": "Talla",
+      "color": "Color",
       "quantity_error_max": "Este artículo tiene un máximo de {{ maximum }}",
       "quantity": "Cantidad",
       "quantity_increments": "Incrementos de {{ increment }}",

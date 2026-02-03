@@ -1,0 +1,62 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+<span
+  class="product-ref-{{ ai_gen_id }}"
+>
+  Ref: {{ product.metafields.custom.color_group }}
+</span>
+
+<style>
+  .product-ref-{{ ai_gen_id }} {
+    display:block;
+    margin-top: -6px;
+    font-size: {{ block.settings.font_size }}px;
+    color: {{ block.settings.text_color }};
+    font-weight: {{ block.settings.font_weight }};
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product reference",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "default": "400",
+      "options": [
+        { "label": "Light", "value": "300" },
+        { "label": "Regular", "value": "400" },
+        { "label": "Medium", "value": "500" },
+        { "label": "Bold", "value": "700" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product reference"
+    }
+  ]
+}
+{% endschema %}

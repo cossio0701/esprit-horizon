@@ -19,12 +19,12 @@
       blocking="render"
       id="view-transition-render-blocker"
     >
-      <link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"
-/>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"
+    >
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
@@ -40,10 +40,15 @@
     {{ content_for_header }}
   </head>
 
-  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }} template-{{ template.name | replace: '.', '-' }}"   data-template="{{ template.name | split: '.' | first }}"
->
+  <body
+    class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }} "
+  >
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
-    <div id="header-group">
+    <div
+      id="header-group"
+      class="template-{{ template.name | replace: '.', '-' }}"
+      data-template="{{ template.name | split: '.' | first }}"
+    >
       {% sections 'header-group' %}
     </div>
 
@@ -72,5 +77,7 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {{ 'plp-variants.js' | asset_url | script_tag }}
   </body>
 </html>

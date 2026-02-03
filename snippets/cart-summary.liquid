@@ -5,36 +5,37 @@
 {%- enddoc -%}
 
 <div class="cart__summary-totals">
-  {% # We need to keep this node in place to allow morphing to work properly # %}
-  <div class="cart__original-total-container cart-primary-typography">
-    {%- if cart.cart_level_discount_applications.size > 0 -%}
-      <span class="cart__summary-item cart__original-total">
-        <span class="cart__original-total-label">{{ 'content.cart_subtotal' | t }}</span>
-        <span class="cart__original-total-value cart-secondary-typography">
-          {{- cart.original_total_price | money -}}
-        </span>
-      </span>
-      <div class="cart__summary-discounts">
-        <ul
-          class="discounts list-unstyled"
-          role="list"
-          aria-label="{{ 'content.discounts' | t }}"
-        >
-          {%- for discount in cart.cart_level_discount_applications -%}
-            <li class="cart__summary-item cart__discount">
-              <span class="cart__discount-label">
-                {{- 'icon-discount.svg' | inline_asset_content -}}
-                {{ discount.title | escape }}
-              </span>
-              <span class="cart__discount-value cart-secondary-typography"
-                >-{{ discount.total_allocated_amount | money -}}
-              </span>
-            </li>
-          {%- endfor -%}
-        </ul>
-      </div>
-    {%- endif -%}
+  <div class="cart__summary-item cart-primary-typography">
+    <span>Subtotal</span>
+    <span class="cart-secondary-typography">{{ cart.original_total_price | money }}</span>
   </div>
+
+  {%- if cart.total_discount > 0 -%}
+    <div class="cart__summary-item cart-primary-typography">
+      <span>Descuentos</span>
+      <span class="cart-secondary-typography">-{{ cart.total_discount | money }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <div class="cart__summary-discounts">
+      <ul
+        class="discounts list-unstyled"
+        role="list"
+        aria-label="{{ 'content.discounts' | t }}"
+      >
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <li class="cart__summary-item cart__discount" style="font-size: 0.8rem; opacity: 0.7;">
+            <span class="cart__discount-label">
+              {{- 'icon-discount.svg' | inline_asset_content -}}
+              {{ discount.title | escape }}
+            </span>
+            <span class="cart-secondary-typography">-{{ discount.total_allocated_amount | money -}}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
 
   {% if settings.show_cart_note or settings.show_add_discount_code %}
     <div class="cart-actions">
@@ -59,21 +60,22 @@
   -%}
 
   <div class="cart__total-container">
-    <span
+    <div
       class="cart__summary-item cart__total"
       role="status"
     >
-      <span class="cart__total-label cart-primary-typography">{{ 'content.cart_estimated_total' | t }}</span>
+      <span class="cart__total-label cart-primary-typography" style="font-weight: 700;">Total</span>
       <text-component
         ref="cartTotal"
         value="{{ total_price | strip_html }}"
         class="cart__total-value cart-secondary-typography"
+        style="font-weight: 700;"
         {% comment %} Used by payment_terms web component {% endcomment %}
         data-cart-subtotal
       >
         {{ total_price }}
       </text-component>
-    </span>
+    </div>
     {% if settings.show_installments %}
       <span class="cart__summary-item cart__installments">
         {% form 'cart', cart %}
@@ -81,9 +83,6 @@
         {% endform %}
       </span>
     {% endif %}
-    <div class="cart__summary-item tax-note cart-primary-typography">
-      {% render 'tax-info', has_discounts_enabled: settings.show_add_discount_code %}
-    </div>
   </div>
 </div>
 

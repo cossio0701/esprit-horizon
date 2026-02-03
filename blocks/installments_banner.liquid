@@ -1,0 +1,313 @@
+{%- comment -%}
+  Installments Banner Block
+  - Richtext con icono via ::after
+  - Date + collection visibility
+{%- endcomment -%}
+
+{%- liquid
+  unless product
+    break
+  endunless
+
+  assign collection_handles_string = block.settings.collection_handles | strip | downcase
+  assign is_valid_collection = false
+
+  if collection_handles_string == blank
+    assign is_valid_collection = true
+  else
+    assign collection_handles_array = collection_handles_string | split: ','
+    for handle in collection_handles_array
+      assign clean_handle = handle | strip
+      for product_collection in product.collections
+        if product_collection.handle == clean_handle
+          assign is_valid_collection = true
+          break
+        endif
+      endfor
+      if is_valid_collection
+        break
+      endif
+    endfor
+  endif
+
+  unless is_valid_collection
+    break
+  endunless
+
+  assign is_date_visible = true
+  assign current_timestamp = 'now' | date: '%s' | plus: 0
+
+  if block.settings.start_date != blank
+    assign start_timestamp = block.settings.start_date | date: '%s' | plus: 0
+    if current_timestamp < start_timestamp
+      assign is_date_visible = false
+    endif
+  endif
+
+  if is_date_visible and block.settings.end_date != blank
+    assign end_timestamp = block.settings.end_date | date: '%s' | plus: 0
+    if current_timestamp > end_timestamp
+      assign is_date_visible = false
+    endif
+  endif
+
+  unless is_date_visible
+    break
+  endunless
+
+  assign block_id = block.id | replace: '_', '' | downcase
+-%}
+
+{%- style -%}
+  .installments-banner-{{ block_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: {{ block.settings.text_color }};
+  }
+
+  .installments-banner__text-{{ block_id }} {
+    display: inline;
+  }
+
+  .installments-banner__text-{{ block_id }} p {
+    display: inline;
+    margin: 0;
+  }
+
+  .installments-banner__text-{{ block_id }} strong,
+  .installments-banner__text-{{ block_id }} b {
+    font-weight: 600;
+  }
+
+  {%- if block.settings.icon != blank -%}
+    .installments-banner__text-{{ block_id }} p::after {
+      content: url('{{ block.settings.icon | image_url: height: block.settings.icon_height }}');
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+  {%- endif -%}
+
+  .installments-banner__separator-{{ block_id }} {
+    color: {{ block.settings.separator_color }};
+    margin: 0 4px;
+  }
+
+  .installments-banner__link-{{ block_id }} {
+    color: {{ block.settings.link_color }};
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+
+  .installments-banner__link-{{ block_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .installments-banner-{{ block_id }} {
+      padding: {{ block.settings.padding_top_mobile }}px 0 {{ block.settings.padding_bottom_mobile }}px;
+      font-size: {{ block.settings.font_size_mobile }}px;
+    }
+
+    {%- if block.settings.icon != blank -%}
+      .installments-banner__text-{{ block_id }} p::after {
+        content: url('{{ block.settings.icon | image_url: height: block.settings.icon_height_mobile }}');
+      }
+    {%- endif -%}
+  }
+{%- endstyle -%}
+
+<div class="installments-banner-{{ block_id }}" {{ block.shopify_attributes }}>
+  <span class="installments-banner__text-{{ block_id }}">{{ block.settings.message }}</span>
+  {%- if block.settings.link_text != blank -%}
+    <span class="installments-banner__separator-{{ block_id }}">&middot;</span>
+    <a href="{{ block.settings.link_url }}" class="installments-banner__link-{{ block_id }}"{%- if block.settings.link_opens_new_tab %} target="_blank" rel="noopener"{% endif -%}>{{ block.settings.link_text }}</a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Installments Banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "richtext",
+      "id": "message",
+      "label": "Mensaje",
+      "default": "<p>Compra a <strong>4 cuotas mensuales de $84.606,77</strong> con tu <strong>Credito SU+ Pay</strong></p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Icono"
+    },
+    {
+      "type": "range",
+      "id": "icon_height",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Altura del icono",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "icon_height_mobile",
+      "min": 10,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Altura del icono mobile",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Link"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Texto del link",
+      "default": "Ver cuotas"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "URL del link"
+    },
+    {
+      "type": "checkbox",
+      "id": "link_opens_new_tab",
+      "label": "Abrir en nueva pestana",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "text",
+      "id": "start_date",
+      "label": "Fecha de inicio",
+      "info": "Formato: YYYY-MM-DD HH:MM"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "Fecha de fin",
+      "info": "Formato: YYYY-MM-DD HH:MM"
+    },
+    {
+      "type": "text",
+      "id": "collection_handles",
+      "label": "Handles de colecciones",
+      "info": "Separados por coma. Vacio = todos."
+    },
+    {
+      "type": "header",
+      "content": "Estilos"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamano de fuente",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamano de fuente mobile",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Color del separador",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Color del link",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Color del link (hover)",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior mobile",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior mobile",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Installments Banner"
+    }
+  ]
+}
+{% endschema %}

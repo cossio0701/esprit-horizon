@@ -41,6 +41,37 @@ class CartItemsComponent extends Component {
   }
 
   /**
+   * Clears the entire cart.
+   * @param {Event} event - The click event.
+   */
+  async onEmptyCart(event) {
+    event.stopPropagation();
+    this.#disableCartItems();
+    const { cartTotal } = this.refs;
+
+    cartTotal?.shimmer();
+
+    try {
+      await fetch(`${Theme.routes.cart_clear_url}`, fetchConfig('json'));
+
+      this.dispatchEvent(
+        new CartUpdateEvent({}, this.sectionId, {
+          itemCount: 0,
+          source: 'cart-items-component',
+          skipOpen: true,
+        })
+      );
+
+      await sectionRenderer.renderSection(this.sectionId, { cache: false });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      resetShimmer(this);
+      this.#enableCartItems();
+    }
+  }
+
+  /**
    * Handles QuantitySelectorUpdateEvent change event.
    * @param {QuantitySelectorUpdateEvent} event - The event.
    */

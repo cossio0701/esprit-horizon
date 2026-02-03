@@ -71,6 +71,38 @@
       padding-block-start: var(--zoom-out-padding-block-start, 0);
       padding-block-end: var(--zoom-out-padding-block-end, 0);
     }
+
+    /* Vista 3 columnas */
+    .product-grid--{{ section.id }}[product-grid-view='3-columns'] {
+      --product-grid-columns-desktop: repeat(3, 1fr);
+    }
+
+    .product-grid--{{ section.id }}[product-grid-view='3-columns'] .product-grid__item {
+      padding-block: 0;
+    }
+
+    /* Vista editorial desktop: patrón 2-4-2-4 (6 productos por ciclo) */
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] {
+      --product-grid-columns-desktop: repeat(4, 1fr);
+    }
+
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item {
+      padding-block: 0;
+    }
+
+    /* Fila 1: productos 1 y 2 ocupan 2 columnas cada uno */
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 1),
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 2) {
+      grid-column: span 2;
+    }
+
+    /* Fila 2: productos 3, 4, 5, 6 ocupan 1 columna cada uno */
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 3),
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 4),
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 5),
+    .product-grid--{{ section.id }}[product-grid-view='editorial'] .product-grid__item:nth-child(6n + 6) {
+      grid-column: span 1;
+    }
   }
 {% endstyle %}
 
@@ -165,7 +197,7 @@
 {% endunless %}
 
 {% stylesheet %}
-  .product-grid {
+  \n .product-grid {
     --product-grid-gap: var(--product-grid-gap-mobile);
     --mobile-columns: 2; /* Default value */
 
@@ -173,6 +205,75 @@
 
     @media screen and (min-width: 750px) {
       --product-grid-gap: var(--product-grid-gap-desktop);
+    }
+  }
+
+  /* Configuración de espaciado para nuevas vistas */
+  [product-grid-view='3-columns'],
+  [product-grid-view='editorial'] {
+    --product-grid-gap: 16px;
+    --padding-block-start: 24px;
+    --padding-block-end: 24px;
+    --padding-inline-start: 0px;
+    --padding-inline-end: 0px;
+  }
+
+  [product-grid-view='3-columns'] .product-grid__item,
+  [product-grid-view='editorial'] .product-grid__item {
+    padding-block: 0;
+  }
+
+  [product-grid-view='mobile-single'],
+  [product-grid-view='mobile-editorial'] {
+    @media screen and (max-width: 749px) {
+      --product-grid-gap: 16px;
+      --padding-block-start: 24px;
+      --padding-block-end: 24px;
+      --padding-inline-start: 0px;
+      --padding-inline-end: 0px;
+    }
+  }
+
+  [product-grid-view='mobile-single'] .product-grid__item,
+  [product-grid-view='mobile-editorial'] .product-grid__item {
+    @media screen and (max-width: 749px) {
+      padding-block: 0;
+    }
+  }
+
+  /* Vista editorial mobile: patrón 2-2-1 (5 productos por ciclo) */
+  .product-grid[product-grid-view='mobile-editorial'] {
+    @media screen and (max-width: 749px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item {
+    @media screen and (max-width: 749px) {
+      padding-block: 0;
+    }
+  }
+
+  /* Primeros 2 productos: 1 columna cada uno */
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item:nth-child(5n + 1),
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item:nth-child(5n + 2) {
+    @media screen and (max-width: 749px) {
+      grid-column: span 1;
+    }
+  }
+
+  /* Siguientes 2 productos: 1 columna cada uno */
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item:nth-child(5n + 3),
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item:nth-child(5n + 4) {
+    @media screen and (max-width: 749px) {
+      grid-column: span 1;
+    }
+  }
+
+  /* Quinto producto: 2 columnas (full width) */
+  .product-grid[product-grid-view='mobile-editorial'] .product-grid__item:nth-child(5n + 5) {
+    @media screen and (max-width: 749px) {
+      grid-column: span 2;
     }
   }
 

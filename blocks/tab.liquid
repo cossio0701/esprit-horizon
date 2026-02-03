@@ -1,0 +1,79 @@
+{% comment %}
+  Archivo: blocks/tab.liquid
+  Descripción: Bloque individual de pestaña que admite contenido anidado.
+  Usa el patrón de <template> para enviar su botón a la sección padre.
+{% endcomment %}
+
+{%- liquid
+  # --- Variables de Fachada ---
+  assign block_id = block.id
+  assign title = block.settings.title | escape
+  assign category_slug = block.settings.category
+  assign shopify_attributes = block.shopify_attributes
+
+  # Calculated variables
+  assign tab_content_id = 'tab-content-' | append: block_id
+-%}
+
+<div class="tab-block-instance" id="block-{{ block_id }}" {{ shopify_attributes }}>
+  <template class="js-tab-portal-source">
+    <button
+      id="{{ category_slug }}"
+      type="button"
+      class="tab-sidebar__button"
+      role="tab"
+      aria-selected="false"
+      data-target-id="{{ tab_content_id }}"
+    >
+      {{ title }}
+    </button>
+  </template>
+
+  <div
+    id="{{ tab_content_id }}"
+    class="tab-content__pane"
+    role="tabpanel"
+    style="display: none;"
+  >
+    <div class="tab-content__inner-wrapper">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Pestaña (Contenedor)",
+  "class": "tab-block",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título de la Pestaña",
+      "default": "Nueva Pestaña"
+    },
+    {
+      "type": "text",
+      "id": "category",
+      "label": "Categoría",
+      "default": "category",
+      "info": "Slug de la categoría. Para identificación de la pestaña. Formato: 'slug-de-categoria'"
+    },
+    {
+      "type": "header",
+      "content": "Contenido Anidado"
+    },
+    {
+      "type": "paragraph",
+      "content": "Agrega bloques de tema (texto, imagen, etc.) dentro de esta pestaña."
+    }
+  ],
+  /* Esto permite que este bloque acepte otros bloques dentro */
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "presets": [
+    {
+      "name": "Pestaña (Contenedor)"
+    }
+  ]
+}
+{% endschema %}

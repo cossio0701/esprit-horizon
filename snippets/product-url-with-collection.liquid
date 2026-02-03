@@ -1,0 +1,58 @@
+{%- comment -%}
+  Snippet: product-url-with-collection
+
+  Genera la URL del producto con el parámetro de colección para preservar
+  el contexto de navegación en el breadcrumb.
+
+  Uso:
+  {% render 'product-url-with-collection', product: product, collection: collection %}
+
+  Parámetros:
+  - product: (requerido) El objeto product
+  - collection: (opcional) La colección actual
+  - variant: (opcional) Variante específica
+  - append_params: (opcional) Parámetros adicionales a añadir
+
+  Retorna: URL del producto con ?collection=handle si aplica
+{%- endcomment -%}
+
+{%- liquid
+  # Determinar la URL base del producto
+  if variant != blank
+    assign base_url = variant.url
+  else
+    assign base_url = product.url
+  endif
+
+  # Determinar si debemos añadir colección
+  assign should_add_collection = false
+  assign collection_handle = ''
+
+  # Prioridad: colección pasada > colección global > ninguna
+  if collection != blank and collection.handle != 'all'
+    assign should_add_collection = true
+    assign collection_handle = collection.handle
+  endif
+
+  # Construir URL final
+  if should_add_collection
+    # Verificar si la URL ya tiene parámetros
+    if base_url contains '?'
+      assign final_url = base_url | append: '&collection=' | append: collection_handle
+    else
+      assign final_url = base_url | append: '?collection=' | append: collection_handle
+    endif
+  else
+    assign final_url = base_url
+  endif
+
+  # Añadir parámetros adicionales si existen
+  if append_params != blank
+    if final_url contains '?'
+      assign final_url = final_url | append: '&' | append: append_params
+    else
+      assign final_url = final_url | append: '?' | append: append_params
+    endif
+  endif
+-%}
+{{- final_url -}}

@@ -1,0 +1,74 @@
+{%- liquid
+  assign composition = product.metafields.custom.composition.value
+-%}
+
+{% if composition != blank %}
+  <div class="pdl">
+    {% for item in composition %}
+      <div class="pdl__row pdl__row--{{ item.key | handleize }}">
+        <span class="pdl__label">{{ item.label }}</span>
+        <span class="pdl__value">{{ item.value }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    .pdl {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pdl__row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee6db;
+    }
+
+    .pdl__row:last-child {
+      border-bottom: 0;
+    }
+
+    .pdl__label {
+      font-size: 13px;
+      font-weight: 400;
+      color: #2b2b2b;
+    }
+
+    .pdl__value {
+      font-size: 13px;
+      font-weight: 400;
+      color: #2b2b2b;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 749px) {
+      .pdl__row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .pdl__value {
+        text-align: left;
+        white-space: normal;
+      }
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product Composition",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product Composition"
+    }
+  ]
+}
+{% endschema %}

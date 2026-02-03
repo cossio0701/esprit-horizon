@@ -12,7 +12,11 @@
     {% render 'account-drawer' %}
   {% endif %}
 
-  {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+  {% liquid
+    assign cart_type = section.settings.cart_type | default: settings.cart_type
+  %}
+
+  {% if cart_type == 'drawer' and template.name != 'cart' %}
     {% render 'cart-drawer' %}
   {% else %}
     <a
@@ -88,12 +92,6 @@
     margin-bottom: var(--margin-md);
   }
 
-  .cart-drawer__items .cart-items__table-row {
-    padding-bottom: var(--gap-xl);
-    border-bottom: var(--style-border-width) solid var(--color-border);
-    margin-bottom: var(--gap-xl);
-  }
-
   .cart-drawer__items .cart-items__table-row:has(+ .cart-items__nested-line) {
     border-bottom: none;
     margin-bottom: 0;
@@ -109,7 +107,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-2xl);
+    gap: var(--gap-xs);
     padding: var(--cart-drawer-summary-padding);
     margin-top: auto;
     background-color: var(--color-background);
@@ -149,9 +147,9 @@
   }
 
   .cart-drawer__items .cart-items__table-row {
-    padding-bottom: var(--gap-xl);
+    padding-bottom: var(--gap-lg);
     border-bottom: var(--style-border-width) solid var(--color-border);
-    margin-bottom: var(--gap-xl);
+    margin-bottom: var(--gap-lg);
   }
 
   .cart-drawer__items .cart-items__table-row:last-child {
@@ -174,8 +172,8 @@
   }
 
   .cart-drawer--empty .cart-drawer__header {
-    justify-content: right;
-    border-bottom: none;
+    justify-content: space-between;
+    border-bottom: 1px solid #e6e6e6ff;
     padding-bottom: 0;
   }
 
@@ -240,16 +238,6 @@
   .cart-drawer__heading .cart-bubble__text {
     font-family: var(--font-paragraph--family);
     font-weight: var(--font-paragraph--weight);
-  }
-
-  .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Create donut mask where the cart bubble sits */
-    mask: radial-gradient(
-      calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
-      transparent 45.45%,
-      #fff 45.45%,
-      #fff 100%
-    );
   }
 
   .cart-drawer__heading .cart-bubble__background {

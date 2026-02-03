@@ -1,0 +1,270 @@
+{% doc %}
+  @prompt
+    Necesito generar un bloque donde pueda declarar muchos bloques progamables por fecha y en donde necesito poder usar rich text y adicional necesito al final poder agregar un svg, porque el texto en general seria "descuento hoy pagando con tu credito (SVG), ver cuotas (esto es un link)"
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-scheduled-promo-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-scheduled-promo__content-{{ ai_gen_id }} {
+    padding: 0px;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .ai-scheduled-promo__text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.4;
+  }
+
+  .ai-scheduled-promo__text-{{ ai_gen_id }} p {
+    margin: 0;
+    display: inline;
+  }
+
+  .ai-scheduled-promo__svg-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  .ai-scheduled-promo__svg-{{ ai_gen_id }} svg {
+    width: {{ block.settings.svg_size }}px;
+    height: auto;
+    fill: {{ block.settings.svg_color }};
+  }
+
+  .ai-scheduled-promo__link-{{ ai_gen_id }} {
+    color: {{ block.settings.link_color }};
+    text-decoration: underline;
+    font-size: {{ block.settings.text_size }}px;
+  }
+
+  .ai-scheduled-promo__link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+  }
+
+  .ai-scheduled-promo--hidden-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-scheduled-promo__content-{{ ai_gen_id }} {
+      padding: 12px 16px;
+    }
+
+    .ai-scheduled-promo__text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.9 }}px;
+    }
+
+    .ai-scheduled-promo__link-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<scheduled-promo-{{ ai_gen_id }}
+  class="ai-scheduled-promo-{{ ai_gen_id }}"
+  data-start-date="{{ block.settings.start_date }}"
+  data-end-date="{{ block.settings.end_date }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-scheduled-promo__content-{{ ai_gen_id }}">
+    {% if block.settings.promo_text != blank %}
+      <div class="ai-scheduled-promo__text-{{ ai_gen_id }}">
+        {{ block.settings.promo_text }}
+      </div>
+    {% endif %}
+
+    {% if block.settings.svg_code != blank %}
+      <div class="ai-scheduled-promo__svg-{{ ai_gen_id }}">
+        {{ block.settings.svg_code }}
+      </div>
+    {% endif %}
+
+    {% if block.settings.link_text != blank and block.settings.link_url != blank %}
+      <a
+        href="{{ block.settings.link_url }}"
+        class="ai-scheduled-promo__link-{{ ai_gen_id }}"
+      >
+        {{ block.settings.link_text }}
+      </a>
+    {% endif %}
+  </div>
+</scheduled-promo-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ScheduledPromo{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.checkSchedule();
+      }
+
+      checkSchedule() {
+        const startDate = this.dataset.startDate;
+        const endDate = this.dataset.endDate;
+
+        if (!startDate || !endDate) {
+          return;
+        }
+
+        const now = new Date();
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (now < start || now > end) {
+          this.classList.add('ai-scheduled-promo--hidden-{{ ai_gen_id }}');
+        } else {
+          this.classList.remove('ai-scheduled-promo--hidden-{{ ai_gen_id }}');
+        }
+      }
+    }
+
+    customElements.define('scheduled-promo-{{ ai_gen_id }}', ScheduledPromo{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Promoción programada",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Programación"
+    },
+    {
+      "type": "text",
+      "id": "start_date",
+      "label": "Fecha de inicio",
+      "info": "Formato: YYYY-MM-DD (ejemplo: 2025-01-01)"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "Fecha de fin",
+      "info": "Formato: YYYY-MM-DD (ejemplo: 2025-12-31)"
+    },
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "richtext",
+      "id": "promo_text",
+      "label": "Texto de promoción",
+      "default": "<p>Descuento hoy pagando con tu crédito</p>"
+    },
+    {
+      "type": "html",
+      "id": "svg_code",
+      "label": "Código SVG",
+      "info": "Pega aquí el código SVG completo"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Texto del enlace",
+      "default": "Ver cuotas"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "URL del enlace"
+    },
+    {
+      "type": "header",
+      "content": "Estilo"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de fondo",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "svg_color",
+      "label": "Color del SVG",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "svg_size",
+      "min": 12,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño del SVG",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Color del enlace",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Color del enlace al pasar el cursor",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Radio del borde",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Ancho en escritorio",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promoción programada"
+    }
+  ]
+}
+{% endschema %}

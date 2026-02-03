@@ -1,4 +1,4 @@
-export {};
+export { };
 
 declare global {
   interface Shopify {
@@ -24,6 +24,7 @@ declare global {
     routes: {
       cart_add_url: string;
       cart_change_url: string;
+      cart_clear_url: string;
       cart_update_url: string;
       cart_url: string;
       predictive_search_url: string;
@@ -57,7 +58,7 @@ declare global {
 
   // Refer to https://github.com/Shopify/model-viewer-ui/blob/main/src/js/model-viewer-ui.js
   interface ModelViewer {
-    new (
+    new(
       element: Element,
       options?: {
         focusOnPlay?: boolean;

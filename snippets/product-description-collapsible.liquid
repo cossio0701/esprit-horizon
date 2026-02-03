@@ -1,0 +1,182 @@
+{%- doc -%}
+  Product Description Collapsible Component
+  Sistema de colapso "Ver más / Ver menos" para descripciones de producto.
+{%- enddoc -%}
+
+{%- liquid
+  assign c_height = collapsed_height | default: 50
+  assign more_text = show_more_text | default: 'Ver más'
+  assign less_text = show_less_text | default: 'Ver menos'
+  assign unique_id = block_id | default: section.id | append: '-' | append: 'now' | date: '%N'
+
+  # Manejar enable_fade - si es nil, default a true
+  if enable_fade == nil
+    assign show_fade = true
+  else
+    assign show_fade = enable_fade
+  endif
+-%}
+
+<style>
+  .description-collapsible-{{ unique_id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-content {
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-inner > *:first-child {
+    margin-block-start: 0;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-inner > *:last-child {
+    margin-block-end: 0;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-fade {
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent 0%, var(--color-background, #fff) 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .description-collapsible-{{ unique_id }}.is-collapsed.has-fade .dc-fade {
+    opacity: 1;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-toggle {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-block-start: 8px;
+    padding: 4px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground, currentColor);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .description-collapsible-{{ unique_id }}.needs-collapse .dc-toggle {
+    display: inline-flex;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-toggle:hover {
+    opacity: 0.7;
+  }
+
+  .description-collapsible-{{ unique_id }} .dc-icon {
+    transition: transform 0.25s ease;
+  }
+
+  .description-collapsible-{{ unique_id }}.is-expanded .dc-icon {
+    transform: rotate(180deg);
+  }
+</style>
+
+<div
+  class="description-collapsible-{{ unique_id }}{% if show_fade %} has-fade{% endif %}"
+  id="dc-{{ unique_id }}"
+  data-collapsed-height="{{ c_height }}"
+>
+  <div class="dc-content">
+    <div class="dc-inner">
+      {{ content }}
+    </div>
+  </div>
+
+  <div class="dc-fade"></div>
+
+  <button type="button" class="dc-toggle" aria-expanded="false">
+    <span class="dc-toggle-text">{{ more_text }}</span>
+    <svg class="dc-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  (function() {
+    var containerId = 'dc-{{ unique_id }}';
+    var showMoreText = {{ more_text | json }};
+    var showLessText = {{ less_text | json }};
+
+    function initCollapsible() {
+      var container = document.getElementById(containerId);
+      if (!container) return;
+
+      var content = container.querySelector('.dc-content');
+      var inner = container.querySelector('.dc-inner');
+      var toggle = container.querySelector('.dc-toggle');
+      var toggleText = container.querySelector('.dc-toggle-text');
+
+      if (!content || !inner || !toggle || !toggleText) return;
+
+      // Leer altura desde data attribute (configurable desde customizer)
+      var collapsedHeight = parseInt(container.dataset.collapsedHeight, 10) || 50;
+      var isExpanded = false;
+
+      function checkOverflow() {
+        var naturalHeight = inner.scrollHeight;
+        var needsCollapse = naturalHeight > (collapsedHeight + 10);
+
+        if (needsCollapse) {
+          container.classList.add('needs-collapse');
+          if (!isExpanded) {
+            content.style.maxHeight = collapsedHeight + 'px';
+            container.classList.add('is-collapsed');
+            container.classList.remove('is-expanded');
+          }
+        } else {
+          container.classList.remove('needs-collapse', 'is-collapsed');
+          content.style.maxHeight = '';
+        }
+      }
+
+      function toggleContent() {
+        if (isExpanded) {
+          isExpanded = false;
+          content.style.maxHeight = collapsedHeight + 'px';
+          container.classList.add('is-collapsed');
+          container.classList.remove('is-expanded');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggleText.textContent = showMoreText;
+        } else {
+          isExpanded = true;
+          content.style.maxHeight = inner.scrollHeight + 'px';
+          container.classList.remove('is-collapsed');
+          container.classList.add('is-expanded');
+          toggle.setAttribute('aria-expanded', 'true');
+          toggleText.textContent = showLessText;
+        }
+      }
+
+      toggle.addEventListener('click', toggleContent);
+      checkOverflow();
+
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(checkOverflow, 150);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCollapsible);
+    } else {
+      setTimeout(initCollapsible, 50);
+    }
+  })();
+</script>

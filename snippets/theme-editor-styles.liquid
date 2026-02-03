@@ -1,0 +1,19 @@
+{%- liquid
+  assign styles = ''
+
+  assign styles = styles | append: 'padding:' | append: block.settings.padding_top | append: 'px ' | append: block.settings.padding_right | append: 'px ' | append: block.settings.padding_bottom | append: 'px ' | append: block.settings.padding_left | append: 'px;'
+
+  assign styles = styles | append: '--direction-desktop:' | append: block.settings.desktop_direction | append: ';'
+  assign styles = styles | append: '--direction-mobile:' | append: block.settings.mobile_direction | append: ';'
+  assign styles = styles | append: 'gap:' | append: block.settings.gap | append: 'px;'
+
+  if block.settings.border != 'none'
+    assign styles = styles | append: 'border:' | append: block.settings.border_width | append: 'px ' | append: block.settings.border | append: ' ' | append: block.settings.border_color | append: ';'
+    assign styles = styles | append: 'border-radius:' | append: block.settings.border_radius | append: 'px;'
+  endif
+
+  # CSS Custom de un textarea con ID custom_css
+  assign styles = styles | append: block.settings.custom_css
+-%}
+
+{{ styles }}
