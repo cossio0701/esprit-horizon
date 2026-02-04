@@ -435,7 +435,11 @@
         "product_gallery_pdp_gJaXqW": {
           "type": "_product-gallery-pdp",
           "name": "Galería de Variantes Personalizada",
-          "settings": {},
+          "settings": {
+            "mobile_gallery_style": "dots",
+            "show_zoom_desktop": false,
+            "show_zoom_mobile": true
+          },
           "blocks": {}
         }
       },
