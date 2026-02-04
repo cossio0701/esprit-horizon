@@ -196,49 +196,23 @@
         The calculation depends on the size of S-1 (over or under the cutoff)
       endcomment
       for font_size in font_sizes
-        assign size_setting = 'type_size_[font_size]' | replace: '[font_size]', font_size
-        assign font_size_value = settings[size_setting] | times: 1
-        assign font_size_string = '[font_size_value]' | replace: '[font_size_value]', font_size_value
-        assign index = font_size_values | find_index: font_size_string
+        assign size_setting = 'type_size_' | append: font_size
+        assign size_mobile_setting = size_setting | append: '_mobile'
 
-        if font_size_value >= fluid_size_cutoff
+        assign desktop_size = settings[size_setting] | times: 1
+        assign mobile_size = settings[size_mobile_setting] | default: desktop_size | times: 1
 
-          comment
-            Calculate the minimum size for each font size
-          endcomment
-          assign fluid_font_size_min = font_size_value
+        comment
+          Calculate the fluid and maximum size for each font size
+        endcomment
+        assign fluid_size_min_rem = mobile_size | divided_by: 16.0
+        assign fluid_size = desktop_size | times: 0.1
+        assign fluid_size_max_rem = desktop_size | divided_by: 16.0
 
-          if index == 0
-            assign fluid_font_size_min = absolute_font_size_min
-          else
-            assign next_font_size_index = index | minus: 1
-            assign next_font_size_value = font_size_values[next_font_size_index]
-            assign next_font_size_value_number = next_font_size_value | times: 1
-
-            comment
-              If the next bigger font size under the fluid cutoff, we use keep a 4px buffer
-            endcomment
-            if next_font_size_value_number < fluid_size_cutoff
-              assign fluid_font_size_min = next_font_size_value_number | plus: 4
-              if font_size_value < fluid_font_size_min
-                assign fluid_font_size_min = font_size_value
-              endif
-            else
-              assign fluid_font_size_min = next_font_size_value | times: 1
-            endif
-          endif
-
-          comment
-            Calculate the fluid and maximum size for each font size
-          endcomment
-          assign fluid_size_min_rem = fluid_font_size_min | divided_by: 16.0
-          assign fluid_size = font_size_value | times: 0.1
-          assign fluid_size_max_rem = font_size_value | divided_by: 16.0
-
+        if desktop_size > mobile_size
           echo '--font-size--[font_size]: clamp([fluid_size_min_rem]rem, [fluid_size]vw, [fluid_size_max_rem]rem);' | replace: '[font_size]', font_size | replace: '[fluid_size_min_rem]', fluid_size_min_rem | replace: '[fluid_size]', fluid_size | replace: '[fluid_size_max_rem]', fluid_size_max_rem
         else
-          assign fluid_size_rem = font_size_value | divided_by: 16.0
-          echo '--font-size--[font_size]: [fluid_size_rem]rem;' | replace: '[font_size]', font_size | replace: '[fluid_size_rem]', fluid_size_rem
+          echo '--font-size--[font_size]: [fluid_size_max_rem]rem;' | replace: '[font_size]', font_size | replace: '[fluid_size_max_rem]', fluid_size_max_rem
         endif
       endfor
 
