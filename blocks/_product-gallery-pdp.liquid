@@ -38,11 +38,24 @@
                 <div class="swiper-wrapper">
                   {% for image in color_gallery %}
                     <div class="swiper-slide">
-                      <img
-                        src="{{ image | image_url: width: 1200 }}"
-                        alt="{{ product.title }} - {{ color }}"
-                        loading="lazy"
-                      >
+                      <div class="swiper-zoom-container">
+                        <img
+                          src="{{ image | image_url: width: 1500 }}"
+                          alt="{{ product.title }} - {{ color }}"
+                          loading="lazy"
+                        >
+                      </div>
+                      {%- if block.settings.show_zoom_desktop or block.settings.show_zoom_mobile -%}
+                        <button
+                          type="button"
+                          class="gallery-zoom-button"
+                          onclick="toggleZoom(this)"
+                          aria-label="{{ 'actions.zoom' | t }}"
+                        >
+                          <span class="zoom-icon-in">{{ 'icon-zoom-in.svg' | inline_asset_content }}</span>
+                          <span class="zoom-icon-out">{{ 'icon-zoom-out.svg' | inline_asset_content }}</span>
+                        </button>
+                      {%- endif -%}
                     </div>
                   {% endfor %}
                 </div>
@@ -76,11 +89,24 @@
                   {% for media in product.media %}
                     {% if media.media_type == 'image' %}
                       <div class="swiper-slide">
-                        <img
-                          src="{{ media | image_url: width: 1200 }}"
-                          alt="{{ product.title }}"
-                          loading="lazy"
-                        >
+                        <div class="swiper-zoom-container">
+                          <img
+                            src="{{ media | image_url: width: 1500 }}"
+                            alt="{{ product.title }}"
+                            loading="lazy"
+                          >
+                        </div>
+                        {%- if block.settings.show_zoom_desktop or block.settings.show_zoom_mobile -%}
+                          <button
+                            type="button"
+                            class="gallery-zoom-button"
+                            onclick="toggleZoom(this)"
+                            aria-label="{{ 'actions.zoom' | t }}"
+                          >
+                            <span class="zoom-icon-in">{{ 'icon-zoom-in.svg' | inline_asset_content }}</span>
+                            <span class="zoom-icon-out">{{ 'icon-zoom-out.svg' | inline_asset_content }}</span>
+                          </button>
+                        {%- endif -%}
                       </div>
                     {% endif %}
                   {% endfor %}
@@ -141,6 +167,23 @@
       skuEl.textContent = variant.sku || 'Sin SKU';
     }
   });
+
+  function toggleZoom(btn) {
+    if (!activeSwiper) return;
+    if (activeSwiper.zoom.enabled) {
+      if (activeSwiper.zoom.scale > 1) {
+        activeSwiper.zoom.out();
+      } else {
+        activeSwiper.zoom.in();
+      }
+    }
+  }
+
+  function updateZoomButtons(isZoomed) {
+    document.querySelectorAll('.gallery-zoom-button').forEach((btn) => {
+      btn.classList.toggle('is-zoomed', isZoomed);
+    });
+  }
 </script>
 
 <script>
@@ -197,9 +240,14 @@
       loop: false,
       speed: 600,
       initialSlide: startIndex,
+      zoom: {
+        maxRatio: 3,
+        minRatio: 1,
+        toggle: true,
+      },
       on: {
         init(swiper) {
-          setTimeout(() => updateIndicator(swiper), 100); // Wait for bullets to render
+          setTimeout(() => updateIndicator(swiper), 100);
         },
         progress(swiper) {
           updateIndicator(swiper);
@@ -212,6 +260,14 @@
           thumbs.forEach((t) => t.classList.remove('is-active'));
           const active = thumbs[swiper.activeIndex];
           if (active) active.classList.add('is-active');
+          // Reset zoom on slide change for consistency
+          if (swiper.zoom && swiper.zoom.enabled) {
+            swiper.zoom.out();
+            updateZoomButtons(false);
+          }
+        },
+        zoomChange(swiper, scale, imageEl, slideEl) {
+          updateZoomButtons(scale > 1);
         },
       },
       pagination: {
@@ -394,6 +450,55 @@
       display: none !important;
     }
   }
+
+  .gallery-zoom-button {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 20;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    transition: transform 0.2s ease;
+  }
+
+  .gallery-zoom-button:hover {
+    transform: scale(1.1);
+  }
+
+  .gallery-zoom-button svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  .gallery-zoom-button .zoom-icon-out {
+    display: none;
+  }
+
+  .gallery-zoom-button.is-zoomed .zoom-icon-in {
+    display: none;
+  }
+
+  .gallery-zoom-button.is-zoomed .zoom-icon-out {
+    display: block;
+  }
+
+  {% if block.settings.show_zoom_mobile %}
+    @media (max-width: 768px) {
+      .gallery-zoom-button {
+        display: flex;
+      }
+    }
+  {% endif %}
 </style>
 
 {% schema %}
@@ -421,6 +526,22 @@
         }
       ],
       "default": "thumbs"
+    },
+    {
+      "type": "header",
+      "content": "Ajustes de Zoom"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_zoom_desktop",
+      "label": "Mostrar botón de zoom en escritorio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_zoom_mobile",
+      "label": "Mostrar botón de zoom en móvil",
+      "default": false
     }
   ],
   "presets": [
