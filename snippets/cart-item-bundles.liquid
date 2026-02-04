@@ -1,0 +1,18 @@
+{%- doc -%}
+  Renders bundle components for a cart line item.
+
+  @param {object} item - The cart line item
+{%- enddoc -%}
+
+{%- if item.item_components.size != 0 -%}
+  <ul class="cart-items__bundle list-unstyled">
+    {%- for component in item.item_components -%}
+      <li>
+        {{- component.title -}}
+        {%- if component.quantity > 1 -%}
+          <span> × {{ component.quantity }}</span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

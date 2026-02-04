@@ -2599,14 +2599,14 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6)>*:not(.tax-note) {
   line-height: normal;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary-button-text);
+  color: rgb(var(--color-foreground-rgb));
   padding-inline: var(--cart-padding);
 }
 
 .cart-bubble__background {
   position: absolute;
   inset: 0;
-  background-color: var(--color-primary-button-background);
+  background-color: rgb(220, 220, 220);
   border-radius: var(--style-border-radius-lg);
 }
 
@@ -2629,7 +2629,7 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6)>*:not(.tax-note) {
   color: var(--color-input-text);
   background-color: var(--color-input-background);
   border: var(--style-border-width-inputs) solid var(--color-input-border);
-  border-radius: var(--style-border-radius-inputs);
+  border-radius: 0;
   flex: 1 1 var(--quantity-selector-width);
   align-self: stretch;
   transition: background-color var(--animation-speed) var(--animation-easing);
@@ -4340,6 +4340,7 @@ slideshow-slide.hidden {
 
 /* 4. Asegurar 4 columnas matemáticas */
 @media (min-width: 1025px) {
+
   /* 1. Reset del sistema de gutters */
   .ui-test-product-list .resource-list__carousel {
     --column-count: 4;
