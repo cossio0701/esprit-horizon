@@ -391,7 +391,7 @@ class ScrollHint extends HTMLElement {
         to ${scrollDirection === 'vertical' ? 'bottom' : 'right'},
         transparent ${scrollPercentage > 0 ? 1 : 0}%,
         black ${scrollPercentage < 0.1 ? scrollPercentage * 100 : 10}%,
-        black ${scrollPercentage > 0.9 ? scrollPercentage * 100 : 90}%,
+        black 98%,
         transparent 100%
       )`;
   };

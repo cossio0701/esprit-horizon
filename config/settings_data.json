@@ -61,7 +61,7 @@
     "cart_type": "page",
     "cart_price_font": "secondary",
     "show_cart_note": false,
-    "show_add_discount_code": false,
+    "show_add_discount_code": true,
     "drawer_drop_shadow": true,
     "icon_stroke": "default",
     "input_border_width": 1,
