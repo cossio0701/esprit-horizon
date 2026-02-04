@@ -309,9 +309,9 @@
               "type": "text",
               "name": "Product description",
               "settings": {
-                "text": "<p>{{ closest.product.description }}</p>",
-                "enable_collapse": false,
-                "collapsed_height": 50,
+                "text": "{{ closest.product.description }}",
+                "enable_collapse": true,
+                "collapsed_height": 80,
                 "show_more_text": "Ver más",
                 "show_less_text": "Ver menos",
                 "enable_fade": true,
