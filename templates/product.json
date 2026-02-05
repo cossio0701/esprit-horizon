@@ -151,7 +151,7 @@
                   "type": "product_reference",
                   "name": "Product reference",
                   "settings": {
-                    "font_size": 14,
+                    "font_size": 12,
                     "text_color": "#c6c6c6",
                     "font_weight": "400"
                   },
@@ -163,7 +163,7 @@
                     "show_sale_price_first": true,
                     "show_installments": false,
                     "show_tax_info": false,
-                    "type_preset": "custom",
+                    "type_preset": "h4",
                     "width": "100%",
                     "alignment": "left",
                     "font": "var(--font-body--family)",
@@ -315,7 +315,7 @@
                 "show_more_text": "Ver más",
                 "show_less_text": "Ver menos",
                 "enable_fade": true,
-                "width": "100%",
+                "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
                 "type_preset": "rte",
