@@ -1,0 +1,219 @@
+{%- liquid
+  assign s = block.settings
+  assign legales_data = shop.metafields.custom.legales_promociones.value
+  assign records_list = legales_data[0].records
+
+  assign years_found = ''
+  assign years_delimiter = '|||'
+
+  for record in records_list
+    assign record_date_ranges = record.date_ranges
+
+    capture visibility_check
+      render 'date-visibility', date_ranges: record_date_ranges
+    endcapture
+    assign is_valid = visibility_check | strip
+
+    if is_valid == 'true'
+      assign first_range = record_date_ranges | first
+      assign start_date = first_range.start_date
+      assign record_year = start_date | date: '%Y'
+
+      unless years_found contains record_year
+        if years_found == ''
+          assign years_found = record_year
+        else
+          assign years_found = years_found | append: years_delimiter | append: record_year
+        endif
+      endunless
+    endif
+  endfor
+
+  assign years_array = years_found | split: years_delimiter | sort | reverse
+-%}
+
+{%- if years_array.size > 0 -%}
+  <div
+    class="legales-promociones"
+    style="
+      --lp-title-color: {{ s.title_color }};
+      --lp-title-font-size: {{ s.title_font_size }}px;
+      --lp-title-font-weight: {{ s.title_font_weight }};
+      --lp-content-color: {{ s.content_color }};
+      --lp-content-font-size: {{ s.content_font_size }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    {%- for year in years_array -%}
+      {%- capture year_content -%}
+        {%- for record in records_list -%}
+          {%- liquid
+            assign record_date_ranges = record.date_ranges
+
+            capture visibility_check
+              render 'date-visibility', date_ranges: record_date_ranges
+            endcapture
+            assign is_valid = visibility_check | strip
+
+            if is_valid == 'true'
+              assign first_range = record_date_ranges | first
+              assign start_date = first_range.start_date
+              assign record_year = start_date | date: '%Y'
+            endif
+          -%}
+
+          {%- if is_valid == 'true' and record_year == year -%}
+            <accordion-custom>
+              <details class="details legales-promociones__item">
+                <summary class="details__header legales-promociones__item-title">
+                  {{ record.title }}
+                  <span class="svg-wrapper icon-plus">
+                    {{- 'icon-plus.svg' | inline_asset_content -}}
+                  </span>
+                </summary>
+                <div class="details-content legales-promociones__item-content">
+                  {{ record.content }}
+                </div>
+              </details>
+            </accordion-custom>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- if year_content != blank -%}
+        <accordion-custom>
+          <details class="details legales-promociones__year">
+            <summary class="details__header legales-promociones__year-title">
+              {{ year }}
+              <span class="svg-wrapper icon-plus">
+                {{- 'icon-plus.svg' | inline_asset_content -}}
+              </span>
+            </summary>
+            <div class="details-content legales-promociones__year-content">
+              {{ year_content }}
+            </div>
+          </details>
+        </accordion-custom>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .legales-promociones {
+    width: 100%;
+  }
+
+  .legales-promociones__year {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .legales-promociones .details__header {
+    padding-block: 14px !important;
+    min-height: auto !important;
+  }
+
+  .legales-promociones__year-title {
+    padding: 0.75rem 0;
+    color: var(--lp-title-color);
+    font-size: var(--lp-title-font-size);
+    font-weight: var(--lp-title-font-weight);
+  }
+
+  .legales-promociones__year-content {
+    padding: 0;
+  }
+
+  .legales-promociones__item {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .legales-promociones__item-title {
+    padding: 0.625rem 0 0.625rem 1rem;
+    color: var(--lp-title-color);
+    font-size: var(--lp-content-font-size);
+    font-weight: var(--lp-title-font-weight);
+  }
+
+  .legales-promociones__item-content {
+    padding: 0 0 0.75rem 1rem;
+    color: var(--lp-content-color);
+    font-size: var(--lp-content-font-size);
+    line-height: 1.6;
+  }
+
+  .legales-promociones .icon-plus {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Legales Promociones",
+  "tag": "div",
+  "class": "legales-promociones-block",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Títulos (Año y Legal)"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color de títulos",
+      "default": "#0f0a05"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Tamaño de fuente (Año)",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Peso de fuente",
+      "options": [
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Regular (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "Contenido (Legales)"
+    },
+    {
+      "type": "color",
+      "id": "content_color",
+      "label": "Color de contenido",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "content_font_size",
+      "label": "Tamaño de fuente",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    }
+  ],
+  "presets": [
+    {
+      "name": "Legales Promociones",
+      "category": "Contenido"
+    }
+  ]
+}
+{% endschema %}
