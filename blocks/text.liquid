@@ -214,79 +214,49 @@
     },
     {
       "type": "select",
-      "id": "font_size",
-      "label": "t:settings.size",
+      "id": "font_size_unit",
+      "label": "t:settings.unit",
       "options": [
         {
-          "value": "",
-          "label": "t:options.default"
+          "value": "px",
+          "label": "px"
         },
         {
-          "value": "0.625rem",
-          "label": "10px"
+          "value": "rem",
+          "label": "rem"
         },
         {
-          "value": "0.75rem",
-          "label": "12px"
+          "value": "em",
+          "label": "em"
         },
         {
-          "value": "0.875rem",
-          "label": "14px"
+          "value": "vh",
+          "label": "vh"
         },
         {
-          "value": "1rem",
-          "label": "16px"
+          "value": "vw",
+          "label": "vw"
         },
         {
-          "value": "1.125rem",
-          "label": "18px"
-        },
-        {
-          "value": "1.25rem",
-          "label": "20px"
-        },
-        {
-          "value": "1.5rem",
-          "label": "24px"
-        },
-        {
-          "value": "2rem",
-          "label": "32px"
-        },
-        {
-          "value": "2.5rem",
-          "label": "40px"
-        },
-        {
-          "value": "3rem",
-          "label": "48px"
-        },
-        {
-          "value": "3.5rem",
-          "label": "56px"
-        },
-        {
-          "value": "4.5rem",
-          "label": "72px"
-        },
-        {
-          "value": "5.5rem",
-          "label": "88px"
-        },
-        {
-          "value": "7.5rem",
-          "label": "120px"
-        },
-        {
-          "value": "9.5rem",
-          "label": "152px"
-        },
-        {
-          "value": "11.5rem",
-          "label": "184px"
+          "value": "%",
+          "label": "%"
         }
       ],
-      "default": "1rem",
+      "default": "px",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "number",
+      "id": "font_size",
+      "label": "t:settings.size_desktop",
+      "default": 16,
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "number",
+      "id": "font_size_mobile",
+      "label": "t:settings.size_mobile",
+      "default": 14,
       "visible_if": "{{ block.settings.type_preset == 'custom' }}"
     },
     {

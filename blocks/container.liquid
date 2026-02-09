@@ -32,9 +32,28 @@
 {%- endcomment -%}
 
 {% if has_content %}
-  <{{ tag }} class="gco-container {{ container_class }}" style="{{ styles }}" {{ block.shopify_attributes }}>
-    {{ children }}
-  </{{ tag }}>
+  {% if block.settings.enable_section_width %}
+    <div
+      class="section section--{{ block.settings.section_width }}"
+      style="{{ styles }}"
+      {{ block.shopify_attributes }}
+    >
+      <{{ tag }}
+        class="gco-container {{ container_class }}"
+        style="display: flex; gap: inherit;"
+      >
+        {{ children }}
+      </{{ tag }}>
+    </div>
+  {% else %}
+    <{{ tag }}
+      class="gco-container {{ container_class }}"
+      style="{{ styles }}; display: flex;"
+      {{ block.shopify_attributes }}
+    >
+      {{ children }}
+    </{{ tag }}>
+  {% endif %}
 {% endif %}
 
 {%- comment -%}
@@ -77,6 +96,29 @@
     {
       "type": "header",
       "content": "Diseño"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_section_width",
+      "label": "Habilitar ancho de sección",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width",
+      "visible_if": "{{ block.settings.enable_section_width == true }}"
     },
     {
       "type": "select",
