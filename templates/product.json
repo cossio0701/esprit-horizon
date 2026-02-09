@@ -163,7 +163,7 @@
                     "show_sale_price_first": true,
                     "show_installments": false,
                     "show_tax_info": false,
-                    "type_preset": "h4",
+                    "type_preset": "h5",
                     "width": "100%",
                     "alignment": "left",
                     "font": "var(--font-body--family)",
@@ -269,6 +269,7 @@
             "installments_banner_hLzt6J": {
               "type": "installments_banner",
               "name": "Installments Banner",
+              "disabled": true,
               "settings": {
                 "message": "<p>Compra a <strong>4 cuotas mensuales de $84.606,77</strong> con tu <strong>Credito</strong></p>",
                 "icon": "shopify://shop_images/logosumas_20240416_1_1.svg",
