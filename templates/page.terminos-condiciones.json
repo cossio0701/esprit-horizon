@@ -35,7 +35,20 @@
               "type": "container",
               "name": "Container",
               "settings": {
-                "container_class": "encabezado-terminos"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "encabezado-terminos",
+                "custom_css": ""
               },
               "blocks": {
                 "text_ceT9kk": {
@@ -43,6 +56,11 @@
                   "name": "t:names.heading",
                   "settings": {
                     "text": "<h2>TÉRMINOS Y CONDICIONES</h2>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -93,6 +111,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<p>ESPRIT dispone este sitio para dar un mejor servicio a sus clientes. Por favor lee las siguientes normas que gobiernan tu uso de esprit.com.co, el cual aceptas al acceder a él. Si no estás de acuerdo, por favor no lo uses.<br/>Nos reservamos el derecho a actualizar o cambiar los Términos y Condiciones en cualquier momento sin previo aviso, es por esto que te recomendamos leer esta sección cada vez que vayas a usar este sitio.</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -152,6 +175,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>Todo el contenido que ves y oyes en el sitio esprit.shop incluyendo, por ejemplo, las imágenes, diseño del sitio, ilustraciones, gráficos son propiedad intelectual de ESPRIT. El contenido del sitio esprit.shop tiene como propósito el uso personal, no comercial de los usuarios de este sitio. Podrás descargar, imprimir o guardar porciones seleccionadas del contenido que te proveemos, pero con las siguientes condiciones:</p><ul><li>Que el uso sea personal, sin ningún propósito comercial.</li><li>No copiar ni reproducir el contenido en ningún medio.</li><li>No alterar o modificar en ninguna manera cualquier marca registrada.<br/>ESPRIT es una marca registrada. Ningún derecho, título o interés en cualquier contenido o material te es trasferido por el resultado de las actividades anteriormente mencionadas. ESPRIT tiene completa propiedad intelectual de cualquier contenido que descargues, reproduzcas, imprimas, redistribuyas o guardes de este sitio.<br/>Todos los contenidos del sitio web <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a> son de propiedad exclusiva y mundial de ESPRIT incluyendo, sin limitación, reproducciones de los artículos, diseño gráfico, logos, imágenes, textos, ilustraciones, fotografías, marcas y otros signos distintivos, en cualquiera de los lenguajes de programación utilizados o utilizables, así como todo el software de funcionamiento y desarrollo del sitio web. La reproducción, distribución, comunicación al público, puesta a disposición del público, transformación, cesión y cualquier otro acto o modalidad de explotación, en cualquier formato Online u Offline que no haya sido expresamente autorizado por el titular de los derechos de explotación, quedan expresamente prohibidos.<br/>ESPRIT no concede ninguna licencia o autorización de uso de ninguna clase sobre sus derechos de propiedad intelectual e industrial o sobre cualquier otra propiedad o derecho relacionado con la página web, y los servicios y productos ofrecidos.<br/>En el caso de datos o contenidos facilitados por el usuario al sitio web <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a> el usuario concede a ESPRIT el derecho no exclusivo, exento de derechos de autor y/o propiedad intelectual, de forma perpetua, irrevocable y totalmente transferible a terceros, a utilizar, reproducir, modificar, adaptar, publicar, traducir, crear servicios derivados, distribuir y exhibir dichas reseñas y comentarios en todo el mundo y en cualquier medio de comunicación.<br/>Todas las marcas y denominaciones de servicios que aparecen en el sitio web <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a> son marcas registradas y de propiedad de ESPRIT.</li></ul>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -197,6 +225,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>En <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>, nuestro compromiso es ofrecer comodidad, servicio y disponibilidad de productos en línea todos los días y a precios atractivos, con algunas ofertas de mercancías, de tiempo limitado y a precios promocionales.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -242,6 +275,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>ESPRIT ha realizado un esfuerzo para mostrar los colores de las prendas de la forma más cercana a la realidad posible. No obstante, el color de las prendas que aparecen en pantalla puede estar sujeto a variaciones dependiendo de la calidad del monitor de tu computador. En este sentido, ESPRIT no puede garantizar que los colores que aparezcan en tu monitor se ajusten fielmente a la realidad.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -287,6 +325,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p><a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>puede entregarte información, por medio de correos electrónicos, avisos generales en el sitio, o por comunicación escrita enviada por correo físico a tu dirección de registro.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -332,6 +375,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>Al acceder y utilizar el sitio web<a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>aceptas que este sujeto a los Términos y Condiciones, y todas las leyes aplicables regirán de conformidad con las leyes colombianas. LEA ATENTAMENTE ESTOS TÉRMINOS Y CONDICIONES. EL ACUERDO INCLUYE UNA RENUNCIA A ACCIONES COLECTIVAS Y REQUIERE UN ARBITRAJE VINCULANTE INDIVIDUAL PARA RESOLVER DISPUTAS. SI NO ESTÁ DE ACUERDO CON LAS CONDICIONES, DEBE (A) DEJAR DE UTILIZAR O COMPRAR EN NUESTRA TIENDA DIGITAL, (B) NO REALIZAR NINGUNA COMPRA Y/O (C) DEVOLVER CUALQUIER COMPRA ELEGIBLE DENTRO DEL PLAZO DE DEVOLUCIÓN APLICABLE.<br/><br/></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -377,6 +425,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>El acoso de cualquier manera o forma del sitio, incluso a través de correo electrónico y chat o por lenguaje obsceno o abusivo está estrictamente prohibido.<br/>La suplantación de identidad está prohibida para todos los miembros o visitantes.<br/>No se puede cargar, distribuir o publicar a través de este sitio cualquier contenido que sea difamatorio, calumnioso, obsceno, amenazante, invasor de la privacidad o de los derechos de publicidad, abusivo, ilegal, o de cualquier otra manera que puedan constituir o fomentar un delito penal, violar los derechos de cualquiera de las partes o que de lo contrario puede dar lugar a responsabilidad civil o violar cualquier ley.<br/>El contenido comercial para solicitar a otros a unirse o ser miembros de cualquier otro servicio comercial en línea u organización está prohibido.<br/>Para una mejor experiencia de compra en nuestra tienda online y garantizar que la información que estás viendo en el sitio está actualizada, te recomendamos usar los siguientes navegadores: Chrome Versión 110.0.5481.178, Firefox Versión 110.0.1, Microsoft Edge Versión 110.0.1587.63<br/><br/></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -422,6 +475,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>Para completar su compra en <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>, debe proporcionar su nombre completo, dirección de correo electrónico, dirección de entrega válida y método de pago. Es posible que tenga que ajustar la configuración de su dispositivo o configurar su navegador para que acepte cookies funcionales y ventanas emergentes para poder utilizar todas las funcionalidades de <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>, lo que incluye añadir artículos a su bolsa de la compra y enviar su pedido.<br/>Cuando complete la compra, le enviaremos un correo electrónico acusando la aprobación de su pago (“Pago aprobado”). Nuestra aceptación de su pedido tiene lugar cuando se le envían los productos; le enviaremos un segundo correo electrónico confirmando que los productos han sido enviados. Si no podemos suministrarle un producto, se lo comunicaremos por escrito y no tramitaremos el pedido de dicho producto.<br/>La venta de productos y el cumplimiento de todos los pedidos en <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a> está sujeta a disponibilidad y nuestra discreción en la gestión de inventario. Nos reservamos explícitamente el derecho de limitar, declinar o rechazar cualquier venta y pedidos por cualquier razón, sin ser responsable de ningún daño o costo que no sea el reembolso de cualquier cantidad recibida de usted en relación con dicha venta o pedido, limitar o cancelar las cantidades compradas por persona, por hogar o por pedido. Estas restricciones pueden incluir pedidos realizados por o bajo la misma cuenta de cliente, la misma tarjeta de crédito y/o pedidos que utilicen la misma dirección de facturación y/o envío. En caso de que modifiquemos o cancelemos un pedido, intentaremos notificárselo poniéndonos en contacto con la dirección de correo electrónico y/o dirección de facturación/número de teléfono facilitados al momento de realizar el pedido. Nos reservamos el derecho a limitar o prohibir pedidos que, a nuestro juicio, parezcan realizados por comerciantes, revendedores o distribuidores. También en situaciones que incluyan, entre otras:</p><ul><li>Un acontecimiento fuera de nuestro control (tal y como se define a continuación);</li><li>El producto que desea comprar no está disponible o en stock;</li><li>Su dirección, datos de facturación o forma de pago son incorrectos o no pueden verificarse;</li><li>Su pedido es marcado por nuestros sistemas de seguridad como potencialmente fraudulento, o se trata de un pedido realizado con software o tecnología de pedidos automatizados;</li><li>Existen pruebas de que su pedido (individual o acumulativo) ha sido adquirido con fines de reventa, evasión fiscal u otros fines fraudulentos;</li><li>Su pedido fue marcado para la expedición o envío a una dirección o proveedor de servicios que permite o posibilita la exportación al extranjero o la evasión ilegal del impuesto sobre las ventas;</li><li>Su compra o pedido supera los límites de compra de productos (cantidad y/o importe en dólares);</li><li>Su cuenta y/o historial de compras muestra un volumen excesivamente alto de devoluciones;</li><li>Existen pruebas de que usted no cumple los requisitos para realizar compras;</li><li>En caso de errores ortográficos, de precios u otros errores o equivocaciones en <a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a> donde usted desea ordenar o comprar.<br/>ESPRIT determinará si cualquiera de los eventos anteriores se ha producido a su entera discreción.</li></ul>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -467,6 +525,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>En un intento de dar más valor a nuestros visitantes, ESPRIT puede elegir varios sitios web de terceros para acceder desde ellos. Sin embargo, incluso si el tercero fue contratado por ESPRIT, no tenemos ningún control sobre estos sitios, los cuales pueden tener prácticas de privacidad y de recopilación de datos diferentes e independientes a las nuestras. ESPRIT no tiene ninguna responsabilidad u obligación por estas políticas o acciones de terceros, y no es responsable por las prácticas de privacidad o el contenido de dichos sitios web.<br/><br/></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -512,6 +575,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>Este sitio, los materiales y productos expuestos en él son mostrados de forma real y sin garantías de ningún tipo, ya sea explícita o implícitamente.<br/>ESPRIT no garantiza que las funciones contenidas en el sitio no puedan ser sujetas de interrupciones o errores, ni que todos los defectos serán corregidos, ni que el sitio o el servidor esté libre de virus o de otros componentes peligrosos. ESPRIT no hace ninguna garantía o representación sobre el uso de los materiales en este sitio en cuanto a su exactitud, adecuación, utilidad, puntualidad, confiabilidad o de otra manera. Estas limitaciones pueden no ser aplicables al usuario.<br/><br/></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -557,6 +625,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>En<a href=\"https://www.esprit.shop/\">https://www.esprit.shop</a>nuestro compromiso es cumplir con los tiempos de entrega, por lo tanto, si el día que llegue tu pedido no estás presente para recibirlo, la transportadora estará autorizada para dejarlo en la portería de la dirección indicada. Sabemos lo importante que es para ti y que no te gustaría esperar hasta una próxima oportunidad para recibirlo.<br/>En ESPRIT queremos garantizar que tu pedido sea entregado en el tiempo acordado. Si necesitamos comunicarnos contigo para notificarte alguna novedad del pedido y en el transcurso de un mes no logramos encontrarte, procederemos con la reversión del pago, realizando la solicitud del mismo directamente a PayPal.<br/>En nuestra tienda online queremos entregar tu pedido en el menor tiempo posible, por eso nuestra promesa de entrega es de 5 a 10 días hábiles, contados a partir del momento en que el consumidor reciba el correo electrónico “Pago aprobado”.<br/>Durante eventos promocionales en los que se cuenta con un mayor flujo transaccional, el tiempo de entrega puede ampliarse hasta 15 días hábiles.<br/>Durante la temporada de vacaciones, ESPRIT extiende el plazo de la Política de Cambios o Devolución de Dinero. Por lo tanto, en caso de realizar una compra entre el 1 de noviembre y el 24 de diciembre, podrá solicitar el cambio o la devolución de dinero en un plazo máximo de 15 días calendario, contados a partir de la fecha en que se recibe el pedido.<br/>En ocasiones se presentan novedades que nos impiden cumplir con nuestra promesa, sin embargo, queremos garantizarte que este tiempo no excederá el plazo de 30 días calendario, y te informaremos de dicha novedad y la nueva fecha de entrega a través de correo electrónico, mediante el cual, en caso de que no desee esperar la entrega del pedido, podrá cancelarlo y obtener el reembolso.<br/>Usualmente entregamos todos los artículos de un mismo pedido en un único envío. Sin embargo, debido a numerosos factores, los productos pueden entregarse en envíos divididos. Nos reservamos el derecho a dividir la entrega de cualquier pedido. Si dividimos su pedido, le notificaremos nuestra intención de hacerlo enviándole un correo electrónico a la dirección de correo electrónico que nos proporcionó al momento de realizar el pedido. No se le cobrarán gastos de envío adicionales.<br/><br/></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -623,6 +696,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h2>PROMOCIONES</h2>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -663,6 +741,18 @@
               },
               "blocks": {}
             },
+            "legales_promociones_FWaXGU": {
+              "type": "legales-promociones",
+              "name": "Legales Promociones",
+              "settings": {
+                "title_color": "#0f0a05",
+                "title_font_size": 24,
+                "title_font_weight": "600",
+                "content_color": "#333333",
+                "content_font_size": 15
+              },
+              "blocks": {}
+            },
             "accordion_imEheK": {
               "type": "accordion",
               "name": "t:names.accordion",
@@ -685,6 +775,7 @@
                 "accordion_row_4Gaf9B": {
                   "type": "_accordion-row",
                   "name": "2025",
+                  "disabled": true,
                   "settings": {
                     "heading": "2025",
                     "open_by_default": false,
@@ -725,6 +816,11 @@
                               "type": "text",
                               "settings": {
                                 "text": "<p>Our goal is for every customer to be totally satisfied with their purchase. If this isn't the case, let us know and we'll do our best to work with you to make it right.</p>",
+                                "enable_collapse": false,
+                                "collapsed_height": 50,
+                                "show_more_text": "Ver más",
+                                "show_less_text": "Ver menos",
+                                "enable_fade": true,
                                 "width": "fit-content",
                                 "max_width": "none",
                                 "alignment": "left",
@@ -769,6 +865,7 @@
                 "accordion_row_9ArEnX": {
                   "type": "_accordion-row",
                   "name": "2024",
+                  "disabled": true,
                   "settings": {
                     "heading": "2024",
                     "open_by_default": false,
@@ -780,6 +877,11 @@
                       "type": "text",
                       "settings": {
                         "text": "<p>We will work quickly to ship your order as soon as possible. Once your order has shipped, you will receive an email with further information. Delivery times vary depending on your location.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
                         "width": "100%",
                         "max_width": "normal",
                         "alignment": "left",
@@ -821,6 +923,7 @@
           "block_order": [
             "text_Tagd7d",
             "spacer_BYNQRV",
+            "legales_promociones_FWaXGU",
             "accordion_imEheK"
           ]
         },
@@ -837,6 +940,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h2>POLITICA DE COOKIES</h2>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -882,6 +990,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<p>Mediante el presente documento, la sociedad COMODIN S.A.S., en adelante la “Compañía”, se permite implementar su Política de Cookies (en adelante la “Política”) para su sitio web esprit.shop (en adelante el “Sitio”).</p><h4>USO DE LAS COOKIES.</h4><p>Para entender de una mejor manera las necesidades de los usuarios y entregar un mejor servicio, la Compañía utiliza dentro del Sitio, identificadores anónimos (cookies) para recoger información anónima de preferencias e intereses de sus usuarios. La información recogida por este medio es utilizada para crear perfiles anónimos para cualquier propósito, incluyendo, más no limitado a, desarrollar, fabricar y comercializar productos. La información conseguida por este medio nunca se combina con datos de carácter personal que permitan identificar a una persona determinada (tal como nombre, domicilio o dirección de correo electrónico) o cualquier información que pueda ser considerada sensible o que pueda comprometer la privacidad de los usuarios.</p><h4>DESACTIVACIÓN DE UTILIZACIÓN DE COOKIES</h4><p>En el momento que el usuario desee puede desactivar el uso de las cookies dentro del Sitio. No obstante, si el usuario opta por su desactivación, posiblemente no pueda conocer, acceder o visualizar determinadas secciones, imágenes o partes del Sitio de la Compañía. Lo anterior puede ocasionar una navegación menos eficiente o el usuario no aprovechar en su totalidad los servicios ofrecidos en el Sitio.</p><p>Con relación a la restricción, bloqueo o borrado de las cookies almacenados en el Sitio, el usuario puede realizar en cualquier momento acorde con las especificaciones de su navegador. Si el usuario desconoce la opción o forma de acceder a la configuración de las cookies, normalmente se encuentra nombrado como “Preferencias” o “Herramientas” en los navegadores web.</p><h4>COOKIES QUE UTILIZA EL SITIO</h4><p>A continuación se informan las cookies que se utilizan dentro del Sitio, las cuales se utilizan para una navegación más eficiente y el usuario aproveche la totalidad de servicios ofrecidos en el Sitio.<br/>a. Cookies de sesión y persistentes (o propias).<br/>b. Cookies de selección /preferencia (En caso de alguna selección de preferencia como Sales channel, etc).<br/>c. Cookies de terceros (sí tienes instalado Google Analytics - Estadísticas sobre el tráfico y volumen de visitas de esta web, etc).<br/>d. Cookies personalizadas: Siendo éstas generadas/creadas propiamente por ustedes como clientes en caso de customizaciones particulares, pero no propiamente nativas VTEX. Es decir gerenciadas en el sitio con un objetivo particular pero como desarrollo a la media y propio del negocio.</p><h4>ACTUALIZACIONES Y CAMBIOS EN LA POLÍTICA DE COOKIES.</h4><p>La presente Política regirá a partir de la fecha de su publicación y dejará sin efectos las demás disposiciones institucionales que le sean contrarias. Todo elemento sobre la materia objeto de la presente Política que no se encuentre contenido en la misma, se reglamentará por la Compañía acorde con su necesidad.</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -928,6 +1041,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h2>GARANTÍAS</h2>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -973,6 +1091,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<h4>POLÍTICA DE GARANTÍAS O DEVOLUCIÓN DE DINERO</h4><p>Nuestro objetivo es asegurarnos que nuestros clientes se encuentren satisfechos con la compra que realizaron. Si por algún motivo diferente a la garantía, no queda conforme con el producto adquirido y desea realizar un cambio por talla, referencia o color, puede solicitar la devolución de dinero en un plazo de 5 días calendario , contados desde la fecha en que se recibe el producto.</p><p><strong>Para ejercer el derecho al cambio, los productos deberán cumplir con los siguientes requisitos:</strong></p><ul><li>No haber sido usada la prenda.</li><li>Contar con todas sus etiquetas.</li><li>No encontrarse sucia.</li><li>No tener rastros de uso de desodorantes o maquillaje con químicos que decoloren o deterioren las telas.</li><li>No tener rastros de uso de químicos o blanqueador.</li><li>No presentar desteñido.</li><li>La prenda no debió ser alterada o modificada por el consumidor.</li><li>La horma de la prenda debe encontrarse perfecta.</li><li>El estampado, apliques o bordados no deben tener inconsistencias por lavado, planchado o adulteración.</li><li>Encontrarse en las mismas condiciones en las que fue adquirida.</li><li>Deben conservar la etiqueta original. Sugerimos que se pruebe las prendas antes de retirarla.</li><li>Debe presentar el certificado de regalo o indicar el número de cédula del comprador.</li><li>El valor a reconocer para cambio será únicamente el que corresponda al valor pagado por la prenda.</li><li>Una prenda que se cambie por otra, la nueva prenda sólo podrá ser cambiada una próxima oportunidad. No aplica un tercer cambio.</li></ul><p><strong>PARA LOS CAMBIOS DE PRENDAS DEBE TENER PRESENTE QUE:</strong></p><ul><li>Si el producto fue adquirido en la tienda esprit.shop, no será posible realizar el cambio en ninguna de las tiendas físicas Esprit a nivel mundial.</li></ul><h4>PREGUNTAS FRECUENTES DE LA POLÍTICA DE CAMBIOS</h4><p><strong>a. ¿Qué puedo hacer si recibí un producto equivocado?</strong><br/>En el caso de que te hayamos enviado por error un producto diferente al adquirido, te reconoceremos el cambio de la prenda. Esprit programará a la empresa transportadora para que recoja el producto equivocado y luego te haremos el envío del producto que solicitaste inicialmente. Para solicitar la recogida de la prenda equivocada te invitamos a usar nuestros canales de atención al cliente disponibles.</p><p><strong>b. ¿Cuáles son los canales de atención disponibles para atención de PQRS?</strong></p><p>Esprit pone a disposición de los consumidores los canales de atención para recibir solicitudes de cambio de prendas:</p><ol><li>Llamando a la Línea de Atención al Cliente +57 310 2281425 de lunes a viernes, de 9:00 a.m. a 7:00 p.m. y sábados de 9:00 a.m. a 6:00 p.m.</li><li>Enviando un mensaje al correo electrónico <a href=\"mailto:servicioalcliente@esprit.shop\">servicioalcliente@esprit.shop</a> informando el número de pedido, número de factura, el producto que desea cambiar y el producto de su interés.</li><li>Diligenciando el formulario de peticiones, quejas y reclamos disponible en la tienda (URL), por medio del botón Peticiones, Quejas y Reclamos.</li></ol><p><strong>c. ¿Si deseo devolver las prendas por medio de una empresa de transporte qué debo hacer?</strong></p><p>Debe hacer llegar la(s) prenda(s) adquirida(s) por medio de una transportadora de lunes a viernes a la siguiente dirección a nombre de:</p><p><strong>Nombre:</strong> BODEGA ONLINE – Esprit<br/><strong>Dirección:</strong> Cra 45A # 60 – 39 Itagüí, Antioquia.</p><p>Para la devolución de dinero a una cuenta debe enviarnos al correo electrónico <a href=\"mailto:servicioalcliente@esprit.shop\">servicioalcliente@esprit.shop</a> o contactarnos a través de la línea de whatsapp.</p><p>El dinero será devuelto en un plazo máximo de 30 días calendario, contados a partir de la fecha en que sean recibidas e identificadas las prendas en nuestra bodega y del recibido de la información bancaria, siempre y cuando se haya ejercido el derecho de retracto dentro del término legal.</p><p><strong>d. ¿Quién asume los gastos o costos de transporte para la devolución de la prenda?</strong><br/>Los gastos o costos que acarreen la devolución del producto a Esprit, serán asumidos en su totalidad y sin excepción por el consumidor.</p><p><strong>NOTA:</strong> En los eventos que los consumidores realicen devoluciones de las prendas bajo la modalidad envío contra entrega o pago por el destinatario, la prenda NO será recibida por la Compañía y será responsabilidad única del consumidor la trazabilidad, extravío, cuidado y/o recuperación de la prenda ante la empresa de transporte contratada por éste.</p><p><strong>e. Luego de recibida la prenda por Esprit, ¿cuándo será devuelto mi dinero?</strong><br/>En caso de que Esprit reciba las prendas y éstas cumplan todas las condiciones mencionadas en la presente política de retracto, devolverá la suma total pagada por la prenda, sin que se procedan a hacer descuentos o retenciones, en un término no mayor a los 30 días calendario siguientes, contados a partir de la fecha de recepción de las prendas en el lugar indicado previamente, siempre y cuando se cuente con la información bancaria del consumidor.</p><p><strong>NOTA:</strong> Recuerde que para la devolución del dinero requerimos su información bancaria para realizar una transferencia electrónica.</p><p>Realizada la devolución del dinero y una vez Esprit cuente con el soporte de la transacción, envía un comunicado al cliente confirmando la devolución de su dinero. Cabe mencionar que, la devolución del dinero se realiza dentro de los 30 días calendario siguientes a la fecha en que se tuvo información bancaria, sin embargo, la fecha en que la Compañía le envía copia del comprobante puede ser en una fecha posterior.</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -1019,6 +1142,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h3>POLÍTICA DE TRATAMIENTO Y PROTECCIÓN DE DATOS PERSONALES</h3>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -1064,6 +1192,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<p>Mediante el presente documento, la sociedad Industria Mercadeo y Color S.A.S., en adelante la Compañía, dando cumplimiento a los presupuestos normativos señalados en la Ley 1581 de 2012, el Decreto Reglamentario 1377 de 2013 y las demás normas concordantes sobre la materia, se permite implementar su Política para el Tratamiento y Protección de Datos Personales (en adelante la Política).<br/>Para estos efectos, es importante tener en cuenta que la Compañía, se caracteriza por ser una sociedad de carácter comercial domiciliada en el municipio de Medellín-Antioquia dedicada tal y como se dispone en su objeto social a: la compra, venta, distribución directa o a través de terceros, exportación, producción y mercadeo de textiles, calzado, entre otras.<br/>En razón de lo anterior, atendiendo a lo determinado por el objeto social de la Compañía y en desarrollo de sus facultades, es posible determinar que existen datos personales que componen Bases de Datos de propiedad de la Compañía, los cuales son tratados según los lineamientos consagrados en el marco legal vigente aplicable en Colombia.<br/>Por todo lo anterior, la Política será aplicada tanto para proteger los datos personales y la información transaccional que actualmente trate la Compañía, como para proteger los que en un futuro se puedan llegar a tratar por parte de ésta, en medio del desarrollo de su actividad económica.</p><h3>DISPOSICIONES GENERALES</h3><h4>Identificación del Responsable.</h4><p>Industria Mercadeo y Color S.A.S., sociedad comercial identificada con Nit 890.940.122-2, con asiento principal en la Carrera 43 A N° 25 B sur-136, Envigado- Antioquia, teléfono 57(4) 270-42-11 y correo electrónico <a href=\"mailto:carlosra@gco.com.co\">carlosra@gco.com.co</a></p><h4>Objetivo.</h4><p>Para efectos de la Política, la Compañía actúa como Responsable del Tratamiento de datos personales en virtud de la recolección que realice directamente de los datos de los titulares, por tal motivo, la Política tiene como objetivo principal la definición y posterior determinación de todos los temas relativos a los procedimientos, los principios y las políticas de seguridad según los cuales, la Compañía garantizará el adecuado tratamiento de los datos personales que sean recolectados en desarrollo de su objeto social.</p><h4>Marco Legal.</h4><p>La Política fue elaborada dando estricto cumplimiento a todo lo dispuesto por la normatividad vigente sobre la materia, de esta manera, el presente documento cumple lo dispuesto por los Artículos 15 y 20 de la Constitución Política de Colombia, en la Ley 1581 de 2012 por la cual “se dictan disposiciones generales para la protección de datos personales”, en el Decreto Reglamentario 1377 de 2013 y en las demás normas que en un futuro puedan llegar a modificar, regular o adicionar la normatividad aplicable en materia de Protección de Datos Personales.</p><h4>Definiciones.</h4><p>Tal y como lo disponen el Artículo 3° del Decreto 1337 de 2013 y el Artículo 3° de la Ley 1581 de 2012, se tendrán definidos a lo largo de la Política, los siguientes términos:</p><ul><li><strong>Archivo:</strong> Conjunto de datos grabados como una sola unidad de almacenamiento, que contenga datos personales.</li><li><strong>Autorización:</strong> Consentimiento previo, expreso e informado del titular para llevar a cabo el tratamiento de datos personales, el cual se obtienen al momento de la recolección del dato.</li><li><strong>Aviso de privacidad:</strong> Comunicación verbal o escrita generada por el Responsable, dirigida al titular, para el tratamiento de sus datos personales, mediante la cual se le informa acerca de la existencia de la Política de tratamiento de información que le será aplicable, la forma de acceder a la misma y las finalidades del tratamiento que se pretende dar a los datos personales.</li><li><strong>Base de Datos:</strong> Conjunto organizado de datos personales que sea objeto de tratamiento.</li><li><strong>Causahabiente:</strong> Persona que ha sucedido a otra por causa del fallecimiento de ésta última (heredero).</li><li><strong>Dato personal:</strong> Cualquier información vinculada o que pueda asociarse a una o varias personas naturales determinadas o determinables.</li><li><strong>Dato público:</strong> Es el dato que no sea semiprivado, privado o sensible. Son considerados datos públicos, entre otros, los datos relativos al estado civil de las personas, a su profesión u oficio y a su calidad de comerciante o de servidor público. Por su naturaleza, los datos públicos pueden estar contenidos, entre otros, en registros públicos, documentos públicos, gacetas y boletines oficiales y sentencias judiciales debidamente ejecutoriadas que no estén sometidas a reserva.</li><li><strong>Dato sensible:</strong> Se entiende por Dato Sensible aquellos que afectan la intimidad del titular o cuyo uso indebido puede generar su discriminación, tales como que revelen el origen racial o étnico, la orientación política, las convicciones religiosas o filosóficas, la pertenencia a sindicatos, organizaciones sociales, de derechos humanos o que promueva intereses de cualquier partido político o que garanticen los derechos y garantías de partidos políticos de oposición, así como los datos relativos a la salud, a la vida sexual, y los datos biométricos.</li><li><strong>Encargado del Tratamiento:</strong> Persona natural o jurídica, pública o privada, que por sí misma o en asocio con otros, realice el tratamiento de datos personales por cuenta del Responsable del Tratamiento.</li><li><strong>Responsable del Tratamiento:</strong> Persona natural o jurídica, pública o privada, que por sí misma o en asocio con otros, decida sobre la base de datos y/o el tratamiento de los datos contenidos en ella.</li><li><strong>Titular:</strong> Persona natural cuyos datos personales sean objeto de tratamiento.</li><li><strong>Tratamiento:</strong> Cualquier operación o conjunto de operaciones sobre datos personales, tales como la recolección, almacenamiento, uso, circulación o supresión.</li><li><strong>Transferencia:</strong> La Transferencia de datos tiene lugar cuando el Responsable y/o Encargado del Tratamiento de datos personales, ubicado en Colombia, envía la información o los datos personales a un receptor, que a su vez es Responsable del Tratamiento y se encuentra dentro o fuera del país.</li><li><strong>Transmisión:</strong> Tratamiento de datos personales que implica la comunicación de los mismos dentro o fuera del territorio de la República de Colombia cuando tenga por objeto la realización de un tratamiento por el Encargado, por cuenta del Responsable.</li><li><strong>Supresión:</strong> Se denomina así, a la acción que el titular de los datos personales solicita al Responsable y/o Encargado de los datos, en ejercicio del derecho que le asiste de libertad y finalidad frente a su información.</li><li>Se advierte que las definiciones incluidas en esta Política fueron tomadas de la normatividad vigente a la fecha, en la cual se regula la debida protección de datos personales de las personas naturales frente a la circulación y tratamiento de los mismos.</li></ul><h4>Principios.</h4><p>En virtud de lo dispuesto por la normatividad vigente, la Compañía ha incorporado a la Política, los principios generales relativos al tratamiento de datos personales. De esta manera, estos principios ostentan una aplicación general que abarca de manera transversal todo el contenido de la Política. Dichos principios fundamentales son tomados del Artículo 4° de la Ley 1581 de 2012.</p><h4>Vigencia y aplicación.</h4><p>Las Bases de Datos y la Política tendrán un período de vigencia indeterminado, de conformidad con la duración del objeto social de la Compañía.<br/>La Política aplicará para el tratamiento de las Bases de Datos en las cuales la Compañía tenga la calidad de Responsable y/o Encargado, a partir de la fecha de su publicación, dejando sin efectos las demás disposiciones institucionales que le sean contrarias.<br/>Dado lo anterior, toda situación que no se encuentre revista en la Política, se reglamentará de acuerdo al Régimen General de Protección de Datos Personales vigente en Colombia y la demás normatividad aplicable sobre la materia.</p><h3>DEBERES DEL RESPONSABLE Y/O ENCARGADO DEL TRATAMIENTO – DERECHOS DE LOS TITULARES DE LA INFORMACIÓN</h3><h4>Deberes de la Compañía como Responsable del Tratamiento.</h4><p>La Compañía tendrá los siguientes deberes en su calidad de Responsable del Tratamiento, los cuales se desprenden de la legislación aplicable en la materia, sin perjuicio de todos los otros deberes previstos en las disposiciones que regulen o lleguen a regularla.</p><ul><li>Garantizar al Titular, en todo tiempo, el pleno y efectivo ejercicio de sus derechos en relación con sus datos personales.</li><li>Permitiéndole el acceso a la información de los Titulares únicamente a las personas habilitadas para tener acceso a ella.</li><li>Rectificar la información cuando sea incorrecta y comunicar lo pertinente.</li><li>Solicitar y conservar, copia de la Autorización otorgada por el Titular para el - Tratamiento de sus datos personales.</li><li>Informar debidamente al Titular sobre la finalidad de la recolección y los derechos vinculados a éste, procedentes desde la Autorización otorgada.</li><li>Garantizar que la información sea veraz, completa, exacta, actualizada, comprobable y comprensible. Además, acreditar en todo momento que la información debe corresponder a los datos personales inicialmente otorgados para el - Tratamiento.</li><li>Conservar la información bajo las condiciones de seguridad físicas y digitales que impidan adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento, además de cualquier conducta regulada y sancionada en la ley de delitos informáticos.</li><li>Actualizar oportunamente la información, atendiendo de esta forma todas las novedades respecto de los datos del Titular, en un término no inferior a cinco (5) días hábiles desde la recepción de la solicitud.</li><li>Implementar todas las medidas necesarias para que la información se mantenga actualizada,</li><li>Implementar un procedimiento del Tratamiento del dato en cuanto a las consultas y reclamos que los Titulares puedan hacer de ella.</li><li>Identificar cuando determinada información se encuentra en discusión por parte del Titular.</li><li>Respetar las condiciones de seguridad y privacidad de la información del Titular.</li><li>Tramitar las consultas y reclamos formulados en los términos señalados por la ley.</li><li>Informar, a solicitud del Titular, sobre el uso dado a sus datos.</li><li>Cumplir los requerimientos e instrucciones que imparta la Superintendencia de - Industria y Comercio sobre el tema en particular.</li><li>Informar a la autoridad de protección de datos cuando se presenten violaciones a los códigos de seguridad y existan riesgos en la administración de la información de los Titulares.</li><li>Velar por el uso adecuado de los datos personales de los niños, niñas y adolescentes, en aquellos casos en que se obtenga con autorización expresa de su representante legal, del Tratamiento de sus datos.</li><li>Usar únicamente datos cuyo Tratamiento esté previamente autorizado de conformidad con lo previsto en la Ley 1581 de 2012, el Decreto 1377 de 2013 y las demás normas que desarrollen y complementen la materia.</li><li>Abstenerse de circular información que esté siendo controvertida por el Titular y cuyo bloqueo haya sido ordenado por la Superintendencia de Industria y Comercio o cualquier otra entidad pública competente en esta toma de decisiones.</li><li>Usar los datos personales del Titular sólo para aquellas finalidades para las que se encuentre facultada debidamente y respetando en todo caso la normatividad vigente sobre protección de datos personales.</li></ul><h4>Encargo de datos personales de la Compañía a un tercero.</h4><p>Para el cumplimiento de su objeto social, la Compañía, podrá encargar el Tratamiento de los datos personales que posea a un tercero, con el fin que éste último realice las gestiones de comunicación, promoción, mercadeo, notificación, actualización de datos, planes de fidelización, programas y proyectos especiales que permitan, entre otras, el cumplimiento de las siguientes finalidades tanto por medios físicos como digitales:</p><ul><li>Celebración, suscripción o mantenimiento de relaciones contractuales con los - Titulares.</li><li>Otorgamiento de créditos y financiación de consumo.</li><li>Tratamiento de información requerida en materia laboral y societaria de la - Compañía.</li><li>Información de carácter confidencial, privacidad y no divulgable.</li><li>Cumplimiento de la finalidad del servicio como proveedor.</li></ul><p>Todo lo anterior, respetando siempre las finalidades que el Titular de la información haya autorizado a la Compañía o autorizadas por ministerio de la Ley.</p><p>El Encargado del Tratamiento sobre cualquiera de las Bases de Datos entregada o compartida por la Compañía, deberá cumplir con los siguientes deberes:</p><ul><li>Garantizar al Titular, en todo tiempo, el pleno y efectivo ejercicio del derecho de hábeas data.</li><li>Actualizar la información reportada por la Compañía dentro de los cinco (5) días hábiles contados a partir de su recibo.</li><li>Realizar oportunamente la Actualización, Rectificación o Supresión de los datos en los términos establecidos por la Ley.</li><li>Conservar la información bajo las condiciones de seguridad necesarias para impedir su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento.</li><li>Tramitar las consultas y los reclamos formulados por los Titulares en los términos señalados en la Ley.</li><li>Registrar en las Bases de Datos las leyendas reclamo en trámite en la forma en que se regula en la normatividad relativa al Tratamiento de datos personales.</li><li>Insertar en la Base de Datos la leyenda información en discusión judicial una vez notificado por parte de la autoridad competente sobre procesos judiciales relacionados con la calidad del dato personal.</li><li>Adoptar una política interna de procedimientos para garantizar el adecuado cumplimiento de la normatividad relativa al Tratamiento de datos personales y, en especial, para la atención de consultas y reclamos por parte de los Titulares.</li><li>Permitir el acceso a la información únicamente a las personas que pueden tener acceso a ella.</li><li>Cumplir las instrucciones y requerimientos que imparta la Superintendencia de - Industria y Comercio.</li><li>Abstenerse de circular información que esté siendo controvertida por el Titular y cuyo bloqueo haya sido ordenado por la Superintendencia de Industria y Comercio.</li><li>Informar a la Superintendencia de Industria y Comercio cuando se presenten violaciones a los códigos de seguridad y existan riesgos en la administración de la información de los Titulares.</li></ul><h4>Derechos de los Titulares de los datos personales.</h4><p>Conforme la Ley aplicable a la protección de datos personales, los siguientes son los derechos de los Titulares que hayan autorizado el Tratamiento de sus datos a la Compañía:</p><ul><li>Acceder, conocer, actualizar, rectificar y suprimir sus datos personales frente a la Compañía en su condición de Responsable.</li><li>Presentar ante la Superintendencia de Industria y Comercio, quejas por infracciones a lo dispuesto en la ley 1581 de 2012, previo trámite de consulta o requerimiento ante la Compañía.</li><li>Solicitar prueba de la Autorización otorgada por el Titular de los datos o por el Responsable del Tratamiento a la Compañía, mediante cualquier medio válido.</li><li>Ser informado por la Compañía, previa solicitud, respecto del uso que esta le ha dado a sus Datos Personales.</li><li>Revocar la Autorización o solicitar la Supresión del dato cuando en el Tratamiento no se respeten los principios, derechos y garantías constitucionales y legales.</li><li>Acceder en forma gratuita a sus Datos Personales que hayan sido objeto de Tratamiento por parte de la Compañía como responsable de los mismos.</li></ul><p>La Compañía reconoce que los datos personales que se encuentran en sus Bases de Datos pertenecen al Titular que autorizó su Tratamiento.</p><h3>TRATAMIENTO DE LA INFORMACIÓN</h3><h4>Canales de Captación.</h4><p>El Titular puede autorizar a la Compañía que ésta ejecute el Tratamiento de sus datos personales a través de diferentes medios, entre ellos se encuentran los siguientes:</p><ul><li>Documentos físicos;</li><li>Documentos Electrónicos;</li><li>Mensaje de datos;</li><li>Internet, Sitios Web;</li><li>Cualquier otro formato que en todo caso permita el consentimiento del Titular mediante conductas inequívocas a través de las cuales sea posible concluir que de no haberse surtido la misma por parte del Titular, o la persona legitimada para ello, los datos no se hubieran almacenado o capturado en la Base de Datos.</li></ul><p>La Autorización será solicitada por la Compañía de manera previa al Tratamiento de los datos personales.</p><h4>Mecanismos de captación de datos personales.</h4><p>La Compañía realiza la recolección de Datos Personales por los mecanismos que se enuncian y definen a continuación:</p><h4>Virtual:</h4><p>Mecanismo a través del cual, la Compañía, utilizando medios tecnológicos no presenciales habilitados previamente (Pagina Web y Cuentas Oficiales en Redes Sociales) , recolecta datos personales, de acuerdo con los formatos establecidos.</p><h4>Escrito:</h4><p>Es el medio a través del cual, de manera física y presencial, la Compañía en el desarrollo de su objeto social, realizará la recolección de datos personales, mediante la información suministrada en documentos de constitución o modificación de la composición accionaria de la sociedad, en contratos con Proveedores, en contratos con empleados, en hojas de vida de candidatos y en formularios de captación en establecimientos propios u operados por terceros.</p><h4>Campos de captura de la información.</h4><p>En desarrollo de los principios de protección de habeas data, la recolección de datos personales se realizará limitándose a aquellos que son pertinentes y adecuados para el propósito para el cual son recolectados o requeridos por la Compañía.</p><h4>Autorización para uso de datos personales.</h4><p>La Compañía actuando como Responsable del Tratamiento de datos personales y de Información Transaccional, obtiene de los Titulares de los datos su Autorización clara, expresa, previa, informada y exenta de vicios, mediante formularios físicos y electrónicos, formatos de recolección de datos y/o a través de los demás medios que disponga o pueda disponer para tal efecto.<br/>Para lo anterior, la Compañía solicitará a los Titulares de los datos personales y la Información Transaccional, su Autorización, informando a éste la finalidad sobre la cual se proporcionará el Tratamiento de sus datos personales. Lo anterior, excepto en los casos expresamente autorizados determinados por Ley, los cuales se encuentran regulados en el artículo 10 de la Ley 1581 de 2012.</p><h3>Autorización para datos recolectados antes de la vigencia de esta Política.</h3><p>Para los datos personales recolectados antes de la vigencia de esta Política, La Compañía solicitó la Autorización de los Titulares para continuar con el Tratamiento de sus datos personales de conformidad con lo establecido por el Artículo 10° del Decreto 1377 de 2013.<br/>Este procedimiento se ejecutó en años anteriores a través del envío masivo de un correo electrónico en el cual se informó a los Titulares que sus datos estaban siendo objeto de Tratamiento por parte de la Compañía, dándoles a conocer a estos la Política de Tratamiento de la información y el modo de ejercer sus derechos.<br/>A su vez, en cumplimiento de su deber legal, la Compañía les informó a los Titulares de los datos personales que, si en un término máximo de treinta (30) días hábiles, contados a partir de la solicitud de Autorización para continuar con el Tratamiento del dato personal ya recolectado, el Titular no contactaba a la Compañía para solicitar la Supresión de sus datos personales, la Compañía podría continuar realizando el Tratamiento de los datos contenidos en sus Bases de Datos para las finalidades indicadas en esta Política.</p><h4>Revocatoria de la Autorización</h4><p>Todos los Titulares de los datos personales pueden en cualquier momento revocar su Autorización otorgada a la Compañía para el Tratamiento de sus datos personales e incluso solicitar a la Compañía la supresión o eliminación de sus datos personales contenidos en sus Bases de Datos. Lo anterior, siempre y cuando dicha conducta no contravenga una disposición legal o contractual vigente.<br/>La Compañía garantizará al Titular el fácil acceso a estas solicitudes, estableciendo mecanismos sencillos y simples que permitan al Titular revocar su Autorización o solicitar la supresión de sus datos personales, al menos por el mismo medio por el cual él los otorgó inicialmente.<br/>Para el anterior procedimiento, deberá tenerse en cuenta por parte del Titular que, la revocatoria del consentimiento puede expresarse de manera total o parcial en relación con las finalidades autorizadas. (i) Si se revoca totalmente, la Compañía deberá cesar cualquier actividad de Tratamiento de los datos suministrados por el Titular; por el contrario (ii) si se revoca parcialmente únicamente frente a ciertos tipos de Tratamiento, la Compañía cesará el tratamiento sobre las finalidades que expresamente fueron revocadas por el Titular. En este último caso, la Compañía podrá continuar tratando los datos personales para aquellos fines que no fueran revocados.</p><h4>Tratamiento al cual serán sometidos los datos y finalidad del mismo.</h4><p>Todo Tratamiento sobre los datos de los Titulares con los cuales la Compañía tuviere establecida una relación como Responsable del Tratamiento y de la Información Transaccional para la oferta de servicios de valor agregado, será realizado por la Compañía con base en las prescripciones de la Ley 1581 de 2012 y la Ley 1266 de 2008 en lo que le sea aplicable, y en general para el cumplimiento de su objeto social.<br/>En todo caso, la Compañía recolectará y tratará los datos personales de los Titulares, con el propósito de ejecutar ciertas finalidades, las cuales varían conforme la Base de Datos, según se describe a continuación:</p><h4>Nómina:</h4><ul><li>Adelantar procesos de selección.</li><li>Desarrollar y ejecutar la relación laboral de llegarse a celebrar.</li><li>Enviar información por cualquier medio conocido o por conocer (correo electrónico, físico, SMS, llamadas telefónicas, mensaje de datos, WhatsApp, herramientas de mensajería instantánea, entre otros) acerca de procesos de selección, ejecución de contratos laborales, incapacidades, pagos, campañas, información de productos y servicios, notificaciones de actividades, promociones, ofertas y lanzamientos.</li><li>Realizar programas y actividades de formación y capacitación.</li><li>Realizar evaluaciones y valoraciones de desempeño.</li><li>Emitir referencias laborales y/o comerciales cuando el Titular lo requiera.</li><li>Validar las referencias laborales y/o comerciales que el Titular hubiese aportado.</li><li>Suministrar información personal de carácter comercial, para la ejecución de las relaciones contractuales adquiridas por la Compañía con terceros.</li><li>Actualizar datos personales.</li><li>Consultar, reportar, procesar y divulgar toda la información que se refiera a su comportamiento financiero, comercial y de servicios, a cualquier Operador de la - Información (Central de Riesgo) o a cualquier entidad o fuente de información pública o privada, nacional, extranjera o multilateral que administre o maneje bases de datos, para fines comerciales y de servicios de crédito.</li><li>Adelantar trámites de vinculación al sistema de seguridad social.</li><li>Realizar tratamiento de datos biométricos para la implementación y uso de sistemas de ingreso y seguridad que requieran autenticación biométrica.</li></ul><h4>Proveedores:</h4><ul><li>Establecimiento de canales de comunicación con el Titular, a través de correo electrónico, llamadas telefónicas, envío de SMS, WhatsApp, herramientas de mensajería instantánea, o cualquier canal de comunicación conocido o por conocerse, siempre que sea autorizado por el Titular.</li><li>Crear y realizar seguimiento a las órdenes de compra.</li><li>Gestionar el pago a proveedores.</li><li>Analizar información con fines estadísticos.</li><li>Solicitar propuestas y cotizaciones.</li><li>Atender reclamaciones.</li><li>Contactar a potenciales proveedor o proveedores actuales para compras y contratación.</li><li>Enviar y solicitar información sobre el desempeño de productos.</li><li>Evaluar calidad de productos y servicios contratados.</li><li>Realizar actividades de mercadeo y publicidad afines al objeto social de la - Compañía.</li><li>Analizar, evaluar y consultar la información entregada por el Titular en listas para el control de lavado de activos y financiación del terrorismo administradas por cualquier autoridad nacional o extranjera.</li></ul><h4>Comercial:</h4><ul><li>Establecimiento de canales de comunicación con el Titular, a través de correo electrónico, llamadas telefónicas, envío de SMS, WhatsApp, herramientas de mensajería instantánea, o cualquier canal de comunicación conocido o por conocerse, siempre que sea autorizado por el Titular.</li><li>Ofrecer servicios y campañas comerciales.</li><li>Ofertar servicios de valor agregado.</li><li>Participar en programas de beneficios y fidelización.</li><li>Consultar en centrales de información para fines comerciales y de servicios de crédito</li><li>Consultar hábitos de consumo y aficiones para ofertas, promociones y servicios, entre otros.</li><li>Contactarlo para realizar estudios de mercado y encuestas de satisfacción.</li><li>Gestionar tramites (solicitudes, quejas y reclamos).</li><li>Compartir con empresas aliadas, asociados, sucursales, franquicias, filiales y subsidiarias para la oferta de servicios.</li></ul><h4>Accionistas:</h4><ul><li>Establecimiento de canales de comunicación con el Titular, a través de correo electrónico, llamadas telefónicas, envío de SMS, WhatsApp, herramientas de mensajería instantánea, o cualquier canal de comunicación conocido o por conocerse, siempre que sea autorizado por el Titular.</li><li>Control de registro de accionistas de la Compañía y el ejercicio de sus derechos.</li><li>Control del Libro de Registro de Accionistas de la sociedad.</li><li>Suministro y entrega de información sobre pago de dividendos o utilidades.</li><li>Analizar, evaluar y consultar la información entregada por el Titular en listas para el control de lavado de activos y financiación del terrorismo administradas por cualquier autoridad nacional o extranjera.</li></ul><h4>Tratamiento de datos de niños, niñas y adolescentes.</h4><p>En el Tratamiento de datos personales, la Compañía asegurará el respeto a los derechos prevalentes de los menores (niños, niñas, y adolescentes). Por este motivo, en caso de presentarse alguna recolección de datos personales correspondientes a este tipo de personas, se dará cumplimiento a lo señalado en el artículo 7 de la ley 1581 de 2012 y las demás disposiciones concordantes sobre la materia.</p><h4>Tratamiento de datos personales sensibles</h4><p>La Compañía conoce que realiza Tratamiento sobre datos personales que revisten la calidad de sensibles, por lo que asegurará que al momento de la recolección de datos personales correspondientes a este tipo, dará cumplimiento a lo señalado en el Artículo 6° del Decreto 1377 de 2013 y las demás disposiciones concordantes sobre la materia.</p><h3>MEDIDAS DE SEGURIDAD</h3><p>La Compañía, en cumplimiento de su propósito de garantizar el cuidado de los datos personales de terceros, obtenidos a través de los Canales autorizados por esta Política, ha dispuesto un conjunto de medidas de seguridad las cuales serán usadas e implementadas buscando una adecuada protección de toda la información que sea objeto de Tratamiento.<br/>Con lo anterior, se considera razonablemente que la Compañía cuenta con adecuados y suficientes modelos de gestión documental y protección de información para cumplir adecuadamente con sus obligaciones legales en relación con el cuidado y custodia de información suministrada por terceros.</p><h4>Procedimientos de seguridad.</h4><p>La Compañía, buscando lograr una adecuada protección de la información objeto de la Política, ha desplegado diversos mecanismos de seguridad para custodiar y evitar todo deterioro, pérdida o fuga que pueda presentarse en la información contenida en sus Bases de Datos.<br/>Uno de ellos está relacionado con la ubicación de la Base de Datos, la cual se encuentra en el Centros de Cómputo propio de la Compañía, contando con los debidos controles de acceso físico entre los cuales se encuentran:</p><ul><li>Acceso con tarjetas magnéticas personales y registro digital del ingreso.</li><li>Un modelo de seguridad lógico que permite restringir los usuarios que tienen acceso a la data e identificar inequívocamente su ingreso.</li><li>La creación diaria de respaldos de la información para evitar su pérdida.</li></ul><h4>Medidas de protección.</h4><p>Al interior de la Compañía, existen dos (2) tipos de medidas de protección dentro del Programa Integral de Gestión de Datos Personales adoptadas por cada uno de los Departamentos de la Compañía.</p><h4>Barreras físicas.</h4><p>La primera de las medidas tiene que ver con las barreras físicas que custodian el acceso a los medios que contienen las Bases de Datos. Para esto, el personal es primeramente identificado en la portería de la Compañía. Para tener acceso a los equipos en los que se almacenan las Bases de Datos, el personal debe pedir autorización al área de Servicios que es la encargada de permitir el ingreso al cuarto de equipos y autenticar la identidad del personal mediante tarjeta RFID. El ingreso es registrado mediante cámaras de video vigilancia.</p><h4>Barreras digitales.</h4><p>La segunda medida se encuentra descrita como las barreras digitales, en la cual, el usuario se debe autenticar en la estación de trabajo y luego frente al aplicativo, el cual se protege a través de un Firewall, a su vez, el aplicativo realiza la consulta a la Base de Datos que también está protegida por un Firewall.<br/>Adicionalmente, la Compañía implementa políticas de contraseñas en la cual se generan claves seguras de al menos doce (12) dígitos y con caracteres adecuados para que no se descifren fácilmente, adicional a que todas son mediante md5.</p><h3>PROCEDIMIENTOS PARA LA ATENCIÓN DE CONSULTAS Y RECLAMOS.</h3><h4>Canales de atención.</h4><p>Para la atención de consultas y reclamos relativos al Tratamiento de Datos Personales, podrán formularse a través del siguiente correo electrónico: <a href=\"mailto:datospersonales@esprit.com.co\">datospersonales@esprit.com.co</a></p><h4>Procedimiento para radicar una consulta.</h4><p>Cuando el Titular de los datos personales pretenda conocer, acceder a la información, o solicitar una copia de la Autorización, el área de Servicio al Cliente resolverá su consulta dentro de los diez (10) días hábiles siguientes a la fecha de recibo de la misma.<br/>Cuando no fuere posible atender la consulta dentro del término indicado en el inciso anterior, se informará al solicitante tal situación, los motivos de la demora y la fecha en la cual será resuelta la solicitud, fecha que en ningún caso superará los cinco (5) días hábiles siguientes al vencimiento del primer término.</p><h4>Procedimiento para radicar un reclamo.</h4><p>Cuando el Titular de los datos personales pretenda rectificar, actualizar, suprimir alguno de sus datos o revocar su Autorización, el área de Servicio al Cliente resolverá su reclamo dentro de los quince (15) días hábiles siguientes a la fecha de recibo de la misma.<br/>Cuando no fuere posible atender la consulta dentro del término indicado en el inciso anterior, se informará al solicitante tal situación, los motivos de la demora y la fecha en la cual será resuelta la solicitud, fecha que en ningún caso superará los ocho (8) días hábiles siguientes al vencimiento del primer término.</p><h4>Medio de respuesta.</h4><p>La Compañía dará respuesta a las consultas y reclamos de los Titulares, dentro de los términos establecidos en los numerales 22 y 23 de esta Política, de manera escrita a la dirección física o electrónica suministrada por el solicitante para tal efecto.<br/>Cuando el solicitante suministre una dirección física y una electrónica, o más de una dirección de aquellas o de estas, será a discreción de la Compañía la decisión sobre a cual dirección enviar la respuesta.</p><h4>Personas legitimadas para radicar consulta o reclamo.</h4><p>De conformidad con las normas aplicables a la materia, se encuentran legitimados para radicar una consulta o un reclamo ante la Compañía, las siguientes personas:</p><ul><li>Los Titulares de los datos personales.</li><li>Los causahabientes de los Titulares.</li><li>Los representantes legales.</li><li>Las entidades públicas o administrativas en ejercicio de sus funciones legales o por orden judicial.</li><li>Los terceros autorizados por el Titular o por la ley.</li></ul><h4>Actualización de las bases de datos.</h4><p>La Compañía actualizará sus Bases de Datos de manera permanente, de conformidad con lo señalado en la Ley 1581 de 2012.</p><h4>Transferencias de datos para tratamiento por terceros, nacionales e internacionales.</h4><p>La Compañía, puede transmitir o transferir de manera parcial o total los Datos Personales y la información transaccional a terceros en el país o en el exterior, en desarrollo de su objeto social, para lo cual solicita Autorización de su Titular e implementa las acciones necesarias para el cumplimiento de los preceptos normativos consagrados en la legislación Nacional Colombiana, mediante la suscripción de Acuerdos de Transferencia y Tratamiento de Datos Personales.</p><h4>Seguridad de la información.</h4><p>La Compañía cuenta con una Política de Seguridad de la Información, la cual hace parte integral de esta Política.</p><h4>Procedimiento para modificaciones a esta Política.</h4><p>Toda modificación a lo dispuesto en esta Política, pasará por un proceso de discusión y decisión conjunta en el que intervendrán los siguientes funcionarios de la Compañía:</p><ul><li>Gerencia de Clientes y Alianzas.</li><li>Dirección de Asuntos Legales y Cumplimiento.</li><li>Gerencia de Tecnología.</li></ul><p>De cada decisión que determine la necesidad de efectuar alguna modificación a la presente Política se dejará constancia escrita suscrita por los integrantes.<br/>Toda modificación que cumpla el procedimiento previamente determinado, entrará hacer parte de la presente Política y por lo tanto será de obligatorio e inmediato cumplimiento.</p><h4>Registro Nacional de Bases de Datos.</h4><p>Acorde con las disposiciones establecidas en el Decreto 1377 de 2013, así como las directrices impartidas por la autoridad competente en Colombia para la protección de los datos personales, la Compañía registrará las Bases de Datos sobre las cuales realice Tratamiento y procederá con su actualización anualmente.<br/>Así mismo, notificará por medio del Registro Nacional de Bases de Datos, cualquier incidente, novedad o inconsistencia que se presente frente al Tratamiento de los datos personales que conforman sus Bases de Datos.</p><h4>Vigencia.</h4><p>La presente Política regirá a partir de la fecha de su publicación y dejará sin efectos las demás disposiciones institucionales que le sean contrarias. Todo elemento sobre la materia objeto de la presente Política que no se encuentre contenido en la misma, se reglamentará de acuerdo al Régimen General de Protección de Datos Personales vigente en la República de Colombia.</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -1101,7 +1234,7 @@
           "type": "tab",
           "name": "Como comprar",
           "settings": {
-            "title": "Como comprar",
+            "title": "Cómo comprar",
             "category": "como-comprar"
           },
           "blocks": {
@@ -1110,6 +1243,11 @@
               "name": "t:names.heading",
               "settings": {
                 "text": "<h2>CÓMO COMPRAR</h2>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -1155,6 +1293,11 @@
               "name": "t:names.text",
               "settings": {
                 "text": "<p>Comprar en Esprit es muy fácil, sólo debes seguir los siguientes pasos:</p>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
                 "width": "fit-content",
                 "max_width": "none",
                 "alignment": "left",
@@ -1199,7 +1342,20 @@
               "type": "container",
               "name": "Paso 1",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_QWrkxR": {
@@ -1207,6 +1363,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>1</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1238,6 +1399,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Para buscar el producto que quieres comprar puedes navegar a través de las categorías en nuestro menú de categorías o utilizar la barra de búsqueda.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1288,7 +1454,20 @@
               "type": "container",
               "name": "Paso 2",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_RKjepC": {
@@ -1296,6 +1475,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>2</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1327,6 +1511,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Una vez hayas elegido el producto que deseas, selecciona el color, la talla y agrégalo a tu bolsa de compras dando clic en el botón <strong>COMPRAR</strong>.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1377,7 +1566,20 @@
               "type": "container",
               "name": "Paso 3",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_RAj3zM": {
@@ -1385,6 +1587,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>3</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1416,6 +1623,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Una vez hayas agregado el producto puedes seguir navegando y agregando a la bolsa los productos que desees.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1466,7 +1678,20 @@
               "type": "container",
               "name": "Paso 4",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_GkkNMG": {
@@ -1474,6 +1699,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>4</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1505,6 +1735,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Cuando hayas agregado todos los productos que deseas comprar, ve a tu bolsa de compras que está en la parte superior derecha. Verifica los productos que tienes en tu bolsa de compras y haz clic en FINALIZAR COMPRA</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1555,7 +1790,20 @@
               "type": "container",
               "name": "Paso 5",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_idWeCj": {
@@ -1563,6 +1811,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>5</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1594,6 +1847,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Ingresa tu correo electrónico para continuar con el proceso.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1644,7 +1902,20 @@
               "type": "container",
               "name": "Paso 6",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_98n6H7": {
@@ -1652,6 +1923,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>6</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1683,6 +1959,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Diligencia tus datos personales y datos de entrega.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1733,7 +2014,20 @@
               "type": "container",
               "name": "Paso 7",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_Pfymfa": {
@@ -1741,6 +2035,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>7</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1772,6 +2071,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Elige el método de pago que desees, puedes pagar con Tarjeta de Crédito, Tarjeta Débito o Efecty.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1822,7 +2126,20 @@
               "type": "container",
               "name": "Paso 8",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_KXEnBr": {
@@ -1830,6 +2147,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>8</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1861,6 +2183,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Verifica el mensaje de confirmación de tu compra y luego recibirás un correo de confirmación.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",
@@ -1911,7 +2238,20 @@
               "type": "container",
               "name": "Paso 9",
               "settings": {
-                "container_class": "como-comprar"
+                "html_tag": "div",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap": 12,
+                "border": "none",
+                "border_width": 1,
+                "border_radius": 0,
+                "border_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "container_class": "como-comprar",
+                "custom_css": ""
               },
               "blocks": {
                 "text_Liydq7": {
@@ -1919,6 +2259,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p><strong>9</strong></p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1950,6 +2295,11 @@
                   "name": "t:names.text",
                   "settings": {
                     "text": "<p>Recibe tu pedido en la puerta de tu casa y oficina.</p>",
+                    "enable_collapse": false,
+                    "collapsed_height": 50,
+                    "show_more_text": "Ver más",
+                    "show_less_text": "Ver menos",
+                    "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "none",
                     "alignment": "left",

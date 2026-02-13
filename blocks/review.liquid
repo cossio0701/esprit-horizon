@@ -1,5 +1,3 @@
-
-
 {% liquid
   assign block_settings = block.settings
   assign product = closest.product
@@ -254,9 +252,27 @@
       "default": "paragraph"
     },
     {
-      "type": "text_alignment",
+      "type": "select",
       "id": "alignment",
       "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        },
+        {
+          "value": "justify",
+          "label": "t:options.justify"
+        }
+      ],
       "default": "left"
     }
   ],

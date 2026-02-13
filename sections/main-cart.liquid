@@ -1,5 +1,3 @@
-
-
 <cart-items-component
   class="cart-items-component"
   data-section-id="{{ section.id }}"
@@ -34,6 +32,10 @@
 </cart-items-component>
 
 {% stylesheet %}
+  cart-items-component .section-background {
+    background-color: transparent;
+  }
+
   .cart-page {
     --cart-font-size--2xs: var(--font-size--2xs);
     --cart-font-size--xs: var(--font-size--xs);
@@ -51,6 +53,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+
+  .cart-page__title {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .cart-page--empty .cart-page__title,
@@ -72,11 +79,20 @@
 
   .cart-page__summary {
     padding-top: var(--padding-xl);
+    min-width: 381px;
+  }
+
+  .cart-page__summary .cart__summary-inner {
+    padding: 0;
+  }
+
+  .cart-page__summary .cart__summary-container {
+    min-width: 381px;
   }
 
   @media screen and (min-width: 750px) {
     .cart-page {
-      grid-template-columns: 1fr min(50vw, var(--sidebar-width));
+      grid-template-columns: 1fr minmax(381px, min(50vw, var(--sidebar-width)));
       grid-template-rows: min-content min-content 1fr;
     }
 
@@ -110,6 +126,15 @@
     .cart-page {
       grid-template-columns: 1fr var(--sidebar-width);
     }
+  }
+
+  /* Cart bubble styling for cart page */
+  cart-items-component .cart-bubble {
+    color: rgb(var(--color-foreground-rgb)) !important;
+  }
+
+  cart-items-component .cart-bubble__background {
+    background-color: rgb(220, 220, 220) !important;
   }
 {% endstylesheet %}
 

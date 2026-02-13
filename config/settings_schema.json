@@ -528,6 +528,16 @@
         "default": "72"
       },
       {
+        "type": "range",
+        "id": "type_size_h1_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 32
+      },
+      {
         "type": "select",
         "id": "type_line_height_h1",
         "label": "t:settings.line_height",
@@ -674,6 +684,16 @@
           }
         ],
         "default": "48"
+      },
+      {
+        "type": "range",
+        "id": "type_size_h2_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 28
       },
       {
         "type": "select",
@@ -832,6 +852,16 @@
         "default": "32"
       },
       {
+        "type": "range",
+        "id": "type_size_h3_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 24
+      },
+      {
         "type": "select",
         "id": "type_line_height_h3",
         "label": "t:settings.line_height",
@@ -986,6 +1016,16 @@
           }
         ],
         "default": "24"
+      },
+      {
+        "type": "range",
+        "id": "type_size_h4_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 20
       },
       {
         "type": "select",
@@ -1144,6 +1184,16 @@
         "default": "18"
       },
       {
+        "type": "range",
+        "id": "type_size_h5_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 16
+      },
+      {
         "type": "select",
         "id": "type_line_height_h5",
         "label": "t:settings.line_height",
@@ -1298,6 +1348,16 @@
           }
         ],
         "default": "16"
+      },
+      {
+        "type": "range",
+        "id": "type_size_h6_mobile",
+        "label": "Tamaño (Mobile)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 14
       },
       {
         "type": "select",

@@ -1,0 +1,30 @@
+{%- doc -%}
+  Renders the price for a cart line item.
+
+  @param {object} item - The cart line item
+  @param {string} [price_class] - Optional CSS class for the price span (e.g. 'cart-items__price-current')
+{%- enddoc -%}
+
+{% if item.original_price != item.final_price %}
+  <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
+  <span class="{{ price_class | default: 'item__final-price' }}">{{ item.final_price | money }}</span>
+  <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
+  <s class="compare-at-price">
+    {% if item.variant.compare_at_price > item.original_price %}
+      {{ item.variant.compare_at_price | money }}
+    {% else %}
+      {{ item.original_price | money }}
+    {% endif %}
+  </s>
+{% else %}
+  {% if item.variant.compare_at_price > item.original_price %}
+    <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
+  {% else %}
+    <span class="visually-hidden">{{ 'content.price' | t }}</span>
+  {% endif %}
+  <span class="{{ price_class }}">{{ item.original_price | money }}</span>
+  {% if item.variant.compare_at_price > item.original_price %}
+    <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
+    <s class="compare-at-price">{{ item.variant.compare_at_price | money }}</s>
+  {% endif %}
+{% endif %}

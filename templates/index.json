@@ -9,42 +9,43 @@
  */
 {
   "sections": {
-    "banner_home_pmXdDf": {
-      "type": "banner-home",
+    "17702342213f69d5dd": {
+      "type": "_blocks",
       "blocks": {
-        "banner_home_7ExqJG": {
-          "type": "_banner-home",
-          "name": "Banner slide",
-          "settings": {
-            "image_desktop": "shopify://shop_images/da4e8f7ada8681fcc0bf3df92e6c24209ac4670a.png",
-            "image_mobile": "shopify://shop_images/0da24530bf1932c2f732c73e42ccb0e5e11694c0.png",
-            "alt_text": "banner home esprit",
-            "start_date": "2025-11-01",
-            "end_date": "2026-11-01",
-            "legal": "",
-            "banner_url": "",
-            "banner_timer": "",
-            "timer_top_dktp": 50,
-            "timer_left_dktp": 50,
-            "timer_top_mbl": 50,
-            "timer_left_mbl": 50,
-            "timer_text_color": "#ffffff",
-            "timer_font_dktp": 1.2,
-            "timer_font_mbl": 3.5
-          },
-          "blocks": {}
+        "commons_components_banner_home_kdXKwX": {
+          "type": "shopify://apps/commons-components/blocks/banner-home/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+          "settings": {}
         }
       },
       "block_order": [
-        "banner_home_7ExqJG"
+        "commons_components_banner_home_kdXKwX"
       ],
-      "name": "Banner home slider GCO",
       "settings": {
-        "show_arrows": true,
-        "arrows_color": "#ffffff",
-        "show_dots": true,
-        "dots_color": "#cccccc",
-        "dots_active_color": "#000000"
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 0,
+        "section_width": "full-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "section_payTgk": {
@@ -86,7 +87,7 @@
             "text": "MODA Y ESTILO",
             "enable_line_breaks": false,
             "custom_break_marker": "",
-            "font_size": 24,
+            "font_size": 18,
             "font_size_mobile": 18,
             "font_weight": "400",
             "line_height": 1,
@@ -101,7 +102,7 @@
             "text": "PARA CADA MUJER",
             "enable_line_breaks": false,
             "custom_break_marker": "",
-            "font_size": 24,
+            "font_size": 18,
             "font_size_mobile": 18,
             "font_weight": "400",
             "line_height": 1,
@@ -142,8 +143,8 @@
         "overlay_color": "#00000026",
         "overlay_style": "solid",
         "gradient_direction": "to top",
-        "padding-block-start": 20,
-        "padding-block-end": 24
+        "padding-block-start": 18,
+        "padding-block-end": 18
       }
     },
     "product_list_fa6P9H": {
@@ -549,7 +550,7 @@
                 "width_mobile": "fill",
                 "custom_width_mobile": 100,
                 "height": "custom",
-                "custom_height": 60,
+                "custom_height": 30,
                 "inherit_color_scheme": true,
                 "color_scheme": "",
                 "background_media": "none",
@@ -797,7 +798,7 @@
                 "width_mobile": "custom",
                 "custom_width_mobile": 100,
                 "height": "custom",
-                "custom_height": 560,
+                "custom_height": 430,
                 "custom_height_mobile": 360,
                 "border": "none",
                 "border_width": 1,
@@ -857,7 +858,7 @@
         "products_count": 4,
         "image": "shopify://shop_images/9e06abd6d6d48e97c06f159a8c5671eb101b9aef.jpg",
         "title": "Spring Days",
-        "subtitle": "Shop Best Sellers",
+        "subtitle": "Comprar Colección",
         "title_color": "#ffffff",
         "subtitle_color": "#ffffff",
         "section_width": "page-width",
@@ -974,7 +975,7 @@
               "type": "ai_gen_block_8969bbd",
               "name": "Custom text",
               "settings": {
-                "text": "NEW ARRIVALS",
+                "text": "ÚLTIMOS VISTOS",
                 "enable_line_breaks": false,
                 "custom_break_marker": "",
                 "font_size": 16,
@@ -1172,7 +1173,7 @@
     }
   },
   "order": [
-    "banner_home_pmXdDf",
+    "17702342213f69d5dd",
     "section_payTgk",
     "product_list_fa6P9H",
     "1763584284ac7bb19d",
