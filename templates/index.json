@@ -1143,6 +1143,7 @@
       "block_order": [
         "instafeed_app_block_DNA74H"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
