@@ -58,7 +58,11 @@
         if has_unit_mobile
            assign font_size_mobile_value = settings.font_size_mobile
         else
-           assign font_size_mobile_value = settings.font_size_mobile | append: font_size_unit
+           if font_size_unit == 'responsive'
+             assign font_size_mobile_value = settings.font_size_mobile | append: 'px'
+           else
+             assign font_size_mobile_value = settings.font_size_mobile | append: font_size_unit
+           endif
         endif
       endif
     %}

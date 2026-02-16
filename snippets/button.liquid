@@ -19,10 +19,14 @@
   {% endif %}
   class="
     size-style
+    {% render 'typography-classes', settings: block_settings %}
     {{ block_settings.style_class }}
     {{ block_settings.style_class }}--{{ block.id }}
   "
-  style="{% render 'size-style', settings: block_settings %}"
+  style="
+    {% render 'size-style', settings: block_settings %}
+    {% render 'typography-style', settings: block_settings, preset: 'custom' %}
+  "
   {%- if block_settings.open_in_new_tab -%}
     target="_blank"
     rel="noopener noreferrer"

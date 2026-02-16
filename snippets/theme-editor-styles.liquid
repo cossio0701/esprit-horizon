@@ -1,11 +1,27 @@
 {%- liquid
   assign styles = ''
 
-  assign styles = styles | append: 'padding:' | append: block.settings.padding_top | append: 'px ' | append: block.settings.padding_right | append: 'px ' | append: block.settings.padding_bottom | append: 'px ' | append: block.settings.padding_left | append: 'px;'
+  capture p_top
+    render 'render-responsive-spacing', unit: block.settings.padding_unit, desktop_value: block.settings.padding_top, mobile_value: block.settings.padding_top_mobile
+  endcapture
+  capture p_right
+    render 'render-responsive-spacing', unit: block.settings.padding_unit, desktop_value: block.settings.padding_right, mobile_value: block.settings.padding_right_mobile
+  endcapture
+  capture p_bottom
+    render 'render-responsive-spacing', unit: block.settings.padding_unit, desktop_value: block.settings.padding_bottom, mobile_value: block.settings.padding_bottom_mobile
+  endcapture
+  capture p_left
+    render 'render-responsive-spacing', unit: block.settings.padding_unit, desktop_value: block.settings.padding_left, mobile_value: block.settings.padding_left_mobile
+  endcapture
+  capture gap_style
+    render 'render-responsive-spacing', unit: block.settings.gap_unit, desktop_value: block.settings.gap, mobile_value: block.settings.gap_mobile
+  endcapture
+
+  assign styles = styles | append: 'padding:' | append: p_top | append: ' ' | append: p_right | append: ' ' | append: p_bottom | append: ' ' | append: p_left | append: ';'
 
   assign styles = styles | append: '--direction-desktop:' | append: block.settings.desktop_direction | append: ';'
   assign styles = styles | append: '--direction-mobile:' | append: block.settings.mobile_direction | append: ';'
-  assign styles = styles | append: 'gap:' | append: block.settings.gap | append: 'px;'
+  assign styles = styles | append: 'gap:' | append: gap_style | append: ';'
 
   if block.settings.border != 'none'
     assign styles = styles | append: 'border:' | append: block.settings.border_width | append: 'px ' | append: block.settings.border | append: ' ' | append: block.settings.border_color | append: ';'

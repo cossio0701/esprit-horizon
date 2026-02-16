@@ -1,0 +1,25 @@
+{%- liquid
+  if unit == 'responsive'
+    assign desktop_val = desktop_value | times: 1.0
+    assign mobile_val = mobile_value | default: desktop_value | times: 1.0
+
+    # Base Desktop = 1280
+    assign vw_value = desktop_val | divided_by: 1280.0 | times: 100.0
+
+    if desktop_val > mobile_val
+      assign min = mobile_val
+      assign max = 1000
+    elsif desktop_val < mobile_val
+      assign min = 0
+      assign max = mobile_val
+    else
+      # If equal, scale from mobile size upwards
+      assign min = mobile_val
+      assign max = 1000
+    endif
+
+    echo 'clamp(' | append: min | append: 'px, ' | append: vw_value | append: 'vw, ' | append: max | append: 'px)'
+  else
+    echo desktop_value | append: 'px'
+  endif
+-%}
