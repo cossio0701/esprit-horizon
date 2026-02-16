@@ -31,16 +31,19 @@
   SECCIÓN 2: HTML/ESTRUCTURA
 {%- endcomment -%}
 
+{%- liquid
+  assign container_styles = styles | append: '; display: flex;'
+-%}
+
 {% if has_content %}
   {% if block.settings.enable_section_width %}
     <div
       class="section section--{{ block.settings.section_width }}"
-      style="{{ styles }}"
       {{ block.shopify_attributes }}
     >
       <{{ tag }}
         class="gco-container {{ container_class }}"
-        style="display: flex; gap: inherit;"
+        style="{{ container_styles }}"
       >
         {{ children }}
       </{{ tag }}>
@@ -48,7 +51,7 @@
   {% else %}
     <{{ tag }}
       class="gco-container {{ container_class }}"
-      style="{{ styles }}; display: flex;"
+      style="{{ container_styles }}"
       {{ block.shopify_attributes }}
     >
       {{ children }}

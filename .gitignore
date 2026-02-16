@@ -1,6 +1,7 @@
 # Ignore VS Code workspace and settings
 .vscode/
 *.code-workspace
+.agent/
 
 # macOS
 .DS_Store
