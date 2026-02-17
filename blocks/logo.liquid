@@ -31,6 +31,54 @@
   style="
     {% if block_settings.unit == 'percent' %}
       --logo-width: {{ block_settings.percent_width }}%;
+    {% elsif block_settings.unit == 'responsive' %}
+      {% liquid
+        assign desktop_height = block_settings.pixel_height | times: 1.0
+        assign mobile_height = block_settings.pixel_height_mobile | default: block_settings.pixel_height | times: 1.0
+
+        # Base Viewports
+        assign desktop_vw = desktop_height | divided_by: 1280.0 | times: 100.0
+
+        assign min_height = mobile_height | append: 'px'
+        assign max_height = desktop_height | append: 'px'
+
+        if mobile_height > desktop_height
+          assign min_height = desktop_height | append: 'px'
+          assign max_height = mobile_height | append: 'px'
+        endif
+
+        if image
+          assign aspect_ratio = image.width | times: 1.0 | divided_by: image.height
+          assign desktop_width = desktop_height | times: aspect_ratio
+          assign mobile_width = mobile_height | times: aspect_ratio
+          assign desktop_width_vw = desktop_width | divided_by: 1280.0 | times: 100.0
+
+          assign min_width = mobile_width | append: 'px'
+          assign max_width = desktop_width | append: 'px'
+
+          if mobile_width > desktop_width
+            assign min_width = desktop_width | append: 'px'
+            assign max_width = mobile_width | append: 'px'
+          endif
+        else
+          # Text fallback sizing
+          assign text_width_ch = shop.name.size | append: 'ch'
+          assign min_width = text_width_ch
+          assign max_width = text_width_ch
+          assign desktop_width_vw = 0
+        endif
+      %}
+      {% if image %}
+        --logo-width: clamp({{ min_width }}, {{ desktop_width_vw }}vw, {{ max_width }});
+        --logo-height: clamp({{ min_height }}, {{ desktop_vw }}vw, {{ max_height }});
+        --logo-width-mobile: var(--logo-width);
+        --logo-height-mobile: var(--logo-height);
+      {% else %}
+        --logo-width: {{ text_width_ch }};
+        --logo-height: clamp({{ min_height }}, {{ desktop_vw }}vw, {{ max_height }});
+        --logo-width-mobile: var(--logo-width);
+        --logo-height-mobile: var(--logo-height);
+      {% endif %}
     {% else %}
       {% if image %}
         --logo-width: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height }}px;
@@ -40,16 +88,16 @@
       {% endif %}
     {% endif %}
 
-    {% if block_settings.custom_mobile_size %}
+    {% if block_settings.custom_mobile_size and block_settings.unit != 'responsive' %}
       {% if block_settings.unit_mobile == 'percent' %}
         --logo-width-mobile: {{ block_settings.percent_width_mobile }}%;
         --logo-height-mobile: auto;
       {% else %}
         {% if image %}
           --logo-width-mobile: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height_mobile }}px;
-          {% else %}
-            --logo-width-mobile: {{ shop.name.size }}ch;
-            --logo-height-mobile: {{ block_settings.pixel_height_mobile }}px;
+        {% else %}
+          --logo-width-mobile: {{ shop.name.size }}ch;
+          --logo-height-mobile: {{ block_settings.pixel_height_mobile }}px;
         {% endif %}
       {% endif %}
     {% endif %}
@@ -172,6 +220,10 @@
         {
           "value": "percent",
           "label": "t:options.percent"
+        },
+        {
+          "value": "responsive",
+          "label": "responsive"
         }
       ],
       "default": "percent"
@@ -196,18 +248,19 @@
       "step": 8,
       "unit": "px",
       "default": 48,
-      "visible_if": "{{ block.settings.unit == 'pixel' }}"
+      "visible_if": "{{ block.settings.unit == 'pixel' or block.settings.unit == 'responsive' }}"
     },
     {
       "type": "checkbox",
       "id": "custom_mobile_size",
       "label": "t:settings.custom_mobile_size",
-      "default": false
+      "default": false,
+      "visible_if": "{{ block.settings.unit != 'responsive' }}"
     },
     {
       "type": "header",
       "content": "t:content.mobile_size",
-      "visible_if": "{{ block.settings.custom_mobile_size == true }}"
+      "visible_if": "{{ block.settings.unit == 'responsive' or block.settings.custom_mobile_size == true }}"
     },
     {
       "type": "select",
@@ -224,7 +277,7 @@
         }
       ],
       "default": "percent",
-      "visible_if": "{{ block.settings.custom_mobile_size == true }}"
+      "visible_if": "{{ block.settings.custom_mobile_size == true and block.settings.unit != 'responsive' }}"
     },
     {
       "type": "range",
@@ -235,7 +288,7 @@
       "step": 1,
       "unit": "%",
       "default": 100,
-      "visible_if": "{{ block.settings.unit_mobile == 'percent' and block.settings.custom_mobile_size == true}}"
+      "visible_if": "{{ block.settings.unit_mobile == 'percent' and block.settings.custom_mobile_size == true and block.settings.unit != 'responsive' }}"
     },
     {
       "type": "range",
@@ -245,8 +298,8 @@
       "max": 160,
       "step": 8,
       "unit": "px",
-      "default": 120,
-      "visible_if": "{{ block.settings.unit_mobile == 'pixel' and block.settings.custom_mobile_size == true}}"
+      "default": 32,
+      "visible_if": "{{ block.settings.unit == 'responsive' or block.settings.unit_mobile == 'pixel' and block.settings.custom_mobile_size == true }}"
     },
     {
       "type": "header",

@@ -26,6 +26,63 @@
     },
     {
       "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "unit",
+      "label": "t:settings.unit",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "t:options.pixel"
+        },
+        {
+          "value": "percent",
+          "label": "t:options.percent"
+        },
+        {
+          "value": "responsive",
+          "label": "responsive"
+        }
+      ],
+      "default": "pixel"
+    },
+    {
+      "type": "range",
+      "id": "percent_width",
+      "label": "t:settings.width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.unit == 'percent' }}"
+    },
+    {
+      "type": "range",
+      "id": "pixel_height",
+      "label": "t:settings.height",
+      "min": 12,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36,
+      "visible_if": "{{ block.settings.unit == 'pixel' or block.settings.unit == 'responsive' }}"
+    },
+    {
+      "type": "range",
+      "id": "pixel_height_mobile",
+      "label": "t:settings.mobile_height",
+      "min": 12,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ block.settings.unit == 'responsive' }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding_desktop"
     },
     {
