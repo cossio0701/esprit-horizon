@@ -737,24 +737,11 @@
     btn.innerHTML = '<span class="plp-spinner"></span>';
 
     try {
-      const response = await addToCart(state.variantId);
+      await addToCart(state.variantId);
 
       btn.innerHTML = CONFIG.MESSAGES.added;
       btn.classList.add(CONFIG.CLASSES.success);
-
-      // Dispatch cart:update event so the cart drawer opens (same as add-to-cart-component)
-      document.dispatchEvent(new CustomEvent('cart:update', {
-        bubbles: true,
-        detail: {
-          resource: response,
-          sourceId: 'plp-add-to-cart-' + productId,
-          data: {
-            source: 'product-form-component',
-            itemCount: 1,
-            productId: productId,
-          },
-        },
-      }));
+      updateCartCount();
 
       resetButtonState(btn, originalContent, [CONFIG.CLASSES.success]);
     } catch (err) {

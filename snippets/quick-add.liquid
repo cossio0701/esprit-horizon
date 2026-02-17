@@ -62,7 +62,6 @@
   class="quick-add color-{{ settings.quick_add_color_scheme }} "
   ref="quickAdd"
   data-product-title="{{ product.title }}"
-  data-product-url="{{ product.url }}"
 >
   <product-form-component
     data-section-id="{{ section_id }}"
@@ -96,26 +95,38 @@
         name="quantity"
         value="{% if variant_to_use.quantity_rule.min %}{{ variant_to_use.quantity_rule.min }}{% else %}1{% endif %}"
       >
-      {% comment %} Always open quick-add modal for all products {% endcomment %}
-      <button
-        class="button quick-add__button quick-add__button--choose"
-        type="button"
-        name="add"
-        on:click="quick-add-component/handleClick"
-      >
-        <span
-          class="add-to-cart-text"
+      {% comment %} If there is one variant option but it's swatches or if it's a single variant product, then use add to cart button {% endcomment %}
+      {%- if product.variants.size == 1 or product.options.size == 1 -%}
+        {% render 'add-to-cart-button',
+          add_to_cart_text: add_to_cart_text,
+          class: 'button quick-add__button quick-add__button--add',
+          can_add_to_cart: can_add_to_cart,
+          icon_only_on_mobile: true,
+          product: product
+        %}
+      {%- endif -%}
+      {%- if product.variants.size > 1 -%}
+        <button
+          class="button quick-add__button quick-add__button--choose"
+          {% comment %} type="submit" is the default, so we explicitly set it to "button" to prevent the ProductFormComponent.handleSubmit from being triggered {% endcomment %}
+          type="button"
+          name="add"
+          on:click="quick-add-component/handleClick"
         >
           <span
-            class="svg-wrapper add-to-cart-icon"
+            class="add-to-cart-text"
           >
-            {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+            <span
+              class="svg-wrapper add-to-cart-icon"
+            >
+              {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+            </span>
+            <span class="add-to-cart-text__content is-visually-hidden-mobile">
+              {{ add_to_cart_text }}
+            </span>
           </span>
-          <span class="add-to-cart-text__content is-visually-hidden-mobile">
-            {{ add_to_cart_text }}
-          </span>
-        </span>
-      </button>
+        </button>
+      {%- endif -%}
     {%- endform -%}
   </product-form-component>
 </quick-add-component>

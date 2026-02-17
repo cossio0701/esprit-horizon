@@ -39,8 +39,8 @@
         </div>
       {%- endif -%}
 
-      {% comment %} Quick Add on hover - opens modal {% endcomment %}
-      {%- render 'quick-add', product: product, section_id: section_id -%}
+      {% comment %} Quick Add on hover {% endcomment %}
+      {%- render 'quick-add-custom', product: product, section_id: section_id -%}
     </div>
 
     {% comment %} Product Info {% endcomment %}
@@ -88,36 +88,13 @@
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
   }
 
-  /* Quick-add button - same behavior as regular product-card */
-  .product-card-simple__media .quick-add {
-    --quick-add-mobile-display: flex;
-    --quick-add-display: flex;
-  }
-
-  /* Mobile: button always visible */
-  @media screen and (max-width: 749px) {
-    .product-card-simple__media .quick-add {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      left: auto;
-      inset: auto 8px 8px auto;
-    }
-  }
-
-  /* Desktop: show on hover */
-  @media screen and (min-width: 750px) {
-    .product-card-simple__media .quick-add {
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-    }
-
-    .product-card-simple__media:hover .quick-add,
-    .product-card-simple__media:focus-within .quick-add {
-      opacity: 1;
-      visibility: visible;
-    }
+  /* Show quick-add on hover */
+  .product-card-simple__media:hover .quick-add-custom,
+  .product-card-simple__media:focus-within .quick-add-custom {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
   }
 
   .product-card-simple__image {
