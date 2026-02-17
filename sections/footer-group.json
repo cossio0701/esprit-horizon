@@ -515,7 +515,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "",
+            "menu": "ayuda",
             "heading": "Ayuda",
             "menu_spacing": 4,
             "show_as_accordion": true,
@@ -536,7 +536,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "",
+            "menu": "sobre-nosotros",
             "heading": "Sobre Nosotros",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -557,8 +557,29 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "",
+            "menu": "informaci-n",
             "heading": "Información",
+            "menu_spacing": 12,
+            "show_as_accordion": true,
+            "accordion_icon": "plus",
+            "accordion_dividers": true,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "heading_preset": "h5",
+            "link_preset": "paragraph",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "menu_ehrkE6": {
+          "type": "menu",
+          "name": "t:names.menu",
+          "settings": {
+            "menu": "contacto",
+            "heading": "Contacto",
             "menu_spacing": 12,
             "show_as_accordion": true,
             "accordion_icon": "plus",
@@ -578,13 +599,14 @@
       "block_order": [
         "menu_bMqiN6",
         "menu_8Yi6EU",
-        "menu_3FnwKQ"
+        "menu_3FnwKQ",
+        "menu_ehrkE6"
       ],
       "custom_css": [],
       "name": "t:names.footer",
       "settings": {
         "section_width": "page-width",
-        "gap": 10,
+        "gap": 0,
         "color_scheme": "scheme-1249be79-cb87-4aba-8a8f-34f6a1723ff9",
         "padding-block-start": 30,
         "padding-block-end": 30
