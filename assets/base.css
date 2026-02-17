@@ -2294,6 +2294,10 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6)>*:not(.tax-note) {
 .custom-font-size,
 .custom-font-size>* {
   font-size: var(--font-size);
+
+  @media screen and (max-width: 749px) {
+    font-size: var(--font-size-mobile, var(--font-size));
+  }
 }
 
 .custom-font-weight,

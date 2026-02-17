@@ -25,13 +25,74 @@
     endif
   endif
 
-  assign logo_width = settings.logo_height | times: settings.logo.aspect_ratio | ceil
-  assign logo_width_mobile = settings.logo_height_mobile | times: settings.logo.aspect_ratio | ceil
-  assign inverse_logo_width = settings.logo_height | times: inverse_logo.aspect_ratio | ceil
-  assign inverse_logo_width_mobile = settings.logo_height_mobile | times: inverse_logo.aspect_ratio | ceil
+  if block_settings.unit == 'responsive'
+    assign desktop_height = block_settings.pixel_height | times: 1.0
+    assign mobile_height = block_settings.pixel_height_mobile | default: block_settings.pixel_height | times: 1.0
 
-  assign logo_style = '--header-logo-image-width: ' | append: logo_width | append: 'px;' | append: '--header-logo-image-width-mobile: ' | append: logo_width_mobile | append: 'px; --header-logo-image-height: ' | append: settings.logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: settings.logo_height_mobile | append: 'px;'
-  assign inverse_logo_style = '--header-logo-image-width: ' | append: inverse_logo_width | append: 'px;' | append: '--header-logo-image-width-mobile: ' | append: inverse_logo_width_mobile | append: 'px; --header-logo-image-height: ' | append: settings.logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: settings.logo_height_mobile | append: 'px;'
+    # Base Viewports: Target 1280px for desktop sizing
+    assign desktop_vw = desktop_height | divided_by: 12.8
+    assign min_height = mobile_height | append: 'px'
+    assign max_height = desktop_height | append: 'px'
+
+    if mobile_height > desktop_height
+      assign min_height = desktop_height | append: 'px'
+      assign max_height = mobile_height | append: 'px'
+    endif
+
+    assign header_logo_height = 'clamp(' | append: min_height | append: ', ' | append: desktop_vw | append: 'vw, ' | append: max_height | append: ')'
+    assign header_logo_height_mobile = header_logo_height
+
+    if settings.logo != blank
+      assign aspect_ratio = settings.logo.width | times: 1.0 | divided_by: settings.logo.height
+      assign desktop_width = desktop_height | times: aspect_ratio
+      assign mobile_width = mobile_height | times: aspect_ratio
+      assign desktop_width_vw = desktop_width | divided_by: 12.8
+
+      assign min_width = mobile_width | append: 'px'
+      assign max_width = desktop_width | append: 'px'
+
+      if mobile_width > desktop_width
+        assign min_width = desktop_width | append: 'px'
+        assign max_width = mobile_width | append: 'px'
+      endif
+
+      assign header_logo_width = 'clamp(' | append: min_width | append: ', ' | append: desktop_width_vw | append: 'vw, ' | append: max_width | append: ')'
+      assign header_logo_width_mobile = header_logo_width
+    endif
+
+    if inverse_logo != blank
+      assign inverse_aspect_ratio = inverse_logo.width | times: 1.0 | divided_by: inverse_logo.height
+      assign inverse_desktop_width = desktop_height | times: inverse_aspect_ratio
+      assign inverse_mobile_width = mobile_height | times: inverse_aspect_ratio
+      assign inverse_desktop_width_vw = inverse_desktop_width | divided_by: 12.8
+
+      assign inverse_min_width = inverse_mobile_width | append: 'px'
+      assign inverse_max_width = inverse_desktop_width | append: 'px'
+
+      if inverse_mobile_width > inverse_desktop_width
+        assign inverse_min_width = inverse_desktop_width | append: 'px'
+        assign inverse_max_width = inverse_mobile_width | append: 'px'
+      endif
+
+      assign inverse_header_logo_width = 'clamp(' | append: inverse_min_width | append: ', ' | append: inverse_desktop_width_vw | append: 'vw, ' | append: inverse_max_width | append: ')'
+      assign inverse_header_logo_width_mobile = inverse_header_logo_width
+    endif
+  else
+    assign logo_width = settings.logo_height | times: settings.logo.aspect_ratio | ceil
+    assign logo_width_mobile = settings.logo_height_mobile | times: settings.logo.aspect_ratio | ceil
+    assign inverse_logo_width = settings.logo_height | times: inverse_logo.aspect_ratio | ceil
+    assign inverse_logo_width_mobile = settings.logo_height_mobile | times: inverse_logo.aspect_ratio | ceil
+
+    assign header_logo_height = settings.logo_height | append: 'px'
+    assign header_logo_height_mobile = settings.logo_height_mobile | append: 'px'
+    assign header_logo_width = logo_width | append: 'px'
+    assign header_logo_width_mobile = logo_width_mobile | append: 'px'
+    assign inverse_header_logo_width = inverse_logo_width | append: 'px'
+    assign inverse_header_logo_width_mobile = inverse_logo_width_mobile | append: 'px'
+  endif
+
+  assign logo_style = '--header-logo-image-width: ' | append: header_logo_width | append: ';' | append: '--header-logo-image-width-mobile: ' | append: header_logo_width_mobile | append: '; --header-logo-image-height: ' | append: header_logo_height | append: '; --header-logo-image-height-mobile: ' | append: header_logo_height_mobile | append: ';'
+  assign inverse_logo_style = '--header-logo-image-width: ' | append: inverse_header_logo_width | append: ';' | append: '--header-logo-image-width-mobile: ' | append: inverse_header_logo_width_mobile | append: '; --header-logo-image-height: ' | append: header_logo_height | append: '; --header-logo-image-height-mobile: ' | append: header_logo_height_mobile | append: ';'
 %}
 
 <a

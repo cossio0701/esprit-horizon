@@ -1060,6 +1060,7 @@
     "show_tax_info": "Tax information",
     // Font size or element dimensions setting
     "size": "Size",
+    "size_desktop": "Desktop size",
     "size_mobile": "Mobile size",
     "slide_spacing": "Slide gap",
     "slide_width": "Slide width",

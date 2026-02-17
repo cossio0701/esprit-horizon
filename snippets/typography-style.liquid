@@ -33,26 +33,94 @@
         endif
       endunless
     %}
+    {% liquid
+      assign font_size_unit = settings.font_size_unit | default: 'px'
+      
+      if settings.font_size != blank
+        assign has_unit = false
+        if settings.font_size contains 'rem' or settings.font_size contains 'px' or settings.font_size contains 'em' or settings.font_size contains 'vh' or settings.font_size contains 'vw' or settings.font_size contains '%' or settings.font_size contains 'responsive'
+          assign has_unit = true
+        endif
+        
+        if has_unit
+           assign font_size_value = settings.font_size
+        else
+           assign font_size_value = settings.font_size | append: font_size_unit
+        endif
+      endif
+
+      if settings.font_size_mobile != blank
+        assign has_unit_mobile = false
+        if settings.font_size_mobile contains 'rem' or settings.font_size_mobile contains 'px' or settings.font_size_mobile contains 'em' or settings.font_size_mobile contains 'vh' or settings.font_size_mobile contains 'vw' or settings.font_size_mobile contains '%'
+           assign has_unit_mobile = true
+        endif
+        
+        if has_unit_mobile
+           assign font_size_mobile_value = settings.font_size_mobile
+        else
+           if font_size_unit == 'responsive'
+             assign font_size_mobile_value = settings.font_size_mobile | append: 'px'
+           else
+             assign font_size_mobile_value = settings.font_size_mobile | append: font_size_unit
+           endif
+        endif
+      endif
+    %}
+
     {%- if settings.font_size != blank -%}
       {%- liquid
-        assign font_size_rem = settings.font_size | split: 'rem' | first | times: 1.0
-        assign fluid_size_cutoff_rem = 3.0
+        assign is_responsive = false
+        if font_size_value contains 'responsive' or settings.font_size_unit == 'responsive'
+          assign is_responsive = true
+        endif
 
-        if font_size_rem >= fluid_size_cutoff_rem
-          assign target_viewport = 1400
-          assign vw_value = font_size_rem | times: 16 | divided_by: target_viewport | times: 100
+        if is_responsive
+          assign desktop_size = settings.font_size | times: 1.0
+          assign mobile_size = settings.font_size_mobile | default: settings.font_size | times: 1.0
+          
+          # Base Desktop = 1280
+          assign vw_value = desktop_size | divided_by: 1280.0 | times: 100.0
+          
+          if desktop_size > mobile_size
+             assign min_size = mobile_size
+             assign max_size = 1000
+          elsif desktop_size < mobile_size
+             assign min_size = 0
+             assign max_size = mobile_size
+          else
+             # If equal, scale from mobile size upwards
+             assign min_size = mobile_size
+             assign max_size = 1000
+          endif
+        else
+          assign font_size_rem = font_size_value | split: 'rem' | first | times: 1.0
+          assign is_rem = false
+          if font_size_value contains 'rem'
+            assign is_rem = true
+          endif
+          assign fluid_size_cutoff_rem = 3.0
 
-          assign scale_factor = font_size_rem | divided_by: fluid_size_cutoff_rem
-          assign base_min_rem = 3.0
-          assign scaling_bonus_rem = scale_factor | minus: 1 | times: 0.25
-          assign dynamic_min_rem = base_min_rem | plus: scaling_bonus_rem
+          if is_rem and font_size_rem >= fluid_size_cutoff_rem
+            assign target_viewport = 1400
+            assign vw_value = font_size_rem | times: 16 | divided_by: target_viewport | times: 100
+
+            assign scale_factor = font_size_rem | divided_by: fluid_size_cutoff_rem
+            assign base_min_rem = 3.0
+            assign scaling_bonus_rem = scale_factor | minus: 1 | times: 0.25
+            assign dynamic_min_rem = base_min_rem | plus: scaling_bonus_rem
+          endif
         endif
       -%}
-      {%- if font_size_rem >= fluid_size_cutoff_rem -%}
-        --font-size: clamp({{ dynamic_min_rem }}rem, {{ vw_value }}vw, {{ settings.font_size }});
+      {%- if is_responsive -%}
+        --font-size: clamp({{ min_size }}px, {{ vw_value }}vw, {{ max_size }}px);
+      {%- elsif is_rem and font_size_rem >= fluid_size_cutoff_rem -%}
+        --font-size: clamp({{ dynamic_min_rem }}rem, {{ vw_value }}vw, {{ font_size_value }});
       {%- else -%}
-        --font-size: {{ settings.font_size }};
+        --font-size: {{ font_size_value }};
       {%- endif -%}
+    {%- endif -%}
+    {%- if settings.font_size_mobile != blank -%}
+      --font-size-mobile: {{ font_size_mobile_value }};
     {%- endif -%}
     {%- if settings.weight != blank -%}
       --font-weight: {{ settings.weight }};

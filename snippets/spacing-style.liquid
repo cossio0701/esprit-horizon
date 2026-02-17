@@ -9,25 +9,36 @@
 {%- enddoc -%}
 {%- liquid
   assign scale_min = 20
-  assign keys = 'padding-block-start,padding-block-end,padding-inline-start,padding-inline-end' | split: ','
+  assign keys = 'padding-block-start,padding-block-end,padding-inline-start,padding-inline-end,padding_top,padding_bottom,padding_left,padding_right' | split: ','
+  assign unit = settings.padding_unit | default: 'px'
 
   for key in keys
     assign value = settings[key]
 
     if value != blank
       echo '--'
-      echo key
+      echo key | replace: '_', '-'
       echo ': '
 
-      if value > scale_min
-        echo 'max('
-        echo scale_min
-        echo 'px, calc(var(--spacing-scale) * '
-        echo value
-        echo 'px))'
+      if unit == 'responsive'
+        assign mobile_key = key | append: '_mobile'
+        assign mobile_value = settings[mobile_key]
+        if mobile_value == blank
+          assign mobile_key = key | append: '-mobile'
+          assign mobile_value = settings[mobile_key]
+        endif
+        render 'render-responsive-spacing', unit: 'responsive', desktop_value: value, mobile_value: mobile_value
       else
-        echo value
-        echo 'px'
+        if value > scale_min
+          echo 'max('
+          echo scale_min
+          echo 'px, calc(var(--spacing-scale, 1.0) * '
+          echo value
+          echo 'px))'
+        else
+          echo value
+          echo 'px'
+        endif
       endif
 
       echo ';'

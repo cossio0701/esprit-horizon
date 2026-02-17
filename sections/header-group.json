@@ -93,6 +93,7 @@
           "name": "Container",
           "settings": {
             "html_tag": "div",
+            "section_width": "full-width",
             "desktop_direction": "row",
             "mobile_direction": "row",
             "gap": 0,
