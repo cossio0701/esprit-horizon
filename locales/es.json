@@ -74,17 +74,17 @@
   },
   "actions": {
     "add_to_cart": "Agregar al carrito",
-    "clear_all": "Borrar todo",
+    "clear_all": "Limpiar",
     "remove": "Eliminar",
     "view_in_your_space": "Ver en tu espacio",
     "show_filters": "Filtrar",
-    "clear": "Borrar",
+    "clear": "Limpiar",
     "continue_shopping": "Seguir comprando",
     "log_in_html": "¿Tienes una cuenta? <a href=\"{{ link }}\">Inicia sesión</a> para pagar más rápido.",
     "see_items": {
-      "one": "Ver {{ count }} artículo",
-      "other": "Ver {{ count }} artículos",
-      "many": "Ver {{ count }} artículos"
+      "one": "Aplicar",
+      "other": "Aplicar",
+      "many": "Aplicar"
     },
     "view_all": "Ver todo",
     "add": "Añadir",

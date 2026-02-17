@@ -476,7 +476,7 @@
 
                       assign active_value_count = filter.active_values | size
                       assign total_active_values = total_active_values | plus: active_value_count
-                      render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, autofocus: should_autofocus, in_drawer: true, sectionId: section.id
+                      render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, autofocus: should_autofocus, in_drawer: true, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
                     %}
                 {% endcase %}
               {%- endfor -%}
