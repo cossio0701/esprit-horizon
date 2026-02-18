@@ -1018,32 +1018,178 @@
             "custom_css": ""
           },
           "blocks": {
-            "image_tqtWh8": {
-              "type": "image",
-              "name": "t:names.image",
+            "container_gUXzqB": {
+              "type": "container",
+              "name": "Imagen",
               "settings": {
-                "image": "shopify://shop_images/spring_days_desktop.jpg",
-                "use_mobile_image": true,
-                "image_mobile": "shopify://shop_images/spring_days_mobile.jpg",
-                "link": "",
-                "image_ratio": "adapt",
-                "width": "custom",
-                "custom_width": 100,
-                "width_mobile": "custom",
-                "custom_width_mobile": 100,
-                "height": "fit",
-                "custom_height": 400,
-                "custom_height_mobile": 0,
+                "html_tag": "div",
+                "enable_section_width": true,
+                "section_width": "full-width",
+                "desktop_direction": "row",
+                "mobile_direction": "row",
+                "gap_unit": "px",
+                "gap": 0,
+                "gap_mobile": 12,
                 "border": "none",
                 "border_width": 1,
-                "border_opacity": 100,
                 "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "border_color": "#000000",
+                "padding_unit": "px",
+                "padding_top": 0,
+                "padding_top_mobile": 0,
+                "padding_bottom": 0,
+                "padding_bottom_mobile": 0,
+                "padding_left": 0,
+                "padding_left_mobile": 0,
+                "padding_right": 0,
+                "padding_right_mobile": 0,
+                "container_class": "spring-image-home",
+                "custom_css": ""
               },
-              "blocks": {}
+              "blocks": {
+                "image_93aBjg": {
+                  "type": "image",
+                  "name": "t:names.image",
+                  "settings": {
+                    "image": "shopify://shop_images/spring_days_desktop.jpg",
+                    "use_mobile_image": true,
+                    "image_mobile": "shopify://shop_images/spring_days_mobile.jpg",
+                    "link": "",
+                    "image_ratio": "adapt",
+                    "width": "fill",
+                    "custom_width": 100,
+                    "width_mobile": "fill",
+                    "custom_width_mobile": 100,
+                    "height": "fit",
+                    "custom_height": 400,
+                    "custom_height_mobile": 0,
+                    "border": "none",
+                    "border_width": 1,
+                    "border_opacity": 100,
+                    "border_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                },
+                "container_Tn9nzd": {
+                  "type": "container",
+                  "name": "Texto",
+                  "settings": {
+                    "html_tag": "div",
+                    "enable_section_width": false,
+                    "section_width": "page-width",
+                    "desktop_direction": "column",
+                    "mobile_direction": "column",
+                    "gap_unit": "px",
+                    "gap": 12,
+                    "gap_mobile": 12,
+                    "border": "none",
+                    "border_width": 1,
+                    "border_radius": 0,
+                    "border_color": "#000000",
+                    "padding_unit": "px",
+                    "padding_top": 0,
+                    "padding_top_mobile": 0,
+                    "padding_bottom": 0,
+                    "padding_bottom_mobile": 0,
+                    "padding_left": 0,
+                    "padding_left_mobile": 0,
+                    "padding_right": 0,
+                    "padding_right_mobile": 0,
+                    "container_class": "spring-home-text",
+                    "custom_css": "position: absolute;\n    top: 4%;\n    left: 4%;"
+                  },
+                  "blocks": {
+                    "text_mtYTgP": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Spring Days</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "custom",
+                        "font": "var(--font-accent--family)",
+                        "font_size_unit": "px",
+                        "font_size": 32,
+                        "font_size_mobile": 32,
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    },
+                    "text_XNJ9b7": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p><a href=\"/collections/sale\" title=\"Sale\">Comprar Colección</a></p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "custom",
+                        "font": "var(--font-body--family)",
+                        "font_size_unit": "responsive",
+                        "font_size": 14,
+                        "font_size_mobile": 14,
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_mtYTgP",
+                    "text_XNJ9b7"
+                  ]
+                }
+              },
+              "block_order": [
+                "image_93aBjg",
+                "container_Tn9nzd"
+              ]
             },
             "container_wegrcQ": {
               "type": "container",
@@ -1524,7 +1670,7 @@
             }
           },
           "block_order": [
-            "image_tqtWh8",
+            "container_gUXzqB",
             "container_wegrcQ"
           ]
         }
@@ -1533,7 +1679,8 @@
         "container_8CQnKQ"
       ],
       "custom_css": [
-        "@media only screen and (max-width: 768px) {.section--page-width {--page-width: 0; }}"
+        "@media only screen and (max-width: 768px) {.section--page-width {--page-width: 0; }}",
+        ".spring-home-text p, .spring-home-text a {color: #ffffff;}"
       ],
       "name": "Spring days",
       "settings": {
@@ -1567,23 +1714,6 @@
         "padding-block-end": 20,
         "padding-block-start-mobile": 20,
         "padding-block-end-mobile": 20
-      }
-    },
-    "featured_collection_hero_FiDk6h": {
-      "type": "featured-collection-hero",
-      "disabled": true,
-      "name": "Featured Collection Hero",
-      "settings": {
-        "collection": "sale",
-        "products_count": 4,
-        "title": "Spring Days",
-        "subtitle": "Comprar Colección",
-        "title_color": "#ffffff",
-        "subtitle_color": "#ffffff",
-        "section_width": "page-width",
-        "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
       }
     },
     "section_tmebwi": {
@@ -1892,7 +2022,6 @@
     "1763584284ac7bb19d",
     "section_9GwNEK",
     "section_pgPt36",
-    "featured_collection_hero_FiDk6h",
     "section_tmebwi",
     "product_list_Ut3bJW",
     "17677328072562cb5a"
