@@ -7,25 +7,45 @@
       settings: {settings || section.settings}
 {%- endcomment -%}
 
-{% assign preset = preset | default: settings.type_preset %}
+{%- liquid
+  assign preset_key = prefix | append: 'type_preset'
+  assign color_key = prefix | append: 'color'
+  assign font_size_key = prefix | append: 'font_size'
+  assign font_size_unit_key = prefix | append: 'font_size_unit'
+  assign font_size_mobile_key = prefix | append: 'font_size_mobile'
+  assign weight_key = prefix | append: 'weight'
+  assign font_key = prefix | append: 'font'
+  assign case_key = prefix | append: 'case'
+  assign wrap_key = prefix | append: 'wrap'
+  assign line_height_key = prefix | append: 'line_height'
+  assign letter_spacing_key = prefix | append: 'letter_spacing'
+
+  assign preset = preset | default: settings[preset_key]
+  assign color = settings[color_key]
+  assign font_size = settings[font_size_key]
+  assign font_size_unit = settings[font_size_unit_key] | default: 'px'
+  assign font_size_mobile = settings[font_size_mobile_key]
+  assign weight = settings[weight_key]
+  assign font = settings[font_key]
+  assign case = settings[case_key]
+  assign wrap = settings[wrap_key]
+  assign line_height = settings[line_height_key]
+  assign letter_spacing = settings[letter_spacing_key]
+-%}
 
 {%- capture variables -%}
-  {%- if preset != 'rte' and settings.color != "" -%}
-    --color: {{ settings.color }};
+  {%- if preset != 'rte' and color != blank and color != "" -%}
+    --color: {{ color }};
   {%- endif -%}
   {%- if preset == 'custom' -%}
     {% liquid
       unless type
-        comment
-          When choosing to customize the font, picking a specific font size
-          determines the type of text block.
-        endcomment
-        if settings.font_size != ''
-          assign font_size_value = settings.font_size | split: 'rem' | first | times: 1.0
+        if font_size != blank and font_size != ''
+          assign font_size_value_num = font_size | split: 'rem' | first | times: 1.0
 
-          if font_size_value > 4.5
+          if font_size_value_num > 4.5
             assign type = 'display'
-          elsif font_size_value > 3.5
+          elsif font_size_value_num > 3.5
             assign type = 'heading'
           else
             assign type = 'body'
@@ -34,49 +54,47 @@
       endunless
     %}
     {% liquid
-      assign font_size_unit = settings.font_size_unit | default: 'px'
-      
-      if settings.font_size != blank
+      if font_size != blank
         assign has_unit = false
-        if settings.font_size contains 'rem' or settings.font_size contains 'px' or settings.font_size contains 'em' or settings.font_size contains 'vh' or settings.font_size contains 'vw' or settings.font_size contains '%' or settings.font_size contains 'responsive'
+        if font_size contains 'rem' or font_size contains 'px' or font_size contains 'em' or font_size contains 'vh' or font_size contains 'vw' or font_size contains '%' or font_size contains 'responsive'
           assign has_unit = true
         endif
         
         if has_unit
-           assign font_size_value = settings.font_size
+           assign font_size_value = font_size
         else
-           assign font_size_value = settings.font_size | append: font_size_unit
+           assign font_size_value = font_size | append: font_size_unit
         endif
       endif
 
-      if settings.font_size_mobile != blank
+      if font_size_mobile != blank
         assign has_unit_mobile = false
-        if settings.font_size_mobile contains 'rem' or settings.font_size_mobile contains 'px' or settings.font_size_mobile contains 'em' or settings.font_size_mobile contains 'vh' or settings.font_size_mobile contains 'vw' or settings.font_size_mobile contains '%'
+        if font_size_mobile contains 'rem' or font_size_mobile contains 'px' or font_size_mobile contains 'em' or font_size_mobile contains 'vh' or font_size_mobile contains 'vw' or font_size_mobile contains '%'
            assign has_unit_mobile = true
         endif
         
         if has_unit_mobile
-           assign font_size_mobile_value = settings.font_size_mobile
+           assign font_size_mobile_value = font_size_mobile
         else
            if font_size_unit == 'responsive'
-             assign font_size_mobile_value = settings.font_size_mobile | append: 'px'
+             assign font_size_mobile_value = font_size_mobile | append: 'px'
            else
-             assign font_size_mobile_value = settings.font_size_mobile | append: font_size_unit
+             assign font_size_mobile_value = font_size_mobile | append: font_size_unit
            endif
         endif
       endif
     %}
 
-    {%- if settings.font_size != blank -%}
+    {%- if font_size != blank -%}
       {%- liquid
         assign is_responsive = false
-        if font_size_value contains 'responsive' or settings.font_size_unit == 'responsive'
+        if font_size_value contains 'responsive' or font_size_unit == 'responsive'
           assign is_responsive = true
         endif
 
         if is_responsive
-          assign desktop_size = settings.font_size | times: 1.0
-          assign mobile_size = settings.font_size_mobile | default: settings.font_size | times: 1.0
+          assign desktop_size = font_size | times: 1.0
+          assign mobile_size = font_size_mobile | default: font_size | times: 1.0
           
           # Base Desktop = 1280
           assign vw_value = desktop_size | divided_by: 1280.0 | times: 100.0
@@ -119,25 +137,25 @@
         --font-size: {{ font_size_value }};
       {%- endif -%}
     {%- endif -%}
-    {%- if settings.font_size_mobile != blank -%}
+    {%- if font_size_mobile != blank -%}
       --font-size-mobile: {{ font_size_mobile_value }};
     {%- endif -%}
-    {%- if settings.weight != blank -%}
-      --font-weight: {{ settings.weight }};
+    {%- if weight != blank -%}
+      --font-weight: {{ weight }};
     {% else %}
-      --font-weight: {{ settings.font | replace: 'family', 'weight' }};
+      --font-weight: {{ font | replace: 'family', 'weight' }};
     {%- endif -%}
-    --font-family: {{ settings.font }};
-    --text-transform: {{ settings.case }};
-    --text-wrap: {{ settings.wrap }};
-    {% if settings.type_preset == 'custom' and settings.font_size == blank %}
-      --line-height--display: var(--line-height--display-{{ settings.line_height }});
-      --line-height--heading: var(--line-height--heading-{{ settings.line_height }});
-      --line-height--body: var(--line-height--body-{{ settings.line_height }});
+    --font-family: {{ font }};
+    --text-transform: {{ case }};
+    --text-wrap: {{ wrap }};
+    {% if preset == 'custom' and font_size == blank %}
+      --line-height--display: var(--line-height--display-{{ line_height }});
+      --line-height--heading: var(--line-height--heading-{{ line_height }});
+      --line-height--body: var(--line-height--body-{{ line_height }});
     {% else %}
-      --line-height: var(--line-height--{{ type }}-{{ settings.line_height }});
+      --line-height: var(--line-height--{{ type }}-{{ line_height }});
     {% endif %}
-    --letter-spacing: var(--letter-spacing--{{ type }}-{{ settings.letter_spacing }});
+    --letter-spacing: var(--letter-spacing--{{ type }}-{{ letter_spacing }});
   {%- endif -%}
 {%- endcapture -%}
 {{- variables | strip | strip_newlines -}}

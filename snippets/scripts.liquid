@@ -12,6 +12,7 @@
       "@theme/performance": "{{ 'performance.js' | asset_url }}",
       "@theme/product-form": "{{ 'product-form.js' | asset_url }}",
       "@theme/recently-viewed-products": "{{ 'recently-viewed-products.js' | asset_url }}",
+      "@theme/product-carousel": "{{ 'product-carousel.js' | asset_url }}",
       "@theme/scrolling": "{{ 'scrolling.js' | asset_url }}",
       "@theme/section-renderer": "{{ 'section-renderer.js' | asset_url }}",
       "@theme/section-hydration": "{{ 'section-hydration.js' | asset_url }}",
@@ -135,6 +136,11 @@
 ></script>
 <script
   src="{{ 'product-card.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+<script
+  src="{{ 'product-carousel.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>

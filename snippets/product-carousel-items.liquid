@@ -1,0 +1,28 @@
+{% liquid
+  assign max_products = max_products | default: 8
+%}
+
+{% capture list_items %}
+  {% for product in products limit: max_products %}
+    <div class="resource-list__item">
+      {% render 'product-card-simple', product: product, section_id: section.id %}
+    </div>
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+{% liquid
+  assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+%}
+
+{% render 'resource-list',
+  list_items: list_items,
+  list_items_array: list_items_array,
+  settings: settings,
+  carousel_ref: carousel_ref,
+  slide_count: products.size,
+  content_type: 'products',
+  layout_type: 'carousel'
+%}

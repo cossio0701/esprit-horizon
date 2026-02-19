@@ -5,7 +5,7 @@ export class RecentlyViewed {
   /** @static @constant {string} The key used to store the viewed products in session storage */
   static #STORAGE_KEY = 'viewedProducts';
   /** @static @constant {number} The maximum number of products to store */
-  static #MAX_PRODUCTS = 4;
+  static #MAX_PRODUCTS = 16;
 
   /**
    * Adds a product to the recently viewed products list.
