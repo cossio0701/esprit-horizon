@@ -1685,50 +1685,12 @@
     "section_8dMTwW": {
       "type": "section",
       "blocks": {
-        "text_zFzAFV": {
-          "type": "text",
-          "name": "t:names.text",
-          "settings": {
-            "text": "<p>ÚLTIMOS VISTOS</p>",
-            "enable_collapse": false,
-            "collapsed_height": 50,
-            "show_more_text": "Ver más",
-            "show_less_text": "Ver menos",
-            "enable_fade": true,
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "custom",
-            "font": "var(--font-accent--family)",
-            "font_size_unit": "responsive",
-            "font_size": 16,
-            "font_size_mobile": 16,
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "use_mobile_padding": false,
-            "padding-block-start-mobile": 0,
-            "padding-block-end-mobile": 0,
-            "padding-inline-start-mobile": 0,
-            "padding-inline-end-mobile": 0
-          },
-          "blocks": {}
-        },
         "product_carousel_wJPdPt": {
           "type": "product-carousel",
           "name": "t:names.product_carousel",
           "settings": {
-            "heading": "New Arrivals",
-            "view_all_link": "",
+            "heading": "ÚLTIMOS VISTOS",
+            "view_all_link": "shopify://collections/sale",
             "view_all_label": "Ver todo",
             "heading_type_preset": "h2",
             "heading_font": "var(--font-heading--family)",
@@ -1776,7 +1738,6 @@
         }
       },
       "block_order": [
-        "text_zFzAFV",
         "product_carousel_wJPdPt"
       ],
       "name": "Carrusel 2",
