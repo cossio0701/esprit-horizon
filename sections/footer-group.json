@@ -11,6 +11,19 @@
   "type": "footer",
   "name": "Footer",
   "sections": {
+    "registration_modal_WMUA9N": {
+      "type": "registration-modal",
+      "name": "Registration Modal",
+      "settings": {
+        "heading": "Crear cuenta",
+        "left_image": "shopify://shop_images/Group_688.png",
+        "success_image": "shopify://shop_images/Group_688.png",
+        "legal_text": "He leído y acepto la",
+        "legal_link_text": "Política de Tratamiento de Datos Personales.",
+        "legal_link": "shopify://pages/terminos-condiciones",
+        "button_text": "Suscribirse"
+      }
+    },
     "section_843EVi": {
       "type": "section",
       "blocks": {
@@ -434,26 +447,17 @@
                   },
                   "blocks": {}
                 },
-                "button_f3DWjE": {
-                  "type": "button",
-                  "name": "t:names.button",
+                "modal_trigger_qr9QfL": {
+                  "type": "_modal-trigger",
+                  "name": "Modal Trigger",
                   "settings": {
-                    "label": "SUSCRIBIRME",
-                    "link": "shopify://collections/all",
-                    "open_in_new_tab": false,
-                    "style_class": "button",
-                    "width": "custom",
-                    "custom_width": 40,
-                    "width_mobile": "custom",
-                    "custom_width_mobile": 50,
-                    "font": "var(--font-body--family)",
-                    "font_size_unit": "responsive",
-                    "font_size": 16,
-                    "font_size_mobile": 14,
-                    "weight": "",
-                    "line_height": "normal",
-                    "letter_spacing": "normal",
-                    "case": "none"
+                    "label": "suscribirme",
+                    "bg_color": "#000000",
+                    "text_color": "#ffffff",
+                    "font_size": 18,
+                    "uppercase": true,
+                    "padding_block": 10,
+                    "padding_inline": 16
                   },
                   "blocks": {}
                 }
@@ -461,7 +465,7 @@
               "block_order": [
                 "text_caapwE",
                 "text_BfVcpw",
-                "button_f3DWjE"
+                "modal_trigger_qr9QfL"
               ]
             }
           },
@@ -680,6 +684,7 @@
     }
   },
   "order": [
+    "registration_modal_WMUA9N",
     "section_843EVi",
     "section_BbhFt6",
     "footer_m9NzUG",

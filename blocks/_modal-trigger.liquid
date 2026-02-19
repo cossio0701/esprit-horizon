@@ -1,0 +1,95 @@
+<button
+  type="button"
+  data-open-newsletter-modal
+  style="
+    width: fit-content;
+    cursor: pointer;
+    {%- if block.settings.bg_color != blank -%}background-color: {{ block.settings.bg_color }};{%- endif -%}
+    {%- if block.settings.text_color != blank -%}color: {{ block.settings.text_color }};{%- endif -%}
+    font-size: {{ block.settings.font_size }}px;
+    padding-block: {{ block.settings.padding_block }}px;
+    padding-inline: {{ block.settings.padding_inline }}px;
+    {%- if block.settings.uppercase -%}text-transform: uppercase;{%- else -%}text-transform: none;{%- endif -%}
+  "
+  {{ block.shopify_attributes }}
+>
+  {{- block.settings.label -}}
+</button>
+
+{% schema %}
+{
+  "name": "Modal Trigger",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Button label",
+      "default": "Crear cuenta"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Uppercase",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "label": "Padding top / bottom",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_inline",
+      "label": "Padding left / right",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modal Trigger"
+    }
+  ]
+}
+{% endschema %}

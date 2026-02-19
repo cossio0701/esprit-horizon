@@ -282,19 +282,38 @@
     <div class="plp-variant-controller" data-product-id="{{ product.id }}" data-first-variant-id="{{ first_available_variant.id }}" data-first-color="{{ first_color }}">
       {%- comment -%} Fila 1: Tallas {%- endcomment -%}
       <div class="plp-sizes" id="sizes-{{ product.id }}">
+        {%- assign rendered_sizes = '' -%}
         {%- for variant in initial_variants -%}
+          {%- assign size_value = variant.option2 | default: variant.option1 -%}
+          {%- assign size_check = '|' | append: size_value | append: '|' -%}
+          {%- if rendered_sizes contains size_check -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- assign rendered_sizes = rendered_sizes | append: size_check -%}
           {%- liquid
+            # Check if ANY variant with this size is available
+            assign size_available = false
+            assign size_variant_id = variant.id
+            for v in initial_variants
+              assign v_size = v.option2 | default: v.option1
+              if v_size == size_value and v.available
+                assign size_available = true
+                assign size_variant_id = v.id
+                break
+              endif
+            endfor
+
             assign is_selected = false
-            if first_available_variant and variant.id == first_available_variant.id
+            if first_available_variant and size_variant_id == first_available_variant.id
               assign is_selected = true
             endif
           -%}
           <button
-            class="plp-size{% unless variant.available %} out{% endunless %}{% if is_selected %} active{% endif %}"
-            {% unless variant.available %}disabled{% endunless %}
-            data-variant-id="{{ variant.id }}"
+            class="plp-size{% unless size_available %} out{% endunless %}{% if is_selected %} active{% endif %}"
+            {% unless size_available %}disabled{% endunless %}
+            data-variant-id="{{ size_variant_id }}"
           >
-            {{ variant.option2 | default: variant.option1 }}
+            {{ size_value }}
           </button>
         {%- endfor -%}
       </div>

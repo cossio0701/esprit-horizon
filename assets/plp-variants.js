@@ -307,20 +307,42 @@
     const container = controller.querySelector(CONFIG.SELECTORS.sizesContainer);
     if (!container) return;
 
-    const firstAvailable = variants.find(v => v.available);
     const state = initProductState(productId);
+
+    // Deduplicar tallas: agrupar variantes por valor de talla
+    const seenSizes = new Set();
+    const uniqueSizes = [];
+
+    variants.forEach(v => {
+      const sizeValue = v.options[1] || v.options[0];
+      if (seenSizes.has(sizeValue)) return;
+      seenSizes.add(sizeValue);
+
+      // Buscar la primera variante disponible con esta talla
+      const availableVariant = variants.find(
+        av => (av.options[1] || av.options[0]) === sizeValue && av.available
+      );
+
+      uniqueSizes.push({
+        size: sizeValue,
+        available: !!availableVariant,
+        variantId: availableVariant ? availableVariant.id : v.id
+      });
+    });
+
+    const firstAvailable = uniqueSizes.find(s => s.available);
 
     // Usar DocumentFragment para mejor performance
     const fragment = document.createDocumentFragment();
 
-    variants.forEach(v => {
-      const isFirstAvailable = firstAvailable && v.id === firstAvailable.id;
+    uniqueSizes.forEach(s => {
+      const isFirstAvailable = firstAvailable && s.variantId === firstAvailable.variantId;
       const btn = document.createElement('button');
 
-      btn.className = `plp-size${v.available ? '' : ' ' + CONFIG.CLASSES.out}${isFirstAvailable ? ' ' + CONFIG.CLASSES.active : ''}`;
-      btn.disabled = !v.available;
-      btn.dataset.variantId = v.id;
-      btn.textContent = v.options[1];
+      btn.className = `plp-size${s.available ? '' : ' ' + CONFIG.CLASSES.out}${isFirstAvailable ? ' ' + CONFIG.CLASSES.active : ''}`;
+      btn.disabled = !s.available;
+      btn.dataset.variantId = s.variantId;
+      btn.textContent = s.size;
 
       fragment.appendChild(btn);
     });
@@ -330,8 +352,8 @@
 
     // Actualizar estado
     if (firstAvailable) {
-      state.size = firstAvailable.options[1];
-      state.variantId = firstAvailable.id;
+      state.size = firstAvailable.size;
+      state.variantId = firstAvailable.variantId;
     } else {
       state.size = null;
       state.variantId = null;
