@@ -4,14 +4,112 @@
   {% render 'text', fallback_text: product_title, block: block %}
 {% elsif closest.product != blank %}
   {% assign product_title = '<p>' | append: closest.product.title | append: '</p>' %}
-  <a
-    class="contents user-select-text"
-    ref="productTitleLink"
-    href="{% render 'product-card-variant-url', product: closest.product %}"
-  >
-    {% render 'text', fallback_text: product_title, block: block %}
-  </a>
+
+  {%- comment -%} Mobile: wrap title + quick-add "+" button in a flex row {%- endcomment -%}
+  {% liquid
+    assign has_quick_add = false
+    if settings.quick_add and closest.product.available
+      assign has_quick_add = true
+    endif
+  %}
+
+  <div class="product-title-row">
+    <a
+      class="contents user-select-text product-title-row__link"
+      ref="productTitleLink"
+      href="{% render 'product-card-variant-url', product: closest.product %}"
+    >
+      {% render 'text', fallback_text: product_title, block: block %}
+    </a>
+
+    {%- if has_quick_add -%}
+      <button
+        type="button"
+        class="mobile-quick-add-btn"
+        aria-label="{{ 'actions.add' | t }}"
+        data-product-url="{{ closest.product.url }}"
+        data-product-title="{{ closest.product.title | escape }}"
+      >
+        {{- 'icon_quick_add_button_mobile.svg' | inline_asset_content -}}
+      </button>
+    {%- endif -%}
+  </div>
 {% endif %}
+
+{% stylesheet %}
+  /* =====================================================
+     Mobile Quick Add "+" Button - Title Row
+     Only visible on mobile (max-width: 749px)
+     ===================================================== */
+  .product-title-row {
+    display: contents;
+  }
+
+  .mobile-quick-add-btn {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .product-title-row__link {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mobile-quick-add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin-top: 2px;
+      background: none;
+      border: none;
+      border-radius: 4px;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mobile-quick-add-btn:active {
+      background-color: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .mobile-quick-add-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.mobile-quick-add-btn');
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const productCard = btn.closest('product-card');
+    if (!productCard) return;
+
+    const quickAddComponent = productCard.querySelector('quick-add-component');
+
+    if (quickAddComponent && typeof quickAddComponent.handleClick === 'function') {
+      quickAddComponent.handleClick(new MouseEvent('click', { cancelable: true, bubbles: true }));
+    }
+  });
+{% endjavascript %}
 
 {% schema %}
 {

@@ -478,7 +478,9 @@
   }
 
   @keyframes plp-spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* ================================
@@ -492,14 +494,14 @@
     }
   }
 
-  /* Mobile: ocultar nuestro variant controller, mostrar quick-add original */
+  /* Mobile: ocultar variant controller y quick-add button original (usamos el "+" en la fila del título) */
   @media screen and (max-width: 749px) {
     .plp-variant-controller {
       display: none !important;
     }
 
     .product-card .quick-add__button {
-      display: flex !important;
+      display: none !important;
     }
   }
 

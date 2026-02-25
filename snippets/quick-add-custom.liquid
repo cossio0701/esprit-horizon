@@ -222,13 +222,10 @@
     pointer-events: all;
   }
 
-  /* Mobile: always show (no hover on touch devices) */
-  @media (hover: none) {
+  /* Mobile: hide completely - use the "+" quick-add button in the title row instead */
+  @media screen and (max-width: 749px) {
     .quick-add-custom {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-      pointer-events: all;
+      display: none !important;
     }
   }
 

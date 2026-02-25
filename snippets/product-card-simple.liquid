@@ -12,7 +12,7 @@
 %}
 
 <product-card class="product-card product-card-simple" data-product-id="{{ product.id }}">
-  <a href="{{ product.url }}" class="product-card-simple__link">
+  <a href="{{ product.url }}" class="product-card-simple__link" ref="productCardLink">
     {% comment %} Product Image {% endcomment %}
     <div class="product-card-simple__media">
       {%- if featured_image != blank -%}
@@ -34,7 +34,11 @@
       {% comment %} Badges {% endcomment %}
       {%- if product.compare_at_price > product.price -%}
         <div class="product-card-simple__badge">
-          {%- assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+          {%- assign discount = product.compare_at_price
+            | minus: product.price
+            | times: 100
+            | divided_by: product.compare_at_price
+          -%}
           -{{ discount }}%
         </div>
       {%- endif -%}
@@ -45,9 +49,23 @@
 
     {% comment %} Product Info {% endcomment %}
     <div class="product-card-simple__info">
-      <h3 class="product-card-simple__title">
-        {{ product.title }}
-      </h3>
+      <div class="product-card-simple__title-row">
+        <h3 class="product-card-simple__title">
+          {{ product.title }}
+        </h3>
+
+        {%- if settings.quick_add and product.available -%}
+          <button
+            type="button"
+            class="mobile-quick-add-btn"
+            aria-label="{{ 'actions.add' | t }}"
+            data-product-url="{{ product.url }}"
+            data-product-title="{{ product.title | escape }}"
+          >
+            {{- 'icon_quick_add_button_mobile.svg' | inline_asset_content -}}
+          </button>
+        {%- endif -%}
+      </div>
 
       <div class="product-card-simple__price">
         {%- if product.compare_at_price > product.price -%}
@@ -65,6 +83,11 @@
       </div>
     </div>
   </a>
+
+  {% comment %} Quick Add Component for modal trigger (hidden, used by mobile '+' button) {% endcomment %}
+  {%- if settings.quick_add and product.available -%}
+    {% render 'quick-add', product: product, section_id: section_id %}
+  {%- endif -%}
 </product-card>
 
 {% stylesheet %}
@@ -149,6 +172,46 @@
     line-height: 1.4;
     color: var(--color-foreground);
     margin: 0;
+  }
+
+  .product-card-simple__title-row {
+    display: contents;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-card-simple__title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .product-card-simple__title-row .product-card-simple__title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-card-simple .mobile-quick-add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin-top: 2px;
+      background: none;
+      border: none;
+      border-radius: 4px;
+      color: var(--color-foreground, #1a1a1a);
+      cursor: pointer;
+    }
+
+    .product-card-simple .mobile-quick-add-btn svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .product-card-simple__price {
