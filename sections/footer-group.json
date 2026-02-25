@@ -16,8 +16,6 @@
       "name": "Registration Modal",
       "settings": {
         "heading": "Crear cuenta",
-        "left_image": "shopify://shop_images/Group_688.png",
-        "success_image": "shopify://shop_images/0636510e-8228-49cd-9ddd-79c05a1b3274___32989afa49b0a5afa3724225decf38e2.webp",
         "legal_text": "He leído y acepto la",
         "legal_link_text": "Política de Tratamiento de Datos Personales.",
         "legal_link": "shopify://pages/terminos-condiciones",
@@ -319,9 +317,9 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "shopify://shop_images/suscribe_desktop.jpg",
+                "image": "shopify://shop_images/Banner-suscribe-desktop-_640x250_92022466-7df0-4d93-a45f-77abe573e7e8.jpg",
                 "use_mobile_image": true,
-                "image_mobile": "shopify://shop_images/suscribe_mobile.jpg",
+                "image_mobile": "shopify://shop_images/Banner-suscribe-_390x177_f9593205-6f89-4871-af1d-d888ac2a643f.jpg",
                 "link": "",
                 "image_ratio": "adapt",
                 "width": "fill",
@@ -561,7 +559,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "informaci-n",
+            "menu": "",
             "heading": "Información",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -582,7 +580,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "contacto",
+            "menu": "",
             "heading": "Contacto",
             "menu_spacing": 12,
             "show_as_accordion": true,
