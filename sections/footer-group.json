@@ -317,9 +317,9 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "shopify://shop_images/Banner-suscribe-desktop-_640x250_92022466-7df0-4d93-a45f-77abe573e7e8.jpg",
+                "image": "shopify://shop_images/Banner-suscribe-desktop-_640x250_5ecdb469-1df0-4716-9128-0aaa906ee4a3.jpg",
                 "use_mobile_image": true,
-                "image_mobile": "shopify://shop_images/Banner-suscribe-_390x177_f9593205-6f89-4871-af1d-d888ac2a643f.jpg",
+                "image_mobile": "shopify://shop_images/Banner-suscribe-_390x177_35d106fa-9c91-415c-9540-2d9385574673.jpg",
                 "link": "",
                 "image_ratio": "adapt",
                 "width": "fill",
@@ -559,7 +559,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "",
+            "menu": "informacion",
             "heading": "Información",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -580,7 +580,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "",
+            "menu": "contacto",
             "heading": "Contacto",
             "menu_spacing": 12,
             "show_as_accordion": true,

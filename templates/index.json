@@ -12,13 +12,13 @@
     "17702342213f69d5dd": {
       "type": "_blocks",
       "blocks": {
-        "commons_components_banner_home_kdXKwX": {
-          "type": "shopify://apps/commons-components/blocks/banner-home/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+        "commonst_esprit_ltm_banner_home_78XmLV": {
+          "type": "shopify://apps/commonst-esprit-ltm/blocks/banner-home/019c9588-d6c1-7783-b00f-ead27b343848",
           "settings": {}
         }
       },
       "block_order": [
-        "commons_components_banner_home_kdXKwX"
+        "commonst_esprit_ltm_banner_home_78XmLV"
       ],
       "name": "Banner home",
       "settings": {
@@ -809,14 +809,14 @@
               "name": "t:names.video",
               "settings": {
                 "source": "uploaded",
-                "video": "",
+                "video": "shopify://files/videos/VIDEO 1366x768.mp4",
                 "video_url": "",
                 "video_autoplay": true,
                 "video_loop": true,
                 "alt": "",
                 "use_mobile_video": true,
                 "source_mobile": "uploaded",
-                "video_mobile": "",
+                "video_mobile": "shopify://files/videos/VIDEO mobile.mp4",
                 "video_url_mobile": "",
                 "alt_mobile": "",
                 "video_height": "auto",
@@ -1619,14 +1619,14 @@
           "name": "t:names.video",
           "settings": {
             "source": "uploaded",
-            "video": "",
+            "video": "shopify://files/videos/banner_full_home_desk.mp4",
             "video_url": "",
             "video_autoplay": true,
             "video_loop": true,
             "alt": "",
             "use_mobile_video": true,
             "source_mobile": "uploaded",
-            "video_mobile": "",
+            "video_mobile": "shopify://files/videos/banner_full_home_mobile.mp4",
             "video_url_mobile": "",
             "alt_mobile": "",
             "video_height": "auto",
