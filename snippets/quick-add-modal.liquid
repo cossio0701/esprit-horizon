@@ -1,3 +1,4 @@
+<script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <quick-add-dialog id="quick-add-dialog">
   <dialog
     class="quick-add-modal dialog-modal color-{{ settings.popover_color_scheme }}"
@@ -71,24 +72,23 @@
   }
 
   .quick-add-modal__content {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 100% 1fr;
+    display: flex;
+    flex-direction: column;
     position: relative;
     max-width: var(--wide-content-width);
     overflow-y: auto;
     max-height: 100vh;
+    width: 500px;
 
     @media screen and (max-width: 750px) {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: auto;
+      width: 100vw;
       padding-inline: var(--padding-xl);
       padding-block: var(--padding-xl);
       gap: var(--gap-lg);
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      height: auto; /* Prevent a bug in Safari where height:fit-content is not respected */
+      height: auto;
       max-height: 100vh;
     }
   }
@@ -132,13 +132,10 @@
   }
 
   .quick-add-modal__content .product-header {
-    @media screen and (max-width: 750px) {
-      display: flex;
-      flex-direction: column;
-      grid-column: 2 / -1;
-      grid-row: 1;
-      padding-right: var(--padding-2xl);
-    }
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    margin-bottom: var(--margin-sm);
   }
 
   .quick-add-modal__content .product-header a:not(product-price *) {
@@ -169,26 +166,15 @@
     cursor: default;
   }
 
-  .quick-add-modal__content .product-details {
-    grid-column: 4 / -1;
-    grid-row: 1 / span 2;
+  .quick-add-modal__info {
+    padding: var(--padding-xl);
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 0;
+    gap: var(--gap-md);
+  }
 
-    dialog[open] & {
-      animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-      animation-delay: 0.1s;
-    }
-
-    @media screen and (max-width: 750px) {
-      grid-column: 2 / span 2;
-      grid-row: span 1;
-      overflow-y: auto;
-      max-height: 100%;
-      height: 100%;
-    }
+  .quick-add-modal__content .product-details {
+    display: none;
   }
 
   .quick-add-modal__content > * {
@@ -218,7 +204,8 @@
     margin-inline-start: calc(-1 * var(--padding-2xs));
   }
 
-  .quick-add-modal__content:not(:has(.product-information__media)) .product-details {
+  .quick-add-modal__content:not(:has(.product-information__media, .section-variant-gallery, .gallery-main-container))
+    .product-details {
     grid-column: 1 / -1;
   }
 
@@ -325,89 +312,53 @@
     content-visibility: auto;
   }
 
-  .quick-add-modal__content .product-information__media {
+  .quick-add-modal__content :is(.product-information__media, .section-variant-gallery, .gallery-main-container) {
     width: 100%;
-    grid-column: 1 / span 1;
-    grid-row: 1;
     position: relative;
-    top: 0;
     animation: fadeIn 0.4s var(--animation-timing-fade-in) both;
-
-    @media screen and (min-width: 750px) {
-      position: sticky;
-      grid-column: 1 / 4;
-      overflow-y: auto;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 
-  .quick-add-modal__content .product-information__media media-gallery {
-    pointer-events: none;
-
-    @media screen and (min-width: 750px) {
-      position: absolute;
-      inset: 0;
-    }
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    media-gallery {
+    pointer-events: all;
   }
 
-  .quick-add-modal media-gallery {
-    padding: 0;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-arrows {
-    display: none;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-container {
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    slideshow-container {
     display: block;
   }
 
-  .quick-add-modal__content .product-information__media slideshow-slides {
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    slideshow-arrows {
     display: flex;
-    flex-direction: column;
-    gap: var(--gap-2xs);
-    overflow: visible;
-    scroll-snap-type: none;
   }
 
-  .quick-add-modal__content .product-information__media slideshow-slide {
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    slideshow-controls {
+    display: flex;
+  }
+
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    :is(slideshow-container, .swiper) {
+    display: block;
     width: 100%;
-    flex: none;
-    scroll-snap-align: unset;
-    position: relative;
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s var(--animation-easing);
   }
 
-  .quick-add-modal__content .product-information__media slideshow-slide[aria-hidden='true'] {
-    @media screen and (max-width: 750px) {
-      display: none;
-    }
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    :is(slideshow-arrows, .swiper-button-prev, .swiper-button-next) {
+    display: flex;
   }
 
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(1) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(2) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-    animation-delay: 0.05s;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(3) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-    animation-delay: 0.1s;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-controls {
-    display: none;
+  .quick-add-modal__content
+    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
+    :is(slideshow-controls, .swiper-pagination) {
+    display: flex;
   }
 
   .quick-add-modal__content .sticky-content,

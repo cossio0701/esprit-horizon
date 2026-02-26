@@ -72,7 +72,11 @@
       padding-block-end: var(--zoom-out-padding-block-end, 0);
     }
 
-    /* Vista 3 columnas */
+    /* Vista 4 columnas (default) */
+    .product-grid--{{ section.id }}[product-grid-view='default'] {
+      --product-grid-columns-desktop: repeat(4, 1fr);
+    }
+
     .product-grid--{{ section.id }}[product-grid-view='3-columns'] {
       --product-grid-columns-desktop: repeat(3, 1fr);
     }

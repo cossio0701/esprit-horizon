@@ -245,31 +245,50 @@
   {%- comment -%} PLP Quick Add - Variant Controller {%- endcomment -%}
   {%- if product != blank and product.variants.size > 0 -%}
     {%- liquid
-      # Encontrar la opción de color (con swatches)
+      # Get available options
+      assign size_option = null
       assign color_option = null
-      assign first_color = null
+      assign size_option_index = null
+      assign color_option_index = null
+
       for option in product.options_with_values
+        assign option_name_lower = option.name | downcase
         assign swatch_count = option.values | map: 'swatch' | compact | size
-        if swatch_count > 0
+
+        if option_name_lower == 'talla'
+          assign size_option = option
+          assign size_option_index = forloop.index0
+        elsif option_name_lower == 'color' or swatch_count > 0
           assign color_option = option
-          assign first_color = option.values.first.name
-          break
+          assign color_option_index = forloop.index0
         endif
       endfor
+
+      # Fallback if names don't match but we have options
+      if size_option == null and product.options.size > 0
+        for option in product.options_with_values
+          if forloop.index0 != color_option_index
+            assign size_option = option
+            assign size_option_index = forloop.index0
+            break
+          endif
+        endfor
+      endif
+
+      assign first_color = color_option.values.first.name
 
       # Filtrar variantes del primer color para pre-renderizar tallas
       assign initial_variants = product.variants
       if first_color
-        assign initial_variants = product.variants | where: 'option1', first_color
-        if initial_variants.size == 0
+        if color_option_index == 0
+          assign initial_variants = product.variants | where: 'option1', first_color
+        elsif color_option_index == 1
           assign initial_variants = product.variants | where: 'option2', first_color
-        endif
-        if initial_variants.size == 0
-          assign initial_variants = product.variants
+        elsif color_option_index == 2
+          assign initial_variants = product.variants | where: 'option3', first_color
         endif
       endif
-    -%}
-    {%- liquid
+
       # Encontrar la primera variante disponible para pre-seleccionar
       assign first_available_variant = null
       for variant in initial_variants
@@ -278,24 +297,53 @@
           break
         endif
       endfor
+
+      # If no variant is available for the first color, try to find the first available variant overall
+      if first_available_variant == null
+        assign first_available_variant = product.selected_or_first_available_variant
+      endif
     -%}
-    <div class="plp-variant-controller" data-product-id="{{ product.id }}" data-first-variant-id="{{ first_available_variant.id }}" data-first-color="{{ first_color }}">
+    <div
+      class="plp-variant-controller"
+      data-product-id="{{ product.id }}"
+      data-first-variant-id="{{ first_available_variant.id }}"
+      data-first-color="{{ first_color }}"
+      data-color-index="{{ color_option_index }}"
+      data-size-index="{{ size_option_index }}"
+    >
       {%- comment -%} Fila 1: Tallas {%- endcomment -%}
       <div class="plp-sizes" id="sizes-{{ product.id }}">
         {%- assign rendered_sizes = '' -%}
         {%- for variant in initial_variants -%}
-          {%- assign size_value = variant.option2 | default: variant.option1 -%}
+          {%- liquid
+            if size_option_index == 0
+              assign size_value = variant.option1
+            elsif size_option_index == 1
+              assign size_value = variant.option2
+            elsif size_option_index == 2
+              assign size_value = variant.option3
+            else
+              assign size_value = variant.title
+            endif
+          -%}
           {%- assign size_check = '|' | append: size_value | append: '|' -%}
           {%- if rendered_sizes contains size_check -%}
             {%- continue -%}
           {%- endif -%}
           {%- assign rendered_sizes = rendered_sizes | append: size_check -%}
           {%- liquid
-            # Check if ANY variant with this size is available
+            # Check if ANY variant with this size is available (for the current filtered variants)
             assign size_available = false
             assign size_variant_id = variant.id
             for v in initial_variants
-              assign v_size = v.option2 | default: v.option1
+              if size_option_index == 0
+                assign v_size = v.option1
+              elsif size_option_index == 1
+                assign v_size = v.option2
+              elsif size_option_index == 2
+                assign v_size = v.option3
+              endif
+
               if v_size == size_value and v.available
                 assign size_available = true
                 assign size_variant_id = v.id
@@ -310,7 +358,9 @@
           -%}
           <button
             class="plp-size{% unless size_available %} out{% endunless %}{% if is_selected %} active{% endif %}"
-            {% unless size_available %}disabled{% endunless %}
+            {% unless size_available %}
+              disabled
+            {% endunless %}
             data-variant-id="{{ size_variant_id }}"
           >
             {{ size_value }}
@@ -368,7 +418,9 @@
         <button
           class="plp-add-to-cart{% if first_available_variant %} ready{% endif %}"
           data-product-id="{{ product.id }}"
-          {% unless first_available_variant %}disabled{% endunless %}
+          {% unless first_available_variant %}
+            disabled
+          {% endunless %}
         >
           Agregar a la bolsa →
         </button>
