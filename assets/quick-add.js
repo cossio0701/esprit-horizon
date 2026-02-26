@@ -19,6 +19,7 @@ export class QuickAddComponent extends Component {
     const url = new URL(productLink.href);
 
     if (url.searchParams.has('variant')) {
+      url.searchParams.set('quick_add', 'true');
       return url.toString();
     }
 
@@ -27,6 +28,7 @@ export class QuickAddComponent extends Component {
       url.searchParams.set('variant', selectedVariantId);
     }
 
+    url.searchParams.set('quick_add', 'true');
     return url.toString();
   }
 
@@ -60,27 +62,40 @@ export class QuickAddComponent extends Component {
     event.preventDefault();
 
     const currentUrl = this.productPageUrl;
+    console.log('[QuickAdd] handleClick - URL:', currentUrl);
 
     // Check if we have cached content for this URL
     let productGrid = this.#cachedContent.get(currentUrl);
 
     if (!productGrid) {
+      console.log('[QuickAdd] Cache miss. Fetching...');
       // Fetch and cache the content
       const html = await this.fetchProductPage(currentUrl);
       if (html) {
+        console.log('[QuickAdd] Fetch successful. Parsing...');
         const gridElement = html.querySelector('[data-product-grid-content]');
         if (gridElement) {
+          console.log('[QuickAdd] Found [data-product-grid-content]');
           // Cache the cloned element to avoid modifying the original
           productGrid = /** @type {Element} */ (gridElement.cloneNode(true));
           this.#cachedContent.set(currentUrl, productGrid);
+        } else {
+          console.warn('[QuickAdd] FAILED to find [data-product-grid-content]');
         }
+      } else {
+        console.error('[QuickAdd] FAILED to fetch product page');
       }
+    } else {
+      console.log('[QuickAdd] Cache hit.');
     }
 
     if (productGrid) {
+      console.log('[QuickAdd] Updating modal...');
       // Use a fresh clone from the cache
       const freshContent = /** @type {Element} */ (productGrid.cloneNode(true));
       await this.updateQuickAddModal(freshContent);
+    } else {
+      console.error('[QuickAdd] No content to display');
     }
 
     this.#openQuickAddModal();
@@ -153,43 +168,76 @@ export class QuickAddComponent extends Component {
    */
   async updateQuickAddModal(productGrid) {
     const modalContent = document.getElementById('quick-add-modal-content');
+    console.log('[QuickAdd] updateQuickAddModal - grid:', productGrid, 'modal:', modalContent);
 
     if (!productGrid || !modalContent) return;
 
-    if (isMobileBreakpoint()) {
-      const productDetails = productGrid.querySelector('.product-details');
-      const productFormComponent = productGrid.querySelector('product-form-component');
-      const variantPicker = productGrid.querySelector('variant-picker');
-      const productPrice = productGrid.querySelector('product-price');
-      const productTitle = document.createElement('a');
+    // Extract key elements
+    const mediaGallery = productGrid.querySelector('.product-information__media, .section-variant-gallery, .gallery-main-container');
+    const productPrice = productGrid.querySelector('product-price');
+    const variantPicker = productGrid.querySelector('variant-picker');
+    const productFormComponent = productGrid.querySelector('product-form-component');
+
+    // Create or find Title
+    let productTitle = productGrid.querySelector('.product-title');
+    if (!productTitle) {
+      productTitle = document.createElement('a');
+      productTitle.classList.add('product-title', 'h3');
       productTitle.textContent = this.dataset.productTitle || '';
-
-      // Make product title as a link to the product page
-      productTitle.href = this.productPageUrl;
-
-      const productHeader = document.createElement('div');
-      productHeader.classList.add('product-header');
-
-      productHeader.appendChild(productTitle);
-      if (productPrice) {
-        productHeader.appendChild(productPrice);
-      }
-      productGrid.appendChild(productHeader);
-
-      if (variantPicker) {
-        productGrid.appendChild(variantPicker);
-      }
-      if (productFormComponent) {
-        productGrid.appendChild(productFormComponent);
-      }
-
-      productDetails?.remove();
+      /** @type {HTMLAnchorElement} */ (productTitle).href = this.productPageUrl;
     }
 
+    // Clear current grid content to rearrange
+    productGrid.innerHTML = '';
+
+    // 1. Media Gallery on top
+    if (mediaGallery) {
+      console.log('[QuickAdd] Appending Media Gallery');
+      productGrid.appendChild(mediaGallery);
+    }
+
+    // Create a container for the info below media
+    const infoContainer = document.createElement('div');
+    infoContainer.classList.add('quick-add-modal__info');
+
+    // 2. Title and Price
+    const productHeader = document.createElement('div');
+    productHeader.classList.add('product-header');
+    productHeader.appendChild(productTitle);
+    if (productPrice) {
+      productHeader.appendChild(productPrice);
+    }
+    infoContainer.appendChild(productHeader);
+
+    // 3. Variant Picker
+    if (variantPicker) {
+      infoContainer.appendChild(variantPicker);
+    }
+
+    // 4. Product Form
+    if (productFormComponent) {
+      infoContainer.appendChild(productFormComponent);
+    }
+
+    productGrid.appendChild(infoContainer);
+
+    console.log('[QuickAdd] Morphing content...');
     morph(modalContent, productGrid);
+
+    // Configuración del carrusel para el modal: 2 columnas en mobile y loop infinito
+    modalContent.querySelectorAll('carousel-component').forEach((carousel) => {
+      carousel.setAttribute('columns-mobile', '2');
+      carousel.setAttribute('gap', '10');
+      carousel.setAttribute('show-dots', 'true');
+      carousel.setAttribute('thumbs-mobile', 'none');
+      carousel.setAttribute('thumbs-desktop', 'none');
+      carousel.setAttribute('loop', 'true');
+    });
 
     this.#syncVariantSelection(modalContent);
   }
+
+
 
   /**
    * Syncs the variant selection from the product card to the modal

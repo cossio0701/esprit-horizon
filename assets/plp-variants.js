@@ -196,9 +196,11 @@
     if (!product) return;
 
     // Obtener colores únicos
+    const controller = document.querySelector(`.plp-variant-controller[data-product-id="${productId}"]`);
+    const colorIndex = parseInt(controller?.dataset.colorIndex || "0");
     const colors = new Set();
     product.variants.forEach(v => {
-      if (v.options[0]) colors.add(v.options[0]);
+      if (v.options[colorIndex]) colors.add(v.options[colorIndex]);
     });
 
     // Precargar primera imagen de cada color con delay escalonado
@@ -309,18 +311,21 @@
 
     const state = initProductState(productId);
 
+    const colorIndex = parseInt(controller.dataset.colorIndex || "0");
+    const sizeIndex = parseInt(controller.dataset.sizeIndex || "1");
+
     // Deduplicar tallas: agrupar variantes por valor de talla
     const seenSizes = new Set();
     const uniqueSizes = [];
 
     variants.forEach(v => {
-      const sizeValue = v.options[1] || v.options[0];
+      const sizeValue = v.options[sizeIndex];
       if (seenSizes.has(sizeValue)) return;
       seenSizes.add(sizeValue);
 
-      // Buscar la primera variante disponible con esta talla
+      // Buscar la primera variante disponible con esta talla que coincida con el color seleccionado
       const availableVariant = variants.find(
-        av => (av.options[1] || av.options[0]) === sizeValue && av.available
+        av => av.options[sizeIndex] === sizeValue && av.available
       );
 
       uniqueSizes.push({
@@ -512,8 +517,11 @@
     const product = window.PLP?.[productId];
     if (!product) return null;
 
+    const controller = document.querySelector(`.plp-variant-controller[data-product-id="${productId}"]`);
+    const colorIndex = parseInt(controller?.dataset.colorIndex || "0");
+
     // Buscar variantes de este color
-    const colorVariants = product.variants.filter(v => v.options.includes(color));
+    const colorVariants = product.variants.filter(v => v.options[colorIndex] === color);
 
     // Encontrar la primera variante que tenga galería configurada
     for (const variant of colorVariants) {
@@ -678,13 +686,15 @@
 
     // Marcar color activo
     const controller = btn.closest(CONFIG.SELECTORS.controller);
+    const colorIndex = parseInt(controller?.dataset.colorIndex || "0");
+
     controller.querySelectorAll(CONFIG.SELECTORS.colorBtn).forEach(c => {
       c.classList.remove(CONFIG.CLASSES.active);
     });
     btn.classList.add(CONFIG.CLASSES.active);
 
     // Filtrar variantes por color y renderizar tallas
-    const variants = product.variants.filter(v => v.options.includes(color));
+    const variants = product.variants.filter(v => v.options[colorIndex] === color);
     renderSizes(productId, variants, controller);
 
     // Actualizar UI
