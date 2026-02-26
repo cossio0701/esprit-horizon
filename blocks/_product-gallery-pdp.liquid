@@ -32,10 +32,11 @@
             columns-desktop="1"
             columns-mobile="1"
             gap="0"
-            show-arrows="true"
-            show-dots="false"
-            thumbs-mobile="bottom"
+            show-arrows="false"
+            show-dots="true"
+            thumbs-mobile="none"
             thumbs-desktop="right"
+            show-thumbs-arrows="true"
             loop="true"
           >
             <div class="carousel-scroller-wrapper">
@@ -82,8 +83,6 @@
                 {% for image in color_gallery %}
                   <button
                     class="carousel-thumb"
-                    role="tab"
-                    data-index="{{ forloop.index0 }}"
                     aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                   >
                     <img
@@ -100,8 +99,6 @@
                   {% if media.media_type == 'image' %}
                     <button
                       class="carousel-thumb"
-                      role="tab"
-                      data-index="{{ forloop.index0 }}"
                       aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                     >
                       <img

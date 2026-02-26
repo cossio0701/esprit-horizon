@@ -7,12 +7,15 @@
  * - columns-mobile: Number of slides visible on mobile (default: 1)
  * - show-arrows: Whether to show navigation arrows (default: true)
  * - show-dots: Whether to show pagination dots (default: false)
+ * - show-thumbs-arrows: Whether to show navigation arrows on thumbnails (default: false)
+ * - thumbs-mobile: Thumbnail position on mobile (top|bottom|left|right|none)
+ * - thumbs-desktop: Thumbnail position on desktop (top|bottom|left|right|none)
  * - loop: Whether to enable infinite loop (experimental)
  * - gap: Gap between slides in pixels (default: 0)
  */
 class CarouselComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['columns-desktop', 'columns-mobile', 'show-arrows', 'show-dots', 'gap', 'loop', 'thumbs-mobile', 'thumbs-desktop'];
+        return ['columns-desktop', 'columns-mobile', 'show-arrows', 'show-dots', 'show-thumbs-arrows', 'gap', 'loop', 'thumbs-mobile', 'thumbs-desktop'];
     }
 
     constructor() {
@@ -72,7 +75,18 @@ class CarouselComponent extends HTMLElement {
             this.setupLoop();
         }
 
-        this.dots = Array.from(this.querySelectorAll('[role="tab"]'));
+        // --- Thumbs (from HTML) ---
+        this.thumbs = Array.from(this.querySelectorAll('.carousel-thumb'));
+        this.thumbs.forEach((thumb, index) => {
+            thumb.addEventListener('click', () => this.scrollToLogicalIndex(index));
+        });
+
+        // --- Dots (auto-generated) ---
+        this.buildDots();
+
+        // --- Thumbs Arrows (auto-generated) ---
+        this.buildThumbsArrows();
+
         this.prevBtn = this.querySelector('[name="previous"]');
         this.nextBtn = this.querySelector('[name="next"]');
 
@@ -81,18 +95,77 @@ class CarouselComponent extends HTMLElement {
         if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.scrollStep(-1));
         if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.scrollStep(1));
 
-        this.dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => this.scrollToLogicalIndex(index));
-        });
-
         if (this.isLoop) {
-            // Posicionar en el primer elemento real después de un pequeño delay para asegurar renderizado
             requestAnimationFrame(() => {
                 this.scrollToLogicalIndex(0, false);
             });
         }
 
         this.updateControls();
+    }
+
+    buildDots() {
+        // Remove existing dots container if present
+        const existing = this.querySelector('.carousel-dots');
+        if (existing) existing.remove();
+
+        if (this.originalCount <= 1) {
+            this.dots = [];
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'carousel-dots';
+
+        for (let i = 0; i < this.originalCount; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.setAttribute('aria-selected', String(i === 0));
+            btn.addEventListener('click', () => this.scrollToLogicalIndex(i));
+            container.appendChild(btn);
+        }
+
+        this.appendChild(container);
+        this.dots = Array.from(container.querySelectorAll('button'));
+    }
+
+    buildThumbsArrows() {
+        // Remove existing wrapper if present (re-init safety)
+        const existingNav = this.querySelector('.carousel-thumbs-nav');
+        if (existingNav) {
+            const thumbsInside = existingNav.querySelector('.carousel-thumbs');
+            if (thumbsInside) existingNav.before(thumbsInside);
+            existingNav.remove();
+        }
+
+        const thumbsContainer = this.querySelector('.carousel-thumbs');
+        if (!thumbsContainer || this.thumbs.length <= 1) return;
+
+        // Wrap thumbs in a nav container
+        const nav = document.createElement('div');
+        nav.className = 'carousel-thumbs-nav';
+        thumbsContainer.before(nav);
+        nav.appendChild(thumbsContainer);
+
+        // Create arrows
+        const prevArrow = document.createElement('button');
+        prevArrow.type = 'button';
+        prevArrow.className = 'carousel-thumbs-arrow carousel-thumbs-arrow--prev';
+        prevArrow.setAttribute('aria-label', 'Previous');
+        prevArrow.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+
+        const nextArrow = document.createElement('button');
+        nextArrow.type = 'button';
+        nextArrow.className = 'carousel-thumbs-arrow carousel-thumbs-arrow--next';
+        nextArrow.setAttribute('aria-label', 'Next');
+        nextArrow.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>';
+
+        // Navigate slides on click
+        prevArrow.addEventListener('click', () => this.scrollStep(-1));
+        nextArrow.addEventListener('click', () => this.scrollStep(1));
+
+        nav.insertBefore(prevArrow, thumbsContainer);
+        nav.appendChild(nextArrow);
     }
 
     setupLoop() {
@@ -126,6 +199,7 @@ class CarouselComponent extends HTMLElement {
         const gap = this.getAttribute('gap') || '0';
         const showArrows = this.getAttribute('show-arrows') !== 'false';
         const showDots = this.getAttribute('show-dots') === 'true';
+        const showThumbsArrows = this.getAttribute('show-thumbs-arrows') === 'true';
 
         this.style.setProperty('--slides-per-view-desktop', desktopCols);
         this.style.setProperty('--slides-per-view-mobile', mobileCols);
@@ -139,6 +213,11 @@ class CarouselComponent extends HTMLElement {
 
         const dotsContainer = this.querySelector('.carousel-dots');
         if (dotsContainer) dotsContainer.toggleAttribute('hidden', !showDots);
+
+        // Thumbs arrows visibility
+        this.querySelectorAll('.carousel-thumbs-arrow').forEach(arrow => {
+            arrow.toggleAttribute('hidden', !showThumbsArrows);
+        });
     }
 
     onScroll() {
@@ -205,9 +284,22 @@ class CarouselComponent extends HTMLElement {
     }
 
     updateControls() {
+        // Sync dots
         this.dots.forEach((dot, index) => {
             dot.setAttribute('aria-selected', String(index === this.logicalIndex));
         });
+
+        // Sync thumbs & auto-scroll active into view
+        if (this.thumbs) {
+            this.thumbs.forEach((thumb, index) => {
+                thumb.setAttribute('aria-selected', String(index === this.logicalIndex));
+            });
+
+            const activeThumb = this.thumbs[this.logicalIndex];
+            if (activeThumb) {
+                activeThumb.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+            }
+        }
 
         if (this.prevBtn) this.prevBtn.disabled = !this.isLoop && this.logicalIndex === 0;
         if (this.nextBtn) this.nextBtn.disabled = !this.isLoop && this.logicalIndex >= this.originalCount - 1;

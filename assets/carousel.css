@@ -157,12 +157,74 @@ carousel-component {
 }
 
 /* --------------------------------------------------------------------------
-   6. MOBILE Layout (< 769px)
+   6. Thumbnails — Navigation Wrapper & Arrows
+   -------------------------------------------------------------------------- */
+.carousel-thumbs-nav {
+    grid-area: thumbs;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.carousel-thumbs-arrow {
+    flex: 0 0 auto;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s, background 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    line-height: 0;
+}
+
+.carousel-thumbs-arrow:hover {
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* --- Vertical thumbs (left/right): nav stacks column, arrows top/bottom --- */
+carousel-component[thumbs-desktop='left'] .carousel-thumbs-nav,
+carousel-component[thumbs-desktop='right'] .carousel-thumbs-nav,
+carousel-component[thumbs-mobile='left'] .carousel-thumbs-nav,
+carousel-component[thumbs-mobile='right'] .carousel-thumbs-nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+carousel-component[thumbs-desktop='left'] .carousel-thumbs-arrow svg,
+carousel-component[thumbs-desktop='right'] .carousel-thumbs-arrow svg,
+carousel-component[thumbs-mobile='left'] .carousel-thumbs-arrow svg,
+carousel-component[thumbs-mobile='right'] .carousel-thumbs-arrow svg {
+    transform: rotate(90deg);
+}
+
+/* --- Horizontal thumbs (top/bottom): nav in row, arrows left/right --- */
+carousel-component[thumbs-desktop='top'] .carousel-thumbs-nav,
+carousel-component[thumbs-desktop='bottom'] .carousel-thumbs-nav,
+carousel-component[thumbs-mobile='top'] .carousel-thumbs-nav,
+carousel-component[thumbs-mobile='bottom'] .carousel-thumbs-nav {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* --------------------------------------------------------------------------
+   7. MOBILE Layout (< 769px)
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
 
     /* --- none --- */
-    carousel-component[thumbs-mobile='none'] .carousel-thumbs {
+    carousel-component[thumbs-mobile='none'] .carousel-thumbs,
+    carousel-component[thumbs-mobile='none'] .carousel-thumbs-nav {
         display: none;
     }
 
@@ -219,6 +281,14 @@ carousel-component {
         overflow-x: hidden;
         max-height: 400px;
     }
+
+    /* --- Priority: thumbs > dots — hide dots when thumbs are visible --- */
+    carousel-component[thumbs-mobile='top'] .carousel-dots,
+    carousel-component[thumbs-mobile='bottom'] .carousel-dots,
+    carousel-component[thumbs-mobile='left'] .carousel-dots,
+    carousel-component[thumbs-mobile='right'] .carousel-dots {
+        display: none;
+    }
 }
 
 /* --------------------------------------------------------------------------
@@ -227,7 +297,8 @@ carousel-component {
 @media (min-width: 769px) {
 
     /* --- none --- */
-    carousel-component[thumbs-desktop='none'] .carousel-thumbs {
+    carousel-component[thumbs-desktop='none'] .carousel-thumbs,
+    carousel-component[thumbs-desktop='none'] .carousel-thumbs-nav {
         display: none;
     }
 
@@ -281,6 +352,14 @@ carousel-component {
         overflow-y: auto;
         overflow-x: hidden;
         max-height: 600px;
+    }
+
+    /* --- Priority: thumbs > dots — hide dots when thumbs are visible --- */
+    carousel-component[thumbs-desktop='top'] .carousel-dots,
+    carousel-component[thumbs-desktop='bottom'] .carousel-dots,
+    carousel-component[thumbs-desktop='left'] .carousel-dots,
+    carousel-component[thumbs-desktop='right'] .carousel-dots {
+        display: none;
     }
 }
 
