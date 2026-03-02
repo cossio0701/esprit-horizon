@@ -37,10 +37,13 @@
 
     @media screen and (max-width: 750px) {
       position: fixed;
-      display: block;
+      display: flex;
+      flex-direction: column;
       margin: auto 0 0 0;
       min-height: unset;
       max-width: 100%;
+      overflow: hidden;
+      padding: 0 !important;
     }
   }
 
@@ -50,6 +53,10 @@
       border-radius: 16px 16px 0 0 !important;
       height: auto !important;
       max-height: 90dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto !important; /* Enable scrolling on the dialog itself */
+      -webkit-overflow-scrolling: touch;
     }
   }
 
@@ -126,13 +133,12 @@
     @media screen and (max-width: 750px) {
       width: 100vw;
       padding-inline: var(--padding-lg);
-      padding-block: var(--padding-lg);
+      padding-block: var(--padding-lg) 60px; /* Some padding for the bottom link */
       gap: var(--gap-lg);
-      flex: 1;
+      flex: 0 0 auto; /* Don't flex, let the dialog handle scroll */
       min-height: 0;
-      overflow-y: auto;
+      overflow: visible; /* Content itself doesn't scroll, the dialog does */
       height: auto;
-      max-height: 100vh;
     }
   }
 

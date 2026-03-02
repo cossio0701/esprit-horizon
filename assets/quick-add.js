@@ -213,7 +213,7 @@ class QuickAddDialog extends DialogComponent {
     const { signal } = this.#abortController;
 
     this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal });
-    this.addEventListener(ThemeEvents.variantUpdate, this.#updateProductTitleLink, { signal });
+    this.addEventListener(ThemeEvents.variantUpdate, this.#handleVariantUpdate, { signal });
     this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose, { signal });
 
     // Drag handle: tap to close + swipe-down to dismiss
@@ -287,11 +287,27 @@ class QuickAddDialog extends DialogComponent {
     this.closeDialog();
   };
 
-  #updateProductTitleLink = (/** @type {CustomEvent} */ event) => {
-    // Build the product URL from the variant picker data in the fetched HTML
+  #handleVariantUpdate = (/** @type {CustomEvent} */ event) => {
     const html = event.detail?.data?.html;
     if (!html) return;
 
+    // 1. Update Gallery
+    const galleryContainer = /** @type {HTMLElement | null} */ (this.querySelector('.quick-add-content__media'));
+    const newGallerySource = html.querySelector('.quick-add-content__media');
+
+    if (galleryContainer && newGallerySource) {
+      morph(galleryContainer, newGallerySource);
+
+      // Re-initialize any carousel in the newly morphed gallery
+      requestAnimationFrame(() => {
+        galleryContainer.querySelectorAll('carousel-component').forEach(el => {
+          // @ts-ignore
+          if (typeof el.reinit === 'function') el.reinit();
+        });
+      });
+    }
+
+    // 2. Update Links (Title & View Details)
     const variantPicker = html.querySelector('variant-picker');
     const productUrl = variantPicker?.dataset?.productUrl;
     if (!productUrl) return;
