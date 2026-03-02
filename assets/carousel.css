@@ -102,6 +102,10 @@ carousel-component {
 /* --------------------------------------------------------------------------
    4. Pagination Dots
    -------------------------------------------------------------------------- */
+.carousel-dots[hidden] {
+    display: none;
+}
+
 .carousel-dots {
     grid-area: dots;
     display: flex;

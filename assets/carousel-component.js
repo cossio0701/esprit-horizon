@@ -3,15 +3,15 @@
  * A lightweight, dependency-free carousel using CSS Scroll Snap.
  *
  * Attributes:
- * - columns-desktop: Number of slides visible on desktop (default: 1)
- * - columns-mobile: Number of slides visible on mobile (default: 1)
+ * - columns-desktop: Number of slides visible on desktop (default: 1). Supports decimals (e.g. 2.25)
+ * - columns-mobile: Number of slides visible on mobile (default: 1). Supports decimals (e.g. 2.25)
  * - show-arrows: Whether to show navigation arrows (default: true)
  * - show-dots: Whether to show pagination dots (default: false)
  * - show-thumbs-arrows: Whether to show navigation arrows on thumbnails (default: false)
  * - thumbs-mobile: Thumbnail position on mobile (top|bottom|left|right|none)
  * - thumbs-desktop: Thumbnail position on desktop (top|bottom|left|right|none)
  * - loop: Whether to enable infinite loop (experimental)
- * - gap: Gap between slides in pixels (default: 0)
+ * - gap: Gap between slides in pixels (default: 0). Supports decimals.
  */
 class CarouselComponent extends HTMLElement {
     static get observedAttributes() {
@@ -38,11 +38,21 @@ class CarouselComponent extends HTMLElement {
         this.scrollTimeout = null;
         this.isLoop = false;
         this.isJumping = false;
+        this._scrollListenerAttached = false;
     }
 
     connectedCallback() {
         this.init();
-        this.renderAttributes();
+    }
+
+    /**
+     * Public method to force a full re-initialization.
+     * Call this after DOM mutations (e.g. morph) that preserve the element
+     * without triggering connectedCallback.
+     */
+    reinit() {
+        this._scrollListenerAttached = false; // Allow re-attaching scroll listener on new scroller
+        this.init();
     }
 
     /**
@@ -55,8 +65,10 @@ class CarouselComponent extends HTMLElement {
 
         if (name === 'loop') {
             this.init(); // Re-init to handle cloning
+            return;
         }
 
+        // Always re-render based on current DOM state
         this.renderAttributes();
     }
 
@@ -64,7 +76,7 @@ class CarouselComponent extends HTMLElement {
         this.scroller = this.querySelector('[role="list"]');
         if (!this.scroller) return;
 
-        // Limpiar clones previos si existen
+        // Clean up previous clones
         this.scroller.querySelectorAll('[data-clone]').forEach(clone => clone.remove());
 
         this.slides = Array.from(this.scroller.querySelectorAll('[role="listitem"]'));
@@ -87,11 +99,17 @@ class CarouselComponent extends HTMLElement {
         // --- Thumbs Arrows (auto-generated) ---
         this.buildThumbsArrows();
 
+        // Always re-query buttons after rebuilding DOM
         this.prevBtn = this.querySelector('[name="previous"]');
         this.nextBtn = this.querySelector('[name="next"]');
 
-        this.scroller.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
+        // Attach scroll listener only once (the scroller element persists)
+        if (!this._scrollListenerAttached) {
+            this.scroller.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
+            this._scrollListenerAttached = true;
+        }
 
+        // Always re-attach click listeners since buttons may be new DOM nodes after a morph
         if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.scrollStep(-1));
         if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.scrollStep(1));
 
@@ -102,6 +120,9 @@ class CarouselComponent extends HTMLElement {
         }
 
         this.updateControls();
+
+        // Always call renderAttributes last, after all DOM is built
+        this.renderAttributes();
     }
 
     buildDots() {
@@ -186,30 +207,33 @@ class CarouselComponent extends HTMLElement {
         });
 
         if (!this.scroller) return;
-        lastClones.reverse().forEach(clone => this.scroller.prepend(clone));
-        firstClones.forEach(clone => this.scroller.append(clone));
+        lastClones.reverse().forEach(clone => this.scroller?.prepend(clone));
+        firstClones.forEach(clone => this.scroller?.append(clone));
 
         // Actualizar lista de diapositivas incluyendo clones
         this.slides = Array.from(this.scroller.querySelectorAll('[role="listitem"]'));
     }
 
     renderAttributes() {
-        const desktopCols = this.getAttribute('columns-desktop') ?? '1';
-        const mobileCols = this.getAttribute('columns-mobile') || '1';
-        const gap = this.getAttribute('gap') || '0';
+        const desktopCols = parseFloat(this.getAttribute('columns-desktop') ?? '1') || 1;
+        const mobileCols = parseFloat(this.getAttribute('columns-mobile') || '1') || 1;
+        const gap = parseFloat(this.getAttribute('gap') || '0') || 0;
         const showArrows = this.getAttribute('show-arrows') !== 'false';
         const showDots = this.getAttribute('show-dots') === 'true';
         const showThumbsArrows = this.getAttribute('show-thumbs-arrows') === 'true';
 
-        this.style.setProperty('--slides-per-view-desktop', desktopCols);
-        this.style.setProperty('--slides-per-view-mobile', mobileCols);
+        this.style.setProperty('--slides-per-view-desktop', String(desktopCols));
+        this.style.setProperty('--slides-per-view-mobile', String(mobileCols));
         this.style.setProperty('--carousel-gap', `${gap}px`);
 
         this.toggleAttribute('has-arrows', showArrows);
         this.toggleAttribute('has-dots', showDots);
 
-        if (this.prevBtn) this.prevBtn.toggleAttribute('hidden', !showArrows);
-        if (this.nextBtn) this.nextBtn.toggleAttribute('hidden', !showArrows);
+        // Always re-query from DOM to avoid stale references after morph/re-render
+        const prevBtn = this.querySelector('[name="previous"]');
+        const nextBtn = this.querySelector('[name="next"]');
+        if (prevBtn) prevBtn.toggleAttribute('hidden', !showArrows);
+        if (nextBtn) nextBtn.toggleAttribute('hidden', !showArrows);
 
         const dotsContainer = this.querySelector('.carousel-dots');
         if (dotsContainer) dotsContainer.toggleAttribute('hidden', !showDots);

@@ -1,0 +1,157 @@
+{% liquid
+  if product == blank
+    assign product = closest.product
+  endif
+
+  assign current_variant = product.selected_or_first_available_variant
+  assign current_color = current_variant.option1
+%}
+
+<div class="quick-add-content" data-product-id="{{ product.id }}">
+  <div class="quick-add-content__media">
+    <carousel-component
+      columns-desktop="1"
+      columns-mobile="2.25"
+      gap="1"
+      show-arrows="false"
+      show-dots="false"
+      thumbs-mobile="none"
+      thumbs-desktop="none"
+      loop="true"
+    >
+      <div class="carousel-scroller-wrapper">
+        <div role="list" class="carousel-scroller">
+          {% liquid
+            assign color_gallery = null
+            for variant in product.variants
+              if variant.option1 == current_color and variant.metafields.custom.gallery.value != blank
+                assign color_gallery = variant.metafields.custom.gallery.value
+                break
+              endif
+            endfor
+          %}
+
+          {% if color_gallery %}
+            {% for image in color_gallery %}
+              <div role="listitem" class="carousel-slide">
+                {{
+                  image
+                  | image_url: width: 800
+                  | image_tag: loading: 'lazy', alt: product.title, widths: '400, 600, 800'
+                }}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <div role="listitem" class="carousel-slide">
+                  {{
+                    media
+                    | image_url: width: 800
+                    | image_tag: loading: 'lazy', alt: product.title, widths: '400, 600, 800'
+                  }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <button
+          type="button"
+          name="previous"
+          class="carousel-button prev"
+          aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+        >
+          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+        </button>
+        <button
+          type="button"
+          name="next"
+          class="carousel-button next"
+          aria-label="{{ 'accessibility.slideshow_next' | t }}"
+        >
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </button>
+      </div>
+    </carousel-component>
+  </div>
+
+  <div class="quick-add-content__info">
+    <div class="product-header">
+      <a href="{{ product.url }}" class="product-title h3">
+        {{ product.title }}
+      </a>
+      <product-price>
+        {% render 'price', product_resource: product, show_unit_price: true %}
+      </product-price>
+    </div>
+
+    {%- content_for 'block',
+      type: '_product-details',
+      id: 'quick-add-details',
+      closest.product: product,
+      is_quick_add: true
+    -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .quick-add-content {
+    display: flex;
+    flex-direction: column;
+    background: rgb(var(--color-background));
+  }
+
+  .quick-add-content__media {
+    width: 100%;
+    position: relative;
+    background: #f5f5f5; /* Light background for images */
+  }
+
+  .quick-add-content__media carousel-component {
+    display: block;
+    width: 100%;
+  }
+
+  .quick-add-content__info {
+    padding: var(--padding-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  @media screen and (min-width: 750px) {
+    .quick-add-content {
+      flex-direction: row;
+      min-height: 450px;
+    }
+
+    .quick-add-content__media {
+      width: 50%;
+      flex: 0 0 50%;
+    }
+
+    .quick-add-content__info {
+      width: 50%;
+      flex: 0 0 50%;
+      padding: var(--padding-xl);
+      justify-content: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Quick Add Content",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    }
+  ]
+}
+{% endschema %}

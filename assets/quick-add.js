@@ -7,7 +7,7 @@ import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utili
 export class QuickAddComponent extends Component {
   /** @type {AbortController | null} */
   #abortController = null;
-  /** @type {Map<string, Element>} */
+  /** @type {Map<string, string>} */
   #cachedContent = new Map();
 
   get productPageUrl() {
@@ -18,17 +18,11 @@ export class QuickAddComponent extends Component {
 
     const url = new URL(productLink.href);
 
-    if (url.searchParams.has('variant')) {
-      url.searchParams.set('quick_add', 'true');
-      return url.toString();
-    }
-
     const selectedVariantId = this.#getSelectedVariantId();
     if (selectedVariantId) {
       url.searchParams.set('variant', selectedVariantId);
     }
 
-    url.searchParams.set('quick_add', 'true');
     return url.toString();
   }
 
@@ -65,35 +59,25 @@ export class QuickAddComponent extends Component {
     console.log('[QuickAdd] handleClick - URL:', currentUrl);
 
     // Check if we have cached content for this URL
-    let productGrid = this.#cachedContent.get(currentUrl);
+    /** @type {string | null | undefined} */
+    let productHtml = this.#cachedContent.get(currentUrl);
 
-    if (!productGrid) {
-      console.log('[QuickAdd] Cache miss. Fetching...');
+    if (!productHtml) {
+      console.log('[QuickAdd] Cache miss. Fetching section...');
       // Fetch and cache the content
-      const html = await this.fetchProductPage(currentUrl);
-      if (html) {
-        console.log('[QuickAdd] Fetch successful. Parsing...');
-        const gridElement = html.querySelector('[data-product-grid-content]');
-        if (gridElement) {
-          console.log('[QuickAdd] Found [data-product-grid-content]');
-          // Cache the cloned element to avoid modifying the original
-          productGrid = /** @type {Element} */ (gridElement.cloneNode(true));
-          this.#cachedContent.set(currentUrl, productGrid);
-        } else {
-          console.warn('[QuickAdd] FAILED to find [data-product-grid-content]');
-        }
+      productHtml = await this.fetchQuickAddSection(currentUrl);
+      if (productHtml) {
+        this.#cachedContent.set(currentUrl, productHtml);
       } else {
-        console.error('[QuickAdd] FAILED to fetch product page');
+        console.error('[QuickAdd] FAILED to fetch quick add section');
       }
     } else {
       console.log('[QuickAdd] Cache hit.');
     }
 
-    if (productGrid) {
+    if (productHtml) {
       console.log('[QuickAdd] Updating modal...');
-      // Use a fresh clone from the cache
-      const freshContent = /** @type {Element} */ (productGrid.cloneNode(true));
-      await this.updateQuickAddModal(freshContent);
+      await this.updateQuickAddModal(productHtml);
     } else {
       console.error('[QuickAdd] No content to display');
     }
@@ -127,30 +111,31 @@ export class QuickAddComponent extends Component {
   };
 
   /**
-   * Fetches the product page content
+   * Fetches the quick add section content
    * @param {string} productPageUrl - The URL of the product page to fetch
-   * @returns {Promise<Document | null>}
+   * @returns {Promise<string | null>}
    */
-  async fetchProductPage(productPageUrl) {
+  async fetchQuickAddSection(productPageUrl) {
     if (!productPageUrl) return null;
+
+    const url = new URL(productPageUrl);
+    url.searchParams.set('section_id', 'quick-add-content');
 
     // We use this to abort the previous fetch request if it's still pending.
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
     try {
-      const response = await fetch(productPageUrl, {
+      const response = await fetch(url.toString(), {
         signal: this.#abortController.signal,
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch product page: HTTP error ${response.status}`);
+        throw new Error(`Failed to fetch quick add section: HTTP error ${response.status}`);
       }
 
       const responseText = await response.text();
-      const html = new DOMParser().parseFromString(responseText, 'text/html');
-
-      return html;
+      return responseText;
     } catch (error) {
       if (error.name === 'AbortError') {
         return null;
@@ -163,75 +148,24 @@ export class QuickAddComponent extends Component {
   }
 
   /**
-   * Re-renders the variant picker.
-   * @param {Element} productGrid - The product grid element
+   * Updates the modal content with the fetched HTML
+   * @param {string} html - The section HTML
    */
-  async updateQuickAddModal(productGrid) {
+  async updateQuickAddModal(html) {
     const modalContent = document.getElementById('quick-add-modal-content');
-    console.log('[QuickAdd] updateQuickAddModal - grid:', productGrid, 'modal:', modalContent);
 
-    if (!productGrid || !modalContent) return;
+    if (!html || !modalContent) return;
 
-    // Extract key elements
-    const mediaGallery = productGrid.querySelector('.product-information__media, .section-variant-gallery, .gallery-main-container');
-    const productPrice = productGrid.querySelector('product-price');
-    const variantPicker = productGrid.querySelector('variant-picker');
-    const productFormComponent = productGrid.querySelector('product-form-component');
+    morph(modalContent, html);
 
-    // Create or find Title
-    let productTitle = productGrid.querySelector('.product-title');
-    if (!productTitle) {
-      productTitle = document.createElement('a');
-      productTitle.classList.add('product-title', 'h3');
-      productTitle.textContent = this.dataset.productTitle || '';
-      /** @type {HTMLAnchorElement} */ (productTitle).href = this.productPageUrl;
-    }
-
-    // Clear current grid content to rearrange
-    productGrid.innerHTML = '';
-
-    // 1. Media Gallery on top
-    if (mediaGallery) {
-      console.log('[QuickAdd] Appending Media Gallery');
-      productGrid.appendChild(mediaGallery);
-    }
-
-    // Create a container for the info below media
-    const infoContainer = document.createElement('div');
-    infoContainer.classList.add('quick-add-modal__info');
-
-    // 2. Title and Price
-    const productHeader = document.createElement('div');
-    productHeader.classList.add('product-header');
-    productHeader.appendChild(productTitle);
-    if (productPrice) {
-      productHeader.appendChild(productPrice);
-    }
-    infoContainer.appendChild(productHeader);
-
-    // 3. Variant Picker
-    if (variantPicker) {
-      infoContainer.appendChild(variantPicker);
-    }
-
-    // 4. Product Form
-    if (productFormComponent) {
-      infoContainer.appendChild(productFormComponent);
-    }
-
-    productGrid.appendChild(infoContainer);
-
-    console.log('[QuickAdd] Morphing content...');
-    morph(modalContent, productGrid);
-
-    // Configuración del carrusel para el modal: 2 columnas en mobile y loop infinito
-    modalContent.querySelectorAll('carousel-component').forEach((carousel) => {
-      carousel.setAttribute('columns-mobile', '2');
-      carousel.setAttribute('gap', '10');
-      carousel.setAttribute('show-dots', 'true');
-      carousel.setAttribute('thumbs-mobile', 'none');
-      carousel.setAttribute('thumbs-desktop', 'none');
-      carousel.setAttribute('loop', 'true');
+    // morph preserves custom elements without calling connectedCallback again.
+    // We must manually re-initialize the carousel so it re-reads its attributes
+    // and rebuilds any dynamically-generated nodes (dots, arrows visibility, CSS vars).
+    requestAnimationFrame(() => {
+      modalContent.querySelectorAll('carousel-component').forEach(el => {
+        // @ts-ignore — reinit() is defined on CarouselComponent
+        if (typeof el.reinit === 'function') el.reinit();
+      });
     });
 
     this.#syncVariantSelection(modalContent);

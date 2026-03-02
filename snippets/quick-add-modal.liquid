@@ -1,4 +1,5 @@
 <script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{{ 'carousel.css' | asset_url | stylesheet_tag }}
 <quick-add-dialog id="quick-add-dialog">
   <dialog
     class="quick-add-modal dialog-modal color-{{ settings.popover_color_scheme }}"
@@ -78,7 +79,11 @@
     max-width: var(--wide-content-width);
     overflow-y: auto;
     max-height: 100vh;
-    width: 500px;
+    width: 900px;
+
+    @media screen and (max-width: 1200px) {
+      width: 800px;
+    }
 
     @media screen and (max-width: 750px) {
       width: 100vw;
@@ -90,32 +95,6 @@
       overflow-y: auto;
       height: auto;
       max-height: 100vh;
-    }
-  }
-
-  .quick-add-modal__content .media-gallery--grid .media-gallery__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .quick-add-modal__content .media-gallery--grid.media-gallery--two-column .product-media-container:first-child {
-    grid-column: auto;
-  }
-
-  .quick-add-modal__content {
-    /* One column */
-    .media-gallery--grid:not(.media-gallery--two-column) .product-media > *,
-    /* Two column, small first image */
-    .media-gallery--grid.media-gallery--two-column:not(.media-gallery--large-first-image)
-    .product-media-container:nth-of-type(odd)
-    .product-media > *,
-    /* Two column, large first image */
-    .media-gallery--grid.media-gallery--two-column.media-gallery--large-first-image
-      .product-media-container:is(:first-of-type, :nth-of-type(even))
-      .product-media > *,
-      /* Carousel */
-    .media-gallery--carousel slideshow-container {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
     }
   }
 
@@ -226,6 +205,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: color 0.2s var(--animation-easing);
@@ -308,57 +288,12 @@
     max-height: 100%;
   }
 
+  .quick-add-modal__content slideshow-controls {
+    display: none;
+  }
+
   .quick-add-modal__content slideshow-slide:not([aria-hidden='false']) {
     content-visibility: auto;
-  }
-
-  .quick-add-modal__content :is(.product-information__media, .section-variant-gallery, .gallery-main-container) {
-    width: 100%;
-    position: relative;
-    animation: fadeIn 0.4s var(--animation-timing-fade-in) both;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    media-gallery {
-    pointer-events: all;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    slideshow-container {
-    display: block;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    slideshow-arrows {
-    display: flex;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    slideshow-controls {
-    display: flex;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    :is(slideshow-container, .swiper) {
-    display: block;
-    width: 100%;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    :is(slideshow-arrows, .swiper-button-prev, .swiper-button-next) {
-    display: flex;
-  }
-
-  .quick-add-modal__content
-    :is(.product-information__media, .section-variant-gallery, .gallery-main-container)
-    :is(slideshow-controls, .swiper-pagination) {
-    display: flex;
   }
 
   .quick-add-modal__content .sticky-content,
