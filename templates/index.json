@@ -12,13 +12,13 @@
     "17702342213f69d5dd": {
       "type": "_blocks",
       "blocks": {
-        "commons_components_banner_home_kdXKwX": {
-          "type": "shopify://apps/commons-components/blocks/banner-home/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+        "commonst_esprit_ltm_banner_home_78XmLV": {
+          "type": "shopify://apps/commonst-esprit-ltm/blocks/banner-home/019c9588-d6c1-7783-b00f-ead27b343848",
           "settings": {}
         }
       },
       "block_order": [
-        "commons_components_banner_home_kdXKwX"
+        "commonst_esprit_ltm_banner_home_78XmLV"
       ],
       "name": "Banner home",
       "settings": {

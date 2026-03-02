@@ -11,15 +11,6 @@
   "sections": {
     "17679063291942452f": {
       "type": "_blocks",
-      "blocks": {
-        "commons_components_banner_landing_hw3iyc": {
-          "type": "shopify://apps/commons-components/blocks/banner-landing/019a5fb5-0369-7d7a-9e19-07bacb81690d",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "commons_components_banner_landing_hw3iyc"
-      ],
       "custom_css": [
         "div[id*=\"Some:Same\"][id$=\"commons_components_banner_landing\"] {}"
       ],

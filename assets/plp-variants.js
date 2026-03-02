@@ -7,7 +7,7 @@
  * @version 2.0.0 - Optimizado
  */
 
-(function() {
+(function () {
   'use strict';
 
   // =====================
@@ -763,7 +763,25 @@
 
       btn.innerHTML = CONFIG.MESSAGES.added;
       btn.classList.add(CONFIG.CLASSES.success);
-      updateCartCount();
+
+      // Fetch real cart state to get accurate total item count
+      const cartResponse = await fetch('/cart.js');
+      const cart = await cartResponse.json();
+
+      // Dispatch 'cart:update' so Horizon cart-icon + cart-drawer update in real-time
+      document.dispatchEvent(new CustomEvent('cart:update', {
+        bubbles: true,
+        detail: {
+          resource: cart,
+          sourceId: 'plp-variants',
+          data: {
+            source: 'plp-variants',
+            itemCount: cart.item_count,
+            variantId: state.variantId,
+            productId: productId
+          }
+        }
+      }));
 
       resetButtonState(btn, originalContent, [CONFIG.CLASSES.success]);
     } catch (err) {

@@ -16,8 +16,6 @@
       "name": "Registration Modal",
       "settings": {
         "heading": "Crear cuenta",
-        "left_image": "shopify://shop_images/Group_688.png",
-        "success_image": "shopify://shop_images/0636510e-8228-49cd-9ddd-79c05a1b3274___32989afa49b0a5afa3724225decf38e2.webp",
         "legal_text": "He leído y acepto la",
         "legal_link_text": "Política de Tratamiento de Datos Personales.",
         "legal_link": "shopify://pages/terminos-condiciones",
@@ -319,9 +317,9 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "shopify://shop_images/suscribe_desktop.jpg",
+                "image": "shopify://shop_images/Banner-suscribe-desktop-_640x250_5ecdb469-1df0-4716-9128-0aaa906ee4a3.jpg",
                 "use_mobile_image": true,
-                "image_mobile": "shopify://shop_images/suscribe_mobile.jpg",
+                "image_mobile": "shopify://shop_images/Banner-suscribe-_390x177_35d106fa-9c91-415c-9540-2d9385574673.jpg",
                 "link": "",
                 "image_ratio": "adapt",
                 "width": "fill",
@@ -561,7 +559,7 @@
           "type": "menu",
           "name": "t:names.menu",
           "settings": {
-            "menu": "informaci-n",
+            "menu": "informacion",
             "heading": "Información",
             "menu_spacing": 12,
             "show_as_accordion": true,

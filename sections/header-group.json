@@ -82,8 +82,8 @@
           },
           "blocks": {}
         },
-        "commons_components_header_dynamic_menu_xxmi63": {
-          "type": "shopify://apps/commons-components/blocks/header-dynamic-menu/019a5fb5-0369-7d7a-9e19-07bacb81690d",
+        "commonst_esprit_ltm_header_dynamic_menu_89KBjL": {
+          "type": "shopify://apps/commonst-esprit-ltm/blocks/header-dynamic-menu/019c9588-d6c1-7783-b00f-ead27b343848",
           "settings": {
             "menu_enabled": true
           }
@@ -93,18 +93,26 @@
           "name": "Container",
           "settings": {
             "html_tag": "div",
+            "enable_section_width": false,
             "section_width": "full-width",
             "desktop_direction": "row",
             "mobile_direction": "row",
+            "gap_unit": "px",
             "gap": 0,
+            "gap_mobile": 12,
             "border": "none",
             "border_width": 1,
             "border_radius": 0,
             "border_color": "#000000",
+            "padding_unit": "px",
             "padding_top": 0,
+            "padding_top_mobile": 0,
             "padding_bottom": 0,
+            "padding_bottom_mobile": 0,
             "padding_left": 0,
+            "padding_left_mobile": 0,
             "padding_right": 0,
+            "padding_right_mobile": 0,
             "container_class": "header-utils",
             "custom_css": ""
           },
@@ -154,7 +162,7 @@
       "block_order": [
         "localization_9cRiwg",
         "logo_wtA9Yq",
-        "commons_components_header_dynamic_menu_xxmi63",
+        "commonst_esprit_ltm_header_dynamic_menu_89KBjL",
         "container_Ny4Ehn"
       ],
       "custom_css": [],
