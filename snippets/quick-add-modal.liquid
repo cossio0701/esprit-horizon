@@ -6,6 +6,11 @@
     ref="dialog"
     scroll-lock
   >
+    {%- comment -%} Drag handle – mobile only (tap or swipe-down to close) {%- endcomment -%}
+    <div ref="dragHandle" class="quick-add-modal__drag-handle">
+      <span class="quick-add-modal__drag-handle-bar"></span>
+    </div>
+
     <button
       ref="closeButton"
       on:click="/closeDialog"
@@ -36,7 +41,15 @@
       margin: auto 0 0 0;
       min-height: unset;
       max-width: 100%;
-      border-radius: 0;
+    }
+  }
+
+  /* Doubled specificity + !important to beat .dialog-modal base rules in base.css */
+  .quick-add-modal.quick-add-modal {
+    @media screen and (max-width: 750px) {
+      border-radius: 16px 16px 0 0 !important;
+      height: auto !important;
+      max-height: 90dvh;
     }
   }
 
@@ -66,10 +79,35 @@
     right: var(--margin-2xs);
     transition: transform 0.15s var(--animation-timing-bounce);
     z-index: var(--layer-raised);
+
+    @media screen and (max-width: 750px) {
+      display: none;
+    }
   }
 
   .quick-add-modal__close:active {
     transform: scale(0.8);
+  }
+
+  /* ── Drag handle (mobile bottom-sheet affordance) ── */
+  .quick-add-modal__drag-handle {
+    display: none;
+
+    @media screen and (max-width: 750px) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 0 6px;
+      cursor: pointer;
+      touch-action: none;
+    }
+  }
+
+  .quick-add-modal__drag-handle-bar {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
   }
 
   .quick-add-modal__content {

@@ -200,21 +200,83 @@ if (!customElements.get('quick-add-component')) {
 class QuickAddDialog extends DialogComponent {
   #abortController = new AbortController();
 
+  /** @type {number} */
+  #touchStartY = 0;
+  /** @type {boolean} */
+  #isDragging = false;
+  /** Minimum swipe distance in px to trigger close */
+  static SWIPE_THRESHOLD = 80;
+
   connectedCallback() {
     super.connectedCallback();
 
-    this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal: this.#abortController.signal });
-    this.addEventListener(ThemeEvents.variantUpdate, this.#updateProductTitleLink);
+    const { signal } = this.#abortController;
 
-    this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose);
+    this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal });
+    this.addEventListener(ThemeEvents.variantUpdate, this.#updateProductTitleLink, { signal });
+    this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose, { signal });
+
+    // Drag handle: tap to close + swipe-down to dismiss
+    this.#initDragHandle();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
     this.#abortController.abort();
-    this.removeEventListener(DialogCloseEvent.eventName, this.#handleDialogClose);
   }
+
+  /* ── Drag handle (mobile bottom-sheet) ── */
+
+  #initDragHandle() {
+    const handle = /** @type {HTMLElement | null} */ (this.refs.dragHandle);
+    if (!handle) return;
+
+    const { signal } = this.#abortController;
+
+    // Tap to close
+    handle.addEventListener('click', () => this.closeDialog(), { signal });
+
+    // Touch: swipe-down to dismiss
+    handle.addEventListener('touchstart', this.#onTouchStart, { passive: true, signal });
+    handle.addEventListener('touchmove', this.#onTouchMove, { passive: false, signal });
+    handle.addEventListener('touchend', this.#onTouchEnd, { passive: true, signal });
+  }
+
+  #onTouchStart = (/** @type {TouchEvent} */ e) => {
+    this.#touchStartY = e.touches[0]?.clientY ?? 0;
+    this.#isDragging = true;
+    const dialog = this.refs.dialog;
+    if (dialog instanceof HTMLElement) dialog.style.transition = 'none';
+  };
+
+  #onTouchMove = (/** @type {TouchEvent} */ e) => {
+    if (!this.#isDragging) return;
+    const deltaY = (e.touches[0]?.clientY ?? 0) - this.#touchStartY;
+    if (deltaY < 0) return; // Only allow downward drag
+    e.preventDefault();
+    const dialog = this.refs.dialog;
+    if (dialog instanceof HTMLElement) dialog.style.transform = `translateY(${deltaY}px)`;
+  };
+
+  #onTouchEnd = (/** @type {TouchEvent} */ e) => {
+    if (!this.#isDragging) return;
+    this.#isDragging = false;
+
+    const dialog = this.refs.dialog;
+    const endY = e.changedTouches[0]?.clientY ?? 0;
+    const deltaY = endY - this.#touchStartY;
+
+    if (dialog instanceof HTMLElement) {
+      dialog.style.transition = '';
+      dialog.style.transform = '';
+    }
+
+    if (deltaY >= QuickAddDialog.SWIPE_THRESHOLD) {
+      this.closeDialog();
+    }
+  };
+
+  /* ── Existing handlers ── */
 
   /**
    * Closes the dialog
