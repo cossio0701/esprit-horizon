@@ -293,6 +293,29 @@ carousel-component[thumbs-mobile='bottom'] .carousel-thumbs-nav {
     carousel-component[thumbs-mobile='right'] .carousel-dots {
         display: none;
     }
+
+    /* --- Override PDP mobile dots position and color --- */
+    .section-variant-gallery carousel-component[thumbs-mobile='none'] .carousel-dots {
+        position: absolute;
+        bottom: 30px;
+        left: 16px;
+        z-index: 10;
+        padding: 0;
+    }
+
+    .section-variant-gallery .carousel-dots {
+        gap: 5px;
+    }
+
+    .section-variant-gallery .carousel-dots button {
+        border-color: #fff;
+        width: 8px;
+        height: 8px;
+    }
+
+    .section-variant-gallery .carousel-dots button[aria-selected='true'] {
+        background: #fff;
+    }
 }
 
 /* --------------------------------------------------------------------------
