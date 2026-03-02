@@ -226,16 +226,24 @@ class QuickAddDialog extends DialogComponent {
   };
 
   #updateProductTitleLink = (/** @type {CustomEvent} */ event) => {
-    const anchorElement = /** @type {HTMLAnchorElement} */ (
-      event.detail.data.html?.querySelector('.view-product-title a')
-    );
-    const viewMoreDetailsLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.view-product-title a'));
-    const mobileProductTitle = /** @type {HTMLAnchorElement} */ (this.querySelector('.product-header a'));
+    // Build the product URL from the variant picker data in the fetched HTML
+    const html = event.detail?.data?.html;
+    if (!html) return;
 
-    if (!anchorElement) return;
+    const variantPicker = html.querySelector('variant-picker');
+    const productUrl = variantPicker?.dataset?.productUrl;
+    if (!productUrl) return;
 
-    if (viewMoreDetailsLink) viewMoreDetailsLink.href = anchorElement.href;
-    if (mobileProductTitle) mobileProductTitle.href = anchorElement.href;
+    const variantId = event.detail?.resource?.id;
+    const url = new URL(productUrl, window.location.origin);
+    if (variantId) url.searchParams.set('variant', variantId);
+
+    const href = url.pathname + url.search;
+    const viewDetailsLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.quick-add-content__view-details'));
+    const productTitleLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.quick-add-content__title'));
+
+    if (viewDetailsLink) viewDetailsLink.href = href;
+    if (productTitleLink) productTitleLink.href = href;
   };
 
   #handleDialogClose = () => {

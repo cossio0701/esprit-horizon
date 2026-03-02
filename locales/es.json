@@ -290,7 +290,8 @@
       "quantity_increments": "Incrementos de {{ increment }}",
       "quantity_minimum": "Mínimo de {{ minimum }}",
       "quantity_maximum": "Máximo de {{ maximum }}",
-      "in_cart": "en el carrito"
+      "in_cart": "en el carrito",
+      "view_full_details": "Ver todos los detalles"
     }
   },
   "fields": {
