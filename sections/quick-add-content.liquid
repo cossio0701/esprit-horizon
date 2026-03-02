@@ -79,7 +79,7 @@
 
   <div class="quick-add-content__info">
     {%- comment -%} 2. Product Name {%- endcomment -%}
-    <a href="{{ product.url }}" class="quick-add-content__title h3">
+    <a href="{{ product.url }}" class="quick-add-content__title">
       {{ product.title }}
     </a>
 
@@ -113,29 +113,6 @@
     {%- comment -%} 9. View All Details Link {%- endcomment -%}
     <a href="{{ product.url }}" class="quick-add-content__view-details">
       {{ 'products.product.view_full_details' | t | default: 'Ver todos los detalles' }}
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          d="M3.33337 8H12.6667"
-          stroke="currentColor"
-          stroke-width="1.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M8 3.33331L12.6667 7.99998L8 12.6666"
-          stroke="currentColor"
-          stroke-width="1.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
     </a>
   </div>
 </div>
@@ -160,6 +137,7 @@
 
   .quick-add-content__info {
     padding: var(--padding-lg);
+    padding-inline: 0;
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
@@ -169,8 +147,10 @@
   .quick-add-content__title {
     color: inherit;
     text-decoration: none;
-    font-weight: 600;
+    font-size: 16px;
     line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -183,6 +163,12 @@
     text-decoration: underline;
   }
 
+  @media screen and (min-width: 750px) {
+    .quick-add-content__title {
+      font-size: 16px;
+    }
+  }
+
   /* 3. Product reference */
   .quick-add-content__reference {
     display: block;
@@ -190,6 +176,18 @@
     color: #c6c6c6;
     font-weight: 400;
     margin-top: -4px;
+  }
+
+  /* 4. Product price */
+  .quick-add-content__info product-price .price {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .quick-add-content__info product-price .compare-at-price {
+    font-size: 14px;
+    opacity: 0.6;
+    text-decoration: line-through;
   }
 
   /* 7. Model measurements */
@@ -201,23 +199,18 @@
 
   /* 9. View details link */
   .quick-add-content__view-details {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-2xs);
+    display: block;
+    text-align: center;
     font-size: 13px;
     color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
     text-decoration: underline;
     text-underline-offset: 3px;
     transition: color 0.2s ease;
-    width: fit-content;
+    width: 100%;
   }
 
   .quick-add-content__view-details:hover {
     color: rgb(var(--color-foreground));
-  }
-
-  .quick-add-content__view-details svg {
-    flex-shrink: 0;
   }
 
   /* Desktop layout */
@@ -268,10 +261,12 @@
 
   .quick-add-content__info .product-form-buttons > span:not(.accelerated-checkout-block) {
     flex: 1;
+    width: 100%;
   }
 
   .quick-add-content__info .product-form-buttons button {
     width: 100%;
+    min-width: 100%;
   }
 
   /* Button color: Black background, white text */
@@ -279,6 +274,8 @@
     background-color: #000 !important;
     color: #fff !important;
     border: 1px solid #000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
   }
 
   .quick-add-content__info .add-to-cart-button:hover {
