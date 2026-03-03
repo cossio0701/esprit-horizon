@@ -1,0 +1,367 @@
+{% liquid
+  if product == blank
+    assign product = closest.product
+  endif
+
+  assign current_variant = product.selected_or_first_available_variant
+
+  # Dynamically detect which option is "color" (by name or swatch presence)
+  # This mirrors the PLP fix so products with any option order work correctly.
+  assign color_option_index = null
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    assign swatch_count = option.values | map: 'swatch' | compact | size
+    if option_name_lower == 'color' or swatch_count > 0
+      assign color_option_index = forloop.index0
+      break
+    endif
+  endfor
+
+  # Resolve the current color from the correct option position
+  if color_option_index == 0
+    assign current_color = current_variant.option1
+  elsif color_option_index == 1
+    assign current_color = current_variant.option2
+  elsif color_option_index == 2
+    assign current_color = current_variant.option3
+  else
+    assign current_color = current_variant.option1
+  endif
+%}
+
+<div class="quick-add-content" data-product-id="{{ product.id }}">
+  {%- comment -%} 1. Photo carousel {%- endcomment -%}
+  <div class="quick-add-content__media">
+    <carousel-component
+      columns-desktop="1"
+      columns-mobile="2.25"
+      gap="1"
+      show-arrows="false"
+      show-dots="false"
+      thumbs-mobile="none"
+      thumbs-desktop="none"
+      loop="true"
+    >
+      <div class="carousel-scroller-wrapper">
+        <div role="list" class="carousel-scroller">
+          {% liquid
+            assign color_gallery = null
+            for variant in product.variants
+              # Compare using the correct option position for color
+              if color_option_index == 1
+                assign variant_color = variant.option2
+              elsif color_option_index == 2
+                assign variant_color = variant.option3
+              else
+                assign variant_color = variant.option1
+              endif
+
+              if variant_color == current_color and variant.metafields.custom.gallery.value != blank
+                assign color_gallery = variant.metafields.custom.gallery.value
+                break
+              endif
+            endfor
+          %}
+
+          {% if color_gallery %}
+            {% for image in color_gallery %}
+              <div role="listitem" class="carousel-slide">
+                {{
+                  image
+                  | image_url: width: 800
+                  | image_tag: loading: 'lazy', alt: product.title, widths: '400, 600, 800'
+                }}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <div role="listitem" class="carousel-slide">
+                  {{
+                    media
+                    | image_url: width: 800
+                    | image_tag: loading: 'lazy', alt: product.title, widths: '400, 600, 800'
+                  }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <button
+          type="button"
+          name="previous"
+          class="carousel-button prev"
+          aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+        >
+          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+        </button>
+        <button
+          type="button"
+          name="next"
+          class="carousel-button next"
+          aria-label="{{ 'accessibility.slideshow_next' | t }}"
+        >
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </button>
+      </div>
+    </carousel-component>
+  </div>
+
+  <div class="quick-add-content__info">
+    {%- comment -%} 2. Product Name {%- endcomment -%}
+    <a href="{{ product.url }}" class="quick-add-content__title">
+      {{ product.title }}
+    </a>
+
+    {%- comment -%} 3. Product Reference {%- endcomment -%}
+    {% if product.metafields.custom.color_group != blank %}
+      <span class="quick-add-content__reference"> Ref: {{ product.metafields.custom.color_group }} </span>
+    {% endif %}
+
+    {%- comment -%} 4. Product Price {%- endcomment -%}
+    <product-price>
+      {% render 'price', product_resource: product, show_unit_price: true %}
+    </product-price>
+
+    {%- comment -%} Divider after price {%- endcomment -%}
+    <hr class="quick-add-content__divider">
+
+    {%- comment -%} 5 & 6. Color + Size Selection (Variant Picker) {%- endcomment -%}
+    {% unless product.has_only_default_variant %}
+      <script src="{{ 'variant-picker.js' | asset_url }}" type="module"></script>
+      {%- content_for 'block', type: 'variant-picker', id: 'quick-add-variant-picker', closest.product: product -%}
+    {% endunless %}
+
+    {%- comment -%} 7. Model Measurements {%- endcomment -%}
+    {% if product.metafields.custom.model_fit != blank %}
+      <div class="quick-add-content__model-fit">
+        <span>{{ product.metafields.custom.model_fit }}</span>
+      </div>
+    {% endif %}
+
+    {%- comment -%} 8. Add to Bag Button {%- endcomment -%}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    {%- content_for 'block', type: 'buy-buttons', id: 'quick-add-buy-buttons', closest.product: product -%}
+
+    {%- comment -%} 9. View All Details Link {%- endcomment -%}
+    <a href="{{ product.url }}" class="quick-add-content__view-details">
+      {{ 'products.product.view_full_details' | t | default: 'Ver todos los detalles' }}
+    </a>
+  </div>
+</div>
+
+{% stylesheet %}
+  .quick-add-content {
+    display: flex;
+    flex-direction: column;
+    background: rgb(var(--color-background));
+  }
+
+  .quick-add-content__media {
+    width: 100%;
+    position: relative;
+    background: #f5f5f5;
+  }
+
+  .quick-add-content__media carousel-component {
+    display: block;
+    width: 100%;
+  }
+
+  .quick-add-content__info {
+    padding: var(--padding-lg);
+    padding-inline: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+  }
+
+  /* 2. Product title */
+  .quick-add-content__title {
+    color: inherit;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .quick-add-content__title:hover {
+    text-decoration: underline;
+  }
+
+  @media screen and (min-width: 750px) {
+    .quick-add-content__title {
+      font-size: 16px;
+    }
+  }
+
+  /* 3. Product reference */
+  .quick-add-content__reference {
+    display: block;
+    font-size: 12px;
+    color: #c6c6c6;
+    font-weight: 400;
+    margin-top: -4px;
+  }
+
+  /* 4. Product price */
+  .quick-add-content__info product-price .price {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .quick-add-content__info product-price .compare-at-price {
+    font-size: 14px;
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+
+  /* Divider after price */
+  .quick-add-content__divider {
+    border: none;
+    border-top: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    margin: var(--margin-xs) 0;
+  }
+
+  /* Force Color (swatches) before Talla (buttons) */
+  .quick-add-content .variant-picker__form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quick-add-content .variant-option--swatches {
+    order: -1;
+  }
+
+  .quick-add-content .variant-option legend {
+    font-weight: 700;
+  }
+
+  /* 7. Model measurements */
+  .quick-add-content__model-fit {
+    font-size: 13px;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    line-height: 1.4;
+  }
+
+  /* 9. View details link */
+  .quick-add-content__view-details {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+    width: 100%;
+  }
+
+  .quick-add-content__view-details:hover {
+    color: rgb(var(--color-foreground));
+  }
+
+  /* Desktop layout */
+  @media screen and (min-width: 750px) {
+    .quick-add-content {
+      flex-direction: row;
+      min-height: 450px;
+    }
+
+    .quick-add-content__media {
+      width: 50%;
+      flex: 0 0 50%;
+    }
+
+    .quick-add-content__info {
+      width: 50%;
+      flex: 0 0 50%;
+      padding: var(--padding-xl);
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+  }
+
+  /* Variant picker overrides inside quick add */
+  .quick-add-content__info .variant-picker {
+    width: 100%;
+  }
+
+  /* Buy buttons overrides inside quick add */
+  .quick-add-content__info .buy-buttons-block {
+    width: 100%;
+  }
+
+  /* Hide quantity selector — quick add always adds 1 */
+  .quick-add-content__info .quantity-selector {
+    display: none !important;
+  }
+
+  /* Hide accelerated checkout (Buy it now) */
+  .quick-add-content__info .accelerated-checkout-block {
+    display: none !important;
+  }
+
+  .quick-add-content__info .product-form-buttons {
+    display: flex;
+    width: 100%;
+  }
+
+  .quick-add-content__info .product-form-buttons > span:not(.accelerated-checkout-block) {
+    flex: 1;
+    width: 100%;
+  }
+
+  .quick-add-content__info .product-form-buttons button {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  /* Button color: Black background, white text */
+  .quick-add-content__info .add-to-cart-button {
+    background-color: #000 !important;
+    color: #fff !important;
+    border: 1px solid #000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .quick-add-content__info .add-to-cart-button:hover {
+    background-color: #333 !important;
+    border-color: #333 !important;
+  }
+  /* 9. View Details Link */
+  .quick-add-content__view-details {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    margin-top: var(--margin-md);
+    font-size: 14px;
+    text-decoration: underline;
+    color: rgb(var(--color-foreground-rgb));
+    padding-bottom: var(--padding-lg);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Quick Add Content",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    }
+  ]
+}
+{% endschema %}

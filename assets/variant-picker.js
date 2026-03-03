@@ -203,6 +203,13 @@ export default class VariantPicker extends Component {
     }
 
     // If variant-picker is a child of quick-add-component or swatches-variant-picker-component, we need to append section_id=section-rendering-product-card to the URL
+    if (this.closest('quick-add-dialog')) {
+      if (productUrl?.includes('?')) {
+        productUrl = productUrl.split('?')[0];
+      }
+      return `${productUrl}?section_id=quick-add-content&${params.join('&')}`;
+    }
+
     if (this.closest('quick-add-component') || this.closest('swatches-variant-picker-component')) {
       if (productUrl?.includes('?')) {
         productUrl = productUrl.split('?')[0];

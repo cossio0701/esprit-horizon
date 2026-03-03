@@ -1,11 +1,48 @@
-/* Contenedor custom */
-.gco-container {
-  display: flex;
-  flex-direction: var(--direction-desktop);
+carousel-component {
+  --slides-per-view-desktop: 1;
+  --slides-per-view-mobile: 1;
+  --carousel-gap: 0px;
+  display: block;
+  position: relative;
+  width: 100%;
 }
 
-@media (max-width: 640px) {
-  .gco-container {
-    flex-direction: var(--direction-mobile);
+.carousel-scroller {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: var(--carousel-gap);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carousel-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-slide {
+  scroll-snap-align: start;
+  flex: 0 0 calc((100% - (var(--carousel-gap) * (var(--slides-per-view-mobile) - 1))) / var(--slides-per-view-mobile));
+}
+
+@media (min-width: 769px) {
+  .carousel-slide {
+    flex: 0 0 calc((100% - (var(--carousel-gap) * (var(--slides-per-view-desktop) - 1))) / var(--slides-per-view-desktop));
   }
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.carousel-pagination[hidden],
+.carousel-button[hidden] {
+  display: none !important;
 }

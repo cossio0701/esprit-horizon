@@ -59,10 +59,22 @@
         class="product-information__media"
         data-testid="product-information-media"
       >
+        {%- liquid
+          assign is_quick_add = false
+          if content_for_header contains 'quick_add=true'
+            assign is_quick_add = true
+          endif
+
+          assign media_presentation = section.settings.media_presentation | default: 'grid'
+          if is_quick_add
+            assign media_presentation = 'carousel'
+          endif
+        -%}
         {%- content_for 'block',
           type: '_product-media-gallery',
           id: 'media-gallery',
-          closest.product: closest.product
+          closest.product: closest.product,
+          media_presentation: media_presentation
         -%}
       </div>
     {% endcapture %}
@@ -71,7 +83,8 @@
       {% content_for 'block',
         type: '_product-details',
         id: 'product-details',
-        closest.product: closest.product
+        closest.product: closest.product,
+        is_quick_add: is_quick_add
       %}
     {% endcapture %}
 

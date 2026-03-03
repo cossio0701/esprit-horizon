@@ -1,4 +1,14 @@
-{% assign block_settings = block.settings %}
+{% liquid
+  assign block_settings = block.settings
+  assign media_presentation = block_settings.media_presentation
+
+  if request.query_parameters.quick_add == 'true'
+    assign media_presentation = 'carousel'
+  endif
+%}
+<!--
+  Debug: media_presentation = {{ media_presentation }}, quick_add param = {{ request.query_parameters.quick_add }}
+-->
 
 {%- if block_settings.zoom -%}
   <script
@@ -24,7 +34,7 @@
 
   assign render_slideshow_controls = false
 
-  if block_settings.media_presentation == 'carousel' or block_settings.slideshow_controls_style == block_settings.slideshow_mobile_controls_style
+  if media_presentation == 'carousel' or block_settings.slideshow_controls_style == block_settings.slideshow_mobile_controls_style
     assign render_slideshow_controls = true
   endif
 
@@ -51,7 +61,7 @@
   else
     assign slideshow_class = ''
 
-    if block_settings.media_presentation == 'carousel'
+    if media_presentation == 'carousel'
       assign render_slideshow_arrows = true
     endif
   endif
@@ -101,7 +111,7 @@
 
   # Determine if we're in single column mode (carousel or grid with one column)
   assign is_single_column = false
-  if block_settings.media_presentation == 'carousel' or sorted_media.size == 1 or block_settings.media_presentation == 'grid' and block_settings.media_columns == 'one'
+  if media_presentation == 'carousel' or sorted_media.size == 1 or media_presentation == 'grid' and block_settings.media_columns == 'one'
     assign is_single_column = true
   endif
 
@@ -275,11 +285,11 @@
   class="
     spacing-style
     sticky-content
-    {% if block_settings.media_presentation == 'grid' %}
+    {% if media_presentation == 'grid' %}
       media-gallery--{{ block_settings.media_columns }}-column
       {% if block_settings.media_columns == "two" and block_settings.large_first_image%}media-gallery--large-first-image{% endif %}
     {% endif %}
-    media-gallery--{{ block_settings.media_presentation }}
+    media-gallery--{{ media_presentation }}
     {% if block_settings.slideshow_mobile_controls_style == 'hint' %}
       media-gallery--hint
     {% endif %}
@@ -288,7 +298,7 @@
     {% endif %}
   "
   style="{% render 'spacing-style', settings: block_settings %} --thumbnail-width: {{ block_settings.thumbnail_width }}px; --media-radius: {{ block_settings.media_radius }}px;{% if block_settings.icons_style contains 'large' %} --slideshow-icon-padding: 0px;{% endif %}--image-gap: {{ block_settings.image_gap }}px;{% unless block_settings.aspect_ratio == 'adapt' %} --gallery-aspect-ratio: {{ block_settings.aspect_ratio }};{% endunless %}"
-  data-presentation="{{ block_settings.media_presentation }}"
+  data-presentation="{{ media_presentation }}"
   {{ block.shopify_attributes }}
 >
   {% capture slides %}
@@ -376,7 +386,7 @@
     controls: controls
   %}
 
-  {% if block_settings.media_presentation == 'grid' %}
+  {% if media_presentation == 'grid' %}
     <ul
       class="media-gallery__grid list-unstyled"
       data-testid="media-gallery-grid"

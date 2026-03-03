@@ -36,6 +36,17 @@
 -%}
 
 {% if has_content %}
+  <style>
+    [data-block-id="{{ block.id }}"] {
+      flex-direction: var(--direction-mobile);
+    }
+    @media screen and (min-width: 750px) {
+      [data-block-id="{{ block.id }}"] {
+        flex-direction: var(--direction-desktop);
+      }
+    }
+  </style>
+
   {% if block.settings.enable_section_width %}
     <div
       class="section section--{{ block.settings.section_width }}"
@@ -43,6 +54,7 @@
     >
       <{{ tag }}
         class="gco-container {{ container_class }}"
+        data-block-id="{{ block.id }}"
         style="{{ container_styles }}"
       >
         {{ children }}
@@ -51,6 +63,7 @@
   {% else %}
     <{{ tag }}
       class="gco-container {{ container_class }}"
+      data-block-id="{{ block.id }}"
       style="{{ container_styles }}"
       {{ block.shopify_attributes }}
     >
