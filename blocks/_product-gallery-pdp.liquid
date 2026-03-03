@@ -44,26 +44,32 @@
                 {% if color_gallery %}
                   {% for image in color_gallery %}
                     <div role="listitem" class="carousel-slide">
-                      <img
-                        src="{{ image | image_url: width: 1500 }}"
-                        alt="{{ product.title }} - {{ color }}"
-                        loading="lazy"
-                        width="1500"
-                        height="1500"
-                      >
+                      <pdp-image-zoom class="pdp-zoom-wrapper">
+                        <img
+                          src="{{ image | image_url: width: 1500 }}"
+                          alt="{{ product.title }} - {{ color }}"
+                          loading="lazy"
+                          width="1500"
+                          height="1500"
+                          class="pdp-zoom-image"
+                        >
+                      </pdp-image-zoom>
                     </div>
                   {% endfor %}
                 {% else %}
                   {% for media in product.media %}
                     {% if media.media_type == 'image' %}
                       <div role="listitem" class="carousel-slide">
-                        <img
-                          src="{{ media | image_url: width: 1500 }}"
-                          alt="{{ product.title }}"
-                          loading="lazy"
-                          width="1500"
-                          height="1500"
-                        >
+                        <pdp-image-zoom class="pdp-zoom-wrapper">
+                          <img
+                            src="{{ media | image_url: width: 1500 }}"
+                            alt="{{ product.title }}"
+                            loading="lazy"
+                            width="1500"
+                            height="1500"
+                            class="pdp-zoom-image"
+                          >
+                        </pdp-image-zoom>
                       </div>
                     {% endif %}
                   {% endfor %}
@@ -75,6 +81,19 @@
               </button>
               <button type="button" name="next" class="carousel-button next" aria-label="Next">
                 {{ 'icon-chevron-right.svg' | inline_asset_content }}
+              </button>
+
+              <button
+                type="button"
+                class="pdp-fixed-zoom-btn {% unless block.settings.show_zoom_desktop %}desktop:hidden{% endunless %} {% unless block.settings.show_zoom_mobile %}mobile:hidden{% endunless %}"
+                aria-label="{{ 'actions.zoom' | t }}"
+              >
+                <span class="pdp-zoom-icon pdp-zoom-icon--in">
+                  {{- 'icon-zoom-in.svg' | inline_asset_content -}}
+                </span>
+                <span class="pdp-zoom-icon pdp-zoom-icon--out">
+                  {{- 'icon-zoom-out.svg' | inline_asset_content -}}
+                </span>
               </button>
             </div>
 
@@ -121,6 +140,248 @@
 </div>
 
 <script>
+  (function () {
+    class PDPImageZoom extends HTMLElement {
+      constructor() {
+        super();
+        this.isZoomed = false;
+        this.scale = 2.5;
+        this.translateX = 0;
+        this.translateY = 0;
+        this.startX = 0;
+        this.startY = 0;
+        this.isPanning = false;
+
+        this._isExiting = false;
+        this._pendingReset = false;
+
+        this.img = null;
+        this.scroller = null;
+      }
+
+      connectedCallback() {
+        this.img = this.querySelector('.pdp-zoom-image');
+        this.scroller = this.closest('.carousel-scroller');
+
+        const boundOnPointerUp = this.onPointerUp.bind(this);
+        this.addEventListener('pointerdown', this.onPointerDown.bind(this));
+        this.addEventListener('pointermove', this.onPointerMove.bind(this));
+        this.addEventListener('pointerup', boundOnPointerUp);
+        this.addEventListener('pointerleave', boundOnPointerUp);
+        this.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+        this.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+        this.addEventListener('touchend', boundOnPointerUp);
+
+        const carousel = this.closest('carousel-component');
+        if (carousel) {
+          carousel.addEventListener('carousel:slideChange', () => {
+            if (!this.isPanning) {
+              this.reset();
+            } else {
+              this._pendingReset = true;
+            }
+          });
+        }
+      }
+
+      toggleZoom(e) {
+        this.isZoomed = !this.isZoomed;
+        this.dataset.zoomed = this.isZoomed;
+
+        if (this.isZoomed) {
+          const rect = this.getBoundingClientRect();
+          let ox = 50,
+            oy = 50;
+          if (e && (e.clientX || e.touches)) {
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            ox = ((clientX - rect.left) / rect.width) * 100;
+            oy = ((clientY - rect.top) / rect.height) * 100;
+          }
+
+          this.translateX = ((rect.width * (50 - ox)) / 100) * (this.scale - 1);
+          this.translateY = ((rect.height * (50 - oy)) / 100) * (this.scale - 1);
+
+          this.applyZoom();
+        } else {
+          this.reset();
+        }
+        return this.isZoomed;
+      }
+
+      handleMove(dx, dy) {
+        if (!this.scroller) return;
+        const rect = this.getBoundingClientRect();
+        const limitX = Math.max(0, (rect.width * this.scale - rect.width) / 2);
+        const limitY = Math.max(0, (rect.height * this.scale - rect.height) / 2);
+
+        const threshold = 40;
+        let targetX = dx;
+
+        if (targetX > limitX + threshold) {
+          this.exitZoomAndSlide('prev');
+          return;
+        } else if (targetX < -limitX - threshold) {
+          this.exitZoomAndSlide('next');
+          return;
+        }
+
+        this.translateX = Math.max(-limitX, Math.min(limitX, targetX));
+        this.translateY = Math.max(-limitY, Math.min(limitY, dy));
+        this.updateTransform();
+      }
+
+      exitZoomAndSlide(direction) {
+        if (this._isExiting) return;
+        this._isExiting = true;
+
+        const carousel = this.closest('carousel-component');
+        if (carousel && carousel.scrollStep) {
+          carousel.scrollStep(direction === 'next' ? 1 : -1);
+        }
+
+        this.reset();
+
+        setTimeout(() => {
+          this._isExiting = false;
+          this.isPanning = false;
+        }, 300);
+      }
+
+      applyZoom() {
+        if (!this.img) return;
+        this.img.style.transformOrigin = '50% 50%';
+        this.updateTransform();
+        this.style.touchAction = 'none';
+
+        if (this.scroller) {
+          this.scroller.style.scrollSnapType = 'none';
+          this.scroller.style.overflow = 'hidden';
+        }
+      }
+
+      reset() {
+        this.isZoomed = false;
+        this.dataset.zoomed = false;
+        this.translateX = 0;
+        this.translateY = 0;
+        this.isPanning = false;
+
+        if (this.img) {
+          this.img.style.transform = 'scale(1) translate(0, 0)';
+          this.img.style.transition = '';
+        }
+
+        this.style.touchAction = '';
+        if (this.scroller) {
+          this.scroller.style.overflow = '';
+          this.scroller.style.scrollSnapType = '';
+
+          const carousel = this.closest('carousel-component');
+          if (carousel && carousel.updateActiveIndex) {
+            setTimeout(() => carousel.updateActiveIndex(), 50);
+          }
+        }
+
+        document.dispatchEvent(new CustomEvent('pdp:zoom-reset', { detail: { element: this } }));
+      }
+
+      onPointerDown(e) {
+        if (!this.isZoomed) return;
+        this.isPanning = true;
+        this.startX = e.clientX - this.translateX;
+        this.startY = e.clientY - this.translateY;
+        this.img.style.transition = 'none';
+        e.preventDefault();
+      }
+
+      onPointerMove(e) {
+        if (!this.isPanning) return;
+        this.handleMove(e.clientX - this.startX, e.clientY - this.startY);
+      }
+
+      onPointerUp() {
+        if (!this.isPanning) return;
+        this.isPanning = false;
+        if (this.img) this.img.style.transition = '';
+
+        if (this._pendingReset) {
+          this._pendingReset = false;
+          this.reset();
+        }
+      }
+
+      onTouchStart(e) {
+        if (!this.isZoomed || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        this.isPanning = true;
+        this.startX = touch.clientX - this.translateX;
+        this.startY = touch.clientY - this.translateY;
+        this.img.style.transition = 'none';
+      }
+
+      onTouchMove(e) {
+        if (!this.isPanning || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        this.handleMove(touch.clientX - this.startX, touch.clientY - this.startY);
+        e.preventDefault();
+      }
+
+      updateTransform() {
+        if (this.img) {
+          this.img.style.transform = `scale(${this.scale}) translate(${this.translateX / this.scale}px, ${
+            this.translateY / this.scale
+          }px)`;
+        }
+      }
+    }
+
+    if (!customElements.get('pdp-image-zoom')) {
+      customElements.define('pdp-image-zoom', PDPImageZoom);
+    }
+
+    // Global fixed button logic
+    function initFixedZoomButtons() {
+      document.querySelectorAll('.pdp-fixed-zoom-btn').forEach((btn) => {
+        const carousel = btn.closest('carousel-component');
+        if (!carousel) return;
+
+        btn.addEventListener('click', (e) => {
+          const scroller = carousel.querySelector('.carousel-scroller');
+          if (!scroller) return;
+
+          // Find the active slide's zoom component
+          const slides = Array.from(scroller.querySelectorAll('.carousel-slide'));
+          const activeIndex = carousel.logicalIndex || 0;
+
+          // carousel-component index might include clones if loop is on
+          // but logicalIndex is 0-based original count
+          // In carousel-component.js, slides includes clones.
+          // Let's find the slide that is currently in view (left matches scroller scrollLeft)
+          const scrollLeft = scroller.scrollLeft;
+          const activeSlide = slides.find((s) => Math.abs(s.offsetLeft - scrollLeft) < 10);
+
+          if (activeSlide) {
+            const zoomComp = activeSlide.querySelector('pdp-image-zoom');
+            if (zoomComp) {
+              const isZoomed = zoomComp.toggleZoom(e);
+              btn.dataset.zoomed = isZoomed;
+            }
+          }
+        });
+
+        // Sync button icon when zoom is reset (e.g. on slide change)
+        document.addEventListener('pdp:zoom-reset', (e) => {
+          if (carousel.contains(e.detail.element)) {
+            btn.dataset.zoomed = 'false';
+          }
+        });
+      });
+    }
+
+    initFixedZoomButtons();
+  })();
+
   document.addEventListener('variant:update', (event) => {
     const variant = event.detail?.resource;
     if (!variant) return;
@@ -131,6 +392,80 @@
     });
   });
 </script>
+
+{% stylesheet %}
+  .pdp-zoom-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: pan-x pan-y;
+  }
+
+  .pdp-zoom-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+
+  .pdp-fixed-zoom-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .pdp-fixed-zoom-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+  }
+
+  .pdp-zoom-icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+  }
+
+  .pdp-zoom-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .pdp-fixed-zoom-btn[data-zoomed='true'] .pdp-zoom-icon--in {
+    display: none;
+  }
+  .pdp-fixed-zoom-btn[data-zoomed='true'] .pdp-zoom-icon--out {
+    display: flex;
+  }
+  .pdp-fixed-zoom-btn:not([data-zoomed='true']) .pdp-zoom-icon--out {
+    display: none;
+  }
+  .pdp-fixed-zoom-btn:not([data-zoomed='true']) .pdp-zoom-icon--in {
+    display: flex;
+  }
+
+  @media screen and (min-width: 750px) {
+    /* Optional: Hide zoom on desktop if specified */
+    /* .pdp-zoom-btn { display: none; } */
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
