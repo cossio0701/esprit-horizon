@@ -1,0 +1,227 @@
+{% liquid
+  assign body_measure_image = block.settings.body_measure_image
+  assign table_cm = block.settings.table_image_cm
+  assign table_in = block.settings.table_image_in
+  assign how_to_image = block.settings.how_to_measure_image
+  assign desc_position = block.settings.description_position | default: 'with_table'
+  assign desc_blocks_count = block.blocks.size
+  assign has_table_cm = false
+  if table_cm != blank
+    assign has_table_cm = true
+  endif
+  assign has_table_in = false
+  if table_in != blank
+    assign has_table_in = true
+  endif
+  assign has_any_table = false
+  if has_table_cm or has_table_in
+    assign has_any_table = true
+  endif
+  assign has_body_measure = false
+  if body_measure_image != blank
+    assign has_body_measure = true
+  endif
+  assign has_desc_content = false
+  if desc_blocks_count > 0
+    assign has_desc_content = true
+  endif
+  assign has_desc_with_body = false
+  if desc_position == 'with_body'
+    assign has_desc_with_body = true
+  endif
+  assign has_desc_with_table = false
+  if desc_position == 'with_table'
+    assign has_desc_with_table = true
+  endif
+  assign has_left_content = false
+  if has_body_measure
+    assign has_left_content = true
+  endif
+  if has_desc_content and has_desc_with_body
+    assign has_left_content = true
+  endif
+  assign has_right_content = false
+  if has_any_table
+    assign has_right_content = true
+  endif
+  if has_desc_content and has_desc_with_table
+    assign has_right_content = true
+  endif
+  assign has_fit_content = false
+  if has_left_content or has_right_content
+    assign has_fit_content = true
+  endif
+  assign has_how_content = false
+  if how_to_image != blank
+    assign has_how_content = true
+  endif
+  assign show_sub_tabs = false
+  if has_fit_content and has_how_content
+    assign show_sub_tabs = true
+  endif
+  assign show_unit_toggle = false
+  if has_table_cm and has_table_in
+    assign show_unit_toggle = true
+  endif
+%}
+
+{% capture description_children %}
+  {% content_for 'blocks' %}
+{% endcapture %}
+
+<section
+  class="sg__category"
+  data-sg-category
+  data-title="{{ block.settings.category_title }}"
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.category_title != blank %}
+    <h3 class="sg__categoryTitle">{{ block.settings.category_title }}</h3>
+  {% endif %}
+
+  {% if show_sub_tabs %}
+    <div class="sg__subTabs">
+      <button class="sg__subTab is-active" data-sg-subtab="fit">Size & Fit</button>
+      <button class="sg__subTab" data-sg-subtab="how">How to Measure</button>
+    </div>
+  {% endif %}
+
+  <div class="sg__subPanels">
+    {% if has_fit_content %}
+      <div class="sg__subPanel is-active" data-sg-subpanel="fit">
+        <div class="sg__grid{% if has_left_content and has_right_content %} sg__grid--split{% elsif has_left_content %} sg__grid--body-full{% elsif has_right_content %} sg__grid--right-full{% endif %}">
+          {% if has_left_content %}
+            <div class="sg__col sg__col--left">
+              {% if has_body_measure %}
+                <img
+                  src="{{ body_measure_image | image_url: width: 1200 }}"
+                  alt=""
+                  loading="lazy"
+                >
+              {% endif %}
+
+              {% if has_desc_content and has_desc_with_body %}
+                {{ description_children }}
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if has_right_content %}
+            <div class="sg__col sg__col--right">
+              {% if has_desc_content and has_desc_with_table %}
+                {{ description_children }}
+              {% endif %}
+
+              {% if has_any_table %}
+                {% if show_unit_toggle %}
+                  <div class="sg__unitToggle">
+                    {% if has_table_cm %}
+                      <button class="sg__unitBtn is-active" data-sg-unit="cm">CM</button>
+                    {% endif %}
+                    {% if has_table_in %}
+                      <button class="sg__unitBtn" data-sg-unit="in">IN</button>
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                <div class="sg__tableWrap">
+                  {% if has_table_cm %}
+                    <img
+                      class="sg__tableImage is-active"
+                      data-sg-table="cm"
+                      src="{{ table_cm | image_url: width: 1600 }}"
+                      loading="lazy"
+                    >
+                  {% endif %}
+
+                  {% if has_table_in %}
+                    <img
+                      class="sg__tableImage{% unless has_table_cm %} is-active{% endunless %}"
+                      data-sg-table="in"
+                      src="{{ table_in | image_url: width: 1600 }}"
+                      loading="lazy"
+                    >
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if has_how_content %}
+      <div class="sg__subPanel{% unless has_fit_content %} is-active{% endunless %}" data-sg-subpanel="how">
+        <img
+          src="{{ how_to_image | image_url: width: 1400 }}"
+          loading="lazy"
+        >
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Size Guide Category",
+  "settings": [
+    {
+      "type": "text",
+      "id": "category_title",
+      "label": "Category title",
+      "default": "General"
+    },
+    {
+      "type": "select",
+      "id": "description_position",
+      "label": "Text position",
+      "default": "with_table",
+      "options": [
+        { "value": "with_body", "label": "With body measure" },
+        { "value": "with_table", "label": "With cm/in table" }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "id": "body_measure_image",
+      "label": "Body measure image"
+    },
+    {
+      "type": "image_picker",
+      "id": "table_image_cm",
+      "label": "Table image CM"
+    },
+    {
+      "type": "image_picker",
+      "id": "table_image_in",
+      "label": "Table image IN"
+    },
+    {
+      "type": "image_picker",
+      "id": "how_to_measure_image",
+      "label": "How to measure image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text"
+    },
+    {
+      "type": "_inline-text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size Guide Category",
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "<p>Describe fit details, highlights, and notes here.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

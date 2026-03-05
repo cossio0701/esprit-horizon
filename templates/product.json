@@ -124,11 +124,11 @@
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
-                    "type_preset": "h4",
-                    "font": "var(--font-primary--family)",
-                    "font_size_unit": "px",
+                    "type_preset": "custom",
+                    "font": "var(--font-body--family)",
+                    "font_size_unit": "responsive",
                     "font_size": 16,
-                    "font_size_mobile": 14,
+                    "font_size_mobile": 16,
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -165,13 +165,13 @@
                     "show_sale_price_first": true,
                     "show_installments": false,
                     "show_tax_info": false,
-                    "type_preset": "h5",
+                    "type_preset": "custom",
                     "width": "100%",
                     "alignment": "left",
-                    "font": "var(--font-body--family)",
-                    "font_size_unit": "px",
+                    "font": "var(--font-accent--family)",
+                    "font_size_unit": "responsive",
                     "font_size": 18,
-                    "font_size_mobile": 14,
+                    "font_size_mobile": 16,
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -375,7 +375,9 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": ["product_composition_KnzdHH"]
+                  "block_order": [
+                    "product_composition_KnzdHH"
+                  ]
                 },
                 "product_accordion_item_fijA6F": {
                   "type": "_product-accordion-item",
@@ -393,7 +395,9 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": ["product_garment_care_nHpbAU"]
+                  "block_order": [
+                    "product_garment_care_nHpbAU"
+                  ]
                 },
                 "product_accordion_item_mDYTge": {
                   "type": "_product-accordion-item",
@@ -411,7 +415,9 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": ["product_fit_zqCQMD"]
+                  "block_order": [
+                    "product_fit_zqCQMD"
+                  ]
                 }
               },
               "block_order": [
@@ -437,14 +443,16 @@
           "type": "_product-gallery-pdp",
           "name": "Galería de Variantes Personalizada",
           "settings": {
-            "mobile_gallery_style": "dots",
             "show_zoom_desktop": false,
             "show_zoom_mobile": true
           },
           "blocks": {}
         }
       },
-      "block_order": ["product_details_bR7WrJ", "product_gallery_pdp_gJaXqW"],
+      "block_order": [
+        "product_details_bR7WrJ",
+        "product_gallery_pdp_gJaXqW"
+      ],
       "name": "Custom Product Detail",
       "settings": {}
     },
@@ -610,7 +618,10 @@
                   "blocks": {}
                 }
               },
-              "block_order": ["text_xrnftG", "price_tVjtKg"]
+              "block_order": [
+                "text_xrnftG",
+                "price_tVjtKg"
+              ]
             },
             "divider_VJhene": {
               "type": "_divider",
