@@ -7,7 +7,7 @@ import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utili
 export class QuickAddComponent extends Component {
   /** @type {AbortController | null} */
   #abortController = null;
-  /** @type {Map<string, Element>} */
+  /** @type {Map<string, string>} */
   #cachedContent = new Map();
 
   get productPageUrl() {
@@ -17,10 +17,6 @@ export class QuickAddComponent extends Component {
     if (!productLink?.href) return '';
 
     const url = new URL(productLink.href);
-
-    if (url.searchParams.has('variant')) {
-      return url.toString();
-    }
 
     const selectedVariantId = this.#getSelectedVariantId();
     if (selectedVariantId) {
@@ -60,27 +56,30 @@ export class QuickAddComponent extends Component {
     event.preventDefault();
 
     const currentUrl = this.productPageUrl;
+    console.log('[QuickAdd] handleClick - URL:', currentUrl);
 
     // Check if we have cached content for this URL
-    let productGrid = this.#cachedContent.get(currentUrl);
+    /** @type {string | null | undefined} */
+    let productHtml = this.#cachedContent.get(currentUrl);
 
-    if (!productGrid) {
+    if (!productHtml) {
+      console.log('[QuickAdd] Cache miss. Fetching section...');
       // Fetch and cache the content
-      const html = await this.fetchProductPage(currentUrl);
-      if (html) {
-        const gridElement = html.querySelector('[data-product-grid-content]');
-        if (gridElement) {
-          // Cache the cloned element to avoid modifying the original
-          productGrid = /** @type {Element} */ (gridElement.cloneNode(true));
-          this.#cachedContent.set(currentUrl, productGrid);
-        }
+      productHtml = await this.fetchQuickAddSection(currentUrl);
+      if (productHtml) {
+        this.#cachedContent.set(currentUrl, productHtml);
+      } else {
+        console.error('[QuickAdd] FAILED to fetch quick add section');
       }
+    } else {
+      console.log('[QuickAdd] Cache hit.');
     }
 
-    if (productGrid) {
-      // Use a fresh clone from the cache
-      const freshContent = /** @type {Element} */ (productGrid.cloneNode(true));
-      await this.updateQuickAddModal(freshContent);
+    if (productHtml) {
+      console.log('[QuickAdd] Updating modal...');
+      await this.updateQuickAddModal(productHtml);
+    } else {
+      console.error('[QuickAdd] No content to display');
     }
 
     this.#openQuickAddModal();
@@ -112,30 +111,31 @@ export class QuickAddComponent extends Component {
   };
 
   /**
-   * Fetches the product page content
+   * Fetches the quick add section content
    * @param {string} productPageUrl - The URL of the product page to fetch
-   * @returns {Promise<Document | null>}
+   * @returns {Promise<string | null>}
    */
-  async fetchProductPage(productPageUrl) {
+  async fetchQuickAddSection(productPageUrl) {
     if (!productPageUrl) return null;
+
+    const url = new URL(productPageUrl);
+    url.searchParams.set('section_id', 'quick-add-content');
 
     // We use this to abort the previous fetch request if it's still pending.
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
     try {
-      const response = await fetch(productPageUrl, {
+      const response = await fetch(url.toString(), {
         signal: this.#abortController.signal,
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch product page: HTTP error ${response.status}`);
+        throw new Error(`Failed to fetch quick add section: HTTP error ${response.status}`);
       }
 
       const responseText = await response.text();
-      const html = new DOMParser().parseFromString(responseText, 'text/html');
-
-      return html;
+      return responseText;
     } catch (error) {
       if (error.name === 'AbortError') {
         return null;
@@ -148,48 +148,30 @@ export class QuickAddComponent extends Component {
   }
 
   /**
-   * Re-renders the variant picker.
-   * @param {Element} productGrid - The product grid element
+   * Updates the modal content with the fetched HTML
+   * @param {string} html - The section HTML
    */
-  async updateQuickAddModal(productGrid) {
+  async updateQuickAddModal(html) {
     const modalContent = document.getElementById('quick-add-modal-content');
 
-    if (!productGrid || !modalContent) return;
+    if (!html || !modalContent) return;
 
-    if (isMobileBreakpoint()) {
-      const productDetails = productGrid.querySelector('.product-details');
-      const productFormComponent = productGrid.querySelector('product-form-component');
-      const variantPicker = productGrid.querySelector('variant-picker');
-      const productPrice = productGrid.querySelector('product-price');
-      const productTitle = document.createElement('a');
-      productTitle.textContent = this.dataset.productTitle || '';
+    morph(modalContent, html);
 
-      // Make product title as a link to the product page
-      productTitle.href = this.productPageUrl;
-
-      const productHeader = document.createElement('div');
-      productHeader.classList.add('product-header');
-
-      productHeader.appendChild(productTitle);
-      if (productPrice) {
-        productHeader.appendChild(productPrice);
-      }
-      productGrid.appendChild(productHeader);
-
-      if (variantPicker) {
-        productGrid.appendChild(variantPicker);
-      }
-      if (productFormComponent) {
-        productGrid.appendChild(productFormComponent);
-      }
-
-      productDetails?.remove();
-    }
-
-    morph(modalContent, productGrid);
+    // morph preserves custom elements without calling connectedCallback again.
+    // We must manually re-initialize the carousel so it re-reads its attributes
+    // and rebuilds any dynamically-generated nodes (dots, arrows visibility, CSS vars).
+    requestAnimationFrame(() => {
+      modalContent.querySelectorAll('carousel-component').forEach(el => {
+        // @ts-ignore — reinit() is defined on CarouselComponent
+        if (typeof el.reinit === 'function') el.reinit();
+      });
+    });
 
     this.#syncVariantSelection(modalContent);
   }
+
+
 
   /**
    * Syncs the variant selection from the product card to the modal
@@ -218,21 +200,83 @@ if (!customElements.get('quick-add-component')) {
 class QuickAddDialog extends DialogComponent {
   #abortController = new AbortController();
 
+  /** @type {number} */
+  #touchStartY = 0;
+  /** @type {boolean} */
+  #isDragging = false;
+  /** Minimum swipe distance in px to trigger close */
+  static SWIPE_THRESHOLD = 80;
+
   connectedCallback() {
     super.connectedCallback();
 
-    this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal: this.#abortController.signal });
-    this.addEventListener(ThemeEvents.variantUpdate, this.#updateProductTitleLink);
+    const { signal } = this.#abortController;
 
-    this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose);
+    this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal });
+    this.addEventListener(ThemeEvents.variantUpdate, this.#handleVariantUpdate, { signal });
+    this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose, { signal });
+
+    // Drag handle: tap to close + swipe-down to dismiss
+    this.#initDragHandle();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
     this.#abortController.abort();
-    this.removeEventListener(DialogCloseEvent.eventName, this.#handleDialogClose);
   }
+
+  /* ── Drag handle (mobile bottom-sheet) ── */
+
+  #initDragHandle() {
+    const handle = /** @type {HTMLElement | null} */ (this.refs.dragHandle);
+    if (!handle) return;
+
+    const { signal } = this.#abortController;
+
+    // Tap to close
+    handle.addEventListener('click', () => this.closeDialog(), { signal });
+
+    // Touch: swipe-down to dismiss
+    handle.addEventListener('touchstart', this.#onTouchStart, { passive: true, signal });
+    handle.addEventListener('touchmove', this.#onTouchMove, { passive: false, signal });
+    handle.addEventListener('touchend', this.#onTouchEnd, { passive: true, signal });
+  }
+
+  #onTouchStart = (/** @type {TouchEvent} */ e) => {
+    this.#touchStartY = e.touches[0]?.clientY ?? 0;
+    this.#isDragging = true;
+    const dialog = this.refs.dialog;
+    if (dialog instanceof HTMLElement) dialog.style.transition = 'none';
+  };
+
+  #onTouchMove = (/** @type {TouchEvent} */ e) => {
+    if (!this.#isDragging) return;
+    const deltaY = (e.touches[0]?.clientY ?? 0) - this.#touchStartY;
+    if (deltaY < 0) return; // Only allow downward drag
+    e.preventDefault();
+    const dialog = this.refs.dialog;
+    if (dialog instanceof HTMLElement) dialog.style.transform = `translateY(${deltaY}px)`;
+  };
+
+  #onTouchEnd = (/** @type {TouchEvent} */ e) => {
+    if (!this.#isDragging) return;
+    this.#isDragging = false;
+
+    const dialog = this.refs.dialog;
+    const endY = e.changedTouches[0]?.clientY ?? 0;
+    const deltaY = endY - this.#touchStartY;
+
+    if (dialog instanceof HTMLElement) {
+      dialog.style.transition = '';
+      dialog.style.transform = '';
+    }
+
+    if (deltaY >= QuickAddDialog.SWIPE_THRESHOLD) {
+      this.closeDialog();
+    }
+  };
+
+  /* ── Existing handlers ── */
 
   /**
    * Closes the dialog
@@ -243,17 +287,41 @@ class QuickAddDialog extends DialogComponent {
     this.closeDialog();
   };
 
-  #updateProductTitleLink = (/** @type {CustomEvent} */ event) => {
-    const anchorElement = /** @type {HTMLAnchorElement} */ (
-      event.detail.data.html?.querySelector('.view-product-title a')
-    );
-    const viewMoreDetailsLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.view-product-title a'));
-    const mobileProductTitle = /** @type {HTMLAnchorElement} */ (this.querySelector('.product-header a'));
+  #handleVariantUpdate = (/** @type {CustomEvent} */ event) => {
+    const html = event.detail?.data?.html;
+    if (!html) return;
 
-    if (!anchorElement) return;
+    // 1. Update Gallery
+    const galleryContainer = /** @type {HTMLElement | null} */ (this.querySelector('.quick-add-content__media'));
+    const newGallerySource = html.querySelector('.quick-add-content__media');
 
-    if (viewMoreDetailsLink) viewMoreDetailsLink.href = anchorElement.href;
-    if (mobileProductTitle) mobileProductTitle.href = anchorElement.href;
+    if (galleryContainer && newGallerySource) {
+      morph(galleryContainer, newGallerySource);
+
+      // Re-initialize any carousel in the newly morphed gallery
+      requestAnimationFrame(() => {
+        galleryContainer.querySelectorAll('carousel-component').forEach(el => {
+          // @ts-ignore
+          if (typeof el.reinit === 'function') el.reinit();
+        });
+      });
+    }
+
+    // 2. Update Links (Title & View Details)
+    const variantPicker = html.querySelector('variant-picker');
+    const productUrl = variantPicker?.dataset?.productUrl;
+    if (!productUrl) return;
+
+    const variantId = event.detail?.resource?.id;
+    const url = new URL(productUrl, window.location.origin);
+    if (variantId) url.searchParams.set('variant', variantId);
+
+    const href = url.pathname + url.search;
+    const viewDetailsLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.quick-add-content__view-details'));
+    const productTitleLink = /** @type {HTMLAnchorElement} */ (this.querySelector('.quick-add-content__title'));
+
+    if (viewDetailsLink) viewDetailsLink.href = href;
+    if (productTitleLink) productTitleLink.href = href;
   };
 
   #handleDialogClose = () => {

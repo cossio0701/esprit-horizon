@@ -1,9 +1,16 @@
+<script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{{ 'carousel.css' | asset_url | stylesheet_tag }}
 <quick-add-dialog id="quick-add-dialog">
   <dialog
     class="quick-add-modal dialog-modal color-{{ settings.popover_color_scheme }}"
     ref="dialog"
     scroll-lock
   >
+    {%- comment -%} Drag handle – mobile only (tap or swipe-down to close) {%- endcomment -%}
+    <div ref="dragHandle" class="quick-add-modal__drag-handle">
+      <span class="quick-add-modal__drag-handle-bar"></span>
+    </div>
+
     <button
       ref="closeButton"
       on:click="/closeDialog"
@@ -30,11 +37,26 @@
 
     @media screen and (max-width: 750px) {
       position: fixed;
-      display: block;
+      display: flex;
+      flex-direction: column;
       margin: auto 0 0 0;
       min-height: unset;
       max-width: 100%;
-      border-radius: 0;
+      overflow: hidden;
+      padding: 0 !important;
+    }
+  }
+
+  /* Doubled specificity + !important to beat .dialog-modal base rules in base.css */
+  .quick-add-modal.quick-add-modal {
+    @media screen and (max-width: 750px) {
+      border-radius: 16px 16px 0 0 !important;
+      height: auto !important;
+      max-height: 90dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto !important; /* Enable scrolling on the dialog itself */
+      -webkit-overflow-scrolling: touch;
     }
   }
 
@@ -64,81 +86,79 @@
     right: var(--margin-2xs);
     transition: transform 0.15s var(--animation-timing-bounce);
     z-index: var(--layer-raised);
+
+    @media screen and (max-width: 750px) {
+      display: none;
+    }
   }
 
   .quick-add-modal__close:active {
     transform: scale(0.8);
   }
 
+  /* ── Drag handle (mobile bottom-sheet affordance) ── */
+  .quick-add-modal__drag-handle {
+    display: none;
+
+    @media screen and (max-width: 750px) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 0 6px;
+      cursor: pointer;
+      touch-action: none;
+    }
+  }
+
+  .quick-add-modal__drag-handle-bar {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+  }
+
   .quick-add-modal__content {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 100% 1fr;
+    display: flex;
+    flex-direction: column;
     position: relative;
     max-width: var(--wide-content-width);
     overflow-y: auto;
     max-height: 100vh;
+    width: 900px;
+
+    @media screen and (max-width: 1200px) {
+      width: 800px;
+    }
 
     @media screen and (max-width: 750px) {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: auto;
-      padding-inline: var(--padding-xl);
-      padding-block: var(--padding-xl);
+      width: 100vw;
+      padding-inline: var(--padding-lg);
+      padding-block: var(--padding-lg) 60px; /* Some padding for the bottom link */
       gap: var(--gap-lg);
-      flex: 1;
+      flex: 0 0 auto; /* Don't flex, let the dialog handle scroll */
       min-height: 0;
-      overflow-y: auto;
-      height: auto; /* Prevent a bug in Safari where height:fit-content is not respected */
-      max-height: 100vh;
-    }
-  }
-
-  .quick-add-modal__content .media-gallery--grid .media-gallery__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .quick-add-modal__content .media-gallery--grid.media-gallery--two-column .product-media-container:first-child {
-    grid-column: auto;
-  }
-
-  .quick-add-modal__content {
-    /* One column */
-    .media-gallery--grid:not(.media-gallery--two-column) .product-media > *,
-    /* Two column, small first image */
-    .media-gallery--grid.media-gallery--two-column:not(.media-gallery--large-first-image)
-    .product-media-container:nth-of-type(odd)
-    .product-media > *,
-    /* Two column, large first image */
-    .media-gallery--grid.media-gallery--two-column.media-gallery--large-first-image
-      .product-media-container:is(:first-of-type, :nth-of-type(even))
-      .product-media > *,
-      /* Carousel */
-    .media-gallery--carousel slideshow-container {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      overflow: visible; /* Content itself doesn't scroll, the dialog does */
+      height: auto;
     }
   }
 
   .quick-add-modal__content .view-more-details__wrapper {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     width: 100%;
   }
 
   .view-more-details__wrapper .view-more-details {
     display: flex;
     align-items: center;
-    width: fit-content;
+    justify-content: center;
   }
 
   .quick-add-modal__content .product-header {
-    @media screen and (max-width: 750px) {
-      display: flex;
-      flex-direction: column;
-      grid-column: 2 / -1;
-      grid-row: 1;
-      padding-right: var(--padding-2xl);
-    }
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    margin-bottom: var(--margin-sm);
   }
 
   .quick-add-modal__content .product-header a:not(product-price *) {
@@ -169,26 +189,15 @@
     cursor: default;
   }
 
-  .quick-add-modal__content .product-details {
-    grid-column: 4 / -1;
-    grid-row: 1 / span 2;
+  .quick-add-modal__info {
+    padding: var(--padding-lg);
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 0;
+    gap: var(--gap-md);
+  }
 
-    dialog[open] & {
-      animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-      animation-delay: 0.1s;
-    }
-
-    @media screen and (max-width: 750px) {
-      grid-column: 2 / span 2;
-      grid-row: span 1;
-      overflow-y: auto;
-      max-height: 100%;
-      height: 100%;
-    }
+  .quick-add-modal__content .product-details {
+    display: none;
   }
 
   .quick-add-modal__content > * {
@@ -216,10 +225,22 @@
 
   .quick-add-modal__content .variant-option--swatches legend {
     margin-inline-start: calc(-1 * var(--padding-2xs));
+    font-weight: 600;
   }
 
-  .quick-add-modal__content:not(:has(.product-information__media)) .product-details {
+  .quick-add-modal__content:not(:has(.product-information__media, .section-variant-gallery, .gallery-main-container))
+    .product-details {
     grid-column: 1 / -1;
+  }
+
+  .quick-add-modal__content .product-title-row__link {
+    font-size: var(--font-size--xl) !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .quick-add-modal__content .product-title-row__link {
+      font-size: 14px !important;
+    }
   }
 
   .quick-add-modal__content .view-product-title {
@@ -233,15 +254,20 @@
     color: inherit;
     text-decoration: none;
     text-align: left;
-    font-size: var(--font-size--2xl);
+    font-size: var(--font-size--xl);
     font-weight: 600;
     line-height: 1.2;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: color 0.2s var(--animation-easing);
+
+    @media screen and (max-width: 749px) {
+      font-size: 14px !important;
+    }
   }
 
   .quick-add-modal__content .view-product-title {
@@ -321,93 +347,12 @@
     max-height: 100%;
   }
 
+  .quick-add-modal__content slideshow-controls {
+    display: none;
+  }
+
   .quick-add-modal__content slideshow-slide:not([aria-hidden='false']) {
     content-visibility: auto;
-  }
-
-  .quick-add-modal__content .product-information__media {
-    width: 100%;
-    grid-column: 1 / span 1;
-    grid-row: 1;
-    position: relative;
-    top: 0;
-    animation: fadeIn 0.4s var(--animation-timing-fade-in) both;
-
-    @media screen and (min-width: 750px) {
-      position: sticky;
-      grid-column: 1 / 4;
-      overflow-y: auto;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .quick-add-modal__content .product-information__media media-gallery {
-    pointer-events: none;
-
-    @media screen and (min-width: 750px) {
-      position: absolute;
-      inset: 0;
-    }
-  }
-
-  .quick-add-modal media-gallery {
-    padding: 0;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-arrows {
-    display: none;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-container {
-    display: block;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slides {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-2xs);
-    overflow: visible;
-    scroll-snap-type: none;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide {
-    width: 100%;
-    flex: none;
-    scroll-snap-align: unset;
-    position: relative;
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s var(--animation-easing);
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide[aria-hidden='true'] {
-    @media screen and (max-width: 750px) {
-      display: none;
-    }
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(1) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(2) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-    animation-delay: 0.05s;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(3) {
-    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
-    animation-delay: 0.1s;
-  }
-
-  .quick-add-modal__content .product-information__media slideshow-controls {
-    display: none;
   }
 
   .quick-add-modal__content .sticky-content,

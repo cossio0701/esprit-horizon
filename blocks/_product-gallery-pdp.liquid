@@ -2,21 +2,18 @@
 {% assign current_color = current_variant.option1 %}
 {% assign rendered_colors = '' %}
 
-<div class="gallery-main-container" data-mobile-style="{{ block.settings.mobile_gallery_style }}">
-  <div class="variant-swipers">
+<script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{{ 'carousel.css' | asset_url | stylesheet_tag }}
+
+<div class="gallery-main-container">
+  <div class="variant-carousels">
     {% for variant in product.variants %}
       {% assign color = variant.option1 %}
 
-      {%- comment -%}
-        Evitar renderizar el mismo color más de una vez
-      {%- endcomment -%}
       {% unless rendered_colors contains color %}
         {% assign rendered_colors = rendered_colors | append: color | append: ',' %}
         {% assign color_gallery = null %}
 
-        {%- comment -%}
-          Buscar UNA galería válida para este color
-        {%- endcomment -%}
         {% for v in product.variants %}
           {% if v.option1 == color and v.metafields.custom.gallery.value != blank %}
             {% assign color_gallery = v.metafields.custom.gallery.value %}
@@ -25,117 +22,117 @@
         {% endfor %}
 
         <div
-          class="variant-swiper"
+          class="variant-carousel"
           data-color="{{ color }}"
           {% unless color == current_color %}
             hidden
           {% endunless %}
         >
-          {% if color_gallery %}
-            <div class="variant-swiper-layout">
-              <!-- Swiper -->
-              <div class="swiper">
-                <div class="swiper-wrapper">
+          <carousel-component
+            columns-desktop="1"
+            columns-mobile="1"
+            gap="0"
+            show-arrows="false"
+            show-dots="true"
+            thumbs-mobile="none"
+            thumbs-desktop="right"
+            show-thumbs-arrows="true"
+            loop="true"
+          >
+            <div class="carousel-scroller-wrapper">
+              <div role="list" class="carousel-scroller">
+                {% if color_gallery %}
                   {% for image in color_gallery %}
-                    <div class="swiper-slide">
-                      <div class="swiper-zoom-container">
+                    <div role="listitem" class="carousel-slide">
+                      <pdp-image-zoom class="pdp-zoom-wrapper">
                         <img
                           src="{{ image | image_url: width: 1500 }}"
                           alt="{{ product.title }} - {{ color }}"
                           loading="lazy"
+                          width="1500"
+                          height="1500"
+                          class="pdp-zoom-image"
                         >
-                      </div>
-                      {%- if block.settings.show_zoom_desktop or block.settings.show_zoom_mobile -%}
-                        <button
-                          type="button"
-                          class="gallery-zoom-button"
-                          onclick="toggleZoom(this)"
-                          aria-label="{{ 'actions.zoom' | t }}"
-                        >
-                          <span class="zoom-icon-in">{{ 'icon-zoom-in.svg' | inline_asset_content }}</span>
-                          <span class="zoom-icon-out">{{ 'icon-zoom-out.svg' | inline_asset_content }}</span>
-                        </button>
-                      {%- endif -%}
+                      </pdp-image-zoom>
                     </div>
                   {% endfor %}
-                </div>
-
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-pagination"></div>
+                {% else %}
+                  {% for media in product.media %}
+                    {% if media.media_type == 'image' %}
+                      <div role="listitem" class="carousel-slide">
+                        <pdp-image-zoom class="pdp-zoom-wrapper">
+                          <img
+                            src="{{ media | image_url: width: 1500 }}"
+                            alt="{{ product.title }}"
+                            loading="lazy"
+                            width="1500"
+                            height="1500"
+                            class="pdp-zoom-image"
+                          >
+                        </pdp-image-zoom>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
               </div>
 
-              <!-- Thumbnails -->
-              <div class="variant-thumbs">
+              <button type="button" name="previous" class="carousel-button prev" aria-label="Previous">
+                {{ 'icon-chevron-left.svg' | inline_asset_content }}
+              </button>
+              <button type="button" name="next" class="carousel-button next" aria-label="Next">
+                {{ 'icon-chevron-right.svg' | inline_asset_content }}
+              </button>
+
+              <button
+                type="button"
+                class="pdp-fixed-zoom-btn {% unless block.settings.show_zoom_desktop %}desktop:hidden{% endunless %} {% unless block.settings.show_zoom_mobile %}mobile:hidden{% endunless %}"
+                aria-label="{{ 'actions.zoom' | t }}"
+              >
+                <span class="pdp-zoom-icon pdp-zoom-icon--in">
+                  {{- 'icon-zoom-in.svg' | inline_asset_content -}}
+                </span>
+                <span class="pdp-zoom-icon pdp-zoom-icon--out">
+                  {{- 'icon-zoom-out.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </div>
+
+            <div class="carousel-thumbs">
+              {% if color_gallery %}
                 {% for image in color_gallery %}
                   <button
-                    class="variant-thumb"
-                    data-index="{{ forloop.index0 }}"
+                    class="carousel-thumb"
+                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                   >
                     <img
                       src="{{ image | image_url: width: 150 }}"
                       alt="{{ product.title }} - {{ color }}"
                       loading="lazy"
+                      width="150"
+                      height="150"
                     >
                   </button>
                 {% endfor %}
-              </div>
-            </div>
-          {% else %}
-            <div class="variant-swiper-layout">
-              <!-- Swiper -->
-              <div class="swiper">
-                <div class="swiper-wrapper">
-                  {% for media in product.media %}
-                    {% if media.media_type == 'image' %}
-                      <div class="swiper-slide">
-                        <div class="swiper-zoom-container">
-                          <img
-                            src="{{ media | image_url: width: 1500 }}"
-                            alt="{{ product.title }}"
-                            loading="lazy"
-                          >
-                        </div>
-                        {%- if block.settings.show_zoom_desktop or block.settings.show_zoom_mobile -%}
-                          <button
-                            type="button"
-                            class="gallery-zoom-button"
-                            onclick="toggleZoom(this)"
-                            aria-label="{{ 'actions.zoom' | t }}"
-                          >
-                            <span class="zoom-icon-in">{{ 'icon-zoom-in.svg' | inline_asset_content }}</span>
-                            <span class="zoom-icon-out">{{ 'icon-zoom-out.svg' | inline_asset_content }}</span>
-                          </button>
-                        {%- endif -%}
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-pagination"></div>
-              </div>
-
-              <!-- Thumbnails -->
-              <div class="variant-thumbs">
+              {% else %}
                 {% for media in product.media %}
                   {% if media.media_type == 'image' %}
                     <button
-                      class="variant-thumb"
-                      data-index="{{ forloop.index0 }}"
+                      class="carousel-thumb"
+                      aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                     >
                       <img
                         src="{{ media | image_url: width: 150 }}"
                         alt="{{ product.title }}"
                         loading="lazy"
+                        width="150"
+                        height="150"
                       >
                     </button>
                   {% endif %}
                 {% endfor %}
-              </div>
+              {% endif %}
             </div>
-          {% endif %}
+          </carousel-component>
         </div>
       {% endunless %}
     {% endfor %}
@@ -143,363 +140,332 @@
 </div>
 
 <script>
-  document.addEventListener('variant:update', (event) => {
-    if (!event.detail || !event.detail.resource) return;
+  (function () {
+    class PDPImageZoom extends HTMLElement {
+      constructor() {
+        super();
+        this.isZoomed = false;
+        this.scale = 2.5;
+        this.translateX = 0;
+        this.translateY = 0;
+        this.startX = 0;
+        this.startY = 0;
+        this.isPanning = false;
 
-    const variant = event.detail.resource;
-    const variantId = String(event.detail.resource.id);
-    document.querySelectorAll('.variant-gallery').forEach((gallery) => {
-      gallery.hidden = gallery.dataset.variantId !== variantId;
-    });
+        this._isExiting = false;
+        this._pendingReset = false;
 
-    // Color seleccionado (option1)
-    const selectedColor = variant.option1;
-
-    // Actualizar texto de color
-    const colorEl = document.querySelector('[data-selected-color]');
-    if (colorEl) {
-      colorEl.textContent = selectedColor || '—';
-    }
-
-    // (Opcional) otros textos
-    const skuEl = document.querySelector('[data-selected-sku]');
-    if (skuEl) {
-      skuEl.textContent = variant.sku || 'Sin SKU';
-    }
-  });
-
-  function toggleZoom(btn) {
-    if (!activeSwiper) return;
-    if (activeSwiper.zoom.enabled) {
-      if (activeSwiper.zoom.scale > 1) {
-        activeSwiper.zoom.out();
-      } else {
-        activeSwiper.zoom.in();
-      }
-    }
-  }
-
-  function updateZoomButtons(isZoomed) {
-    document.querySelectorAll('.gallery-zoom-button').forEach((btn) => {
-      btn.classList.toggle('is-zoomed', isZoomed);
-    });
-  }
-</script>
-
-<script>
-  let activeSwiper = null;
-  let lastColor = null;
-  const slideIndexByColor = {};
-
-  function initSwiper(container, color, startIndex = 0) {
-    const swiperEl = container.querySelector('.swiper');
-    const thumbs = container.querySelectorAll('.variant-thumb');
-
-    if (!swiperEl) return;
-
-    // 🔥 LIMPIEZA TOTAL (clave)
-    thumbs.forEach((t) => t.classList.remove('is-active'));
-
-    const paginationEl = swiperEl.querySelector('.swiper-pagination');
-
-    function updateIndicator(swiper) {
-      if (!paginationEl) return;
-      let indicator = paginationEl.querySelector('.swiper-pagination-indicator');
-      if (!indicator && swiper.pagination.bullets.length > 0) {
-        indicator = document.createElement('div');
-        indicator.className = 'swiper-pagination-indicator';
-        paginationEl.appendChild(indicator);
+        this.img = null;
+        this.scroller = null;
       }
 
-      if (indicator && swiper.pagination.bullets.length > 1) {
-        const bullets = swiper.pagination.bullets;
-        const firstBullet = bullets[0];
-        const lastBullet = bullets[bullets.length - 1];
-        const totalDistance = lastBullet.offsetLeft - firstBullet.offsetLeft;
+      connectedCallback() {
+        this.img = this.querySelector('.pdp-zoom-image');
+        this.scroller = this.closest('.carousel-scroller');
 
-        // Swiper progress goes from 0 to 1
-        const currentPos = firstBullet.offsetLeft + swiper.progress * totalDistance;
+        const boundOnPointerUp = this.onPointerUp.bind(this);
+        this.addEventListener('pointerdown', this.onPointerDown.bind(this));
+        this.addEventListener('pointermove', this.onPointerMove.bind(this));
+        this.addEventListener('pointerup', boundOnPointerUp);
+        this.addEventListener('pointerleave', boundOnPointerUp);
+        this.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+        this.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+        this.addEventListener('touchend', boundOnPointerUp);
 
-        // Liquid Stretch Effect Logic
-        const bulletCount = bullets.length - 1;
-        const localProgress = (swiper.progress * bulletCount) % 1;
-        const stretchAmount = Math.sin(localProgress * Math.PI) * 0.8;
-        const scaleX = 1 + stretchAmount;
-
-        // Apply transform: translateX + scaleX
-        indicator.style.transform = `translateX(${currentPos}px) scaleX(${scaleX})`;
-        indicator.style.transformOrigin = localProgress > 0.5 ? 'left center' : 'right center';
-      } else if (indicator && swiper.pagination.bullets[0]) {
-        indicator.style.transform = `translateX(${swiper.pagination.bullets[0].offsetLeft}px) scaleX(1)`;
+        const carousel = this.closest('carousel-component');
+        if (carousel) {
+          carousel.addEventListener('carousel:slideChange', () => {
+            if (!this.isPanning) {
+              this.reset();
+            } else {
+              this._pendingReset = true;
+            }
+          });
+        }
       }
-    }
 
-    activeSwiper = new Swiper(swiperEl, {
-      slidesPerView: 1,
-      spaceBetween: 0,
-      loop: false,
-      speed: 600,
-      initialSlide: startIndex,
-      zoom: {
-        maxRatio: 3,
-        minRatio: 1,
-        toggle: true,
-      },
-      on: {
-        init(swiper) {
-          setTimeout(() => updateIndicator(swiper), 100);
-        },
-        progress(swiper) {
-          updateIndicator(swiper);
-        },
-        setTranslate(swiper) {
-          updateIndicator(swiper);
-        },
-        slideChange(swiper) {
-          slideIndexByColor[color] = swiper.activeIndex;
-          thumbs.forEach((t) => t.classList.remove('is-active'));
-          const active = thumbs[swiper.activeIndex];
-          if (active) active.classList.add('is-active');
-          // Reset zoom on slide change for consistency
-          if (swiper.zoom && swiper.zoom.enabled) {
-            swiper.zoom.out();
-            updateZoomButtons(false);
+      toggleZoom(e) {
+        this.isZoomed = !this.isZoomed;
+        this.dataset.zoomed = this.isZoomed;
+
+        if (this.isZoomed) {
+          const rect = this.getBoundingClientRect();
+          let ox = 50,
+            oy = 50;
+          if (e && (e.clientX || e.touches)) {
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            ox = ((clientX - rect.left) / rect.width) * 100;
+            oy = ((clientY - rect.top) / rect.height) * 100;
           }
-        },
-        zoomChange(swiper, scale, imageEl, slideEl) {
-          updateZoomButtons(scale > 1);
-        },
-      },
-      pagination: {
-        el: paginationEl,
-        clickable: true,
-        dynamicBullets: false,
-      },
-      effect: 'fade',
-      fadeEffect: {
-        crossFade: true,
-      },
-    });
 
-    // Click thumbs
-    thumbs.forEach((thumb) => {
-      thumb.addEventListener('click', () => {
-        const index = Number(thumb.dataset.index);
-        activeSwiper.slideTo(index);
-      });
-    });
+          this.translateX = ((rect.width * (50 - ox)) / 100) * (this.scale - 1);
+          this.translateY = ((rect.height * (50 - oy)) / 100) * (this.scale - 1);
 
-    // Estado inicial
-    const initialThumb = thumbs[startIndex];
-    if (initialThumb) initialThumb.classList.add('is-active');
-  }
-
-  function destroySwiper() {
-    if (activeSwiper) {
-      activeSwiper.destroy(true, true);
-      activeSwiper = null;
-    }
-  }
-
-  function showColorSwiper(color) {
-    document.querySelectorAll('.variant-swiper').forEach((block) => {
-      const isActive = block.dataset.color === color;
-      block.hidden = !isActive;
-
-      if (isActive) {
-        const startIndex = slideIndexByColor[color] !== undefined ? slideIndexByColor[color] : 0;
-
-        destroySwiper();
-        initSwiper(block, color, startIndex);
-
-        lastColor = color;
+          this.applyZoom();
+        } else {
+          this.reset();
+        }
+        return this.isZoomed;
       }
-    });
-  }
+
+      handleMove(dx, dy) {
+        if (!this.scroller) return;
+        const rect = this.getBoundingClientRect();
+        const limitX = Math.max(0, (rect.width * this.scale - rect.width) / 2);
+        const limitY = Math.max(0, (rect.height * this.scale - rect.height) / 2);
+
+        const threshold = 40;
+        let targetX = dx;
+
+        if (targetX > limitX + threshold) {
+          this.exitZoomAndSlide('prev');
+          return;
+        } else if (targetX < -limitX - threshold) {
+          this.exitZoomAndSlide('next');
+          return;
+        }
+
+        this.translateX = Math.max(-limitX, Math.min(limitX, targetX));
+        this.translateY = Math.max(-limitY, Math.min(limitY, dy));
+        this.updateTransform();
+      }
+
+      exitZoomAndSlide(direction) {
+        if (this._isExiting) return;
+        this._isExiting = true;
+
+        const carousel = this.closest('carousel-component');
+        if (carousel && carousel.scrollStep) {
+          carousel.scrollStep(direction === 'next' ? 1 : -1);
+        }
+
+        this.reset();
+
+        setTimeout(() => {
+          this._isExiting = false;
+          this.isPanning = false;
+        }, 300);
+      }
+
+      applyZoom() {
+        if (!this.img) return;
+        this.img.style.transformOrigin = '50% 50%';
+        this.updateTransform();
+        this.style.touchAction = 'none';
+
+        if (this.scroller) {
+          this.scroller.style.scrollSnapType = 'none';
+          this.scroller.style.overflow = 'hidden';
+        }
+      }
+
+      reset() {
+        this.isZoomed = false;
+        this.dataset.zoomed = false;
+        this.translateX = 0;
+        this.translateY = 0;
+        this.isPanning = false;
+
+        if (this.img) {
+          this.img.style.transform = 'scale(1) translate(0, 0)';
+          this.img.style.transition = '';
+        }
+
+        this.style.touchAction = '';
+        if (this.scroller) {
+          this.scroller.style.overflow = '';
+          this.scroller.style.scrollSnapType = '';
+
+          const carousel = this.closest('carousel-component');
+          if (carousel && carousel.updateActiveIndex) {
+            setTimeout(() => carousel.updateActiveIndex(), 50);
+          }
+        }
+
+        document.dispatchEvent(new CustomEvent('pdp:zoom-reset', { detail: { element: this } }));
+      }
+
+      onPointerDown(e) {
+        if (!this.isZoomed) return;
+        this.isPanning = true;
+        this.startX = e.clientX - this.translateX;
+        this.startY = e.clientY - this.translateY;
+        this.img.style.transition = 'none';
+        e.preventDefault();
+      }
+
+      onPointerMove(e) {
+        if (!this.isPanning) return;
+        this.handleMove(e.clientX - this.startX, e.clientY - this.startY);
+      }
+
+      onPointerUp() {
+        if (!this.isPanning) return;
+        this.isPanning = false;
+        if (this.img) this.img.style.transition = '';
+
+        if (this._pendingReset) {
+          this._pendingReset = false;
+          this.reset();
+        }
+      }
+
+      onTouchStart(e) {
+        if (!this.isZoomed || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        this.isPanning = true;
+        this.startX = touch.clientX - this.translateX;
+        this.startY = touch.clientY - this.translateY;
+        this.img.style.transition = 'none';
+      }
+
+      onTouchMove(e) {
+        if (!this.isPanning || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        this.handleMove(touch.clientX - this.startX, touch.clientY - this.startY);
+        e.preventDefault();
+      }
+
+      updateTransform() {
+        if (this.img) {
+          this.img.style.transform = `scale(${this.scale}) translate(${this.translateX / this.scale}px, ${
+            this.translateY / this.scale
+          }px)`;
+        }
+      }
+    }
+
+    if (!customElements.get('pdp-image-zoom')) {
+      customElements.define('pdp-image-zoom', PDPImageZoom);
+    }
+
+    // Global fixed button logic
+    function initFixedZoomButtons() {
+      document.querySelectorAll('.pdp-fixed-zoom-btn').forEach((btn) => {
+        const carousel = btn.closest('carousel-component');
+        if (!carousel) return;
+
+        btn.addEventListener('click', (e) => {
+          const scroller = carousel.querySelector('.carousel-scroller');
+          if (!scroller) return;
+
+          // Find the active slide's zoom component
+          const slides = Array.from(scroller.querySelectorAll('.carousel-slide'));
+          const activeIndex = carousel.logicalIndex || 0;
+
+          // carousel-component index might include clones if loop is on
+          // but logicalIndex is 0-based original count
+          // In carousel-component.js, slides includes clones.
+          // Let's find the slide that is currently in view (left matches scroller scrollLeft)
+          const scrollLeft = scroller.scrollLeft;
+          const activeSlide = slides.find((s) => Math.abs(s.offsetLeft - scrollLeft) < 10);
+
+          if (activeSlide) {
+            const zoomComp = activeSlide.querySelector('pdp-image-zoom');
+            if (zoomComp) {
+              const isZoomed = zoomComp.toggleZoom(e);
+              btn.dataset.zoomed = isZoomed;
+            }
+          }
+        });
+
+        // Sync button icon when zoom is reset (e.g. on slide change)
+        document.addEventListener('pdp:zoom-reset', (e) => {
+          if (carousel.contains(e.detail.element)) {
+            btn.dataset.zoomed = 'false';
+          }
+        });
+      });
+    }
+
+    initFixedZoomButtons();
+  })();
 
   document.addEventListener('variant:update', (event) => {
     const variant = event.detail?.resource;
     if (!variant) return;
 
-    showColorSwiper(variant.option1);
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const initial = document.querySelector('.variant-swiper:not([hidden])');
-    if (!initial) return;
-
-    const color = initial.dataset.color;
-    slideIndexByColor[color] = 0;
-
-    initSwiper(initial, color, 0);
-    lastColor = color;
+    const color = variant.option1;
+    document.querySelectorAll('.variant-carousel').forEach((block) => {
+      block.hidden = block.dataset.color !== color;
+    });
   });
 </script>
 
-<style>
-  .gallery-main-container {
+{% stylesheet %}
+  .pdp-zoom-wrapper {
+    position: relative;
+    display: block;
     width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: pan-x pan-y;
   }
 
-  .swiper {
+  .pdp-zoom-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+
+  .pdp-fixed-zoom-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .pdp-fixed-zoom-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+  }
+
+  .pdp-zoom-icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+  }
+
+  .pdp-zoom-icon svg {
     width: 100%;
     height: 100%;
   }
 
-  /* Base Styles: Mobile */
-  .variant-swiper-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    align-items: flex-start;
-  }
-
-  .variant-thumbs {
+  .pdp-fixed-zoom-btn[data-zoomed='true'] .pdp-zoom-icon--in {
     display: none;
-    flex-direction: row;
-    gap: 8px;
-    overflow-x: auto;
-    order: 2;
   }
-
-  .gallery-main-container[data-mobile-style='thumbs'] .variant-thumbs {
+  .pdp-fixed-zoom-btn[data-zoomed='true'] .pdp-zoom-icon--out {
+    display: flex;
+  }
+  .pdp-fixed-zoom-btn:not([data-zoomed='true']) .pdp-zoom-icon--out {
+    display: none;
+  }
+  .pdp-fixed-zoom-btn:not([data-zoomed='true']) .pdp-zoom-icon--in {
     display: flex;
   }
 
-  .variant-thumb {
-    padding: 0;
-    border: 1px solid transparent;
-    background: none;
-    cursor: pointer;
-    flex-shrink: 0;
-    width: 80px;
+  @media screen and (min-width: 750px) {
+    /* Optional: Hide zoom on desktop if specified */
+    /* .pdp-zoom-btn { display: none; } */
   }
-
-  .variant-thumb img {
-    width: 100%;
-    display: block;
-  }
-
-  .variant-thumb.is-active {
-    border-color: #000;
-  }
-
-  .swiper-pagination {
-    position: absolute;
-    bottom: 16px !important;
-    left: 16px !important;
-    transform: none !important;
-    z-index: 10;
-    display: none;
-    width: auto !important;
-    text-align: left;
-    white-space: nowrap;
-  }
-
-  .gallery-main-container[data-mobile-style='dots'] .swiper-pagination {
-    display: block;
-  }
-
-  .swiper-pagination-bullet {
-    background: #fff !important;
-    opacity: 0.5;
-    width: 8px !important;
-    height: 8px !important;
-    margin: 0 4px !important;
-    border-radius: 50% !important;
-    transition: opacity 0.3s;
-  }
-
-  .swiper-pagination-bullet-active {
-    opacity: 0.5 !important;
-  }
-
-  .swiper-pagination-indicator {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    border-radius: 50%;
-    z-index: 11;
-    pointer-events: none;
-    margin-top: -4px; /* Center vertically */
-    transition: transform 0.05s linear, opacity 0.3s; /* Even faster for liquid feel */
-    will-change: transform;
-  }
-
-  /* Desktop Styles */
-  @media (min-width: 769px) {
-    .variant-swiper-layout {
-      grid-template-columns: 1fr 80px;
-    }
-
-    .variant-thumbs {
-      display: flex;
-      flex-direction: column;
-      order: unset;
-      overflow-x: visible;
-    }
-
-    .variant-thumb {
-      width: 100%;
-    }
-
-    .swiper-pagination {
-      display: none !important;
-    }
-  }
-
-  .gallery-zoom-button {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    z-index: 20;
-    background: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 8px;
-    transition: transform 0.2s ease;
-  }
-
-  .gallery-zoom-button:hover {
-    transform: scale(1.1);
-  }
-
-  .gallery-zoom-button svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-
-  .gallery-zoom-button .zoom-icon-out {
-    display: none;
-  }
-
-  .gallery-zoom-button.is-zoomed .zoom-icon-in {
-    display: none;
-  }
-
-  .gallery-zoom-button.is-zoomed .zoom-icon-out {
-    display: block;
-  }
-
-  {% if block.settings.show_zoom_mobile %}
-    @media (max-width: 768px) {
-      .gallery-zoom-button {
-        display: flex;
-      }
-    }
-  {% endif %}
-</style>
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -507,26 +473,6 @@
   "tag": "section",
   "class": "section-variant-gallery",
   "settings": [
-    {
-      "type": "header",
-      "content": "Configuración de la Galería"
-    },
-    {
-      "type": "select",
-      "id": "mobile_gallery_style",
-      "label": "Estilo de galería en movil",
-      "options": [
-        {
-          "value": "thumbs",
-          "label": "Miniaturas (Thumbs)"
-        },
-        {
-          "value": "dots",
-          "label": "Puntos (Dots)"
-        }
-      ],
-      "default": "thumbs"
-    },
     {
       "type": "header",
       "content": "Ajustes de Zoom"

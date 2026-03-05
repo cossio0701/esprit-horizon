@@ -2054,6 +2054,12 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
     /* for when you want fixed sizing (e.g. pdp) */
     --swatch-width: var(--variant-picker-swatch-width);
     --swatch-height: var(--variant-picker-swatch-height);
+
+    @media screen and (max-width: 749px) {
+      /* size based on the user request for mobile */
+      --swatch-width: 20px;
+      --swatch-height: 20px;
+    }
   }
 
   &.swatch--filter {
