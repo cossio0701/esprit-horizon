@@ -271,6 +271,177 @@
               },
               "block_order": []
             },
+            "size_guide_WFhmCy": {
+              "type": "_size-guide",
+              "name": "Size Guide",
+              "settings": {
+                "button_label": "Guia de tallas",
+                "modal_title": "Guia de tallas",
+                "alignment": "left"
+              },
+              "blocks": {
+                "size_guide_category_YKDUTT": {
+                  "type": "_size-guide-category",
+                  "name": "Superiores",
+                  "settings": {
+                    "category_title": "Superiores",
+                    "description_position": "with_table",
+                    "body_measure_image": "shopify://shop_images/tallas-image.png",
+                    "table_image_cm": "shopify://shop_images/tallas-prendas-superiores-cut.png"
+                  },
+                  "blocks": {
+                    "text_EeLezp": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p><p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size_unit": "px",
+                        "font_size": 16,
+                        "font_size_mobile": 14,
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 20,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_EeLezp"
+                  ]
+                },
+                "size_guide_category_Gfpi4m": {
+                  "type": "_size-guide-category",
+                  "name": "Inferiores",
+                  "settings": {
+                    "category_title": "Inferiores",
+                    "description_position": "with_table",
+                    "body_measure_image": "shopify://shop_images/tallas-image.png",
+                    "table_image_cm": "shopify://shop_images/tallas-prendas-inferiores-cut.png"
+                  },
+                  "blocks": {
+                    "text_3tQFXR": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p><p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size_unit": "px",
+                        "font_size": 16,
+                        "font_size_mobile": 14,
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_3tQFXR"
+                  ]
+                },
+                "size_guide_category_NaFPkm": {
+                  "type": "_size-guide-category",
+                  "name": "Calzado",
+                  "settings": {
+                    "category_title": "Calzado",
+                    "description_position": "with_body",
+                    "table_image_cm": "shopify://shop_images/d629a009-58a8-4a31-b4f9-8f1d62d44e6e___a4012b84988b05dce7d654cd7d8b9f9a.webp"
+                  },
+                  "blocks": {
+                    "text_7qPjLT": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p><strong>Toma las medidas de tus pies y encuentra tu talla ideal</strong></p><p><strong>A. ¿Cómo medir tu pie?</strong><br/>Coloca una hoja de papel en el suelo y ubicala contra la pared, párate sobre el papel y asegurate que con el talón puedas tocar la pared. Dibuja en la hoja de papel el contorno de tu pie, identificando cuales son los puntos más extremos.</p><p><strong>B. Mide tu pie</strong><br/>Después de dibujar el contorno con ayuda de una regla mide los centímetros que existen en tre el talón y la punta de tus pies. Toma la medida mas larga de tus pies y revisa nuestra tabla de medidas para encontrar tu talla ideal.</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size_unit": "px",
+                        "font_size": 16,
+                        "font_size_mobile": 14,
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_7qPjLT"
+                  ]
+                }
+              },
+              "block_order": [
+                "size_guide_category_YKDUTT",
+                "size_guide_category_Gfpi4m",
+                "size_guide_category_NaFPkm"
+              ]
+            },
             "installments_banner_hLzt6J": {
               "type": "installments_banner",
               "name": "Installments Banner",
@@ -433,6 +604,7 @@
             "variant_picker_EQ4gcg",
             "product_model_fit_dmTpMP",
             "buy_buttons_JqjPaM",
+            "size_guide_WFhmCy",
             "installments_banner_hLzt6J",
             "divider_A4UTje",
             "text_xWt7wD",
