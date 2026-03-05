@@ -1,0 +1,113 @@
+{{ 'size-guide-modal.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'size-guide-modal.js' | asset_url }}" defer></script>
+
+{% liquid
+  assign sg_id = 'sg-' | append: block.id
+  assign modal_id = sg_id | append: '-modal'
+  assign title_id = sg_id | append: '-title'
+  assign alignment = block.settings.alignment | default: 'left'
+  assign button_label = block.settings.button_label | default: 'Size guide'
+  assign modal_title = block.settings.modal_title | default: 'Size guide'
+  assign category_count = block.blocks.size
+%}
+
+<div class="sg" id="{{ sg_id }}" data-sg-root {{ block.shopify_attributes }}>
+  <div class="sg__trigger sg__trigger--{{ alignment }}">
+    <button
+      type="button"
+      class="sg__button"
+      data-sg-trigger
+      data-sg-target="#{{ modal_id }}"
+      aria-haspopup="dialog"
+      aria-controls="{{ modal_id }}"
+      aria-expanded="false"
+    >
+      <span class="sg__buttonText">{{ button_label }}</span>
+    </button>
+  </div>
+
+  <div class="sg__overlay" data-sg-overlay hidden>
+    <div
+      class="sg__dialog"
+      id="{{ modal_id }}"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="{{ title_id }}"
+      tabindex="-1"
+      data-sg-dialog
+    >
+      <div class="sg__header">
+        <h2 id="{{ title_id }}" class="sg__title_modal">{{ modal_title }}</h2>
+
+        <button type="button" class="sg__close" data-sg-close>×</button>
+      </div>
+
+      <div class="sg__body">
+        {% if category_count > 1 %}
+          <div class="sg__categoryTabs" data-sg-category-tabs></div>
+        {% endif %}
+
+        <div class="sg__categories">
+          {% content_for 'blocks' %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Size Guide",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Size guide"
+    },
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal title",
+      "default": "Size guide"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "_size-guide-category"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size Guide",
+      "blocks": [
+        {
+          "type": "_size-guide-category",
+          "settings": {
+            "category_title": "General"
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>This is a general size guide.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
