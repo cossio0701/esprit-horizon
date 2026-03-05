@@ -57,6 +57,7 @@
       flex-direction: column;
       overflow-y: auto !important; /* Enable scrolling on the dialog itself */
       -webkit-overflow-scrolling: touch;
+      will-change: transform;
     }
   }
 
@@ -73,11 +74,21 @@
   }
 
   .quick-add-modal[open] {
-    animation: modalSlideInTop var(--animation-speed) var(--animation-easing) forwards;
+    @media screen and (min-width: 751px) {
+      animation: modalSlideInTop var(--animation-speed) var(--animation-easing) forwards;
+    }
+    @media screen and (max-width: 750px) {
+      animation: bottomSheetSlideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
   }
 
   .quick-add-modal.dialog-closing {
-    animation: modalSlideOutTop var(--animation-speed) var(--animation-easing) forwards;
+    @media screen and (min-width: 751px) {
+      animation: modalSlideOutTop var(--animation-speed) var(--animation-easing) forwards;
+    }
+    @media screen and (max-width: 750px) {
+      animation: bottomSheetSlideOut 0.8s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+    }
   }
 
   .quick-add-modal__close {
@@ -104,7 +115,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px 0 6px;
+      padding: 14px 0 10px;
       cursor: pointer;
       touch-action: none;
     }
@@ -115,6 +126,11 @@
     height: 4px;
     border-radius: 2px;
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+    transition: transform 0.15s ease;
+  }
+
+  .quick-add-modal__drag-handle:active .quick-add-modal__drag-handle-bar {
+    transform: scaleX(0.85);
   }
 
   .quick-add-modal__content {
@@ -374,6 +390,23 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes bottomSheetSlideIn {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bottomSheetSlideOut {
+    /* No 'from' state to allow animating from the current drag position */
+    to {
+      transform: translateY(100%);
+      opacity: 0;
     }
   }
 {% endstylesheet %}
