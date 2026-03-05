@@ -200,12 +200,27 @@ if (!customElements.get('quick-add-component')) {
 class QuickAddDialog extends DialogComponent {
   #abortController = new AbortController();
 
+  /* ── Drag-to-dismiss gesture (mobile bottom-sheet) ── */
+
+  /** @type {number} */
+  #touchStartX = 0;
   /** @type {number} */
   #touchStartY = 0;
+  /** @type {number} */
+  #lastTouchY = 0;
+  /** @type {number} */
+  #lastTouchTime = 0;
+  /** @type {number} */
+  #velocity = 0;
   /** @type {boolean} */
   #isDragging = false;
-  /** Minimum swipe distance in px to trigger close */
-  static SWIPE_THRESHOLD = 80;
+  /** @type {boolean} */
+  #dragConfirmed = false;
+
+  /** Minimum distance to trigger close if velocity is low */
+  static SWIPE_THRESHOLD = 100;
+  /** Minimum velocity (px/ms) to trigger close */
+  static VELOCITY_THRESHOLD = 0.6;
 
   connectedCallback() {
     super.connectedCallback();
@@ -225,56 +240,140 @@ class QuickAddDialog extends DialogComponent {
     this.#abortController.abort();
   }
 
-  /* ── Drag handle (mobile bottom-sheet) ── */
-
   #initDragHandle() {
+    const dialog = this.refs.dialog;
     const handle = /** @type {HTMLElement | null} */ (this.refs.dragHandle);
-    if (!handle) return;
+    if (!dialog || !handle) return;
 
     const { signal } = this.#abortController;
 
-    // Tap to close
+    // Tap handle to close
     handle.addEventListener('click', () => this.closeDialog(), { signal });
 
-    // Touch: swipe-down to dismiss
-    handle.addEventListener('touchstart', this.#onTouchStart, { passive: true, signal });
-    handle.addEventListener('touchmove', this.#onTouchMove, { passive: false, signal });
-    handle.addEventListener('touchend', this.#onTouchEnd, { passive: true, signal });
+    // Drag gesture on the entire dialog
+    dialog.addEventListener('touchstart', this.#onTouchStart, { passive: true, signal });
+    dialog.addEventListener('touchmove', this.#onTouchMove, { passive: false, signal });
+    dialog.addEventListener('touchend', this.#onTouchEnd, { passive: true, signal });
   }
 
   #onTouchStart = (/** @type {TouchEvent} */ e) => {
-    this.#touchStartY = e.touches[0]?.clientY ?? 0;
+    if (!isMobileBreakpoint()) return;
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    this.#touchStartX = touch.clientX;
+    this.#touchStartY = touch.clientY;
+    this.#lastTouchY = touch.clientY;
+    this.#lastTouchTime = Date.now();
     this.#isDragging = true;
-    const dialog = this.refs.dialog;
-    if (dialog instanceof HTMLElement) dialog.style.transition = 'none';
+    this.#dragConfirmed = false;
+    this.#velocity = 0;
   };
 
   #onTouchMove = (/** @type {TouchEvent} */ e) => {
-    if (!this.#isDragging) return;
-    const deltaY = (e.touches[0]?.clientY ?? 0) - this.#touchStartY;
-    if (deltaY < 0) return; // Only allow downward drag
-    e.preventDefault();
+    if (!this.#isDragging || !isMobileBreakpoint()) return;
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const deltaY = touch.clientY - this.#touchStartY;
+    const deltaX = touch.clientX - this.#touchStartX;
+    const currentTime = Date.now();
+    const timeDelta = currentTime - this.#lastTouchTime;
+
+    // Calculate instantaneous velocity
+    if (timeDelta > 0) {
+      this.#velocity = (touch.clientY - this.#lastTouchY) / timeDelta;
+    }
+    this.#lastTouchY = touch.clientY;
+    this.#lastTouchTime = currentTime;
+
     const dialog = this.refs.dialog;
-    if (dialog instanceof HTMLElement) dialog.style.transform = `translateY(${deltaY}px)`;
+    if (!(dialog instanceof HTMLElement)) return;
+
+    // If we haven't confirmed the drag yet, check if we should
+    if (!this.#dragConfirmed) {
+      // Don't drag if scrolling horizontally (e.g. inside a carousel)
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        this.#isDragging = false;
+        return;
+      }
+
+      // Don't drag if we are scrolling down INSIDE the modal content
+      if (dialog.scrollTop > 5) {
+        return;
+      }
+
+      // Only start drag if moving downward
+      if (deltaY > 5) {
+        this.#dragConfirmed = true;
+        dialog.style.transition = 'none';
+        dialog.style.animation = 'none'; // CRITICAL: Prevent CSS animation from locking transform
+      } else {
+        return;
+      }
+    }
+
+    // If drag is confirmed, move the dialog and update backdrop
+    if (this.#dragConfirmed) {
+      e.preventDefault();
+      const moveY = Math.max(0, deltaY);
+      dialog.style.transform = `translateY(${moveY}px)`;
+
+      // Backdrop opacity scaling
+      const opacity = Math.max(0, 1 - (moveY / (window.innerHeight * 0.5)));
+      dialog.style.setProperty('--backdrop-opacity-multiplier', opacity.toString());
+    }
   };
 
   #onTouchEnd = (/** @type {TouchEvent} */ e) => {
-    if (!this.#isDragging) return;
-    this.#isDragging = false;
-
-    const dialog = this.refs.dialog;
-    const endY = e.changedTouches[0]?.clientY ?? 0;
-    const deltaY = endY - this.#touchStartY;
-
-    if (dialog instanceof HTMLElement) {
-      dialog.style.transition = '';
-      dialog.style.transform = '';
+    if (!this.#isDragging || !this.#dragConfirmed) {
+      this.#isDragging = false;
+      return;
     }
 
-    if (deltaY >= QuickAddDialog.SWIPE_THRESHOLD) {
-      this.closeDialog();
+    this.#isDragging = false;
+    const dialog = this.refs.dialog;
+    if (!(dialog instanceof HTMLElement)) return;
+
+    const deltaY = (e.changedTouches[0]?.clientY ?? 0) - this.#touchStartY;
+
+    // Dismiss if crossed threshold OR velocity is high enough
+    if (deltaY > QuickAddDialog.SWIPE_THRESHOLD || this.#velocity > QuickAddDialog.VELOCITY_THRESHOLD) {
+      this.#dismissFromDrag();
+    } else {
+      // Snap back
+      dialog.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+      dialog.style.transform = '';
+      dialog.style.removeProperty('--backdrop-opacity-multiplier');
     }
   };
+
+  /**
+   * Finalizes the dismissal after a successful drag gesture
+   */
+  async #dismissFromDrag() {
+    const { dialog } = this.refs;
+    if (!(dialog instanceof HTMLDialogElement)) return;
+
+    // Reset local dragging state immediately to prevent multi-triggering
+    this.#isDragging = false;
+    this.#dragConfirmed = false;
+
+    // Reset backdrop multiplier so it doesn't conflict with final removal
+    dialog.style.removeProperty('--backdrop-opacity-multiplier');
+
+    // Use the standard close method.
+    // Because we removed the 'from' in bottomSheetSlideOut CSS,
+    // it will now animate correctly from the current deltaY position.
+    await this.closeDialog();
+
+    // Cleanup inline styles after it's closed
+    dialog.style.transform = '';
+    dialog.style.transition = '';
+    dialog.style.animation = '';
+  }
 
   /* ── Existing handlers ── */
 
