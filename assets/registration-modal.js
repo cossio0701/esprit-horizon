@@ -14,6 +14,7 @@ customElements.whenDefined('dialog-component').then(() => {
       super.disconnectedCallback();
       this.removeEventListener('dialog:close', this.#onClose);
       this.#form?.removeEventListener('submit', this.#onSubmit);
+      this.#removeBlurListeners();
     }
 
     get #form() {
@@ -44,6 +45,7 @@ customElements.whenDefined('dialog-component').then(() => {
       this.#triggerElement = document.activeElement;
       this.#resetState();
       this.#form?.addEventListener('submit', this.#onSubmit);
+      this.#addBlurListeners();
       super.showDialog();
       requestAnimationFrame(() =>
         requestAnimationFrame(() => this.#firstField?.focus())
@@ -56,18 +58,51 @@ customElements.whenDefined('dialog-component').then(() => {
       }
       this.#triggerElement = null;
       this.#form?.removeEventListener('submit', this.#onSubmit);
+      this.#removeBlurListeners();
     };
 
+    #addBlurListeners() {
+      for (const field of this.querySelectorAll('[required]')) {
+        field.addEventListener('blur', this.#onFieldBlur);
+      }
+    }
+
+    #removeBlurListeners() {
+      for (const field of this.querySelectorAll('[required]')) {
+        field.removeEventListener('blur', this.#onFieldBlur);
+      }
+    }
+
     /** @param {Event} event */
+    #onFieldBlur = (event) => {
+      const field = /** @type {HTMLInputElement} */ (event.currentTarget);
+      const wrapper = field.closest(
+        '.registration-modal__field, .registration-modal__legal'
+      );
+      this.#clearError(field, wrapper);
+      if (!field.checkValidity()) {
+        this.#showError(field, wrapper);
+      }
+    };
+
+    /** @param {SubmitEvent} event */
     #onSubmit = async (event) => {
       event.preventDefault();
       if (!this.#validateForm()) return;
 
-      // submitFormData() -- desacoplada, conectar al backend cuando este disponible.
-      // const result = await submitFormData(new FormData(event.currentTarget));
-      // if (!result.ok) return;
+      const btn = /** @type {HTMLButtonElement | null} */ (
+        this.querySelector('.registration-modal__submit')
+      );
+      if (btn) btn.setAttribute('aria-busy', 'true');
 
-      this.#showSuccess();
+      try {
+        // const result = await submitFormData(new FormData(event.currentTarget));
+        // if (!result.ok) return;
+
+        this.#showSuccess();
+      } finally {
+        if (btn) btn.removeAttribute('aria-busy');
+      }
     };
 
     /** @returns {boolean} */
@@ -133,13 +168,15 @@ customElements.whenDefined('dialog-component').then(() => {
       const formWrapper = this.#formWrapper;
       if (!success || !formWrapper) return;
 
-      formWrapper.hidden = true;
-      success.hidden = false;
-
-      /** @type {any} */ (this).classList.add('is-success');
-
-      const focusTarget = success.querySelector('img, [tabindex]') || success;
-      if (focusTarget instanceof HTMLElement) focusTarget.focus();
+      formWrapper.classList.add('is-hiding');
+      formWrapper.addEventListener('transitionend', () => {
+        formWrapper.hidden = true;
+        formWrapper.classList.remove('is-hiding');
+        success.hidden = false;
+        /** @type {any} */ (this).classList.add('is-success');
+        const focusTarget = success.querySelector('img, [tabindex]') || success;
+        if (focusTarget instanceof HTMLElement) focusTarget.focus();
+      }, { once: true });
     }
 
     #resetState() {
@@ -149,6 +186,7 @@ customElements.whenDefined('dialog-component').then(() => {
 
       success.hidden = true;
       formWrapper.hidden = false;
+      formWrapper.classList.remove('is-hiding');
 
       /** @type {any} */ (this).classList.remove('is-success');
 

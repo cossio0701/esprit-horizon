@@ -1,12 +1,17 @@
 <script src="{{ 'registration-modal.js' | asset_url }}" type="module"></script>
 
-<registration-modal id="registration-modal-{{ section.id }}">
+<registration-modal
+  id="registration-modal-{{ section.id }}"
+  {% if section.settings.close_color_on_image != blank %}
+    style="--close-color-on-image: {{ section.settings.close_color_on_image }}"
+  {% endif %}
+>
   <dialog
     class="registration-modal color-{{ settings.popover_color_scheme }}"
     ref="dialog"
     role="dialog"
     aria-modal="true"
-    aria-label="{{ section.settings.heading }}"
+    aria-label="Leads Modal"
     scroll-lock
   >
     <button
@@ -20,7 +25,7 @@
 
     <div class="registration-modal__inner">
 
-      {%- comment -%} LEFT - Image {%- endcomment -%}
+      {%- comment -%} LEFT - Imagen desktop (oculta en mobile) {%- endcomment -%}
       <div class="registration-modal__media">
         {%- if section.settings.left_image != blank -%}
           {{
@@ -39,17 +44,50 @@
       {%- comment -%} RIGHT - Form {%- endcomment -%}
       <div class="registration-modal__content">
 
-        {%- comment -%} Success state (vacio por ahora) {%- endcomment -%}
-        <div class="registration-modal__success" hidden tabindex="-1">
-          {%- if section.settings.success_image != blank -%}
+        {%- comment -%} Banner imagen mobile (oculto en desktop) {%- endcomment -%}
+        {%- if section.settings.left_image_mobile != blank -%}
+          <div class="registration-modal__media-mobile">
             {{
-              section.settings.success_image
-              | image_url: width: 400
+              section.settings.left_image_mobile
+              | image_url: width: 600
               | image_tag:
                 loading: 'lazy',
-                class: 'registration-modal__success-image',
-                alt: section.settings.success_image.alt | escape
+                class: 'registration-modal__image-mobile',
+                alt: section.settings.left_image_mobile.alt | escape
             }}
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Success state {%- endcomment -%}
+        <div class="registration-modal__success" hidden tabindex="-1">
+          {%- if section.settings.success_image != blank or section.settings.success_image_mobile != blank -%}
+            <picture>
+              {%- if section.settings.success_image_mobile != blank -%}
+                <source
+                  media="(max-width: 749px)"
+                  srcset="{{ section.settings.success_image_mobile | image_url: width: 600 }}"
+                >
+              {%- endif -%}
+              {%- if section.settings.success_image != blank -%}
+                {{
+                  section.settings.success_image
+                  | image_url: width: 800
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'registration-modal__success-image',
+                    alt: section.settings.success_image.alt | escape
+                }}
+              {%- elsif section.settings.success_image_mobile != blank -%}
+                {{
+                  section.settings.success_image_mobile
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'registration-modal__success-image',
+                    alt: section.settings.success_image_mobile.alt | escape
+                }}
+              {%- endif -%}
+            </picture>
           {%- endif -%}
         </div>
 
@@ -159,22 +197,23 @@
 </registration-modal>
 
 {% stylesheet %}
+  /* =============================================
+     MOBILE FIRST
+     ============================================= */
+
   /* -- Dialog shell -- */
   .registration-modal {
     padding: 0;
     border: var(--style-border-popover, none);
     border-radius: 0;
     box-shadow: 0 8px 40px rgb(var(--color-shadow-rgb) / var(--opacity-15));
-    width: min(92vw, 900px);
-    max-height: 90vh;
+    width: min(92vw, 480px);
+    max-height: 90dvh;
     overflow: hidden;
   }
 
   .registration-modal[open] {
     display: flex;
-  }
-
-  .registration-modal[open] {
     animation: modalSlideInTop var(--animation-speed) var(--animation-easing) forwards;
   }
 
@@ -199,44 +238,26 @@
     transform: scale(0.8);
   }
 
-  /* -- Two-column inner -- */
+  .registration-modal__close {
+    color: var(--close-color-on-image, currentColor);
+  }
+
+  registration-modal.is-success .registration-modal__close {
+    color: var(--close-color-on-image, currentColor);
+  }
+
+  /* -- Inner grid (mobile: una columna) -- */
   .registration-modal__inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     width: 100%;
     min-height: 0;
+    flex: 1;
   }
 
-  registration-modal.is-success .registration-modal {
-    height: 90vh;
-  }
-
-  registration-modal.is-success .registration-modal__inner {
-    grid-template-columns: 1fr;
-    height: 100%;
-  }
-
-  registration-modal.is-success .registration-modal__media {
-    display: none;
-  }
-
-  registration-modal.is-success .registration-modal__content {
-    padding: 0;
-    height: 100%;
-  }
-
-  registration-modal.is-success .registration-modal__success {
-    height: 100%;
-  }
-
-  .registration-modal__success-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* -- Left: image -- */
+  /* -- Imagen desktop (oculta en mobile) -- */
   .registration-modal__media {
+    display: none;
     position: relative;
     overflow: hidden;
   }
@@ -252,12 +273,29 @@
     background: rgb(var(--color-foreground-rgb) / var(--opacity-5));
   }
 
-  /* -- Right: content -- */
+  /* -- Banner imagen mobile (oculto en desktop) -- */
+  .registration-modal__media-mobile {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-bottom: var(--margin-lg);
+  }
+
+  .registration-modal__image-mobile {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* -- Content (mobile) -- */
   .registration-modal__content {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding: var(--padding-3xl) var(--padding-xl);
+    padding: 0;
+    min-height: 0;
   }
 
   /* -- Success state -- */
@@ -274,6 +312,38 @@
     height: 100%;
   }
 
+  registration-modal.is-success .registration-modal {
+    height: 360px;
+  }
+
+  registration-modal.is-success .registration-modal__inner {
+    grid-template-columns: 1fr;
+    height: 100%;
+  }
+
+  registration-modal.is-success .registration-modal__media,
+  registration-modal.is-success .registration-modal__media-mobile {
+    display: none;
+  }
+
+  registration-modal.is-success .registration-modal__content {
+    padding: 0;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  registration-modal.is-success .registration-modal__success {
+    position: absolute;
+    inset: 0;
+  }
+
+  .registration-modal__success-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   /* -- Form wrapper -- */
   .registration-modal__form-wrapper[hidden] {
     display: none;
@@ -283,7 +353,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-md);
-    height: 100%;
+    padding-inline: var(--padding-xl);
+    padding-bottom: var(--padding-xl);
+    transition: opacity 0.15s var(--animation-easing);
+  }
+
+  .registration-modal__form-wrapper.is-hiding {
+    opacity: 0;
   }
 
   /* -- Title -- */
@@ -357,16 +433,26 @@
     border-color: var(--color-foreground);
   }
 
+  .registration-modal__field input[aria-invalid="true"] {
+    border-color: #cc0000;
+  }
+
+  .registration-modal__error {
+    font-size: var(--font-size--xs);
+    color: #cc0000;
+  }
+
   /* -- Legal checkbox -- */
   .registration-modal__legal {
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: auto 1fr;
     gap: var(--gap-2xs);
     margin-block-start: var(--margin-2xs);
   }
 
   .registration-modal__legal input[type="checkbox"] {
-    flex-shrink: 0;
+    grid-column: 1;
+    grid-row: 1;
     margin-block-start: 0.2em;
     accent-color: var(--color-foreground);
     width: 1em;
@@ -375,14 +461,22 @@
   }
 
   .registration-modal__legal label {
+    grid-column: 2;
+    grid-row: 1;
     font-size: var(--font-size--xs);
     color: rgb(var(--color-foreground-rgb) / var(--opacity-80));
     line-height: var(--line-height--body);
     cursor: pointer;
   }
 
+  .registration-modal__legal .registration-modal__error {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
   .registration-modal__legal a {
     color: var(--color-foreground);
+    text-decoration: underline;
     text-underline-offset: 2px;
   }
 
@@ -393,42 +487,63 @@
     padding-block: 8px;
     padding-inline: var(--padding-2xl);
     text-transform: uppercase;
+    transition: opacity 0.15s var(--animation-easing);
   }
 
-  /* -- Responsive -- */
-  @media screen and (max-width: 749px) {
+  .registration-modal__submit[aria-busy="true"] {
+    opacity: 0.5;
+    cursor: wait;
+    pointer-events: none;
+  }
+
+  /* =============================================
+     DESKTOP (min-width: 750px)
+     ============================================= */
+  @media screen and (min-width: 750px) {
     .registration-modal {
-      position: fixed;
-      inset-block-end: 0;
-      inset-inline: 0;
-      width: 100%;
-      max-height: 90dvh;
-      border-radius: 0;
-      margin: 0;
-    }
-
-    .registration-modal[open] {
-      animation: modalSlideInBottom var(--animation-speed) var(--animation-easing) forwards;
-    }
-
-    .registration-modal.dialog-closing {
-      animation: modalSlideOutBottom var(--animation-speed) var(--animation-easing) forwards;
+      width: min(92vw, 900px);
+      max-height: 90vh;
     }
 
     .registration-modal__inner {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
     }
 
     .registration-modal__media {
+      display: block;
+    }
+
+    .registration-modal__media-mobile {
       display: none;
     }
 
+    .registration-modal__close {
+      color: currentColor;
+    }
+
+    registration-modal.is-success .registration-modal {
+      height: 90vh;
+    }
+
     .registration-modal__content {
-      padding: var(--padding-xl);
+      padding: var(--padding-3xl) var(--padding-xl);
+    }
+
+    .registration-modal__form-wrapper {
+      padding: 0;
     }
   }
 
   /* -- Animations -- */
+  @keyframes successFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .registration-modal__success:not([hidden]) {
+    animation: successFadeIn 0.3s var(--animation-easing) forwards;
+  }
+
   @keyframes modalSlideInTop {
     from { opacity: 0; transform: translateY(-12px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -438,66 +553,81 @@
     from { opacity: 1; transform: translateY(0); }
     to   { opacity: 0; transform: translateY(-12px); }
   }
-
-  @keyframes modalSlideInBottom {
-    from { opacity: 0; transform: translateY(100%); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes modalSlideOutBottom {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(100%); }
-  }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Registration Modal",
+  "name": "Leads Modal",
   "tag": "section",
   "settings": [
     {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Crear cuenta"
+      "type": "header",
+      "content": "Imagen del formulario"
     },
     {
       "type": "image_picker",
       "id": "left_image",
-      "label": "Left image"
+      "label": "Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image_mobile",
+      "label": "Mobile"
+    },
+    {
+      "type": "header",
+      "content": "Imagen de éxito"
     },
     {
       "type": "image_picker",
       "id": "success_image",
-      "label": "Success state image"
+      "label": "Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "success_image_mobile",
+      "label": "Mobile"
+    },
+    {
+      "type": "header",
+      "content": "Formulario"
     },
     {
       "type": "textarea",
       "id": "legal_text",
-      "label": "Legal checkbox text",
+      "label": "Texto del checkbox legal",
       "default": "Acepto los"
     },
     {
       "type": "text",
       "id": "legal_link_text",
-      "label": "Legal link label",
+      "label": "Texto del enlace legal",
       "default": "terminos y condiciones"
     },
     {
       "type": "url",
       "id": "legal_link",
-      "label": "Legal link URL"
+      "label": "URL del enlace legal"
     },
     {
       "type": "text",
       "id": "button_text",
-      "label": "Button text",
+      "label": "Texto del botón",
       "default": "Registrarse"
+    },
+    {
+      "type": "header",
+      "content": "Estilos"
+    },
+    {
+      "type": "color",
+      "id": "close_color_on_image",
+      "label": "Color del botón cerrar sobre imagen"
     }
   ],
   "presets": [
     {
-      "name": "Registration Modal"
+      "name": "Leads Modal"
     }
   ]
 }

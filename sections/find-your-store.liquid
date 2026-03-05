@@ -1,0 +1,950 @@
+{% assign section_id = section.id | replace: '-', '' | replace: '_', '' | downcase %}
+{% assign api_key = shop.metafields.custom.maps_api_key | default: section.settings.google_maps_api_key %}
+
+{% style %}
+  .store-map-container-{{ section_id }} {
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .store-map-layout-{{ section_id }} {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .store-map-layout-{{ section_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .store-map-map-{{ section_id }} {
+      height: 300px !important;
+    }
+  }
+
+  /* ---- Map ---- */
+  .store-map-map-{{ section_id }} {
+    width: 100%;
+    height: {{ section.settings.map_height }}px;
+    border-radius: {{ section.settings.border_radius }}px;
+    background: #f0f0f0;
+  }
+
+  /* ---- Sidebar ---- */
+  .store-map-sidebar-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: {{ section.settings.map_height }}px;
+  }
+
+  .store-map-controls-{{ section_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .store-map-search-{{ section_id }},
+  .store-map-city-filter-{{ section_id }} {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    background: #fff;
+  }
+
+  .store-map-search-{{ section_id }}:focus,
+  .store-map-city-filter-{{ section_id }}:focus {
+    border-color: #222;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.06);
+  }
+
+  .store-map-geo-btn-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .store-map-geo-btn-{{ section_id }}:hover {
+    background: #f5f5f5;
+    border-color: #999;
+  }
+
+  .store-map-geo-btn-{{ section_id }}.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* ---- Store list ---- */
+  .store-map-list-wrap-{{ section_id }} {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+  }
+
+  .store-map-count-{{ section_id }} {
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #888;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .store-map-store-list-{{ section_id }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ---- Store item ---- */
+  .store-map-store-item-{{ section_id }} {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .store-map-store-item-{{ section_id }}:last-child {
+    border-bottom: none;
+  }
+
+  .store-map-store-item-{{ section_id }}:hover {
+    background: #f9f9f9;
+  }
+
+  .store-map-store-item-{{ section_id }}.is-active {
+    background: #f0f7ff;
+    border-left: 3px solid #0066cc;
+    padding-left: 11px;
+  }
+
+  .store-map-store-name-{{ section_id }} {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111;
+    margin: 0 0 3px;
+  }
+
+  .store-map-store-address-{{ section_id }} {
+    font-size: 12px;
+    color: #666;
+    margin: 0 0 2px;
+  }
+
+  .store-map-store-hours-{{ section_id }} {
+    font-size: 11px;
+    color: #888;
+    margin: 2px 0 0;
+  }
+
+  .store-map-store-meta-{{ section_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 7px;
+  }
+
+  .store-map-store-meta-{{ section_id }} a {
+    font-size: 12px;
+    color: #0066cc;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .store-map-store-meta-{{ section_id }} a:hover {
+    text-decoration: underline;
+  }
+
+  .store-map-distance-badge-{{ section_id }} {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 11px;
+    color: #555;
+    background: #eef2f7;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  /* ---- Empty state ---- */
+  .store-map-empty-{{ section_id }} {
+    padding: 28px 16px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+  }
+
+  /* ---- Skeleton loader ---- */
+  .store-map-skeleton-{{ section_id }} {
+    display: flex;
+    gap: 20px;
+  }
+
+  .store-map-skeleton-map-{{ section_id }} {
+    flex: 2;
+    height: {{ section.settings.map_height }}px;
+    border-radius: {{ section.settings.border_radius }}px;
+    background: linear-gradient(90deg, #ececec 25%, #e0e0e0 50%, #ececec 75%);
+    background-size: 200% 100%;
+    animation: store-map-shimmer-{{ section_id }} 1.4s infinite;
+  }
+
+  .store-map-skeleton-side-{{ section_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .store-map-skeleton-line-{{ section_id }} {
+    border-radius: 6px;
+    background: linear-gradient(90deg, #ececec 25%, #e0e0e0 50%, #ececec 75%);
+    background-size: 200% 100%;
+    animation: store-map-shimmer-{{ section_id }} 1.4s infinite;
+  }
+
+  @keyframes store-map-shimmer-{{ section_id }} {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ---- Error ---- */
+  .store-map-error-{{ section_id }} {
+    height: {{ section.settings.map_height }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: {{ section.settings.border_radius }}px;
+    color: #999;
+    font-size: 14px;
+    gap: 8px;
+  }
+
+  /* ---- Titulo ---- */
+  .store-map-title-{{ section_id }} {
+    margin: 0 0 20px;
+  }
+
+  /* ---- Panel de diagnostico (solo editor) ---- */
+  .store-map-debug-{{ section_id }} {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+    border: 1px solid #d0d7de;
+  }
+
+  .store-map-debug-header-{{ section_id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+    font-weight: 600;
+    font-size: 12px;
+    color: #444;
+    font-family: monospace;
+  }
+
+  .store-map-debug-body-{{ section_id }} {
+    padding: 12px 14px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .store-map-debug-row-{{ section_id }} {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  .store-map-debug-label-{{ section_id }} {
+    color: #666;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  .store-map-debug-value-{{ section_id }} {
+    color: #111;
+    word-break: break-all;
+  }
+
+  .store-map-debug-badge-{{ section_id }} {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+  }
+
+  .store-map-debug-badge-{{ section_id }}.ok     { background: #d1fae5; color: #065f46; }
+  .store-map-debug-badge-{{ section_id }}.warn   { background: #fef3c7; color: #92400e; }
+  .store-map-debug-badge-{{ section_id }}.error  { background: #fee2e2; color: #991b1b; }
+{% endstyle %}
+
+<div class="section section--{{ section.settings.section_width }} spacing-style" style="{%- render 'spacing-style', settings: section.settings -%}">
+
+{% if section.settings.title != blank %}
+  <h2 class="store-map-title-{{ section_id }}">{{ section.settings.title | escape }}</h2>
+{% endif %}
+
+{% if request.design_mode %}
+  {%- comment -%} Determinar fuente y estado de la API key {%- endcomment -%}
+  {% if shop.metafields.custom.maps_api_key != blank %}
+    {% assign key_source  = 'Metafield — shop.metafields.custom.maps_api_key' %}
+    {% assign key_badge   = 'ok' %}
+    {% assign key_label   = 'OK' %}
+  {% elsif section.settings.google_maps_api_key != blank %}
+    {% assign key_source  = 'Configuracion de seccion (respaldo)' %}
+    {% assign key_badge   = 'warn' %}
+    {% assign key_label   = 'ADVERTENCIA' %}
+  {% else %}
+    {% assign key_source  = 'Sin configurar' %}
+    {% assign key_badge   = 'error' %}
+    {% assign key_label   = 'ERROR' %}
+  {% endif %}
+
+  {%- comment -%} Mostrar primeros 8 caracteres enmascarados {%- endcomment -%}
+  {% if api_key != blank %}
+    {% assign key_preview = api_key | slice: 0, 8 | append: '••••••••••••' %}
+  {% else %}
+    {% assign key_preview = '—' %}
+  {% endif %}
+
+  {%- comment -%} Validar JSON de tiendas {%- endcomment -%}
+  {% assign json_first_char = section.settings.stores_json | strip | slice: 0, 1 %}
+  {% if section.settings.stores_json == blank %}
+    {% assign json_badge = 'error' %}
+    {% assign json_label = 'ERROR' %}
+    {% assign json_msg   = 'Sin JSON configurado' %}
+  {% elsif json_first_char == '[' %}
+    {% assign json_badge = 'ok' %}
+    {% assign json_label = 'OK' %}
+    {% assign json_msg   = 'Formato valido (array) — validacion completa en el navegador' %}
+  {% else %}
+    {% assign json_badge = 'error' %}
+    {% assign json_label = 'ERROR' %}
+    {% assign json_msg   = 'El JSON no comienza con [ — debe ser un array' %}
+  {% endif %}
+
+  <div class="store-map-debug-{{ section_id }}" aria-label="Panel de diagnostico">
+    <div class="store-map-debug-header-{{ section_id }}">
+      &#128270; Diagnostico de seccion &mdash; solo visible en el editor
+    </div>
+    <div class="store-map-debug-body-{{ section_id }}">
+      <div class="store-map-debug-row-{{ section_id }}">
+        <span class="store-map-debug-label-{{ section_id }}">API Key</span>
+        <span class="store-map-debug-value-{{ section_id }}">
+          <span class="store-map-debug-badge-{{ section_id }} {{ key_badge }}">{{ key_label }}</span>
+          &nbsp;{{ key_source }}
+        </span>
+      </div>
+      <div class="store-map-debug-row-{{ section_id }}">
+        <span class="store-map-debug-label-{{ section_id }}">Preview</span>
+        <span class="store-map-debug-value-{{ section_id }}">{{ key_preview }}</span>
+      </div>
+      <div class="store-map-debug-row-{{ section_id }}">
+        <span class="store-map-debug-label-{{ section_id }}">JSON</span>
+        <span class="store-map-debug-value-{{ section_id }}">
+          <span class="store-map-debug-badge-{{ section_id }} {{ json_badge }}">{{ json_label }}</span>
+          &nbsp;{{ json_msg }}
+        </span>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<store-finder-{{ section_id }}
+  class="store-map-container-{{ section_id }}"
+  data-api-key="{{ api_key }}"
+  data-stores='{{ section.settings.stores_json | escape }}'
+  data-marker-icon="{{ section.settings.custom_marker_icon | image_url }}"
+  data-zoom="{{ section.settings.zoom_level }}"
+>
+  <!-- Skeleton: visible por defecto, se oculta cuando el mapa carga -->
+  <div class="store-map-skeleton-{{ section_id }}" aria-hidden="true">
+    <div class="store-map-skeleton-map-{{ section_id }}"></div>
+    <div class="store-map-skeleton-side-{{ section_id }}">
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+    </div>
+  </div>
+
+  <!-- Contenido real: oculto hasta que el mapa carga -->
+  <div class="store-map-layout-{{ section_id }}" style="display:none;" aria-label="Mapa de tiendas">
+    <div id="map-{{ section_id }}" class="store-map-map-{{ section_id }}" role="application" aria-label="Mapa interactivo"></div>
+
+    <div class="store-map-sidebar-{{ section_id }}">
+      <div class="store-map-controls-{{ section_id }}">
+        <input
+          type="search"
+          class="store-map-search-{{ section_id }}"
+          placeholder="Buscar tienda o direcci&oacute;n..."
+          aria-label="Buscar tienda"
+          autocomplete="off"
+        />
+        <select class="store-map-city-filter-{{ section_id }}" aria-label="Filtrar por ciudad">
+          <option value="">Todas las ciudades</option>
+        </select>
+        <button class="store-map-geo-btn-{{ section_id }}" type="button" aria-label="Encontrar tienda m&aacute;s cercana a mi ubicaci&oacute;n">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+          </svg>
+          Tienda m&aacute;s cercana
+        </button>
+      </div>
+
+      <div class="store-map-list-wrap-{{ section_id }}">
+        <div class="store-map-count-{{ section_id }}" aria-live="polite"></div>
+        <ul class="store-map-store-list-{{ section_id }}" role="list" aria-label="Lista de tiendas"></ul>
+      </div>
+    </div>
+  </div>
+</store-finder-{{ section_id }}>
+
+</div><!-- /.section -->
+
+<script>
+(function () {
+  // Previene XSS al insertar datos en innerHTML
+  function esc(str) {
+    if (str == null) return '';
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str)));
+    return d.innerHTML;
+  }
+
+  // Distancia entre dos coordenadas en km (f&oacute;rmula Haversine)
+  function haversine(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function formatDistance(km) {
+    return km < 1 ? `${(km * 1000).toFixed(0)} m` : `${km.toFixed(1)} km`;
+  }
+
+  class StoreFinder{{ section_id }} extends HTMLElement {
+    connectedCallback() {
+      // Sanitizar la API key: solo caracteres v&aacute;lidos para una Google Maps API key
+      this.apiKey = (this.dataset.apiKey || '').replace(/[^A-Za-z0-9_\-]/g, '');
+      this.storesData = this.dataset.stores;
+      this.markerIcon = this.dataset.markerIcon;
+      this.zoom = parseInt(this.dataset.zoom) || 12;
+
+      this.storeMarkers = [];
+      this.allStores = [];
+      this.activeStoreId = null;
+      this.userLocation = null;
+      this.searchQuery = '';
+      this.selectedCity = '';
+
+      if (!this.apiKey) {
+        this.showError('Google Maps API key no configurada');
+        return;
+      }
+
+      this.loadScript();
+    }
+
+    loadScript() {
+      if (window.google && window.google.maps) {
+        this.init();
+        return;
+      }
+
+      // Evita inyectar el script m&aacute;s de una vez si hay varias instancias
+      if (document.querySelector('script[data-store-finder-gmaps]')) {
+        window.addEventListener('store-finder-gmaps-ready', () => this.init(), { once: true });
+        return;
+      }
+
+      const s = document.createElement('script');
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&v=weekly`;
+      s.async = true;
+      s.dataset.storeFinderGmaps = '1';
+      s.onload = () => {
+        window.dispatchEvent(new Event('store-finder-gmaps-ready'));
+        this.init();
+      };
+      s.onerror = () => this.showError('No se pudo cargar Google Maps. Verifica la API key y los dominios autorizados.');
+      document.head.appendChild(s);
+    }
+
+    init() {
+      let stores;
+      try {
+        stores = JSON.parse(this.storesData);
+      } catch {
+        this.showError('El JSON de tiendas es inv\u00e1lido. Verifica el formato en la configuraci\u00f3n de la secci\u00f3n.');
+        return;
+      }
+
+      if (!Array.isArray(stores) || !stores.length) {
+        this.showError('No hay tiendas configuradas. Agrega un JSON array en la configuraci\u00f3n.');
+        return;
+      }
+
+      this.allStores = stores;
+
+      // Mostrar mapa, ocultar skeleton
+      this.querySelector('.store-map-skeleton-{{ section_id }}').style.display = 'none';
+      this.querySelector('.store-map-layout-{{ section_id }}').style.display = 'grid';
+
+      const firstPos = {
+        lat: stores[0].address.location.latitude,
+        lng: stores[0].address.location.longitude,
+      };
+
+      this.map = new google.maps.Map(this.querySelector('#map-{{ section_id }}'), {
+        center: firstPos,
+        zoom: this.zoom,
+        mapTypeControl: false,
+        fullscreenControl: true,
+        streetViewControl: false,
+        // Ocultar etiquetas de puntos de inter&eacute;s para un mapa m&aacute;s limpio
+        styles: [
+          { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        ],
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+      this.infoWindow = new google.maps.InfoWindow();
+
+      // Corregir estilos del InfoWindow cuando el DOM este listo
+      this.infoWindow.addListener('domready', () => {
+        const container = document.querySelector('.gm-style-iw-c');
+        const header    = document.querySelector('.gm-style-iw-chr');  // header que crea el espacio blanco
+        const content   = document.querySelector('.gm-style-iw-d');
+        const closeBtn  = document.querySelector('.gm-ui-hover-effect');
+
+        if (container) {
+          container.style.setProperty('padding', '0', 'important');
+          container.style.setProperty('border-radius', '8px', 'important');
+          container.style.setProperty('box-shadow', '0 4px 16px rgba(0,0,0,0.12)', 'important');
+          container.style.setProperty('position', 'relative', 'important');
+        }
+        // Ocultar el header que reserva espacio para el boton de cierre
+        if (header) {
+          header.style.setProperty('display', 'none', 'important');
+        }
+        if (content) {
+          content.style.setProperty('overflow', 'hidden', 'important');
+          content.style.setProperty('padding', '14px 36px 14px 14px', 'important');
+          content.style.setProperty('max-height', 'none', 'important');
+        }
+        // Mover el boton de cierre al contenedor y posicionarlo absolutamente
+        if (closeBtn && container) {
+          closeBtn.style.setProperty('position', 'absolute', 'important');
+          closeBtn.style.setProperty('top', '4px', 'important');
+          closeBtn.style.setProperty('right', '4px', 'important');
+          closeBtn.style.setProperty('margin', '0', 'important');
+          closeBtn.style.setProperty('opacity', '0.6', 'important');
+          closeBtn.style.setProperty('z-index', '1', 'important');
+          container.appendChild(closeBtn);
+        }
+      });
+
+      // Cerrar infoWindow al hacer click fuera
+      this.map.addListener('click', () => {
+        this.infoWindow.close();
+        this.activeStoreId = null;
+        this.querySelector('.store-map-store-list-{{ section_id }}')
+          .querySelectorAll('.store-map-store-item-{{ section_id }}')
+          .forEach(el => el.classList.remove('is-active'));
+      });
+
+      stores.forEach((store) => {
+        const pos = {
+          lat: store.address.location.latitude,
+          lng: store.address.location.longitude,
+        };
+
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: this.map,
+          title: store.name,
+          animation: google.maps.Animation.DROP,
+          icon: this.markerIcon
+            ? { url: this.markerIcon, scaledSize: new google.maps.Size(40, 40) }
+            : null,
+        });
+
+        marker.addListener('click', () => this.selectStore(store.id));
+
+        this.storeMarkers.push({ store, marker, pos });
+        bounds.extend(pos);
+      });
+
+      this.map.fitBounds(bounds);
+
+      this.populateCityFilter(stores);
+      this.renderSidebar(stores);
+      this.bindControls();
+    }
+
+    selectStore(storeId) {
+      const storeIdStr = String(storeId);
+      const data = this.storeMarkers.find(sm => String(sm.store.id) === storeIdStr);
+      if (!data) return;
+
+      this.activeStoreId = storeIdStr;
+      const { store, marker, pos } = data;
+
+      // Actualizar estado activo en el sidebar
+      this.querySelector('.store-map-store-list-{{ section_id }}')
+        .querySelectorAll('.store-map-store-item-{{ section_id }}')
+        .forEach(el => {
+          const isActive = el.dataset.storeId === storeIdStr;
+          el.classList.toggle('is-active', isActive);
+          if (isActive) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+      // Centrar mapa y abrir InfoWindow
+      this.infoWindow.close();
+      this.map.setZoom(16);
+      this.map.panTo(pos);
+
+      const directionsUrl =
+        `https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}`;
+
+      this.infoWindow.setContent(`
+        <div style="min-width:210px;font-family:inherit;padding:2px 0;">
+          <p style="margin:0 0 4px;font-weight:700;font-size:14px;color:#111;">${esc(store.name)}</p>
+          <p style="margin:0 0 2px;font-size:12px;color:#555;">${esc(store.address.street)}</p>
+          <p style="margin:0 0 8px;font-size:12px;color:#555;">${esc(store.address.city)}</p>
+          ${store.hours ? `<p style="margin:0 0 8px;font-size:11px;color:#888;">${esc(store.hours)}</p>` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            ${store.phone ? `<a href="tel:${esc(store.phone)}" style="font-size:12px;color:#0066cc;text-decoration:none;">&#128222; ${esc(store.phone)}</a>` : ''}
+            ${store.whatsapp ? `<a href="https://wa.me/${esc(store.whatsapp)}" target="_blank" rel="noopener" style="font-size:12px;color:#0066cc;text-decoration:none;">&#128172; WhatsApp</a>` : ''}
+            <a href="${esc(directionsUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:#0066cc;text-decoration:none;"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-bottom:1px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> C&oacute;mo llegar</a>
+          </div>
+        </div>
+      `);
+
+      this.infoWindow.open(this.map, marker);
+    }
+
+    renderSidebar(stores) {
+      const list = this.querySelector('.store-map-store-list-{{ section_id }}');
+      const countEl = this.querySelector('.store-map-count-{{ section_id }}');
+
+      list.innerHTML = '';
+      countEl.textContent = `${stores.length} tienda${stores.length !== 1 ? 's' : ''}`;
+
+      if (!stores.length) {
+        const empty = document.createElement('li');
+        empty.className = 'store-map-empty-{{ section_id }}';
+        empty.textContent = 'Sin resultados para tu b\u00fasqueda';
+        list.appendChild(empty);
+        return;
+      }
+
+      stores.forEach((store) => {
+        const directionsUrl =
+          `https://www.google.com/maps/dir/?api=1&destination=${store.address.location.latitude},${store.address.location.longitude}`;
+
+        const distanceBadge = (this.userLocation && store._distance != null)
+          ? `<span class="store-map-distance-badge-{{ section_id }}">${esc(formatDistance(store._distance))}</span>`
+          : '';
+
+        const item = document.createElement('li');
+        item.className = 'store-map-store-item-{{ section_id }}';
+        item.dataset.storeId = String(store.id);
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', `Ver tienda ${store.name}`);
+
+        if (String(store.id) === this.activeStoreId) {
+          item.classList.add('is-active');
+        }
+
+        item.innerHTML = `
+          ${distanceBadge}
+          <p class="store-map-store-name-{{ section_id }}">${esc(store.name)}</p>
+          <p class="store-map-store-address-{{ section_id }}">${esc(store.address.street)}, ${esc(store.address.city)}</p>
+          ${store.hours ? `<p class="store-map-store-hours-{{ section_id }}">${esc(store.hours)}</p>` : ''}
+          <div class="store-map-store-meta-{{ section_id }}">
+            ${store.phone ? `<a href="tel:${esc(store.phone)}" onclick="event.stopPropagation()">&#128222; ${esc(store.phone)}</a>` : ''}
+            ${store.whatsapp ? `<a href="https://wa.me/${esc(store.whatsapp)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#128172; WhatsApp</a>` : ''}
+            <a href="${esc(directionsUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-bottom:1px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> C&oacute;mo llegar</a>
+          </div>
+        `;
+
+        item.addEventListener('click', () => this.selectStore(store.id));
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.selectStore(store.id);
+          }
+        });
+
+        list.appendChild(item);
+      });
+    }
+
+    populateCityFilter(stores) {
+      const select = this.querySelector('.store-map-city-filter-{{ section_id }}');
+      const cities = [...new Set(stores.map(s => s.address.city))].sort();
+
+      cities.forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.textContent = city;
+        select.appendChild(opt);
+      });
+    }
+
+    bindControls() {
+      const search = this.querySelector('.store-map-search-{{ section_id }}');
+      const cityFilter = this.querySelector('.store-map-city-filter-{{ section_id }}');
+      const geoBtn = this.querySelector('.store-map-geo-btn-{{ section_id }}');
+
+      search.addEventListener('input', (e) => {
+        this.searchQuery = e.target.value.trim().toLowerCase();
+        this.applyFilters();
+      });
+
+      cityFilter.addEventListener('change', (e) => {
+        this.selectedCity = e.target.value;
+        this.applyFilters();
+      });
+
+      geoBtn.addEventListener('click', () => this.findNearest());
+    }
+
+    applyFilters() {
+      this.infoWindow.close();
+
+      const bounds = new google.maps.LatLngBounds();
+      const filtered = [];
+
+      this.storeMarkers.forEach(({ store, marker, pos }) => {
+        const matchesCity = !this.selectedCity || store.address.city === this.selectedCity;
+        const matchesSearch =
+          !this.searchQuery ||
+          store.name.toLowerCase().includes(this.searchQuery) ||
+          store.address.street.toLowerCase().includes(this.searchQuery) ||
+          store.address.city.toLowerCase().includes(this.searchQuery);
+
+        const visible = matchesCity && matchesSearch;
+        marker.setVisible(visible);
+
+        if (visible) {
+          bounds.extend(pos);
+          filtered.push(store);
+        }
+      });
+
+      // Mantener orden por distancia si el usuario us&oacute; geolocalizaci&oacute;n
+      if (this.userLocation) {
+        filtered.sort((a, b) => (a._distance || 0) - (b._distance || 0));
+      }
+
+      this.renderSidebar(filtered);
+      if (filtered.length) this.map.fitBounds(bounds);
+    }
+
+    findNearest() {
+      if (!navigator.geolocation) {
+        alert('Tu navegador no soporta geolocalizaci\u00f3n');
+        return;
+      }
+
+      const btn = this.querySelector('.store-map-geo-btn-{{ section_id }}');
+      const originalHTML = btn.innerHTML;
+      btn.classList.add('is-loading');
+      btn.textContent = 'Buscando...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+
+          btn.classList.remove('is-loading');
+          btn.innerHTML = originalHTML;
+
+          // Calcular distancia a cada tienda y actualizar referencia en storeMarkers
+          this.allStores = this.allStores.map(store => ({
+            ...store,
+            _distance: haversine(
+              this.userLocation.lat,
+              this.userLocation.lng,
+              store.address.location.latitude,
+              store.address.location.longitude
+            ),
+          }));
+
+          this.storeMarkers.forEach(sm => {
+            const updated = this.allStores.find(s => String(s.id) === String(sm.store.id));
+            if (updated) sm.store = updated;
+          });
+
+          this.applyFilters();
+
+          // Auto-seleccionar la tienda m&aacute;s cercana
+          const nearest = [...this.allStores].sort((a, b) => a._distance - b._distance)[0];
+          if (nearest) this.selectStore(nearest.id);
+        },
+        () => {
+          btn.classList.remove('is-loading');
+          btn.innerHTML = originalHTML;
+          alert('No se pudo obtener tu ubicaci\u00f3n. Verifica los permisos del navegador.');
+        },
+        { timeout: 8000, maximumAge: 60000 }
+      );
+    }
+
+    showError(msg) {
+      const skeleton = this.querySelector('.store-map-skeleton-{{ section_id }}');
+      if (skeleton) skeleton.style.display = 'none';
+
+      const err = document.createElement('div');
+      err.className = 'store-map-error-{{ section_id }}';
+      err.setAttribute('role', 'alert');
+      err.textContent = `\u26A0\uFE0F ${msg}`;
+      this.appendChild(err);
+    }
+  }
+
+  customElements.define('store-finder-{{ section_id }}', StoreFinder{{ section_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Encontrar Tienda",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titulo de la seccion",
+      "default": "Encuentra tu tienda"
+    },
+    {
+      "type": "paragraph",
+      "content": "SEGURIDAD: La API key se lee preferentemente del metafield `custom.maps_api_key` de la tienda (Admin > Configuracion > Datos personalizados > Tienda). Solo usa el campo de abajo como respaldo."
+    },
+    {
+      "type": "text",
+      "id": "google_maps_api_key",
+      "label": "Google Maps API Key (respaldo)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Estructura JSON: [{\"id\":\"1\",\"name\":\"Tienda\",\"phone\":\"+57 300 000 0000\",\"whatsapp\":\"573000000000\",\"hours\":\"Lun-Vie 9am-6pm\",\"address\":{\"street\":\"Calle 1 #2-3\",\"city\":\"Bogota\",\"location\":{\"latitude\":4.6,\"longitude\":-74.1}}}]"
+    },
+    {
+      "type": "textarea",
+      "id": "stores_json",
+      "label": "Tiendas (JSON array)"
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_marker_icon",
+      "label": "Icono de marcador personalizado"
+    },
+    {
+      "type": "range",
+      "id": "map_height",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "label": "Altura del mapa (px)",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "zoom_level",
+      "min": 1,
+      "max": 18,
+      "step": 1,
+      "label": "Zoom inicial",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "label": "Border radius (px)",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Ancho de la seccion",
+      "options": [
+        { "value": "page-width", "label": "Ancho de pagina" },
+        { "value": "full-width", "label": "Ancho completo" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [{ "name": "Encontrar Tienda" }]
+}
+{% endschema %}
