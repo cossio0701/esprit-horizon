@@ -1,0 +1,67 @@
+{{ 'gco-cookies.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="gco-cookie-banner"
+  style="opacity:0;"
+>
+  {% if section.settings.image_cookies != blank %}
+    <img
+      width="auto"
+      height="auto"
+      src="{{ section.settings.image_cookies | image_url }}"
+      class="gco-cookie-banner__icon"
+    >
+  {% endif %}
+
+  {% if section.settings.cookies_label != blank %}
+    <span class="gco-cookie-banner__label">
+      {{ section.settings.cookies_label }}
+    </span>
+  {% endif %}
+
+  <div class="gco-cookie-banner__message">
+    {{ section.settings.text_policies }}
+  </div>
+
+  <button class="gco-cookie-banner__button">
+    {{ section.settings.cookies_button_label }}
+  </button>
+</section>
+
+<script src="{{ 'gco-cookies.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "GCO Cookies popup",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_cookies",
+      "label": "Imagen / Ícono cookies"
+    },
+    {
+      "type": "text",
+      "id": "cookies_label",
+      "label": "Titulo popup",
+      "default": "Utilizamos cookies"
+    },
+    {
+      "type": "richtext",
+      "id": "text_policies",
+      "label": "Politica",
+      "default": "<p>ESPRIT usa cookies para darte la mejor experiencia de navegación. Al navegar en el sitio estas aceptando su uso, si deseas saber más acerca de nuestra política has <a href=\"/pages/terminos-condiciones?category=politica-cookies\">click aquí</a>.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cookies_button_label",
+      "label": "Texto de botón aceptar",
+      "default": "Aceptar cookies"
+    }
+  ],
+  "presets": [
+    {
+      "name": "GCO Cookies popup"
+    }
+  ]
+}
+{% endschema %}
