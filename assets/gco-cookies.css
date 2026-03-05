@@ -1,0 +1,74 @@
+.gco-cookie-banner {
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  z-index: 999;
+
+  margin: 0 auto;
+  max-width: 350px;
+  padding: 1.5rem 2.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  background-color: #f9f7f0;
+  border: 2px solid #000;
+  color: #000;
+  line-height: 1.2;
+
+  transition: opacity 0.85s ease-in-out;
+}
+
+.gco-cookie-banner__label {
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 1rem;
+}
+
+.gco-cookie-banner__message {
+  text-align: justify;
+}
+
+.gco-cookie-banner__message a {
+  color: #000;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.gco-cookie-banner__message a:visited {
+  color: #000;
+}
+
+.gco-cookie-banner__button {
+  width: 100%;
+  max-width: 300px;
+  padding: 1rem 0;
+
+  cursor: pointer;
+  border: 1px solid #000;
+
+  background: #000;
+  color: #f9f7f0;
+
+  font-weight: bold;
+  letter-spacing: 1px;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.gco-cookie-banner__button:hover {
+  background: transparent;
+  color: #000;
+}
+
+@media (min-width: 768px) {
+  .gco-cookie-banner {
+    margin: 1rem;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: auto;
+  }
+}
