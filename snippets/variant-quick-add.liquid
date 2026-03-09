@@ -80,9 +80,13 @@
           {% if variant_style == 'swatch' %}
             {% render 'swatch', swatch: product_option_value.swatch, variant_image: featured_media %}
           {% else %}
-            <span>{{ product_option_value | escape }}</span>
+            <div class="size-container">
+              <div class="size-text">
+                <span class="variant-option__button-label__text">{{ product_option_value | escape }}</span>
+                {% render 'strikethrough-variant', product_option: product_option_value %}
+              </div>
+            </div>
           {% endif %}
-          {% render 'strikethrough-variant', product_option: product_option_value %}
         </label>
       {%- endfor -%}
       {% if option_id_attribute %}

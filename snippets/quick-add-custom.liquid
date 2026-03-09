@@ -263,15 +263,33 @@
     color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
 
     cursor: pointer;
+    position: relative;
   }
 
-  .quick-add-custom__size-btn:hover:not(.is-unavailable):not(.is-selected) {
-    color: var(--color-foreground);
+  .quick-add-custom__size-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: black;
+    transition: width 0.2s ease-in-out;
+  }
+
+  .quick-add-custom__size-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+    width: 80%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
   }
 
   .quick-add-custom__size-btn.is-selected {
     color: var(--color-foreground);
     font-weight: 600;
+  }
+
+  .quick-add-custom__size-btn.is-selected::after {
+    width: 100%;
   }
 
   .quick-add-custom__size-btn.is-unavailable {
@@ -307,12 +325,27 @@
 
     /* No outline by default */
     outline: none;
-    outline-offset: 2px;
   }
 
-  .quick-add-custom__color-btn.is-selected {
-    /* Selected state - outline only */
-    outline: 1px solid var(--color-foreground);
+  .quick-add-custom__color-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: black;
+    transition: width 0.2s ease-in-out;
+  }
+
+  .quick-add-custom__color-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+    width: 60%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+  }
+
+  .quick-add-custom__color-btn.is-selected::after {
+    width: 82%;
   }
 
   .quick-add-custom__color-btn.is-unavailable {
