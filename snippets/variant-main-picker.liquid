@@ -523,11 +523,12 @@
   .variant-option__button-label--has-swatch {
     --focus-outline-radius: var(--variant-picker-swatch-radius);
 
-    padding: 0;
+    padding: 0 0 5px 0;
     border: none;
     display: block;
     flex-basis: auto;
     min-height: auto;
+    overflow: visible;
   }
 
   .variant-option__button-label:has(:checked) {
@@ -603,8 +604,8 @@
     position: absolute;
     width: 0%;
     height: 1.5px;
-    bottom: -4px;
-    background-color: black;
+    bottom: 2px;
+    background-color: var(--color-foreground, #1a1a1a);
     left: 50%;
     transform: translateX(-50%);
     transition: width 0.2s ease-in-out;
