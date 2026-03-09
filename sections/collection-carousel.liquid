@@ -47,96 +47,100 @@
 
 {% if has_carousel_items %}
   <section class="collection-carousel-section section section--{{ section_width }}">
-    <div class="swiper collection-carousel-swiper">
-      <div class="swiper-wrapper">
-        {% for item in carousel_items %}
-          {%- liquid
-            assign item_title = item.title
-            assign item_file = item.file
-            assign item_link = item.link.url
-          -%}
+    <script src="{{ 'carousel-component.js' | asset_url }}" type="module"></script>
+    <carousel-component
+      class="collection-carousel-swiper"
+      columns-desktop="{{ slides_per_view_desktop }}"
+      columns-mobile="{{ slides_per_view_mobile }}"
+      gap="{{ space_between }}"
+      show-arrows="{{ show_arrows }}"
+      show-dots="{{ show_dots }}"
+      loop="{{ loop_enabled }}"
+      autoplay="{{ autoplay_enabled }}"
+      autoplay-speed="{{ autoplay_delay }}"
+      style="
+        --slides-per-view-desktop: {{ slides_per_view_desktop }};
+        --slides-per-view-mobile: {{ slides_per_view_mobile }};
+        --carousel-gap: {{ space_between }}px;
+      "
+    >
+      <div class="carousel-scroller-wrapper">
+        <div role="list" class="carousel-scroller">
+          {% for item in carousel_items %}
+            {%- liquid
+              assign item_title = item.title
+              assign item_file = item.file
+              assign item_link = item.link.url
+            -%}
 
-          <div class="swiper-slide collection-carousel-slide">
-            {% if item_link != blank %}
-              <a href="{{ item_link }}" class="carousel-item-link">
-            {% endif %}
+            <div role="listitem" class="carousel-slide collection-carousel-slide">
+              {% if item_link != blank %}
+                <a href="{{ item_link }}" class="carousel-item-link">
+              {% endif %}
 
-            {% if item_file != blank %}
-              <div class="carousel-item-image">
-                {{ item_file | image_url: width: 800 | image_tag: loading: 'lazy', class: 'carousel-image' }}
-              </div>
-            {% endif %}
+              {% if item_file != blank %}
+                <div class="carousel-item-image">
+                  {{ item_file | image_url: width: 800 | image_tag: loading: 'lazy', class: 'carousel-image' }}
+                </div>
+              {% endif %}
 
-            {% if item_title != blank %}
-              <div class="carousel-item-title">
-                {{ item.title | metafield_tag }}
-              </div>
-            {% endif %}
+              {% if item_title != blank %}
+                <div class="carousel-item-title">
+                  {{ item.title | metafield_tag }}
+                </div>
+              {% endif %}
 
-            {% if item_link != blank %}
-              </a>
-            {% endif %}
-          </div>
-        {% endfor %}
+              {% if item_link != blank %}
+                </a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if show_arrows %}
+          <button
+            type="button"
+            name="previous"
+            class="carousel-button prev"
+            aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button
+            type="button"
+            name="next"
+            class="carousel-button next"
+            aria-label="{{ 'accessibility.slideshow_next' | t }}"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 6 15 12 9 18"></polyline>
+            </svg>
+          </button>
+        {% endif %}
       </div>
-
-      {% if show_arrows %}
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-      {% endif %}
-
-      {% if show_dots %}
-        <div class="swiper-pagination"></div>
-      {% endif %}
-    </div>
+    </carousel-component>
   </section>
 {% endif %}
-
-{%- comment -%}
-  ============================================
-    SECCIÓN 3: JAVASCRIPT Y CSS
-  ============================================
-{%- endcomment -%}
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const carouselSwiper = new Swiper('.collection-carousel-swiper', {
-      loop: {{ loop_enabled }},
-      slidesPerView: {{ slides_per_view_mobile }},
-      spaceBetween: {{ space_between }},
-      slidesOffsetBefore: 0,
-      slidesOffsetAfter: 0,
-
-      breakpoints: {
-        768: {
-          slidesPerView: {{ slides_per_view_desktop }},
-          spaceBetween: {{ space_between }}
-        }
-      },
-
-      {% if show_dots %}
-      pagination: {
-        el: '.swiper-pagination',
-        clickable: true
-      },
-      {% endif %}
-
-      {% if show_arrows %}
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev'
-      },
-      {% endif %}
-
-      {% if autoplay_enabled %}
-      autoplay: {
-        delay: {{ autoplay_delay }},
-        disableOnInteraction: false
-      }
-      {% endif %}
-    });
-  });
-</script>
 
 <style>
   .collection-carousel-section {
@@ -147,13 +151,6 @@
   .collection-carousel-swiper {
     position: relative;
     width: 100%;
-    padding-bottom: 3rem;
-  }
-
-  /* Prevenir FOUC: establecer ancho inicial de slides antes de que Swiper se inicialice */
-  .collection-carousel-swiper .swiper-wrapper {
-    display: flex;
-    gap: {{ space_between }}px;
   }
 
   .collection-carousel-slide {
@@ -161,21 +158,6 @@
     display: flex;
     flex-direction: column;
     background: transparent;
-    flex-shrink: 0;
-    /* Ancho inicial para móvil basado en slidesPerView */
-    width: calc((100% - ({{ space_between }}px * ({{ slides_per_view_mobile }} - 1))) / {{ slides_per_view_mobile }});
-  }
-
-  @media (min-width: 768px) {
-    .collection-carousel-slide {
-      /* Ancho inicial para desktop basado en slidesPerView */
-      width: calc((100% - ({{ space_between }}px * ({{ slides_per_view_desktop }} - 1))) / {{ slides_per_view_desktop }});
-    }
-  }
-
-  /* Eliminar margen del último slide visible para alineación correcta */
-  .collection-carousel-swiper .swiper-slide:last-child {
-    margin-right: 0 !important;
   }
 
   .carousel-item-link {
@@ -225,90 +207,37 @@
     background: transparent;
   }
 
-  {% if show_arrows %}
-  .collection-carousel-swiper .swiper-button-next,
-  .collection-carousel-swiper .swiper-button-prev {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    margin-top: -22px;
-    z-index: 10;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* Carousel component overrides */
+  .collection-carousel-swiper[has-arrows] .carousel-button {
     color: {{ arrows_color }};
+    background: white; /* Match Swiper's logic or preferences */
     opacity: 0.7;
     transition: opacity 0.2s;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
 
-  .collection-carousel-swiper .swiper-button-next::after,
-  .collection-carousel-swiper .swiper-button-prev::after {
-    font-family: swiper-icons;
-    font-size: 24px;
-    text-transform: none !important;
-    letter-spacing: 0;
-    font-variant: initial;
-    line-height: 1;
-  }
-
-  .collection-carousel-swiper .swiper-button-prev {
-    left: 10px;
-  }
-
-  .collection-carousel-swiper .swiper-button-next {
-    right: 10px;
-  }
-
-  .collection-carousel-swiper .swiper-button-next:hover,
-  .collection-carousel-swiper .swiper-button-prev:hover {
+  .collection-carousel-swiper[has-arrows] .carousel-button:hover {
     opacity: 1;
   }
 
-  .collection-carousel-swiper .swiper-button-disabled {
-    opacity: 0.35;
-    cursor: auto;
-    pointer-events: none;
-  }
-  {% endif %}
-
-  {% if show_dots %}
-  .collection-carousel-swiper .swiper-pagination {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .collection-carousel-swiper .swiper-pagination-bullet {
+  .collection-carousel-swiper .carousel-dots button {
+    background: transparent;
+    border-color: {{ dots_color }};
+    opacity: 0.5;
     width: 10px;
     height: 10px;
-    display: inline-block;
-    border-radius: 50%;
-    background: {{ dots_color }};
-    opacity: 0.5;
-    cursor: pointer;
     transition: opacity 0.3s, background 0.3s, transform 0.3s;
   }
 
-  .collection-carousel-swiper .swiper-pagination-bullet:hover {
-    opacity: 0.7;
-  }
-
-  .collection-carousel-swiper .swiper-pagination-bullet-active {
+  .collection-carousel-swiper .carousel-dots button[aria-selected="true"] {
     background: {{ dots_active_color }};
+    border-color: {{ dots_active_color }};
     opacity: 1;
     transform: scale(1.2);
   }
-  {% endif %}
 
   @media (max-width: 767px) {
     .carousel-item-title {
