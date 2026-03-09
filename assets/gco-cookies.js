@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const banner = document.querySelector(".gco-cookie-banner");
   const button = document.querySelector(".gco-cookie-banner__button");
 
+  if (!banner || !button) return;
+
   function setCookie(name, value, days) {
     const d = new Date();
     d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
@@ -19,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!getCookie(cookieName)) {
     banner.style.opacity = "1";
+    banner.style.pointerEvents = "auto";
   }
 
   button.addEventListener("click", function () {
@@ -39,5 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     banner.style.opacity = "0";
+    banner.style.pointerEvents = "none";
   });
 });
