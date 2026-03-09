@@ -546,7 +546,7 @@
       });
 
       const bounds = new google.maps.LatLngBounds();
-      this.infoWindow = new google.maps.InfoWindow();
+      this.infoWindow = new google.maps.InfoWindow({ maxWidth: 240 });
 
       // Corregir estilos del InfoWindow cuando el DOM este listo
       this.infoWindow.addListener('domready', () => {
@@ -660,6 +660,13 @@
       `);
 
       this.infoWindow.open(this.map, marker);
+
+      // Desplazar el mapa hacia abajo para que el InfoWindow quede visible
+      google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
+        const iwEl = document.querySelector('.gm-style-iw-c');
+        const offset = iwEl ? iwEl.offsetHeight + 60 : 180;
+        this.map.panBy(0, -offset);
+      });
     }
 
     renderSidebar(stores) {
