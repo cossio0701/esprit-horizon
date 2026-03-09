@@ -15,7 +15,7 @@
  */
 class CarouselComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['columns-desktop', 'columns-mobile', 'show-arrows', 'show-dots', 'show-thumbs-arrows', 'gap', 'loop', 'thumbs-mobile', 'thumbs-desktop'];
+        return ['columns-desktop', 'columns-mobile', 'show-arrows', 'show-dots', 'show-thumbs-arrows', 'gap', 'loop', 'thumbs-mobile', 'thumbs-desktop', 'autoplay', 'autoplay-speed'];
     }
 
     constructor() {
@@ -36,13 +36,29 @@ class CarouselComponent extends HTMLElement {
         this.clonesCount = 2; // Number of clones at each end
         /** @type {number | null} */
         this.scrollTimeout = null;
+        /** @type {number | null} */
+        this.autoplayInterval = null;
         this.isLoop = false;
         this.isJumping = false;
         this._scrollListenerAttached = false;
+        /** @type {HTMLElement[]} */
+        this.thumbs = [];
+
+        // Bind for event listeners
+        this.onMouseEnter = this.stopAutoplay.bind(this);
+        this.onMouseLeave = this.startAutoplay.bind(this);
     }
 
     connectedCallback() {
         this.init();
+        this.addEventListener('mouseenter', this.onMouseEnter);
+        this.addEventListener('mouseleave', this.onMouseLeave);
+    }
+
+    disconnectedCallback() {
+        this.stopAutoplay();
+        this.removeEventListener('mouseenter', this.onMouseEnter);
+        this.removeEventListener('mouseleave', this.onMouseLeave);
     }
 
     /**
@@ -65,6 +81,11 @@ class CarouselComponent extends HTMLElement {
 
         if (name === 'loop') {
             this.init(); // Re-init to handle cloning
+            return;
+        }
+
+        if (name === 'autoplay' || name === 'autoplay-speed') {
+            this.startAutoplay();
             return;
         }
 
@@ -110,8 +131,14 @@ class CarouselComponent extends HTMLElement {
         }
 
         // Always re-attach click listeners since buttons may be new DOM nodes after a morph
-        if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.scrollStep(-1));
-        if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.scrollStep(1));
+        if (this.prevBtn) this.prevBtn.addEventListener('click', () => {
+            this.stopAutoplay();
+            this.scrollStep(-1);
+        });
+        if (this.nextBtn) this.nextBtn.addEventListener('click', () => {
+            this.stopAutoplay();
+            this.scrollStep(1);
+        });
 
         if (this.isLoop) {
             requestAnimationFrame(() => {
@@ -121,8 +148,37 @@ class CarouselComponent extends HTMLElement {
 
         this.updateControls();
 
+        // Autoplay init
+        this.startAutoplay();
+
         // Always call renderAttributes last, after all DOM is built
         this.renderAttributes();
+    }
+
+    startAutoplay() {
+        this.stopAutoplay();
+        if (this.getAttribute('autoplay') !== 'true' || this.originalCount <= 1) return;
+
+        const speed = parseInt(this.getAttribute('autoplay-speed') || '5000', 10);
+        this.autoplayInterval = window.setInterval(() => {
+            if (this.isLoop) {
+                this.scrollStep(1);
+            } else {
+                // If not loop, go back to start at the end
+                if (this.logicalIndex >= this.originalCount - 1) {
+                    this.scrollToLogicalIndex(0);
+                } else {
+                    this.scrollStep(1);
+                }
+            }
+        }, speed);
+    }
+
+    stopAutoplay() {
+        if (this.autoplayInterval) {
+            window.clearInterval(this.autoplayInterval);
+            this.autoplayInterval = null;
+        }
     }
 
     buildDots() {
