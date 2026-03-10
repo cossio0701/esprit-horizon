@@ -1,10 +1,7 @@
 {% liquid
   assign tab_id = 'ui-tab-' | append: block.id
   assign panel_id = 'ui-panel-' | append: block.id
-  assign tab_label = block.settings.label
-  if tab_label == blank
-    assign tab_label = block.settings.title
-  endif
+  assign tab_label = block.settings.title
   if tab_label == blank
     assign tab_label = block.settings.heading
   endif
@@ -41,8 +38,8 @@
   "settings": [
     {
       "type": "text",
-      "id": "label",
-      "label": "Tab label",
+      "id": "title",
+      "label": "Title",
       "default": "Tab"
     }
   ],
