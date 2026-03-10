@@ -34,8 +34,8 @@
   }
 
   .cart-title .cart-bubble[data-maintain-ratio] {
-    aspect-ratio: 1;
-    min-width: 26px;
+    width: min(1lh, 26px);
+    height: min(1lh, 26px);
   }
 
   .cart-title .cart-bubble__background {
@@ -45,7 +45,8 @@
   .cart-title .cart-bubble__text {
     color: var(--color-foreground);
     font-family: var(--font-paragraph--family);
-    font-size: clamp(var(--cart-font-size--2xs), 0.7lh, var(--cart-font-size--xs));
+    font-weight: var(--font-paragraph--weight);
+    font-size: clamp(var(--font-size--3xs), 0.75em, var(--font-size--xs));
   }
 {% endstylesheet %}
 
