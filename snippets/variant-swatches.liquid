@@ -3,6 +3,7 @@
 
   @param {object} product_resource - The product object, which contains variants and options.
   @param {boolean} [has_option_selected] - Whether an option is already selected.
+  @param {boolean} [only_color] - Whether to only show the color option.
 
   @example
   {% render 'variant-swatches', product_resource: product %}
@@ -17,9 +18,16 @@
     {%- for product_option in product_resource.options_with_values -%}
       {%- liquid
         assign swatch_count = product_option.values | map: 'swatch' | compact | size
+        assign option_name_lower = product_option.name | downcase
       -%}
 
-      {% if swatch_count == 0 %}
+      {% if only_color %}
+        {% unless option_name_lower contains 'color' or option_name_lower contains 'colour' or swatch_count > 0 %}
+          {% continue %}
+        {% endunless %}
+      {% endif %}
+
+      {% if swatch_count == 0 and only_color != true %}
         {% continue %}
       {% endif %}
 

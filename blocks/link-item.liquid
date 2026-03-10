@@ -1,0 +1,101 @@
+
+{% liquid
+  assign block_settings = block.settings
+%}
+
+<li class="menu__item custom-link-list__item" {{ block.shopify_attributes }}>
+  <a href="{{ block_settings.link }}" 
+     class="custom-link-list__link"
+     style="{% if block_settings.link_color != blank %}color: {{ block_settings.link_color }};{% endif %}"
+     {% if block_settings.open_in_new_tab %}target="_blank" rel="noopener"{% endif %}>
+    
+    {% if block_settings.icon != 'none' or block_settings.image_upload != blank %}
+      <span class="custom-link-list__icon" style="--icon-width: {{ block_settings.icon_size }}px;">
+        {% render 'icon-or-image',
+          icon: block_settings.icon,
+          image_upload: block_settings.image_upload,
+          width: block_settings.icon_size,
+          class_name: 'icon-item'
+        %}
+      </span>
+    {% endif %}
+    
+    <span class="custom-link-list__text">{{ block_settings.text }}</span>
+  </a>
+</li>
+
+{% schema %}
+{
+  "name": "Link Item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:settings.icon",
+      "options": [
+        { "value": "none", "label": "t:options.none" },
+        { "value": "apple", "label": "t:options.apple" },
+        { "value": "arrow", "label": "t:options.arrow" },
+        { "value": "chat_bubble", "label": "t:options.chat_bubble" },
+        { "value": "facebook", "label": "t:options.social_facebook" },
+        { "value": "instagram", "label": "t:options.social_instagram" },
+        { "value": "linkedin", "label": "t:options.social_linkedin" },
+        { "value": "map_pin", "label": "t:options.map_pin" },
+        { "value": "pinterest", "label": "t:options.social_pinterest" },
+        { "value": "tiktok", "label": "t:options.social_tiktok" },
+        { "value": "twitter", "label": "t:options.social_twitter" },
+        { "value": "whatsapp", "label": "t:options.social_whatsapp" },
+        { "value": "youtube", "label": "t:options.social_youtube" },
+        { "value": "return", "label": "t:options.return" },
+        { "value": "truck", "label": "t:options.truck" },
+        { "value": "phone", "label": "t:options.phone" },
+        { "value": "email", "label": "t:options.email" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_upload",
+      "label": "t:settings.image_icon"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "t:settings.width",
+      "min": 12,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Link Label"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "t:settings.open_new_tab",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "t:settings.color"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Link Item"
+    }
+  ]
+}
+{% endschema %}

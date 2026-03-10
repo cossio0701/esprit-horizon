@@ -433,6 +433,17 @@ class DropdownLocalizationComponent extends Component {
     document.addEventListener('click', this.#handleClickOutside);
 
     this.refs.panel.removeAttribute('hidden');
+
+    // Detect and fix viewport overflow
+    const rect = this.refs.panel.getBoundingClientRect();
+    if (rect.left < 0) {
+      this.refs.panel.classList.remove('right-bound');
+      this.refs.panel.classList.add('left-bound');
+    } else if (rect.right > window.innerWidth) {
+      this.refs.panel.classList.remove('left-bound');
+      this.refs.panel.classList.add('right-bound');
+    }
+
     this.refs.button.setAttribute('aria-expanded', 'true');
 
     onAnimationEnd(this.refs.panel, () => {
