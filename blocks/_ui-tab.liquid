@@ -1,0 +1,55 @@
+{% liquid
+  assign tab_id = 'ui-tab-' | append: block.id
+  assign panel_id = 'ui-panel-' | append: block.id
+  assign tab_label = block.settings.label
+  if tab_label == blank
+    assign tab_label = block.settings.title
+  endif
+  if tab_label == blank
+    assign tab_label = block.settings.heading
+  endif
+  if tab_label == blank
+    assign tab_label = block.name
+  endif
+  if tab_label == blank
+    assign tab_label = 'Tab'
+  endif
+%}
+
+<section
+  id="{{ panel_id }}"
+  class="ui-tabs__panel"
+  role="tabpanel"
+  data-panel
+  data-panel-id="{{ panel_id }}"
+  data-tab-id="{{ tab_id }}"
+  data-tab-label="{{ tab_label | escape }}"
+  aria-labelledby="{{ tab_id }}"
+  {{ block.shopify_attributes }}
+>
+  {% content_for 'blocks' %}
+</section>
+
+{% schema %}
+{
+  "name": "UI Tab",
+  "tag": null,
+  "blocks": [
+    { "type": "@theme" },
+    { "type": "@app" }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Tab label",
+      "default": "Tab"
+    }
+  ],
+  "presets": [
+    {
+      "name": "UI Tab"
+    }
+  ]
+}
+{% endschema %}

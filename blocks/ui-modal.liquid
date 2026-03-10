@@ -1,0 +1,207 @@
+{% liquid
+  assign modal_id = 'ui-modal-' | append: block.id
+  assign title_id = modal_id | append: '-title'
+%}
+
+{{ 'modal.js' | asset_url | script_tag }}
+{{ 'modal.css' | asset_url | stylesheet_tag }}
+
+<div
+  id="{{ modal_id }}"
+  class="ui-modal ui-modal--{{ block.settings.size }}"
+  data-modal
+  data-modal-close-overlay="{{ block.settings.close_on_overlay }}"
+  data-modal-close-esc="{{ block.settings.close_on_escape }}"
+  style="
+    --ui-modal-title-size: {{ block.settings.title_font_size }}px;
+    --ui-modal-trigger-text-size: {{ block.settings.trigger_font_size }}px;
+    --ui-modal-trigger-bg: {{ block.settings.trigger_background_color }};
+    --ui-modal-trigger-color: {{ block.settings.trigger_text_color }};
+    --ui-modal-trigger-border-color: {{ block.settings.trigger_border_color }};
+    --ui-modal-trigger-border-width: {{ block.settings.trigger_border_width }}px;
+    --ui-modal-trigger-radius: {{ block.settings.trigger_border_radius }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.show_trigger %}
+  <button
+    type="button"
+    class="ui-modal__trigger"
+    data-modal-trigger="{{ modal_id }}"
+    aria-haspopup="dialog"
+    aria-controls="{{ modal_id }}"
+    aria-expanded="false"
+  >
+    {{ block.settings.trigger_label | escape }}
+  </button>
+  {% endif %}
+
+  <div class="ui-modal__overlay" data-modal-overlay hidden>
+    <div
+      class="ui-modal__dialog"
+      data-modal-dialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="{{ title_id }}"
+      tabindex="-1"
+    >
+      <header class="ui-modal__header">
+        <h2 id="{{ title_id }}" class="ui-modal__title">{{ block.settings.title | escape }}</h2>
+        <button type="button" class="ui-modal__close" data-modal-close aria-label="{{ 'accessibility.close' | t }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </header>
+
+      <div class="ui-modal__body">
+        {% content_for 'blocks' %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if block.settings.custom_css != blank %}
+  {% liquid
+    assign modal_scope = '#' | append: modal_id
+    assign scoped_custom_css = block.settings.custom_css | replace: '&', modal_scope
+  %}
+  <style>
+    {{ scoped_custom_css }}
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "UI Modal",
+  "tag": null,
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Trigger"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trigger",
+      "label": "Show trigger button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trigger_label",
+      "label": "Trigger label",
+      "default": "Open modal"
+    },
+    {
+      "type": "range",
+      "id": "trigger_font_size",
+      "label": "Trigger text size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "trigger_background_color",
+      "label": "Trigger background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "trigger_text_color",
+      "label": "Trigger text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "trigger_border_color",
+      "label": "Trigger border color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "trigger_border_width",
+      "label": "Trigger border width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "trigger_border_radius",
+      "label": "Trigger border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Title"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Modal title"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title size",
+      "min": 12,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Modal"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Modal size",
+      "default": "medium",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "fullscreen", "label": "Fullscreen" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "close_on_overlay",
+      "label": "Close on overlay click",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "close_on_escape",
+      "label": "Close on Escape",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS",
+      "info": "Usa '&' para referirte a esta instancia. Ej: '& .ui-modal__trigger { color: red; }'"
+    }
+  ],
+  "presets": [
+    {
+      "name": "UI Modal"
+    }
+  ]
+}
+{% endschema %}
