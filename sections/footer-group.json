@@ -15,11 +15,11 @@
       "type": "registration-modal",
       "name": "Registration Modal",
       "settings": {
-        "heading": "Crear cuenta",
         "legal_text": "He leído y acepto la",
         "legal_link_text": "Política de Tratamiento de Datos Personales.",
         "legal_link": "shopify://pages/terminos-condiciones",
-        "button_text": "Suscribirse"
+        "button_text": "Suscribirse",
+        "close_color_on_image": ""
       }
     },
     "section_843EVi": {
@@ -514,10 +514,9 @@
       "type": "footer",
       "blocks": {
         "menu_bMqiN6": {
-          "type": "menu",
-          "name": "t:names.menu",
+          "type": "custom-link-list",
+          "name": "Ayuda",
           "settings": {
-            "menu": "ayuda",
             "heading": "Ayuda",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -526,19 +525,76 @@
             "inherit_color_scheme": true,
             "color_scheme": "",
             "heading_preset": "h5",
-            "link_preset": "paragraph",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "link_item_rajhjh": {
+              "type": "link-item",
+              "name": "Guía de tallas",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Guía de tallas",
+                "link": "/",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_PdWge9": {
+              "type": "link-item",
+              "name": "¿Cómo comprar?",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "¿Cómo comprar?",
+                "link": "/pages/terminos-condiciones?category=como-comprar",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_Trn7eM": {
+              "type": "link-item",
+              "name": "Preguntas frecuentes",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Preguntas frecuentes",
+                "link": "/",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_cBYPmd": {
+              "type": "link-item",
+              "name": "Estado de mis PQRs",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Estado de mis PQRs",
+                "link": "shopify://pages/estado-pqrs",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "link_item_rajhjh",
+            "link_item_PdWge9",
+            "link_item_Trn7eM",
+            "link_item_cBYPmd"
+          ]
         },
         "menu_8Yi6EU": {
-          "type": "menu",
-          "name": "t:names.menu",
+          "type": "custom-link-list",
+          "name": "Sobre Nosotros",
           "settings": {
-            "menu": "sobre-nosotros",
             "heading": "Sobre Nosotros",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -547,19 +603,62 @@
             "inherit_color_scheme": true,
             "color_scheme": "",
             "heading_preset": "h5",
-            "link_preset": "paragraph",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "link_item_KiABgc": {
+              "type": "link-item",
+              "name": "Historia de la marca",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Historia de la marca",
+                "link": "shopify://pages/history",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_6yzfth": {
+              "type": "link-item",
+              "name": "Mapa del sitio",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Mapa del sitio",
+                "link": "shopify://pages/site-map",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_7WXkbH": {
+              "type": "link-item",
+              "name": "Nuestras tiendas",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Nuestras tiendas",
+                "link": "shopify://pages/encuentra-tu-tienda",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "link_item_KiABgc",
+            "link_item_6yzfth",
+            "link_item_7WXkbH"
+          ]
         },
         "menu_3FnwKQ": {
-          "type": "menu",
-          "name": "t:names.menu",
+          "type": "custom-link-list",
+          "name": "Información",
           "settings": {
-            "menu": "informacion",
             "heading": "Información",
             "menu_spacing": 12,
             "show_as_accordion": true,
@@ -568,34 +667,149 @@
             "inherit_color_scheme": true,
             "color_scheme": "",
             "heading_preset": "h5",
-            "link_preset": "paragraph",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "link_item_ALaxmg": {
+              "type": "link-item",
+              "name": "Términos y condiciones",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Términos y condiciones",
+                "link": "/pages/terminos-condiciones?category=terminos-condiciones",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_y8qRpD": {
+              "type": "link-item",
+              "name": "Promociones",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Promociones",
+                "link": "/pages/terminos-condiciones?category=promociones",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_TWpAQz": {
+              "type": "link-item",
+              "name": "Política de cookies",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Política de cookies",
+                "link": "/pages/terminos-condiciones?category=politica-cookies",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_f9p3kB": {
+              "type": "link-item",
+              "name": "Garantías",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Garantías",
+                "link": "/pages/terminos-condiciones?category=garantias",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_NzfQ8V": {
+              "type": "link-item",
+              "name": "Política de tratamiento de datos personales",
+              "settings": {
+                "icon": "none",
+                "icon_size": 20,
+                "text": "Política de tratamiento de datos personales",
+                "link": "/pages/terminos-condiciones?category=politica-datos-personales",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "link_item_ALaxmg",
+            "link_item_y8qRpD",
+            "link_item_TWpAQz",
+            "link_item_f9p3kB",
+            "link_item_NzfQ8V"
+          ]
         },
         "menu_ehrkE6": {
-          "type": "menu",
-          "name": "t:names.menu",
+          "type": "custom-link-list",
+          "name": "Contacto",
           "settings": {
-            "menu": "contacto",
             "heading": "Contacto",
             "menu_spacing": 12,
-            "show_as_accordion": true,
+            "show_as_accordion": false,
             "accordion_icon": "plus",
             "accordion_dividers": true,
             "inherit_color_scheme": true,
             "color_scheme": "",
             "heading_preset": "h5",
-            "link_preset": "paragraph",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {
+            "link_item_qVH9qX": {
+              "type": "link-item",
+              "name": "Whatsapp",
+              "settings": {
+                "icon": "whatsapp",
+                "icon_size": 20,
+                "text": "Whatsapp",
+                "link": "https://wa.link/jhyooy",
+                "open_in_new_tab": true,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_HajcGf": {
+              "type": "link-item",
+              "name": "Cambios, garantías y PQRs",
+              "settings": {
+                "icon": "return",
+                "icon_size": 20,
+                "text": "Cambios, garantías y PQRs",
+                "link": "/pages/ayuda-pqr",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            },
+            "link_item_VN7CPq": {
+              "type": "link-item",
+              "name": "servicioalcliente@esprit.shop",
+              "settings": {
+                "icon": "chat_bubble",
+                "icon_size": 20,
+                "text": "servicioalcliente@esprit.shop",
+                "link": "mailto:servicioalcliente@esprit.shop",
+                "open_in_new_tab": false,
+                "link_color": ""
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "link_item_qVH9qX",
+            "link_item_HajcGf",
+            "link_item_VN7CPq"
+          ]
         }
       },
       "block_order": [

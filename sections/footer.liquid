@@ -70,12 +70,13 @@
 
   @media screen and (min-width: 990px) {
     .footer-content {
-      grid-template-columns: repeat(var(--grid-columns), 1fr);
+      grid-template-columns: repeat(var(--grid-columns), auto);
+      justify-content: space-between;
     }
 
     /* Single item centered */
     .footer-content[style*='--grid-columns: 1'] {
-      justify-items: center;
+      justify-content: center;
     }
 
     .footer-content--isolated-grid-item-desktop > :last-child {
@@ -110,6 +111,9 @@
     },
     {
       "type": "image"
+    },
+    {
+      "type": "custom-link-list"
     },
     {
       "type": "menu"
