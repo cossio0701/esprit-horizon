@@ -272,7 +272,7 @@
               "block_order": []
             },
             "size_guide_WFhmCy": {
-              "type": "size-guide",
+              "type": "_size-guide",
               "name": "Size Guide",
               "settings": {
                 "button_label": "Guia de tallas",
