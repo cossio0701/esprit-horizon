@@ -276,19 +276,19 @@
               "name": "UI Modal",
               "settings": {
                 "show_trigger": true,
-                "trigger_label": "Open modal",
-                "trigger_font_size": 16,
+                "trigger_label": "Guía de tallas",
+                "trigger_font_size": 14,
                 "trigger_background_color": "#ffffff",
                 "trigger_text_color": "#111111",
                 "trigger_border_color": "#111111",
-                "trigger_border_width": 1,
+                "trigger_border_width": 2,
                 "trigger_border_radius": 0,
-                "title": "Modal title",
-                "title_font_size": 24,
-                "size": "medium",
+                "title": "GUÍA DE TALLAS",
+                "title_font_size": 30,
+                "size": "large",
                 "close_on_overlay": true,
                 "close_on_escape": true,
-                "custom_css": ""
+                "custom_css": ".ui-modal__title {\n    margin: 10px 0 !important;\n  }\n.ui-modal__trigger {\n  padding: 0 18px;\n}"
               },
               "blocks": {}
             },
