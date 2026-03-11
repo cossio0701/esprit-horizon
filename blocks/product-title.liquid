@@ -90,6 +90,17 @@
       height: 20px;
     }
   }
+
+  /* Title truncation - 2 lines max with ellipsis */
+  .product-card .product-title-row__link .text-block > p,
+  .product-card .product-title-row .text-block > p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 {% endstylesheet %}
 
 {% javascript %}
