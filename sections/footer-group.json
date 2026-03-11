@@ -15,8 +15,8 @@
       "type": "registration-modal",
       "name": "Registration Modal",
       "settings": {
-        "legal_text": "He le\u00eddo y acepto la",
-        "legal_link_text": "Pol\u00edtica de Tratamiento de Datos Personales.",
+        "legal_text": "He leído y acepto la",
+        "legal_link_text": "Política de Tratamiento de Datos Personales.",
         "legal_link": "shopify://pages/terminos-condiciones",
         "button_text": "Suscribirse",
         "close_color_on_image": ""
@@ -29,7 +29,7 @@
           "type": "ai_gen_block_8969bbd",
           "name": "Custom text",
           "settings": {
-            "text": "B\u00daSQUEDAS EN TENDENCIA",
+            "text": "BÚSQUEDAS EN TENDENCIA",
             "enable_line_breaks": false,
             "custom_break_marker": "",
             "font_size": 16,
@@ -358,18 +358,20 @@
                   "type": "text",
                   "name": "Title",
                   "settings": {
-                    "text": "<p>\u00a1Aprovecha un 25% de descuento al registrarte en nuestra Newsletter!</p>",
+                    "text": "<p>¡Aprovecha un 25% de descuento al registrarte en nuestra Newsletter!</p>",
                     "enable_collapse": false,
                     "collapsed_height": 50,
-                    "show_more_text": "Ver m\u00e1s",
+                    "show_more_text": "Ver más",
                     "show_less_text": "Ver menos",
                     "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
+                    "use_mobile_font_size": false,
                     "type_preset": "custom",
                     "font": "var(--font-accent--family)",
                     "font_size": "1.125rem",
+                    "font_size_mobile": "1rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -394,18 +396,20 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Obt\u00e9n un 25% de descuento en tu primera compra y s\u00e9 el primero en conocer nuestros eventos, contenido exclusivo y precios especiales.</p>",
+                    "text": "<p>Obtén un 25% de descuento en tu primera compra y sé el primero en conocer nuestros eventos, contenido exclusivo y precios especiales.</p>",
                     "enable_collapse": false,
                     "collapsed_height": 50,
-                    "show_more_text": "Ver m\u00e1s",
+                    "show_more_text": "Ver más",
                     "show_less_text": "Ver menos",
                     "enable_fade": true,
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
+                    "use_mobile_font_size": false,
                     "type_preset": "custom",
                     "font": "var(--font-body--family)",
                     "font_size": "1rem",
+                    "font_size_mobile": "1rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -433,7 +437,7 @@
                     "label": "suscribirme",
                     "bg_color": "#000000",
                     "text_color": "#ffffff",
-                    "font_size": 18,
+                    "font_size": 16,
                     "uppercase": true,
                     "padding_block": 10,
                     "padding_inline": 16
@@ -514,11 +518,11 @@
           "blocks": {
             "link_item_rajhjh": {
               "type": "link-item",
-              "name": "Gu\u00eda de tallas",
+              "name": "Guía de tallas",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "Gu\u00eda de tallas",
+                "text": "Guía de tallas",
                 "link": "/",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -527,11 +531,11 @@
             },
             "link_item_PdWge9": {
               "type": "link-item",
-              "name": "\u00bfC\u00f3mo comprar?",
+              "name": "¿Cómo comprar?",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "\u00bfC\u00f3mo comprar?",
+                "text": "¿Cómo comprar?",
                 "link": "/pages/terminos-condiciones?category=como-comprar",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -638,9 +642,9 @@
         },
         "menu_3FnwKQ": {
           "type": "custom-link-list",
-          "name": "Informaci\u00f3n",
+          "name": "Información",
           "settings": {
-            "heading": "Informaci\u00f3n",
+            "heading": "Información",
             "menu_spacing": 12,
             "show_as_accordion": true,
             "accordion_icon": "plus",
@@ -656,11 +660,11 @@
           "blocks": {
             "link_item_ALaxmg": {
               "type": "link-item",
-              "name": "T\u00e9rminos y condiciones",
+              "name": "Términos y condiciones",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "T\u00e9rminos y condiciones",
+                "text": "Términos y condiciones",
                 "link": "/pages/terminos-condiciones?category=terminos-condiciones",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -682,11 +686,11 @@
             },
             "link_item_TWpAQz": {
               "type": "link-item",
-              "name": "Pol\u00edtica de cookies",
+              "name": "Política de cookies",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "Pol\u00edtica de cookies",
+                "text": "Política de cookies",
                 "link": "/pages/terminos-condiciones?category=politica-cookies",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -695,11 +699,11 @@
             },
             "link_item_f9p3kB": {
               "type": "link-item",
-              "name": "Garant\u00edas",
+              "name": "Garantías",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "Garant\u00edas",
+                "text": "Garantías",
                 "link": "/pages/terminos-condiciones?category=garantias",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -708,11 +712,11 @@
             },
             "link_item_NzfQ8V": {
               "type": "link-item",
-              "name": "Pol\u00edtica de tratamiento de datos personales",
+              "name": "Política de tratamiento de datos personales",
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "Pol\u00edtica de tratamiento de datos personales",
+                "text": "Política de tratamiento de datos personales",
                 "link": "/pages/terminos-condiciones?category=politica-datos-personales",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -761,11 +765,11 @@
             },
             "link_item_HajcGf": {
               "type": "link-item",
-              "name": "Cambios, garant\u00edas y PQRs",
+              "name": "Cambios, garantías y PQRs",
               "settings": {
                 "icon": "return",
                 "icon_size": 20,
-                "text": "Cambios, garant\u00edas y PQRs",
+                "text": "Cambios, garantías y PQRs",
                 "link": "/pages/ayuda-pqr",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -815,13 +819,13 @@
         "ai_gen_block_bc699b9_akw8am": {
           "type": "ai_gen_block_bc699b9",
           "settings": {
-            "company_line_1": "COMOD\u00cdN S.A.S / NIT:800069933-6",
-            "company_line_2": "Calle 14 # 52 A 37 Medell\u00edn, Colombia",
+            "company_line_1": "COMODÍN S.A.S / NIT:800069933-6",
+            "company_line_2": "Calle 14 # 52 A 37 Medellín, Colombia",
             "icon_size": 150,
             "center_line_1": "",
             "center_line_2": "",
             "center_text_size": 10,
-            "copyright_text": "\u00a9 2025 ESPRIT, todos los derechos reservados",
+            "copyright_text": "© 2025 ESPRIT, todos los derechos reservados",
             "instagram_url": "#",
             "tiktok_url": "#",
             "facebook_url": "#",
