@@ -593,7 +593,7 @@
                         "width": "fit-content",
                         "max_width": "normal",
                         "alignment": "left",
-                        "use_mobile_font_size": false,
+                        "use_mobile_font_size": true,
                         "type_preset": "custom",
                         "font": "var(--font-accent--family)",
                         "font_size": "1.125rem",
@@ -742,11 +742,11 @@
                         "width": "100%",
                         "max_width": "none",
                         "alignment": "left",
-                        "use_mobile_font_size": false,
+                        "use_mobile_font_size": true,
                         "type_preset": "custom",
                         "font": "var(--font-body--family)",
                         "font_size": "1rem",
-                        "font_size_mobile": "1rem",
+                        "font_size_mobile": "0.875rem",
                         "line_height": "normal",
                         "letter_spacing": "tight",
                         "case": "none",
@@ -1192,9 +1192,9 @@
                             "background": false,
                             "background_color": "#00000026",
                             "corner_radius": 0,
-                            "padding-block-start": 4,
+                            "padding-block-start": 5,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1218,7 +1218,7 @@
                             "color": "var(--color-foreground)",
                             "padding-block-start": 0,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1281,9 +1281,9 @@
                             "background": false,
                             "background_color": "#00000026",
                             "corner_radius": 0,
-                            "padding-block-start": 4,
+                            "padding-block-start": 5,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1307,7 +1307,7 @@
                             "color": "var(--color-foreground)",
                             "padding-block-start": 0,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1407,7 +1407,7 @@
                             "corner_radius": 0,
                             "padding-block-start": 4,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1431,7 +1431,7 @@
                             "color": "var(--color-foreground)",
                             "padding-block-start": 0,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1496,7 +1496,7 @@
                             "corner_radius": 0,
                             "padding-block-start": 4,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
@@ -1520,7 +1520,7 @@
                             "color": "var(--color-foreground)",
                             "padding-block-start": 0,
                             "padding-block-end": 0,
-                            "padding-inline-start": 0,
+                            "padding-inline-start": 5,
                             "padding-inline-end": 0
                           },
                           "blocks": {}
