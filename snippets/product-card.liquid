@@ -146,6 +146,10 @@
     "
   >
     {{ children }}
+    
+    <div class="product-card-swatches mobile-only">
+      {%- render 'variant-swatches', product_resource: product, only_color: true -%}
+    </div>
   </div>
 </product-card>
 {%- if settings.transition_to_main_product -%}
@@ -153,6 +157,84 @@
 {%- endif -%}
 
 {% stylesheet %}
+  .mobile-only {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mobile-only {
+      display: block;
+    }
+  }
+
+  /* Product Card - compact color swatches (matching carousel style) */
+  .product-card .product-card-swatches {
+    padding-top: 4px;
+    padding-bottom: 8px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches .variant-option {
+    margin-bottom: 0;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches .variant-option__swatch {
+    margin-bottom: 0;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches .variant-option__button-label--has-swatch {
+    width: 16px;
+    height: 24px;
+    border-radius: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches .swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 0 !important;
+    display: block;
+    flex: 0 0 16px;
+  }
+
+  /* Active swatch underline */
+  .product-card .product-card-swatches .variant-option__button-label--has-swatch:has(input:checked)::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1.5px;
+    background-color: var(--color-foreground, #1a1a1a);
+    z-index: 3;
+  }
+
+  .product-card .product-card-swatches swatches-variant-picker-component form {
+    padding-bottom: 0px;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches .overflow-list__container {
+    gap: 10px;
+    overflow: visible;
+  }
+
+  .product-card .product-card-swatches overflow-list {
+    display: block;
+    overflow: visible;
+  }
+
   product-card-link,
   :not(product-card-link) product-card {
     width: 100%;

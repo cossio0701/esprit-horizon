@@ -97,6 +97,40 @@
   .hidden-swatches__count:hover {
     color: var(--color-foreground-rgb);
   }
+
+  /* Product Card - compact color swatches (matching carousel style) */
+  .product-card product-swatches .variant-option__button-label--has-swatch {
+    width: 16px;
+    height: 24px;
+    border-radius: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+
+  .product-card product-swatches .swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 0 !important;
+    display: block;
+    flex: 0 0 16px;
+  }
+
+  /* Active swatch underline */
+  .product-card product-swatches .variant-option__button-label--has-swatch:has(input:checked)::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1.5px;
+    background-color: var(--color-foreground, #1a1a1a);
+    z-index: 3;
+  }
 {% endstylesheet %}
 
 {% schema %}
