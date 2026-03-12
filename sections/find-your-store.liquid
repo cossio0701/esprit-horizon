@@ -309,132 +309,151 @@
   .store-map-debug-badge-{{ section_id }}.error  { background: #fee2e2; color: #991b1b; }
 {% endstyle %}
 
-<div class="section section--{{ section.settings.section_width }} spacing-style" style="{%- render 'spacing-style', settings: section.settings -%}">
-
-{% if section.settings.title != blank %}
-  <h2 class="store-map-title-{{ section_id }}">{{ section.settings.title | escape }}</h2>
-{% endif %}
-
-{% if request.design_mode %}
-  {%- comment -%} Determinar fuente y estado de la API key {%- endcomment -%}
-  {% if shop.metafields.custom.maps_api_key != blank %}
-    {% assign key_source  = 'Metafield — shop.metafields.custom.maps_api_key' %}
-    {% assign key_badge   = 'ok' %}
-    {% assign key_label   = 'OK' %}
-  {% elsif section.settings.google_maps_api_key != blank %}
-    {% assign key_source  = 'Configuracion de seccion (respaldo)' %}
-    {% assign key_badge   = 'warn' %}
-    {% assign key_label   = 'ADVERTENCIA' %}
-  {% else %}
-    {% assign key_source  = 'Sin configurar' %}
-    {% assign key_badge   = 'error' %}
-    {% assign key_label   = 'ERROR' %}
-  {% endif %}
-
-  {%- comment -%} Mostrar primeros 8 caracteres enmascarados {%- endcomment -%}
-  {% if api_key != blank %}
-    {% assign key_preview = api_key | slice: 0, 8 | append: '••••••••••••' %}
-  {% else %}
-    {% assign key_preview = '—' %}
-  {% endif %}
-
-  {%- comment -%} Validar JSON de tiendas {%- endcomment -%}
-  {% assign json_first_char = section.settings.stores_json | strip | slice: 0, 1 %}
-  {% if section.settings.stores_json == blank %}
-    {% assign json_badge = 'error' %}
-    {% assign json_label = 'ERROR' %}
-    {% assign json_msg   = 'Sin JSON configurado' %}
-  {% elsif json_first_char == '[' %}
-    {% assign json_badge = 'ok' %}
-    {% assign json_label = 'OK' %}
-    {% assign json_msg   = 'Formato valido (array) — validacion completa en el navegador' %}
-  {% else %}
-    {% assign json_badge = 'error' %}
-    {% assign json_label = 'ERROR' %}
-    {% assign json_msg   = 'El JSON no comienza con [ — debe ser un array' %}
-  {% endif %}
-
-  <div class="store-map-debug-{{ section_id }}" aria-label="Panel de diagnostico">
-    <div class="store-map-debug-header-{{ section_id }}">
-      &#128270; Diagnostico de seccion &mdash; solo visible en el editor
-    </div>
-    <div class="store-map-debug-body-{{ section_id }}">
-      <div class="store-map-debug-row-{{ section_id }}">
-        <span class="store-map-debug-label-{{ section_id }}">API Key</span>
-        <span class="store-map-debug-value-{{ section_id }}">
-          <span class="store-map-debug-badge-{{ section_id }} {{ key_badge }}">{{ key_label }}</span>
-          &nbsp;{{ key_source }}
-        </span>
-      </div>
-      <div class="store-map-debug-row-{{ section_id }}">
-        <span class="store-map-debug-label-{{ section_id }}">Preview</span>
-        <span class="store-map-debug-value-{{ section_id }}">{{ key_preview }}</span>
-      </div>
-      <div class="store-map-debug-row-{{ section_id }}">
-        <span class="store-map-debug-label-{{ section_id }}">JSON</span>
-        <span class="store-map-debug-value-{{ section_id }}">
-          <span class="store-map-debug-badge-{{ section_id }} {{ json_badge }}">{{ json_label }}</span>
-          &nbsp;{{ json_msg }}
-        </span>
-      </div>
-    </div>
-  </div>
-{% endif %}
-
-<store-finder-{{ section_id }}
-  class="store-map-container-{{ section_id }}"
-  data-api-key="{{ api_key }}"
-  data-stores='{{ section.settings.stores_json | escape }}'
-  data-marker-icon="{{ section.settings.custom_marker_icon | image_url }}"
-  data-zoom="{{ section.settings.zoom_level }}"
+<div
+  class="section section--{{ section.settings.section_width }} spacing-style"
+  style="{%- render 'spacing-style', settings: section.settings -%}"
 >
-  <!-- Skeleton: visible por defecto, se oculta cuando el mapa carga -->
-  <div class="store-map-skeleton-{{ section_id }}" aria-hidden="true">
-    <div class="store-map-skeleton-map-{{ section_id }}"></div>
-    <div class="store-map-skeleton-side-{{ section_id }}">
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
-      <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
-    </div>
-  </div>
+  {% if section.settings.title != blank %}
+    <h2 class="store-map-title-{{ section_id }}">{{ section.settings.title | escape }}</h2>
+  {% endif %}
 
-  <!-- Contenido real: oculto hasta que el mapa carga -->
-  <div class="store-map-layout-{{ section_id }}" style="display:none;" aria-label="Mapa de tiendas">
-    <div id="map-{{ section_id }}" class="store-map-map-{{ section_id }}" role="application" aria-label="Mapa interactivo"></div>
+  {% if request.design_mode %}
+    {%- comment -%} Determinar fuente y estado de la API key {%- endcomment -%}
+    {% if shop.metafields.custom.maps_api_key != blank %}
+      {% assign key_source = 'Metafield — shop.metafields.custom.maps_api_key' %}
+      {% assign key_badge = 'ok' %}
+      {% assign key_label = 'OK' %}
+    {% elsif section.settings.google_maps_api_key != blank %}
+      {% assign key_source = 'Configuracion de seccion (respaldo)' %}
+      {% assign key_badge = 'warn' %}
+      {% assign key_label = 'ADVERTENCIA' %}
+    {% else %}
+      {% assign key_source = 'Sin configurar' %}
+      {% assign key_badge = 'error' %}
+      {% assign key_label = 'ERROR' %}
+    {% endif %}
 
-    <div class="store-map-sidebar-{{ section_id }}">
-      <div class="store-map-controls-{{ section_id }}">
-        <input
-          type="search"
-          class="store-map-search-{{ section_id }}"
-          placeholder="Buscar tienda o direcci&oacute;n..."
-          aria-label="Buscar tienda"
-          autocomplete="off"
-        />
-        <select class="store-map-city-filter-{{ section_id }}" aria-label="Filtrar por ciudad">
-          <option value="">Todas las ciudades</option>
-        </select>
-        <button class="store-map-geo-btn-{{ section_id }}" type="button" aria-label="Encontrar tienda m&aacute;s cercana a mi ubicaci&oacute;n">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-          </svg>
-          Tienda m&aacute;s cercana
-        </button>
+    {%- comment -%} Mostrar primeros 8 caracteres enmascarados {%- endcomment -%}
+    {% if api_key != blank %}
+      {% assign key_preview = api_key | slice: 0, 8 | append: '••••••••••••' %}
+    {% else %}
+      {% assign key_preview = '—' %}
+    {% endif %}
+
+    {%- comment -%} Validar JSON de tiendas {%- endcomment -%}
+    {% assign json_first_char = section.settings.stores_json | strip | slice: 0, 1 %}
+    {% if section.settings.stores_json == blank %}
+      {% assign json_badge = 'error' %}
+      {% assign json_label = 'ERROR' %}
+      {% assign json_msg = 'Sin JSON configurado' %}
+    {% elsif json_first_char == '[' %}
+      {% assign json_badge = 'ok' %}
+      {% assign json_label = 'OK' %}
+      {% assign json_msg = 'Formato valido (array) — validacion completa en el navegador' %}
+    {% else %}
+      {% assign json_badge = 'error' %}
+      {% assign json_label = 'ERROR' %}
+      {% assign json_msg = 'El JSON no comienza con [ — debe ser un array' %}
+    {% endif %}
+
+    <div class="store-map-debug-{{ section_id }}" aria-label="Panel de diagnostico">
+      <div class="store-map-debug-header-{{ section_id }}">
+        &#128270; Diagnostico de seccion &mdash; solo visible en el editor
       </div>
-
-      <div class="store-map-list-wrap-{{ section_id }}">
-        <div class="store-map-count-{{ section_id }}" aria-live="polite"></div>
-        <ul class="store-map-store-list-{{ section_id }}" role="list" aria-label="Lista de tiendas"></ul>
+      <div class="store-map-debug-body-{{ section_id }}">
+        <div class="store-map-debug-row-{{ section_id }}">
+          <span class="store-map-debug-label-{{ section_id }}">API Key</span>
+          <span class="store-map-debug-value-{{ section_id }}">
+            <span class="store-map-debug-badge-{{ section_id }} {{ key_badge }}">{{ key_label }}</span>
+            &nbsp;{{ key_source }}
+          </span>
+        </div>
+        <div class="store-map-debug-row-{{ section_id }}">
+          <span class="store-map-debug-label-{{ section_id }}">Preview</span>
+          <span class="store-map-debug-value-{{ section_id }}">{{ key_preview }}</span>
+        </div>
+        <div class="store-map-debug-row-{{ section_id }}">
+          <span class="store-map-debug-label-{{ section_id }}">JSON</span>
+          <span class="store-map-debug-value-{{ section_id }}">
+            <span class="store-map-debug-badge-{{ section_id }} {{ json_badge }}">{{ json_label }}</span>
+            &nbsp;{{ json_msg }}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-</store-finder-{{ section_id }}>
+  {% endif %}
 
-</div><!-- /.section -->
+  <store-finder-{{ section_id }}
+    class="store-map-container-{{ section_id }}"
+    data-api-key="{{ api_key }}"
+    data-stores="{{ section.settings.stores_json | escape }}"
+    data-marker-icon="{{ section.settings.custom_marker_icon | image_url }}"
+    data-zoom="{{ section.settings.zoom_level }}"
+  >
+    <!-- Skeleton: visible por defecto, se oculta cuando el mapa carga -->
+    <div class="store-map-skeleton-{{ section_id }}" aria-hidden="true">
+      <div class="store-map-skeleton-map-{{ section_id }}"></div>
+      <div class="store-map-skeleton-side-{{ section_id }}">
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:38px;"></div>
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+        <div class="store-map-skeleton-line-{{ section_id }}" style="height:64px;"></div>
+      </div>
+    </div>
+
+    <!-- Contenido real: oculto hasta que el mapa carga -->
+    <div class="store-map-layout-{{ section_id }}" style="display:none;" aria-label="Mapa de tiendas">
+      <div
+        id="map-{{ section_id }}"
+        class="store-map-map-{{ section_id }}"
+        role="application"
+        aria-label="Mapa interactivo"
+      ></div>
+
+      <div class="store-map-sidebar-{{ section_id }}">
+        <div class="store-map-controls-{{ section_id }}">
+          <input
+            type="search"
+            class="store-map-search-{{ section_id }}"
+            placeholder="Buscar tienda o direcci&oacute;n..."
+            aria-label="Buscar tienda"
+            autocomplete="off"
+          >
+          <select class="store-map-city-filter-{{ section_id }}" aria-label="Filtrar por ciudad">
+            <option value="">Todas las ciudades</option>
+          </select>
+          <button
+            class="store-map-geo-btn-{{ section_id }}"
+            type="button"
+            aria-label="Encontrar tienda m&aacute;s cercana a mi ubicaci&oacute;n"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+            </svg>
+            Tienda m&aacute;s cercana
+          </button>
+        </div>
+
+        <div class="store-map-list-wrap-{{ section_id }}">
+          <div class="store-map-count-{{ section_id }}" aria-live="polite"></div>
+          <ul class="store-map-store-list-{{ section_id }}" role="list" aria-label="Lista de tiendas"></ul>
+        </div>
+      </div>
+    </div>
+  </store-finder-{{ section_id }}>
+</div>
+<!-- /.section -->
 
 <script>
 (function () {
@@ -546,7 +565,7 @@
       });
 
       const bounds = new google.maps.LatLngBounds();
-      this.infoWindow = new google.maps.InfoWindow({ maxWidth: 240 });
+      this.infoWindow = new google.maps.InfoWindow({ maxWidth: 240, pixelOffset: new google.maps.Size(0, 105), });
 
       // Corregir estilos del InfoWindow cuando el DOM este listo
       this.infoWindow.addListener('domready', () => {
@@ -664,7 +683,7 @@
       // Desplazar el mapa hacia abajo para que el InfoWindow quede visible
       google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
         const iwEl = document.querySelector('.gm-style-iw-c');
-        const offset = iwEl ? iwEl.offsetHeight + 60 : 180;
+        const offset = iwEl ? Math.round(iwEl.offsetHeight * 0.35) : 60;
         this.map.panBy(0, -offset);
       });
     }
