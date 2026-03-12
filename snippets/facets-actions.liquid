@@ -63,6 +63,7 @@
     justify-content: space-between;
     align-items: stretch;
     gap: var(--gap-sm);
+    background-color: rgb(var(--color-background-rgb));
     background-image: var(--to-top-gradient-background);
     z-index: var(--facets-sticky-z-index);
     padding-block-start: var(--padding-xs);
@@ -130,15 +131,19 @@
     background-color: transparent;
   }
 
+  /* Clear all wrapper — equal flex child */
+  .facets__actions > facet-remove-component {
+    flex: 1 1 0;
+  }
+
   /* Clear all button */
   .facets__clear-all {
     display: none;
     cursor: pointer;
-    min-width: var(--facets-clear-all-min-width);
     transition: transform var(--animation-values), opacity var(--animation-values);
     opacity: 0;
     transform: translateY(100%);
-    flex-grow: 1;
+    width: 100%;
     padding-block: var(--padding-lg);
   }
 
@@ -207,8 +212,7 @@
   }
 
   .facets__see-results {
-    min-width: var(--facets-see-results-min-width);
-    flex-grow: 1;
+    flex: 1 1 0;
     padding-block: var(--padding-lg);
   }
 
