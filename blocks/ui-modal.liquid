@@ -3,7 +3,7 @@
   assign title_id = modal_id | append: '-title'
 %}
 
-{{ 'modal.js' | asset_url | script_tag }}
+<script src="{{ 'modal.js' | asset_url }}" defer="defer"></script>
 {{ 'modal.css' | asset_url | stylesheet_tag }}
 
 <div
@@ -24,16 +24,16 @@
   {{ block.shopify_attributes }}
 >
   {% if block.settings.show_trigger %}
-  <button
-    type="button"
-    class="ui-modal__trigger"
-    data-modal-trigger="{{ modal_id }}"
-    aria-haspopup="dialog"
-    aria-controls="{{ modal_id }}"
-    aria-expanded="false"
-  >
-    {{ block.settings.trigger_label | escape }}
-  </button>
+    <button
+      type="button"
+      class="ui-modal__trigger"
+      data-modal-trigger="{{ modal_id }}"
+      aria-haspopup="dialog"
+      aria-controls="{{ modal_id }}"
+      aria-expanded="false"
+    >
+      {{ block.settings.trigger_label | escape }}
+    </button>
   {% endif %}
 
   <div class="ui-modal__overlay" data-modal-overlay hidden>

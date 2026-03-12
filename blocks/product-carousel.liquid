@@ -321,15 +321,42 @@
       "id": "heading_type_preset",
       "label": "t:settings.preset",
       "options": [
-        { "value": "rte", "label": "t:options.default" },
-        { "value": "paragraph", "label": "t:options.paragraph" },
-        { "value": "h1", "label": "t:options.h1" },
-        { "value": "h2", "label": "t:options.h2" },
-        { "value": "h3", "label": "t:options.h3" },
-        { "value": "h4", "label": "t:options.h4" },
-        { "value": "h5", "label": "t:options.h5" },
-        { "value": "h6", "label": "t:options.h6" },
-        { "value": "custom", "label": "t:options.custom" }
+        {
+          "value": "rte",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
       ],
       "default": "h2"
     },
@@ -338,10 +365,22 @@
       "id": "heading_font",
       "label": "t:settings.font",
       "options": [
-        { "value": "var(--font-body--family)", "label": "t:options.body" },
-        { "value": "var(--font-subheading--family)", "label": "t:options.subheading" },
-        { "value": "var(--font-heading--family)", "label": "t:options.heading" },
-        { "value": "var(--font-accent--family)", "label": "t:options.accent" }
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "t:options.accent"
+        }
       ],
       "default": "var(--font-heading--family)",
       "visible_if": "{{ block.settings.heading_type_preset == 'custom' }}"
@@ -351,13 +390,34 @@
       "id": "heading_font_size_unit",
       "label": "t:settings.unit",
       "options": [
-        { "value": "px", "label": "px" },
-        { "value": "rem", "label": "rem" },
-        { "value": "em", "label": "em" },
-        { "value": "vh", "label": "vh" },
-        { "value": "vw", "label": "vw" },
-        { "value": "responsive", "label": "responsive" },
-        { "value": "%", "label": "%" }
+        {
+          "value": "px",
+          "label": "px"
+        },
+        {
+          "value": "rem",
+          "label": "rem"
+        },
+        {
+          "value": "em",
+          "label": "em"
+        },
+        {
+          "value": "vh",
+          "label": "vh"
+        },
+        {
+          "value": "vw",
+          "label": "vw"
+        },
+        {
+          "value": "responsive",
+          "label": "responsive"
+        },
+        {
+          "value": "%",
+          "label": "%"
+        }
       ],
       "default": "px",
       "visible_if": "{{ block.settings.heading_type_preset == 'custom' }}"
@@ -381,9 +441,18 @@
       "id": "heading_line_height",
       "label": "t:settings.line_height",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.heading_type_preset == 'custom' }}"
@@ -393,9 +462,18 @@
       "id": "heading_letter_spacing",
       "label": "t:settings.letter_spacing",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.heading_type_preset == 'custom' }}"
@@ -405,8 +483,14 @@
       "id": "heading_case",
       "label": "t:settings.case",
       "options": [
-        { "value": "none", "label": "t:options.default" },
-        { "value": "uppercase", "label": "t:options.uppercase" }
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        }
       ],
       "default": "none",
       "visible_if": "{{ block.settings.heading_type_preset == 'custom' }}"
@@ -416,9 +500,18 @@
       "id": "heading_color",
       "label": "t:settings.color",
       "options": [
-        { "value": "var(--color-foreground)", "label": "t:options.text" },
-        { "value": "var(--color-foreground-heading)", "label": "t:options.heading" },
-        { "value": "var(--color-primary)", "label": "t:options.link" }
+        {
+          "value": "var(--color-foreground)",
+          "label": "t:options.text"
+        },
+        {
+          "value": "var(--color-foreground-heading)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--color-primary)",
+          "label": "t:options.link"
+        }
       ],
       "default": "var(--color-foreground-heading)",
       "visible_if": "{{ block.settings.heading_type_preset != 'rte' }}"
@@ -432,11 +525,26 @@
       "id": "source",
       "label": "t:settings.source",
       "options": [
-        { "value": "collection", "label": "t:options.collection_source" },
-        { "value": "best_sellers", "label": "t:options.best_sellers" },
-        { "value": "new_arrivals", "label": "t:options.new_arrivals" },
-        { "value": "related", "label": "t:options.related_products" },
-        { "value": "recently_viewed", "label": "t:options.recently_viewed" }
+        {
+          "value": "collection",
+          "label": "t:options.collection_source"
+        },
+        {
+          "value": "best_sellers",
+          "label": "t:options.best_sellers"
+        },
+        {
+          "value": "new_arrivals",
+          "label": "t:options.new_arrivals"
+        },
+        {
+          "value": "related",
+          "label": "t:options.related_products"
+        },
+        {
+          "value": "recently_viewed",
+          "label": "t:options.recently_viewed"
+        }
       ],
       "default": "collection"
     },
@@ -454,14 +562,38 @@
       "id": "sort_by",
       "label": "t:settings.sort",
       "options": [
-        { "value": "relevance", "label": "t:options.relevance" },
-        { "value": "date_desc", "label": "t:options.date_desc" },
-        { "value": "date_asc", "label": "t:options.date_asc" },
-        { "value": "best_selling", "label": "t:options.best_selling_sort" },
-        { "value": "price_asc", "label": "t:options.price_asc" },
-        { "value": "price_desc", "label": "t:options.price_desc" },
-        { "value": "discount_desc", "label": "t:options.discount_desc" },
-        { "value": "name_asc", "label": "t:options.name_asc" }
+        {
+          "value": "relevance",
+          "label": "t:options.relevance"
+        },
+        {
+          "value": "date_desc",
+          "label": "t:options.date_desc"
+        },
+        {
+          "value": "date_asc",
+          "label": "t:options.date_asc"
+        },
+        {
+          "value": "best_selling",
+          "label": "t:options.best_selling_sort"
+        },
+        {
+          "value": "price_asc",
+          "label": "t:options.price_asc"
+        },
+        {
+          "value": "price_desc",
+          "label": "t:options.price_desc"
+        },
+        {
+          "value": "discount_desc",
+          "label": "t:options.discount_desc"
+        },
+        {
+          "value": "name_asc",
+          "label": "t:options.name_asc"
+        }
       ],
       "default": "relevance",
       "visible_if": "{{ block.settings.source == 'collection' }}"
@@ -488,7 +620,6 @@
       "step": 1,
       "default": 4
     },
-
     {
       "type": "checkbox",
       "id": "carousel_on_mobile",
@@ -500,8 +631,14 @@
       "id": "mobile_columns",
       "label": "t:settings.mobile_columns",
       "options": [
-        { "value": "1", "label": "t:options.one_number" },
-        { "value": "2", "label": "t:options.two_number" }
+        {
+          "value": "1",
+          "label": "t:options.one_number"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two_number"
+        }
       ],
       "default": "1"
     },
@@ -510,8 +647,14 @@
       "id": "mobile_card_size",
       "label": "t:settings.mobile_card_size",
       "options": [
-        { "value": "60cqw", "label": "t:options.large" },
-        { "value": "44cqw", "label": "t:options.small" }
+        {
+          "value": "60cqw",
+          "label": "t:options.large"
+        },
+        {
+          "value": "44cqw",
+          "label": "t:options.small"
+        }
       ],
       "default": "60cqw"
     },
@@ -524,11 +667,26 @@
       "id": "icons_style",
       "label": "t:settings.style",
       "options": [
-        { "value": "arrow", "label": "t:options.arrow" },
-        { "value": "chevron", "label": "t:options.chevron" },
-        { "value": "arrows_large", "label": "t:options.large_arrows" },
-        { "value": "chevron_large", "label": "t:options.large_chevrons" },
-        { "value": "none", "label": "t:options.none" }
+        {
+          "value": "arrow",
+          "label": "t:options.arrow"
+        },
+        {
+          "value": "chevron",
+          "label": "t:options.chevron"
+        },
+        {
+          "value": "arrows_large",
+          "label": "t:options.large_arrows"
+        },
+        {
+          "value": "chevron_large",
+          "label": "t:options.large_chevrons"
+        },
+        {
+          "value": "none",
+          "label": "t:options.none"
+        }
       ],
       "default": "chevron"
     },
@@ -551,15 +709,42 @@
       "id": "title_type_preset",
       "label": "t:settings.preset",
       "options": [
-        { "value": "rte", "label": "t:options.default" },
-        { "value": "paragraph", "label": "t:options.paragraph" },
-        { "value": "h1", "label": "t:options.h1" },
-        { "value": "h2", "label": "t:options.h2" },
-        { "value": "h3", "label": "t:options.h3" },
-        { "value": "h4", "label": "t:options.h4" },
-        { "value": "h5", "label": "t:options.h5" },
-        { "value": "h6", "label": "t:options.h6" },
-        { "value": "custom", "label": "t:options.custom" }
+        {
+          "value": "rte",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
       ],
       "default": "paragraph"
     },
@@ -568,10 +753,22 @@
       "id": "title_font",
       "label": "t:settings.font",
       "options": [
-        { "value": "var(--font-body--family)", "label": "t:options.body" },
-        { "value": "var(--font-subheading--family)", "label": "t:options.subheading" },
-        { "value": "var(--font-heading--family)", "label": "t:options.heading" },
-        { "value": "var(--font-accent--family)", "label": "t:options.accent" }
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "t:options.accent"
+        }
       ],
       "default": "var(--font-body--family)",
       "visible_if": "{{ block.settings.title_type_preset == 'custom' }}"
@@ -581,13 +778,34 @@
       "id": "title_font_size_unit",
       "label": "t:settings.unit",
       "options": [
-        { "value": "px", "label": "px" },
-        { "value": "rem", "label": "rem" },
-        { "value": "em", "label": "em" },
-        { "value": "vh", "label": "vh" },
-        { "value": "vw", "label": "vw" },
-        { "value": "responsive", "label": "responsive" },
-        { "value": "%", "label": "%" }
+        {
+          "value": "px",
+          "label": "px"
+        },
+        {
+          "value": "rem",
+          "label": "rem"
+        },
+        {
+          "value": "em",
+          "label": "em"
+        },
+        {
+          "value": "vh",
+          "label": "vh"
+        },
+        {
+          "value": "vw",
+          "label": "vw"
+        },
+        {
+          "value": "responsive",
+          "label": "responsive"
+        },
+        {
+          "value": "%",
+          "label": "%"
+        }
       ],
       "default": "px",
       "visible_if": "{{ block.settings.title_type_preset == 'custom' }}"
@@ -611,9 +829,18 @@
       "id": "title_line_height",
       "label": "t:settings.line_height",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.title_type_preset == 'custom' }}"
@@ -623,9 +850,18 @@
       "id": "title_letter_spacing",
       "label": "t:settings.letter_spacing",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.title_type_preset == 'custom' }}"
@@ -635,8 +871,14 @@
       "id": "title_case",
       "label": "t:settings.case",
       "options": [
-        { "value": "none", "label": "t:options.default" },
-        { "value": "uppercase", "label": "t:options.uppercase" }
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        }
       ],
       "default": "none",
       "visible_if": "{{ block.settings.title_type_preset == 'custom' }}"
@@ -646,9 +888,18 @@
       "id": "title_color",
       "label": "t:settings.color",
       "options": [
-        { "value": "var(--color-foreground)", "label": "t:options.text" },
-        { "value": "var(--color-foreground-heading)", "label": "t:options.heading" },
-        { "value": "var(--color-primary)", "label": "t:options.link" }
+        {
+          "value": "var(--color-foreground)",
+          "label": "t:options.text"
+        },
+        {
+          "value": "var(--color-foreground-heading)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--color-primary)",
+          "label": "t:options.link"
+        }
       ],
       "default": "var(--color-foreground)",
       "visible_if": "{{ block.settings.title_type_preset != 'rte' }}"
@@ -662,15 +913,42 @@
       "id": "price_type_preset",
       "label": "t:settings.preset",
       "options": [
-        { "value": "rte", "label": "t:options.default" },
-        { "value": "paragraph", "label": "t:options.paragraph" },
-        { "value": "h1", "label": "t:options.h1" },
-        { "value": "h2", "label": "t:options.h2" },
-        { "value": "h3", "label": "t:options.h3" },
-        { "value": "h4", "label": "t:options.h4" },
-        { "value": "h5", "label": "t:options.h5" },
-        { "value": "h6", "label": "t:options.h6" },
-        { "value": "custom", "label": "t:options.custom" }
+        {
+          "value": "rte",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
       ],
       "default": "paragraph"
     },
@@ -679,10 +957,22 @@
       "id": "price_font",
       "label": "t:settings.font",
       "options": [
-        { "value": "var(--font-body--family)", "label": "t:options.body" },
-        { "value": "var(--font-subheading--family)", "label": "t:options.subheading" },
-        { "value": "var(--font-heading--family)", "label": "t:options.heading" },
-        { "value": "var(--font-accent--family)", "label": "t:options.accent" }
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "t:options.accent"
+        }
       ],
       "default": "var(--font-body--family)",
       "visible_if": "{{ block.settings.price_type_preset == 'custom' }}"
@@ -692,13 +982,34 @@
       "id": "price_font_size_unit",
       "label": "t:settings.unit",
       "options": [
-        { "value": "px", "label": "px" },
-        { "value": "rem", "label": "rem" },
-        { "value": "em", "label": "em" },
-        { "value": "vh", "label": "vh" },
-        { "value": "vw", "label": "vw" },
-        { "value": "responsive", "label": "responsive" },
-        { "value": "%", "label": "%" }
+        {
+          "value": "px",
+          "label": "px"
+        },
+        {
+          "value": "rem",
+          "label": "rem"
+        },
+        {
+          "value": "em",
+          "label": "em"
+        },
+        {
+          "value": "vh",
+          "label": "vh"
+        },
+        {
+          "value": "vw",
+          "label": "vw"
+        },
+        {
+          "value": "responsive",
+          "label": "responsive"
+        },
+        {
+          "value": "%",
+          "label": "%"
+        }
       ],
       "default": "px",
       "visible_if": "{{ block.settings.price_type_preset == 'custom' }}"
@@ -722,9 +1033,18 @@
       "id": "price_line_height",
       "label": "t:settings.line_height",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.price_type_preset == 'custom' }}"
@@ -734,9 +1054,18 @@
       "id": "price_letter_spacing",
       "label": "t:settings.letter_spacing",
       "options": [
-        { "value": "tight", "label": "t:options.tight" },
-        { "value": "normal", "label": "t:options.normal" },
-        { "value": "loose", "label": "t:options.loose" }
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.price_type_preset == 'custom' }}"
@@ -746,8 +1075,14 @@
       "id": "price_case",
       "label": "t:settings.case",
       "options": [
-        { "value": "none", "label": "t:options.default" },
-        { "value": "uppercase", "label": "t:options.uppercase" }
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        }
       ],
       "default": "none",
       "visible_if": "{{ block.settings.price_type_preset == 'custom' }}"
@@ -757,9 +1092,18 @@
       "id": "price_color",
       "label": "t:settings.color",
       "options": [
-        { "value": "var(--color-foreground)", "label": "t:options.text" },
-        { "value": "var(--color-foreground-heading)", "label": "t:options.heading" },
-        { "value": "var(--color-primary)", "label": "t:options.link" }
+        {
+          "value": "var(--color-foreground)",
+          "label": "t:options.text"
+        },
+        {
+          "value": "var(--color-foreground-heading)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--color-primary)",
+          "label": "t:options.link"
+        }
       ],
       "default": "var(--color-foreground)",
       "visible_if": "{{ block.settings.price_type_preset != 'rte' }}"

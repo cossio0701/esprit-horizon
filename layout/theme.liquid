@@ -71,7 +71,7 @@
       {% render 'quick-add-modal' %}
     {% endif %}
 
-    {{ 'plp-variants.js' | asset_url | script_tag }}
+    <script src="{{ 'plp-variants.js' | asset_url }}" defer="defer"></script>
 
     {% section 'gco-cookies' %}
   </body>
