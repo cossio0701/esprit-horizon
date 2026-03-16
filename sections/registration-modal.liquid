@@ -24,17 +24,14 @@
     </button>
 
     <div class="registration-modal__inner">
-
       {%- comment -%} LEFT - Imagen desktop (oculta en mobile) {%- endcomment -%}
       <div class="registration-modal__media">
         {%- if section.settings.left_image != blank -%}
           {{
             section.settings.left_image
             | image_url: width: 800
-            | image_tag:
-              loading: 'lazy',
-              class: 'registration-modal__image',
-              alt: section.settings.left_image.alt | escape
+            | image_tag: loading: 'lazy', class: 'registration-modal__image', alt: section.settings.left_image.alt
+            | escape
           }}
         {%- else -%}
           {{ 'image' | placeholder_svg_tag: 'registration-modal__image registration-modal__image--placeholder' }}
@@ -43,7 +40,6 @@
 
       {%- comment -%} RIGHT - Form {%- endcomment -%}
       <div class="registration-modal__content">
-
         {%- comment -%} Banner imagen mobile (oculto en desktop) {%- endcomment -%}
         {%- if section.settings.left_image_mobile != blank -%}
           <div class="registration-modal__media-mobile">
@@ -53,7 +49,8 @@
               | image_tag:
                 loading: 'lazy',
                 class: 'registration-modal__image-mobile',
-                alt: section.settings.left_image_mobile.alt | escape
+                alt: section.settings.left_image_mobile.alt
+              | escape
             }}
           </div>
         {%- endif -%}
@@ -75,7 +72,8 @@
                   | image_tag:
                     loading: 'lazy',
                     class: 'registration-modal__success-image',
-                    alt: section.settings.success_image.alt | escape
+                    alt: section.settings.success_image.alt
+                  | escape
                 }}
               {%- elsif section.settings.success_image_mobile != blank -%}
                 {{
@@ -84,7 +82,8 @@
                   | image_tag:
                     loading: 'lazy',
                     class: 'registration-modal__success-image',
-                    alt: section.settings.success_image_mobile.alt | escape
+                    alt: section.settings.success_image_mobile.alt
+                  | escape
                 }}
               {%- endif -%}
             </picture>
@@ -97,11 +96,8 @@
             class="registration-modal__form"
             novalidate
           >
-
             <div class="registration-modal__field">
-              <label for="registration-name-{{ section.id }}">
-                Nombre
-              </label>
+              <label for="registration-name-{{ section.id }}"> Nombre </label>
               <input
                 id="registration-name-{{ section.id }}"
                 type="text"
@@ -113,9 +109,7 @@
             </div>
 
             <div class="registration-modal__field">
-              <label for="registration-email-{{ section.id }}">
-                Correo electr&#243;nico
-              </label>
+              <label for="registration-email-{{ section.id }}"> Correo electr&#243;nico </label>
               <input
                 id="registration-email-{{ section.id }}"
                 type="email"
@@ -127,9 +121,7 @@
             </div>
 
             <div class="registration-modal__field">
-              <label for="registration-phone-{{ section.id }}">
-                Celular
-              </label>
+              <label for="registration-phone-{{ section.id }}"> Celular </label>
               <input
                 id="registration-phone-{{ section.id }}"
                 type="tel"
@@ -141,9 +133,7 @@
             </div>
 
             <div class="registration-modal__field">
-              <label for="registration-dob-{{ section.id }}">
-                Fecha de nacimiento
-              </label>
+              <label for="registration-dob-{{ section.id }}"> Fecha de nacimiento </label>
               <input
                 id="registration-dob-{{ section.id }}"
                 type="date"
@@ -153,9 +143,7 @@
             </div>
 
             <div class="registration-modal__field">
-              <label for="registration-id-{{ section.id }}">
-                Identificaci&#243;n
-              </label>
+              <label for="registration-id-{{ section.id }}"> Identificaci&#243;n </label>
               <input
                 id="registration-id-{{ section.id }}"
                 type="text"
@@ -187,11 +175,9 @@
             <button type="submit" class="button registration-modal__submit">
               {{ section.settings.button_text | default: 'Registrarse' }}
             </button>
-
           </form>
         </div>
       </div>
-
     </div>
   </dialog>
 </registration-modal>
@@ -276,7 +262,6 @@
   /* -- Banner imagen mobile (oculto en desktop) -- */
   .registration-modal__media-mobile {
     width: 100%;
-    height: 180px;
     overflow: hidden;
     flex-shrink: 0;
     margin-bottom: var(--margin-lg);
@@ -285,7 +270,6 @@
   .registration-modal__image-mobile {
     display: block;
     width: 100%;
-    height: 100%;
     object-fit: cover;
   }
 
@@ -420,11 +404,11 @@
     color: rgb(var(--color-foreground-rgb) / 0.35);
   }
 
-  .registration-modal__field input[type="date"] {
+  .registration-modal__field input[type='date'] {
     color: rgb(var(--color-foreground-rgb) / 0.35);
   }
 
-  .registration-modal__field input[type="date"]:valid {
+  .registration-modal__field input[type='date']:valid {
     color: var(--color-input-text);
   }
 
@@ -433,7 +417,7 @@
     border-color: var(--color-foreground);
   }
 
-  .registration-modal__field input[aria-invalid="true"] {
+  .registration-modal__field input[aria-invalid='true'] {
     border-color: #cc0000;
   }
 
@@ -450,7 +434,7 @@
     margin-block-start: var(--margin-2xs);
   }
 
-  .registration-modal__legal input[type="checkbox"] {
+  .registration-modal__legal input[type='checkbox'] {
     grid-column: 1;
     grid-row: 1;
     margin-block-start: 0.2em;
@@ -490,7 +474,7 @@
     transition: opacity 0.15s var(--animation-easing);
   }
 
-  .registration-modal__submit[aria-busy="true"] {
+  .registration-modal__submit[aria-busy='true'] {
     opacity: 0.5;
     cursor: wait;
     pointer-events: none;
@@ -536,8 +520,12 @@
 
   /* -- Animations -- */
   @keyframes successFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .registration-modal__success:not([hidden]) {
@@ -545,13 +533,25 @@
   }
 
   @keyframes modalSlideInTop {
-    from { opacity: 0; transform: translateY(-12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes modalSlideOutTop {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(-12px); }
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
   }
 {% endstylesheet %}
 

@@ -15,6 +15,8 @@
       "type": "registration-modal",
       "name": "Registration Modal",
       "settings": {
+        "left_image": "shopify://shop_images/Group_688.png",
+        "left_image_mobile": "shopify://shop_images/Group_688_1.png",
         "legal_text": "He leído y acepto la",
         "legal_link_text": "Política de Tratamiento de Datos Personales.",
         "legal_link": "shopify://pages/terminos-condiciones",
