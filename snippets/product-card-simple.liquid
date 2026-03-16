@@ -85,7 +85,11 @@
   </a>
 
   <div class="product-card-simple__swatches mobile-only">
-    {%- render 'variant-swatches', product_resource: product, only_color: true -%}
+    {%- if product.metafields.custom.color_siblings != blank -%}
+      {%- render 'color-siblings', product: product, mode: 'card' -%}
+    {%- else -%}
+      {%- render 'variant-swatches', product_resource: product, only_color: true -%}
+    {%- endif -%}
   </div>
 
   {% comment %} Quick Add Component for modal trigger (hidden, used by mobile '+' button) {% endcomment %}

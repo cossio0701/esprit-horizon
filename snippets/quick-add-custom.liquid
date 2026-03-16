@@ -13,18 +13,13 @@
 
   # Get available options
   assign size_option = null
-  assign color_option = null
   assign size_option_index = null
-  assign color_option_index = null
 
   for option in product.options_with_values
     assign option_name_lower = option.name | downcase
     if option_name_lower == 'size' or option_name_lower == 'talla' or option_name_lower == 'talle'
       assign size_option = option
       assign size_option_index = forloop.index0
-    elsif option_name_lower == 'color' or option_name_lower == 'colour'
-      assign color_option = option
-      assign color_option_index = forloop.index0
     endif
   endfor
 
@@ -35,6 +30,9 @@
     assign has_multiple_variants = true
   endif
 
+  # Color siblings
+  assign siblings = product.metafields.custom.color_siblings.value
+
   # Get the color scheme from settings (same as quick-add.liquid)
   assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
 %}
@@ -42,8 +40,6 @@
 <quick-add-custom-component
   class="quick-add-custom color-{{ quick_add_color_scheme }}"
   data-product-id="{{ product.id }}"
-  data-product-url="{{ product.url }}"
-  data-section-id="{{ section_id }}"
 >
   <div class="quick-add-custom__inner">
     {%- if has_multiple_variants -%}
@@ -77,44 +73,20 @@
         </div>
       {%- endif -%}
 
-      {%- comment -%} Color Selector {%- endcomment -%}
-      {%- if color_option -%}
-        <div class="quick-add-custom__colors" data-option-index="{{ color_option_index }}">
-          {%- for value in color_option.values -%}
-            {% liquid
-              assign color_available = false
-              assign swatch_color = value.swatch.color
-              assign swatch_image = value.swatch.image
-
-              for variant in product.variants
-                assign variant_color = variant.options[color_option_index]
-                if variant_color == value and variant.available
-                  assign color_available = true
-                  break
-                endif
-              endfor
-            %}
+      {%- comment -%} Color Selector desde color_siblings {%- endcomment -%}
+      {%- if siblings and siblings.size > 0 -%}
+        <div class="quick-add-custom__colors" data-siblings-colors>
+          {%- for s in siblings -%}
             <button
               type="button"
-              class="quick-add-custom__color-btn{% if forloop.first %} is-selected{% endif %}{% unless color_available %} is-unavailable{% endunless %}"
-              data-option-value="{{ value }}"
-              data-option-index="{{ color_option_index }}"
-              {% unless color_available %}
-                disabled
-              {% endunless %}
-              aria-label="{{ value }}"
-              style="
-                {%- if swatch_image -%}
-                  background-image: url('{{ swatch_image | image_url: width: 50 }}');
-                {%- elsif swatch_color -%}
-                  background-color: {{ swatch_color }};
-                {%- else -%}
-                  background-color: {{ value | handleize | replace: '-', '' }};
-                {%- endif -%}
-              "
-              title="{{ value }}"
+              class="quick-add-custom__color-btn{% if s.self %} is-selected{% endif %}"
+              data-handle="{{ s.handle }}"
+              data-self="{{ s.self | default: false }}"
+              aria-label="{{ s.color | default: s.title }}"
+              title="{{ s.color | default: s.title }}"
+              style="background-color: {{ s.swatch }};"
             >
-              <span class="visually-hidden">{{ value }}</span>
+              <span class="visually-hidden">{{ s.color | default: s.title }}</span>
             </button>
           {%- endfor -%}
         </div>
@@ -514,6 +486,8 @@
       this.btnText = null;
       this.feedback = null;
       this.feedbackText = null;
+      this._siblingCache = new Map();
+      this._fetchToken = 0;
     }
 
     connectedCallback() {
@@ -521,17 +495,18 @@
     }
 
     init() {
-      // Parse variants JSON
       const variantsJson = this.querySelector('[data-variants-json]');
       if (variantsJson) {
         try {
           this.variants = JSON.parse(variantsJson.textContent);
+          this._originalVariants = [...this.variants];
         } catch (e) {
           console.error('Failed to parse variants JSON:', e);
         }
       }
 
-      // Cache DOM elements
+      this._originalProductId = this.dataset.productId;
+
       this.form = this.querySelector('[data-type="add-to-cart-form"]');
       this.variantInput = this.querySelector('[data-variant-input]');
       this.submitBtn = this.querySelector('[data-add-to-cart-btn]');
@@ -539,58 +514,53 @@
       this.feedback = this.querySelector('[data-feedback]');
       this.feedbackText = this.querySelector('[data-feedback-text]');
 
-      // Initialize selected options from first available or first option
-      this.initializeSelectedOptions();
+      this._originalSizesHTML = this.querySelector('.quick-add-custom__sizes')?.innerHTML ?? null;
 
-      // Bind events
+      const cardGallery = this.closest('.card-gallery');
+      if (cardGallery) {
+        this._mode = 'slideshow';
+        this._slideshow = cardGallery.querySelector('slideshow-component') ?? null;
+        this._slideshowScroller = this._slideshow?.querySelector('[ref="scroller"]') ?? null;
+        this._originalScrollerHTML = this._slideshowScroller?.innerHTML ?? null;
+        this._cardImg = null;
+        this._cardLink = cardGallery.querySelector('[ref="cardGalleryLink"]') ?? null;
+        this._originalHref = this._cardLink?.href ?? null;
+      } else {
+        this._mode = 'simple';
+        this._cardImg = this.closest('.product-card-simple__media')?.querySelector('.product-card-simple__image') ?? null;
+        this._originalImageSrc = this._cardImg?.src ?? null;
+        this._originalImageSrcset = this._cardImg?.srcset ?? null;
+        this._cardLink = this.closest('.product-card-simple__link') ?? null;
+        this._originalHref = this._cardLink?.href ?? null;
+      }
+
+      this.initializeSelectedOptions();
       this.bindEvents();
     }
 
     initializeSelectedOptions() {
-      // Get all option buttons and select the first one of each type
       const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-      const colorContainer = this.querySelector('.quick-add-custom__colors');
-
       if (sizeContainer) {
         const firstSize = sizeContainer.querySelector('.quick-add-custom__size-btn.is-selected');
         if (firstSize) {
-          const index = firstSize.dataset.optionIndex;
-          this.selectedOptions[index] = firstSize.dataset.optionValue;
+          this.selectedOptions[firstSize.dataset.optionIndex] = firstSize.dataset.optionValue;
         }
       }
-
-      if (colorContainer) {
-        const firstColor = colorContainer.querySelector('.quick-add-custom__color-btn.is-selected');
-        if (firstColor) {
-          const index = firstColor.dataset.optionIndex;
-          this.selectedOptions[index] = firstColor.dataset.optionValue;
-        }
-      }
-
-      // Update variant based on initial selection
       this.updateVariant();
     }
 
     bindEvents() {
-      // Prevent clicks inside quick-add from navigating to product
-      // Only stop propagation, not default (so form submit works)
-      this.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
+      this.addEventListener('click', (e) => e.stopPropagation());
 
-      // Size buttons
-      const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
-      sizeBtns.forEach((btn) => {
+      this.querySelectorAll('.quick-add-custom__size-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => this.handleOptionClick(e));
       });
 
-      // Color buttons
-      const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
-      colorBtns.forEach((btn) => {
-        btn.addEventListener('click', (e) => this.handleOptionClick(e));
+      this.querySelectorAll('[data-siblings-colors] .quick-add-custom__color-btn').forEach((btn) => {
+        btn.addEventListener('mouseenter', (e) => this.prefetchSibling(e));
+        btn.addEventListener('click', (e) => this.handleSiblingColorClick(e));
       });
 
-      // Form submit
       if (this.form) {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
       }
@@ -603,26 +573,195 @@
       const btn = event.currentTarget;
       if (btn.disabled) return;
 
-      const optionIndex = btn.dataset.optionIndex;
-      const optionValue = btn.dataset.optionValue;
-
-      // Update selection in same group
       const container = btn.parentElement;
       container.querySelectorAll('button').forEach((b) => b.classList.remove('is-selected'));
       btn.classList.add('is-selected');
 
-      // Update selected options
-      this.selectedOptions[optionIndex] = optionValue;
+      this.selectedOptions[btn.dataset.optionIndex] = btn.dataset.optionValue;
+      this.updateVariant();
+      this.updateSizeAvailability();
+    }
 
-      // Update variant
+    prefetchSibling(event) {
+      const handle = event.currentTarget.dataset.handle;
+      if (!handle || event.currentTarget.dataset.self === 'true' || this._siblingCache.has(handle)) return;
+      fetch('/products/' + handle + '.js')
+        .then((r) => r.json())
+        .then((data) => this._siblingCache.set(handle, data))
+        .catch(() => {});
+    }
+
+    handleSiblingColorClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const btn = event.currentTarget;
+      const handle = btn.dataset.handle;
+
+      this.querySelectorAll('[data-siblings-colors] .quick-add-custom__color-btn').forEach((b) => {
+        b.classList.remove('is-selected');
+      });
+      btn.classList.add('is-selected');
+
+      if (btn.dataset.self === 'true') {
+        this.restoreOriginal();
+        return;
+      }
+
+      if (this._siblingCache.has(handle)) {
+        this.rebuildFromProduct(this._siblingCache.get(handle));
+        return;
+      }
+
+      this.classList.add('is-loading');
+      this.submitBtn.disabled = true;
+
+      const token = ++this._fetchToken;
+
+      fetch('/products/' + handle + '.js')
+        .then((r) => r.json())
+        .then((data) => {
+          if (token !== this._fetchToken) return;
+          this._siblingCache.set(handle, data);
+          this.rebuildFromProduct(data);
+          this.classList.remove('is-loading');
+        })
+        .catch(() => {
+          if (token !== this._fetchToken) return;
+          this.classList.remove('is-loading');
+          this.showFeedback('Error al cargar tallas');
+        });
+    }
+
+    restoreOriginal() {
+      this.variants = [...this._originalVariants];
+      this.dataset.productId = this._originalProductId;
+
+      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
+      if (sizeContainer && this._originalSizesHTML !== null) {
+        sizeContainer.innerHTML = this._originalSizesHTML;
+        sizeContainer.querySelectorAll('button').forEach((btn) => {
+          btn.addEventListener('click', (e) => this.handleOptionClick(e));
+        });
+      }
+
+      const firstSize = this.querySelector('.quick-add-custom__size-btn.is-selected');
+      this.selectedOptions = firstSize
+        ? { [firstSize.dataset.optionIndex]: firstSize.dataset.optionValue }
+        : {};
       this.updateVariant();
 
-      // Update availability of other options
-      this.updateOptionAvailability();
+      if (this._mode === 'slideshow') {
+        if (this._slideshowScroller && this._originalScrollerHTML !== null) {
+          this._slideshowScroller.innerHTML = this._originalScrollerHTML;
+          this._resetSlideshowToFirst();
+        }
+      } else {
+        if (this._cardImg && this._originalImageSrc) {
+          this._cardImg.src = this._originalImageSrc;
+          this._cardImg.srcset = this._originalImageSrcset ?? '';
+        }
+      }
+      if (this._cardLink && this._originalHref) this._cardLink.href = this._originalHref;
+    }
+
+    rebuildFromProduct(productData) {
+      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
+      if (!sizeContainer) return;
+
+      const sizeIndex = parseInt(sizeContainer.dataset.optionIndex);
+      const sizeOption = productData.options[sizeIndex];
+      if (!sizeOption) return;
+
+      this.variants = productData.variants.map((v) => ({
+        id: v.id,
+        available: v.available,
+        options: v.options,
+        title: v.title,
+        price: v.price,
+      }));
+
+      this.dataset.productId = productData.id;
+
+      sizeContainer.innerHTML = sizeOption.values
+        .map((value, i) => {
+          const available = productData.variants.some(
+            (v) => v.options[sizeIndex] === value && v.available
+          );
+          return `<button
+            type="button"
+            class="quick-add-custom__size-btn${i === 0 ? ' is-selected' : ''}${!available ? ' is-unavailable' : ''}"
+            data-option-value="${value}"
+            data-option-index="${sizeIndex}"
+            ${!available ? 'disabled' : ''}
+            aria-label="${value}"
+          >${value}</button>`;
+        })
+        .join('');
+
+      sizeContainer.querySelectorAll('button').forEach((btn) => {
+        btn.addEventListener('click', (e) => this.handleOptionClick(e));
+      });
+
+      this.selectedOptions = { [sizeIndex]: sizeOption.values[0] };
+      this.updateVariant();
+      this.updateCardImage(productData);
+      if (this._cardLink) this._cardLink.href = '/products/' + productData.handle;
+    }
+
+    updateCardImage(productData) {
+      if (this._mode === 'slideshow') {
+        this._rebuildSlideshow(productData.images ?? []);
+      } else {
+        if (!this._cardImg) return;
+        const rawUrl = productData.featured_image;
+        if (!rawUrl) return;
+        const base = rawUrl.split('?')[0];
+        const url = base.startsWith('//') ? 'https:' + base : base;
+        this._cardImg.src = url + '?width=600';
+        this._cardImg.srcset = [200, 300, 400, 500, 600].map((w) => `${url}?width=${w} ${w}w`).join(', ');
+      }
+    }
+
+    _rebuildSlideshow(images) {
+      if (!this._slideshowScroller || !images.length) return;
+
+      const fragment = document.createDocumentFragment();
+      images.slice(0, 5).forEach((rawUrl, index) => {
+        const base = rawUrl.split('?')[0];
+        const url = base.startsWith('//') ? 'https:' + base : base;
+
+        const slide = document.createElement('slideshow-slide');
+        slide.setAttribute('ref', 'slides[]');
+        slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
+        slide.setAttribute('slide-id', `sibling-${index}`);
+        slide.className = 'product-media-container media-fit product-media-container--image';
+
+        const img = document.createElement('img');
+        img.src = url + '?width=800';
+        img.srcset = [400, 800, 1200].map((w) => `${url}?width=${w} ${w}w`).join(', ');
+        img.sizes = 'auto';
+        img.loading = index === 0 ? 'eager' : 'lazy';
+        img.className = 'product-media';
+        img.alt = '';
+
+        slide.appendChild(img);
+        fragment.appendChild(slide);
+      });
+
+      this._slideshowScroller.innerHTML = '';
+      this._slideshowScroller.appendChild(fragment);
+      this._resetSlideshowToFirst();
+    }
+
+    _resetSlideshowToFirst() {
+      if (!this._slideshow) return;
+      requestAnimationFrame(() => {
+        try { this._slideshow.select(0, null, { animate: false }); } catch (e) {}
+      });
     }
 
     updateVariant() {
-      // Find matching variant
       const matchingVariant = this.variants.find((variant) => {
         return Object.keys(this.selectedOptions).every((index) => {
           return variant.options[parseInt(index)] === this.selectedOptions[index];
@@ -631,7 +770,6 @@
 
       if (matchingVariant) {
         this.variantInput.value = matchingVariant.id;
-
         if (matchingVariant.available) {
           this.submitBtn.disabled = false;
           this.btnText.textContent = 'Agregar a la bolsa';
@@ -641,68 +779,35 @@
           this.btnText.textContent = 'Agotado';
         }
       } else {
-        // No matching variant - likely need to select more options
         this.classList.add('needs-selection');
       }
     }
 
-    updateOptionAvailability() {
-      // Update size availability based on selected color
-      const colorIndex = this.querySelector('.quick-add-custom__colors')?.dataset.optionIndex;
-      const sizeIndex = this.querySelector('.quick-add-custom__sizes')?.dataset.optionIndex;
+    updateSizeAvailability() {
+      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
+      if (!sizeContainer) return;
 
-      if (colorIndex !== undefined && sizeIndex !== undefined) {
-        const selectedColor = this.selectedOptions[colorIndex];
+      const sizeIndex = parseInt(sizeContainer.dataset.optionIndex);
 
-        // Update size buttons
-        const sizeBtns = this.querySelectorAll('.quick-add-custom__size-btn');
-        sizeBtns.forEach((btn) => {
-          const sizeValue = btn.dataset.optionValue;
-
-          // Check if this size is available with the selected color
-          const isAvailable = this.variants.some((variant) => {
-            return (
-              variant.options[parseInt(sizeIndex)] === sizeValue &&
-              variant.options[parseInt(colorIndex)] === selectedColor &&
-              variant.available
-            );
-          });
-
-          btn.classList.toggle('is-unavailable', !isAvailable);
-          btn.disabled = !isAvailable;
-        });
-
-        // Similarly update color buttons based on selected size
-        const selectedSize = this.selectedOptions[sizeIndex];
-        const colorBtns = this.querySelectorAll('.quick-add-custom__color-btn');
-        colorBtns.forEach((btn) => {
-          const colorValue = btn.dataset.optionValue;
-
-          const isAvailable = this.variants.some((variant) => {
-            return (
-              variant.options[parseInt(colorIndex)] === colorValue &&
-              variant.options[parseInt(sizeIndex)] === selectedSize &&
-              variant.available
-            );
-          });
-
-          btn.classList.toggle('is-unavailable', !isAvailable);
-          btn.disabled = !isAvailable;
-        });
-      }
+      sizeContainer.querySelectorAll('.quick-add-custom__size-btn').forEach((btn) => {
+        const sizeValue = btn.dataset.optionValue;
+        const isAvailable = this.variants.some(
+          (v) => v.options[sizeIndex] === sizeValue && v.available
+        );
+        btn.classList.toggle('is-unavailable', !isAvailable);
+        btn.disabled = !isAvailable;
+      });
     }
 
     async handleSubmit(event) {
       event.preventDefault();
       event.stopPropagation();
 
-      // Validate selection
       if (!this.variantInput.value || this.submitBtn.disabled) {
-        this.showFeedback('Selecciona talla y color');
+        this.showFeedback('Selecciona una talla');
         return;
       }
 
-      // Show loading state
       this.classList.add('is-loading');
       const originalText = this.btnText.textContent;
       this.btnText.textContent = 'Agregando...';
@@ -718,16 +823,13 @@
         const result = await response.json();
 
         if (response.ok) {
-          // Success
           this.classList.remove('is-loading');
           this.classList.add('is-added');
           this.btnText.textContent = 'Agregado';
 
-          // Fetch real cart state for accurate total item count
           const cartResponse = await fetch(window.Shopify?.routes?.root + 'cart.js');
           const cart = await cartResponse.json();
 
-          // Dispatch cart:update with real total so Horizon cart-icon + cart-drawer update
           document.dispatchEvent(
             new CustomEvent('cart:update', {
               bubbles: true,
@@ -744,13 +846,11 @@
             })
           );
 
-          // Reset after delay
           setTimeout(() => {
             this.classList.remove('is-added');
             this.btnText.textContent = originalText;
           }, 2000);
         } else {
-          // Error
           this.classList.remove('is-loading');
           this.btnText.textContent = originalText;
           this.showFeedback(result.message || 'Error al agregar');
@@ -767,7 +867,6 @@
       if (this.feedback && this.feedbackText) {
         this.feedbackText.textContent = message;
         this.feedback.hidden = false;
-
         setTimeout(() => {
           this.feedback.hidden = true;
         }, 3000);

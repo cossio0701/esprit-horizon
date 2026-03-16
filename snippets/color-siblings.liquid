@@ -1,0 +1,200 @@
+{%- doc -%}
+  Renders cross-product color swatches from the color_siblings metafield.
+  Each sibling is a separate product sharing the same style tag.
+
+  @param {object} product - The current product object
+  @param {string} [mode] - 'card' for compact PLP swatches, 'pdp' for full picker (default: 'card')
+
+  @example
+  {% render 'color-siblings', product: product %}
+  {% render 'color-siblings', product: product, mode: 'pdp' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign siblings = product.metafields.custom.color_siblings.value
+  assign sibling_mode = mode | default: 'card'
+
+  # El color del producto activo viene del propio metafield (entrada con self: true)
+  # El script de sync lo escribe así para evitar cross-lookup via all_products
+  assign current_color = nil
+  assign current_color_name = nil
+  for s in siblings
+    if s.self
+      assign current_color = s.swatch
+      assign current_color_name = s.color | default: s.title
+      break
+    endif
+  endfor
+-%}
+
+{%- if siblings and siblings.size > 0 -%}
+  <div
+    class="color-siblings color-siblings--{{ sibling_mode }}"
+    aria-label="Colores disponibles"
+    {% if section_id %}data-section-id="{{ section_id }}"{% endif %}
+    data-product-title="{{ product.title | escape }}"
+  >
+
+    {%- if sibling_mode == 'pdp' and current_color_name -%}
+      <p class="color-siblings__label">
+        Color: <span class="color-siblings__label-value">{{ current_color_name }}</span>
+      </p>
+    {%- endif -%}
+
+    {%- comment -%} Producto actual (activo) {%- endcomment -%}
+    <a
+      href="{{ product.url }}"
+      class="color-siblings__swatch color-siblings__swatch--active"
+      aria-label="{{ product.title }}"
+      aria-current="true"
+      title="{{ product.title }}"
+      data-handle="{{ product.handle }}"
+    >
+      {%- if current_color -%}
+        <span class="color-siblings__swatch-dot" style="background: {{ current_color }};"></span>
+      {%- else -%}
+        <span class="color-siblings__swatch-fallback"></span>
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Productos hermanos {%- endcomment -%}
+    {%- for sibling in siblings -%}
+      {%- unless sibling.self -%}
+        <a
+          href="/products/{{ sibling.handle }}"
+          class="color-siblings__swatch"
+          aria-label="{{ sibling.color | default: sibling.title }}"
+          title="{{ sibling.color | default: sibling.title }}"
+          data-handle="{{ sibling.handle }}"
+        >
+          {%- if sibling.swatch -%}
+            <span class="color-siblings__swatch-dot" style="background: {{ sibling.swatch }};"></span>
+          {%- else -%}
+            <span class="color-siblings__swatch-fallback"></span>
+          {%- endif -%}
+        </a>
+      {%- endunless -%}
+    {%- endfor -%}
+
+  </div>
+{%- endif -%}
+
+<script>
+  (function () {
+    if (window.__colorSiblingsInitialized) return;
+    window.__colorSiblingsInitialized = true;
+
+    document.addEventListener('click', function (e) {
+      const swatch = e.target.closest('.color-siblings__swatch');
+      if (!swatch) return;
+
+      e.preventDefault();
+
+      if (swatch.getAttribute('aria-current') === 'true') return;
+
+      const container = swatch.closest('[data-section-id]');
+
+      if (!container) {
+        window.location.href = swatch.href;
+        return;
+      }
+
+      const handle = swatch.dataset.handle;
+      const sectionId = container.dataset.sectionId;
+
+      container.classList.add('color-siblings--loading');
+
+      fetch('/products/' + handle + '?sections=' + sectionId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          const wrapper = document.getElementById('shopify-section-' + sectionId);
+          if (wrapper && data[sectionId]) {
+            wrapper.innerHTML = data[sectionId];
+            history.pushState({}, '', '/products/' + handle);
+            const productTitle = wrapper.querySelector('[data-product-title]')?.dataset.productTitle;
+            if (productTitle) document.title = productTitle;
+          } else {
+            window.location.href = swatch.href;
+          }
+        })
+        .catch(function () {
+          window.location.href = swatch.href;
+        });
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .color-siblings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .color-siblings__label {
+    width: 100%;
+    margin: 0 0 4px;
+    font-size: var(--font-size-sm, 0.875rem);
+  }
+
+  .color-siblings__label-value {
+    font-weight: 500;
+  }
+
+  .color-siblings__swatch {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 0;
+    overflow: visible;
+    text-decoration: none;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .color-siblings__swatch::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: rgb(var(--color-foreground-rgb));
+    transition: width 0.2s ease-in-out;
+  }
+
+  .color-siblings__swatch:hover::after {
+    width: 70%;
+  }
+
+  .color-siblings__swatch--active::after {
+    width: 70%;
+  }
+
+  .color-siblings__swatch-dot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+  }
+
+  .color-siblings__swatch-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: rgb(var(--color-foreground-rgb) / 0.1);
+  }
+
+  /* PDP mode */
+  .color-siblings--pdp .color-siblings__swatch {
+    width: 28px;
+    height: 28px;
+  }
+
+  .color-siblings--loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+{% endstylesheet %}

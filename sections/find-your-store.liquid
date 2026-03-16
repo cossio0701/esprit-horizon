@@ -446,7 +446,7 @@
     return d.innerHTML;
   }
 
-  // Distancia entre dos coordenadas en km (f&oacute;rmula Haversine)
+  // Distancia entre dos coordenadas en km (formula Haversine)
   function haversine(lat1, lng1, lat2, lng2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -463,7 +463,7 @@
 
   class StoreFinder{{ section_id }} extends HTMLElement {
     connectedCallback() {
-      // Sanitizar la API key: solo caracteres v&aacute;lidos para una Google Maps API key
+      // Sanitizar la API key: solo caracteres validos para una Google Maps API key
       this.apiKey = (this.dataset.apiKey || '').replace(/[^A-Za-z0-9_\-]/g, '');
       this.storesData = this.dataset.stores;
       this.markerIcon = this.dataset.markerIcon;
@@ -490,7 +490,7 @@
         return;
       }
 
-      // Evita inyectar el script m&aacute;s de una vez si hay varias instancias
+      // Evita inyectar el script mas de una vez si hay varias instancias
       if (document.querySelector('script[data-store-finder-gmaps]')) {
         window.addEventListener('store-finder-gmaps-ready', () => this.init(), { once: true });
         return;
@@ -539,7 +539,7 @@
         mapTypeControl: false,
         fullscreenControl: true,
         streetViewControl: false,
-        // Ocultar etiquetas de puntos de inter&eacute;s para un mapa m&aacute;s limpio
+        // Ocultar etiquetas de puntos de interes para un mapa mas limpio
         styles: [
           { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
         ],
@@ -780,7 +780,7 @@
         }
       });
 
-      // Mantener orden por distancia si el usuario us&oacute; geolocalizaci&oacute;n
+      // Mantener orden por distancia si el usuario uso geolocalizacion
       if (this.userLocation) {
         filtered.sort((a, b) => (a._distance || 0) - (b._distance || 0));
       }
@@ -828,7 +828,7 @@
 
           this.applyFilters();
 
-          // Auto-seleccionar la tienda m&aacute;s cercana
+          // Auto-seleccionar la tienda mas cercana
           const nearest = [...this.allStores].sort((a, b) => a._distance - b._distance)[0];
           if (nearest) this.selectStore(nearest.id);
         },

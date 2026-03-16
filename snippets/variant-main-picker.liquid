@@ -7,6 +7,10 @@
 
 {% assign block_settings = block.settings %}
 
+{% if product_resource.metafields.custom.color_siblings != blank %}
+  {%- render 'color-siblings', product: product_resource, mode: 'pdp', section_id: section.id -%}
+{% endif %}
+
 {% unless product_resource.has_only_default_variant %}
   {% liquid
     assign button_background_brightness = section.settings.color_scheme.settings.foreground | color_brightness
