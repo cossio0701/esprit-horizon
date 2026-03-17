@@ -90,6 +90,17 @@
       height: 20px;
     }
   }
+
+  /* Title truncation - 2 lines max with ellipsis */
+  .product-card .product-title-row__link .text-block > p,
+  .product-card .product-title-row .text-block > p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -261,53 +272,79 @@
     },
     {
       "type": "select",
-      "id": "font_size_unit",
-      "label": "t:settings.unit",
+      "id": "font_size",
+      "label": "t:settings.size",
       "options": [
         {
-          "value": "px",
-          "label": "px"
+          "value": "",
+          "label": "t:options.default"
         },
         {
-          "value": "rem",
-          "label": "rem"
+          "value": "0.625rem",
+          "label": "10px"
         },
         {
-          "value": "em",
-          "label": "em"
+          "value": "0.75rem",
+          "label": "12px"
         },
         {
-          "value": "vh",
-          "label": "vh"
+          "value": "0.875rem",
+          "label": "14px"
         },
         {
-          "value": "vw",
-          "label": "vw"
+          "value": "1rem",
+          "label": "16px"
         },
         {
-          "value": "responsive",
-          "label": "responsive"
+          "value": "1.125rem",
+          "label": "18px"
         },
         {
-          "value": "%",
-          "label": "%"
+          "value": "1.25rem",
+          "label": "20px"
+        },
+        {
+          "value": "1.5rem",
+          "label": "24px"
+        },
+        {
+          "value": "2rem",
+          "label": "32px"
+        },
+        {
+          "value": "2.5rem",
+          "label": "40px"
+        },
+        {
+          "value": "3rem",
+          "label": "48px"
+        },
+        {
+          "value": "3.5rem",
+          "label": "56px"
+        },
+        {
+          "value": "4.5rem",
+          "label": "72px"
+        },
+        {
+          "value": "5.5rem",
+          "label": "88px"
+        },
+        {
+          "value": "7.5rem",
+          "label": "120px"
+        },
+        {
+          "value": "9.5rem",
+          "label": "152px"
+        },
+        {
+          "value": "11.5rem",
+          "label": "184px"
         }
       ],
-      "default": "px",
-      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
-    },
-    {
-      "type": "number",
-      "id": "font_size",
-      "label": "t:settings.size_desktop",
-      "default": 16,
-      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
-    },
-    {
-      "type": "number",
-      "id": "font_size_mobile",
-      "label": "t:settings.size_mobile",
-      "default": 14,
+      "default": "1rem",
       "visible_if": "{{ block.settings.type_preset == 'custom' }}"
     },
     {

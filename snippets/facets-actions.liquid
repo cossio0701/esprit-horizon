@@ -140,6 +140,16 @@
     transform: translateY(100%);
     flex-grow: 1;
     padding-block: var(--padding-lg);
+    width: 100%;
+  }
+
+  .facets__actions > facet-remove-component {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .facets__actions > facet-remove-component:not(:has(.active)) {
+    display: none;
   }
 
   .facets:not(.facets--drawer) .facets__clear-all {
@@ -207,9 +217,15 @@
   }
 
   .facets__see-results {
-    min-width: var(--facets-see-results-min-width);
+    min-width: 0;
     flex-grow: 1;
     padding-block: var(--padding-lg);
+    flex: 1 1 0;
+  }
+
+  .facets__actions--active .facets__see-results {
+    padding: 0;
+    transition: padding var(--animation-speed) var(--animation-easing);
   }
 
   .facets:not(.facets--drawer) .facets__see-results {

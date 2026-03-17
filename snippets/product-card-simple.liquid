@@ -247,9 +247,16 @@
     text-decoration: line-through;
   }
 
+  @media screen and (max-width: 749px) {
+    .product-card-simple__price {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+  }
+
   /* Swatches for carousel - Mobile only */
   .product-card-simple__swatches {
-    margin-top: 12px;
     padding-bottom: 8px;
     width: 100%;
     position: relative;

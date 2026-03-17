@@ -1,4 +1,4 @@
-{{ 'tabs.js' | asset_url | script_tag }}
+<script src="{{ 'tabs.js' | asset_url }}" defer="defer"></script>
 
 <div
   class="ui-tabs"
@@ -54,7 +54,6 @@
 {% schema %}
 {
   "name": "UI Tabs",
-  "tag": null,
   "blocks": [
     { "type": "_ui-tab" }
   ],
@@ -77,11 +76,7 @@
   ],
   "presets": [
     {
-      "name": "UI Tabs",
-      "blocks": [
-        { "type": "_ui-tab", "settings": { "label": "Tab 1" } },
-        { "type": "_ui-tab", "settings": { "label": "Tab 2" } }
-      ]
+      "name": "UI Tabs"
     }
   ]
 }

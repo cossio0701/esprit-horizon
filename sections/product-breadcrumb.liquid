@@ -454,10 +454,22 @@
       "id": "separator_style",
       "label": "Estilo de separador",
       "options": [
-        { "value": "slash", "label": "Barra (/)" },
-        { "value": "arrow", "label": "Flecha (→)" },
-        { "value": "chevron", "label": "Chevron (›)" },
-        { "value": "pipe", "label": "Barra vertical (|)" }
+        {
+          "value": "slash",
+          "label": "Barra (/)"
+        },
+        {
+          "value": "arrow",
+          "label": "Flecha (→)"
+        },
+        {
+          "value": "chevron",
+          "label": "Chevron (›)"
+        },
+        {
+          "value": "pipe",
+          "label": "Barra vertical (|)"
+        }
       ],
       "default": "slash"
     },
@@ -470,10 +482,22 @@
       "id": "font_family",
       "label": "Familia de fuente",
       "options": [
-        { "value": "inherit", "label": "Heredar del tema" },
-        { "value": "var(--font-body--family)", "label": "Fuente del cuerpo" },
-        { "value": "var(--font-primary--family)", "label": "Fuente primaria" },
-        { "value": "system-ui, sans-serif", "label": "Sistema" }
+        {
+          "value": "inherit",
+          "label": "Heredar del tema"
+        },
+        {
+          "value": "var(--font-body--family)",
+          "label": "Fuente del cuerpo"
+        },
+        {
+          "value": "var(--font-primary--family)",
+          "label": "Fuente primaria"
+        },
+        {
+          "value": "system-ui, sans-serif",
+          "label": "Sistema"
+        }
       ],
       "default": "inherit"
     },
@@ -488,24 +512,26 @@
       "default": 14
     },
     {
-      "type": "range",
-      "id": "font_size_mobile",
-      "min": 10,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Tamaño de fuente móvil",
-      "default": 12
-    },
-    {
       "type": "select",
       "id": "current_font_weight",
       "label": "Peso del elemento actual",
       "options": [
-        { "value": "400", "label": "Normal" },
-        { "value": "500", "label": "Medio" },
-        { "value": "600", "label": "Semi-bold" },
-        { "value": "700", "label": "Bold" }
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medio"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
       ],
       "default": "600"
     },
@@ -657,6 +683,11 @@
       "category": "Navegación"
     }
   ],
-  "templates": ["product", "collection", "page", "search"]
+  "templates": [
+    "product",
+    "collection",
+    "page",
+    "search"
+  ]
 }
 {% endschema %}
