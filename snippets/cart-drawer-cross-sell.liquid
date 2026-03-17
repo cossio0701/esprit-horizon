@@ -117,9 +117,6 @@
 
   .cart-drawer-cross-sell__carousel-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
 
   .cart-drawer-cross-sell__carousel {
@@ -131,8 +128,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: 4px;
-    flex: 1;
+    padding: 4px 36px;
   }
 
   .cart-drawer-cross-sell__carousel::-webkit-scrollbar {
@@ -142,11 +138,13 @@
   .cart-drawer-cross-sell__slide {
     flex-shrink: 0;
     scroll-snap-align: start;
-    width: 55%;
+    width: 70%;
   }
 
   .cart-drawer-cross-sell__arrow {
-    flex-shrink: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -158,23 +156,21 @@
     cursor: pointer;
     transition: all 0.2s ease;
     z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .cart-drawer-cross-sell__arrow--prev {
+    left: 0;
+  }
+
+  .cart-drawer-cross-sell__arrow--next {
+    right: 0;
   }
 
   .cart-drawer-cross-sell__arrow:hover {
     background-color: var(--color-foreground);
     color: var(--color-background);
     border-color: var(--color-foreground);
-  }
-
-  .cart-drawer-cross-sell__arrow:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
-  .cart-drawer-cross-sell__arrow:disabled:hover {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    border-color: var(--color-border);
   }
 
   .cart-drawer-cross-sell__arrow .svg-wrapper {

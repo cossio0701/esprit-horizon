@@ -16,11 +16,7 @@
       {{
         featured_image
         | image_url: width: 200
-        | image_tag:
-          loading: 'lazy',
-          class: 'cart-cross-sell-card__image',
-          widths: '100, 150, 200',
-          sizes: '80px'
+        | image_tag: loading: 'lazy', class: 'cart-cross-sell-card__image', widths: '100, 150, 200', sizes: '80px'
       }}
     {%- else -%}
       <div class="cart-cross-sell-card__placeholder">
@@ -108,7 +104,7 @@
     gap: 4px;
     flex: 1;
     min-width: 0;
-    justify-content: center;
+    justify-content: space-evenly;
   }
 
   .cart-cross-sell-card__title {
