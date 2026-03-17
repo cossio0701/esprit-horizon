@@ -205,6 +205,97 @@ if (!customElements.get('facet-inputs-component')) {
   customElements.define('facet-inputs-component', FacetInputsComponent);
 }
 
+function getCurrencyDecimals(currency = '') {
+  return CURRENCY_DECIMALS[currency.toUpperCase()] ?? DEFAULT_CURRENCY_DECIMALS;
+}
+
+function normalizeNumericString(value) {
+  const raw = String(value ?? '').trim().replace(/\s/g, '').replace(/'/g, '');
+  if (raw === '') return '';
+
+  const hasComma = raw.includes(',');
+  const hasDot = raw.includes('.');
+
+  if (hasComma && hasDot) {
+    return raw.lastIndexOf(',') > raw.lastIndexOf('.')
+      ? raw.replace(/\./g, '').replace(',', '.')
+      : raw.replace(/,/g, '');
+  }
+
+  if (hasComma) return raw.replace(',', '.');
+  return raw;
+}
+
+function parseLocalizedNumber(value, fallback = NaN) {
+  const normalized = normalizeNumericString(value);
+  if (normalized === '') return fallback;
+
+  const parsed = Number(normalized);
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
+
+function parseMinorUnits(value, fallback, currency = '') {
+  const parsed = parseLocalizedNumber(value, NaN);
+  if (Number.isNaN(parsed)) return fallback;
+
+  return Math.round(parsed * Math.pow(10, getCurrencyDecimals(currency)));
+}
+
+function formatMoneyFromTemplate(template, moneyValue, currency = '') {
+  const safeTemplate = template || '{{amount}}';
+  const minorUnitPrecision = getCurrencyDecimals(currency);
+
+  return safeTemplate.replace(/{{\s*(\w+)\s*}}/g, (_, placeholder) => {
+    if (typeof placeholder !== 'string') return '';
+    if (placeholder === 'currency') return currency;
+
+    let thousandsSeparator = ',';
+    let decimalSeparator = '.';
+    let precision = minorUnitPrecision;
+
+    if (placeholder === 'amount') {
+      // Check first since it's the most common, use defaults.
+    } else if (placeholder === 'amount_no_decimals') {
+      precision = 0;
+    } else if (placeholder === 'amount_with_comma_separator') {
+      thousandsSeparator = '.';
+      decimalSeparator = ',';
+    } else if (placeholder === 'amount_no_decimals_with_comma_separator') {
+      // Weirdly, this is correct. It uses amount_with_comma_separator's
+      // behaviour but removes decimals, resulting in an unintuitive
+      // output that can't possibly include commas, despite the name.
+      thousandsSeparator = '.';
+      precision = 0;
+    } else if (placeholder === 'amount_no_decimals_with_space_separator') {
+      thousandsSeparator = ' ';
+      precision = 0;
+    } else if (placeholder === 'amount_with_space_separator') {
+      thousandsSeparator = ' ';
+      decimalSeparator = ',';
+    } else if (placeholder === 'amount_with_period_and_space_separator') {
+      thousandsSeparator = ' ';
+      decimalSeparator = '.';
+    } else if (placeholder === 'amount_with_apostrophe_separator') {
+      thousandsSeparator = "'";
+      decimalSeparator = '.';
+    }
+
+    return formatMinorUnitsValue(moneyValue, thousandsSeparator, decimalSeparator, precision, minorUnitPrecision);
+  });
+}
+
+function formatMinorUnitsValue(moneyValue, thousandsSeparator, decimalSeparator, displayPrecision, minorUnitPrecision) {
+  const roundedNumber = (moneyValue / Math.pow(10, minorUnitPrecision)).toFixed(displayPrecision);
+
+  let [a, b] = roundedNumber.split('.');
+  if (!a) a = '0';
+  if (!b) b = '';
+
+  a = a.replace(/\d(?=(\d\d\d)+(?!\d))/g, (digit) => digit + thousandsSeparator);
+
+  return displayPrecision <= 0 ? a : a + decimalSeparator + b.padEnd(displayPrecision, '0');
+}
+
 /**
  * @typedef {Object} PriceFacetRefs
  * @property {HTMLInputElement} minInput - The minimum price input
@@ -218,11 +309,20 @@ if (!customElements.get('facet-inputs-component')) {
 class PriceFacetComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
+    this.refs.minRange?.addEventListener('input', this.#onRangeInput);
+    this.refs.maxRange?.addEventListener('input', this.#onRangeInput);
+    this.refs.minRange?.addEventListener('change', this.#onRangeChange);
+    this.refs.maxRange?.addEventListener('change', this.#onRangeChange);
     this.addEventListener('keydown', this.#onKeyDown);
+    this.#syncSliderUI(this.#getDomain());
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.refs.minRange?.removeEventListener('input', this.#onRangeInput);
+    this.refs.maxRange?.removeEventListener('input', this.#onRangeInput);
+    this.refs.minRange?.removeEventListener('change', this.#onRangeChange);
+    this.refs.maxRange?.removeEventListener('change', this.#onRangeChange);
     this.removeEventListener('keydown', this.#onKeyDown);
   }
 
@@ -231,10 +331,20 @@ class PriceFacetComponent extends Component {
    * @param {KeyboardEvent} event - The keydown event
    */
   #onKeyDown = (event) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement && target.type === 'range') return;
     if (event.metaKey) return;
 
     const pattern = /[0-9]|\.|,|'| |Tab|Backspace|Enter|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|Delete|Escape/;
     if (!event.key.match(pattern)) event.preventDefault();
+  };
+
+  #onRangeInput = () => {
+    this.#syncSliderUI(this.#getDomain());
+  };
+
+  #onRangeChange = () => {
+    this.updatePriceFilterAndResults();
   };
 
   /**
@@ -242,15 +352,19 @@ class PriceFacetComponent extends Component {
    */
   updatePriceFilterAndResults() {
     const { minInput, maxInput } = this.refs;
+    const domain = this.#getDomain();
 
+    this.#syncHiddenInputsFromRanges(domain);
     this.#adjustToValidValues(minInput);
     this.#adjustToValidValues(maxInput);
 
     const facetsForm = this.closest('facets-form-component');
     if (!(facetsForm instanceof FacetsFormComponent)) return;
 
+    this.#setMinAndMaxValues(domain);
+    this.#syncRangesFromHiddenInputs(domain);
+    this.#syncSliderUI(domain);
     facetsForm.updateFilters();
-    this.#setMinAndMaxValues();
     this.#updateSummary();
   }
 
@@ -259,11 +373,12 @@ class PriceFacetComponent extends Component {
    * @param {HTMLInputElement} input - The input element to adjust
    */
   #adjustToValidValues(input) {
-    if (input.value.trim() === '') return;
+    if (!(input instanceof HTMLInputElement) || input.value.trim() === '') return;
 
-    const value = Number(input.value);
-    const min = Number(formatMoney(input.getAttribute('data-min') ?? ''));
-    const max = Number(formatMoney(input.getAttribute('data-max') ?? ''));
+    const value = parseLocalizedNumber(input.value, NaN);
+    const min = parseLocalizedNumber(input.getAttribute('data-min') ?? '', NaN);
+    const max = parseLocalizedNumber(input.getAttribute('data-max') ?? '', NaN);
+    if (Number.isNaN(value) || Number.isNaN(min) || Number.isNaN(max)) return;
 
     if (value < min) input.value = min.toString();
     if (value > max) input.value = max.toString();
@@ -272,13 +387,12 @@ class PriceFacetComponent extends Component {
   /**
    * Sets min and max values for the inputs
    */
-  #setMinAndMaxValues() {
+  #setMinAndMaxValues(domain) {
     const { minInput, maxInput } = this.refs;
+    const { rangeMin, rangeMax } = domain;
 
-    if (maxInput.value) minInput.setAttribute('data-max', maxInput.value);
-    if (minInput.value) maxInput.setAttribute('data-min', minInput.value);
-    if (minInput.value === '') maxInput.setAttribute('data-min', '0');
-    if (maxInput.value === '') minInput.setAttribute('data-max', maxInput.getAttribute('data-max') ?? '');
+    this.#setInputAttribute(minInput, 'data-max', maxInput.value || this.#formatInputValue(rangeMax));
+    this.#setInputAttribute(maxInput, 'data-min', minInput.value || this.#formatInputValue(rangeMin));
   }
 
   /**
@@ -292,6 +406,172 @@ class PriceFacetComponent extends Component {
     if (!(statusComponent instanceof FacetStatusComponent)) return;
 
     statusComponent?.updatePriceSummary(minInput, maxInput);
+  }
+
+  #syncHiddenInputsFromRanges(domain) {
+    const minInput = this.refs.minInput;
+    const maxInput = this.refs.maxInput;
+    if (
+      !(minInput instanceof HTMLInputElement) ||
+      !(maxInput instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    const { rangeMin, rangeMax } = domain;
+    const values = this.#readRangeValues(domain);
+    this.#writeRangeValues(values);
+
+    minInput.value = values.minValue <= rangeMin ? '' : this.#formatInputValue(values.minValue);
+    maxInput.value = values.maxValue >= rangeMax ? '' : this.#formatInputValue(values.maxValue);
+  }
+
+  #syncRangesFromHiddenInputs(domain) {
+    const minInput = this.refs.minInput;
+    const maxInput = this.refs.maxInput;
+    if (
+      !(minInput instanceof HTMLInputElement) ||
+      !(maxInput instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    const { rangeMin, rangeMax } = domain;
+    const values = this.#normalizeRangeValues(
+      minInput.value ? this.#parseInputValue(minInput.value, rangeMin) : rangeMin,
+      maxInput.value ? this.#parseInputValue(maxInput.value, rangeMax) : rangeMax,
+      domain,
+    );
+
+    this.#writeRangeValues(values);
+  }
+
+  #syncSliderUI(domain) {
+    const minLabel = this.refs.minLabel;
+    const maxLabel = this.refs.maxLabel;
+    const activeRange = this.refs.activeRange;
+    if (
+      !(minLabel instanceof HTMLElement) ||
+      !(maxLabel instanceof HTMLElement) ||
+      !(activeRange instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    const { rangeMin, rangeSpan } = domain;
+    const values = this.#readRangeValues(domain);
+    this.#writeRangeValues(values);
+
+    minLabel.textContent = this.#formatDisplayMoney(this.#toMinorUnits(values.minValue));
+    maxLabel.textContent = this.#formatDisplayMoney(this.#toMinorUnits(values.maxValue));
+
+    const start = ((values.minValue - rangeMin) / rangeSpan) * 100;
+    const end = ((values.maxValue - rangeMin) / rangeSpan) * 100;
+
+    activeRange.style.left = `${start}%`;
+    activeRange.style.width = `${Math.max(end - start, 0)}%`;
+  }
+
+  #getDomain() {
+    const rangeMin = parseLocalizedNumber(this.dataset.rangeMin || '0', NaN);
+    const rangeMax = parseLocalizedNumber(this.dataset.rangeMax || String(rangeMin), NaN);
+    const safeMin = Number.isNaN(rangeMin) ? 0 : rangeMin;
+    const safeMax = Number.isNaN(rangeMax) ? safeMin : Math.max(rangeMax, safeMin);
+    const rangeSpan = Math.max(safeMax - safeMin, 1);
+
+    return { rangeMin: safeMin, rangeMax: safeMax, rangeSpan };
+  }
+
+  #normalizeRangeValues(minCandidate, maxCandidate, domain) {
+    const { rangeMin, rangeMax } = domain;
+    let minValue = this.#clampToDomain(minCandidate, rangeMin, rangeMax);
+    let maxValue = this.#clampToDomain(maxCandidate, rangeMin, rangeMax);
+
+    if (minValue > maxValue) {
+      [minValue, maxValue] = [maxValue, minValue];
+    }
+
+    return { minValue, maxValue };
+  }
+
+  #clampToDomain(value, rangeMin, rangeMax) {
+    if (Number.isNaN(value)) return rangeMin;
+    return Math.min(Math.max(value, rangeMin), rangeMax);
+  }
+
+  #readRangeValues(domain) {
+    const minRange = this.refs.minRange;
+    const maxRange = this.refs.maxRange;
+    if (!(minRange instanceof HTMLInputElement) || !(maxRange instanceof HTMLInputElement)) {
+      return { minValue: domain.rangeMin, maxValue: domain.rangeMax };
+    }
+
+    const values = this.#normalizeRangeValues(
+      parseLocalizedNumber(minRange.value || String(domain.rangeMin), domain.rangeMin),
+      parseLocalizedNumber(maxRange.value || String(domain.rangeMax), domain.rangeMax),
+      domain,
+    );
+
+    return values;
+  }
+
+  #writeRangeValues({ minValue, maxValue }) {
+    const minRange = this.refs.minRange;
+    const maxRange = this.refs.maxRange;
+    if (!(minRange instanceof HTMLInputElement) || !(maxRange instanceof HTMLInputElement)) return;
+
+    const minString = this.#formatRangeValue(minValue);
+    const maxString = this.#formatRangeValue(maxValue);
+    if (minRange.value !== minString) minRange.value = minString;
+    if (maxRange.value !== maxString) maxRange.value = maxString;
+  }
+
+  #setInputAttribute(input, attribute, value) {
+    if (!(input instanceof HTMLInputElement)) return;
+    if (input.getAttribute(attribute) === value) return;
+    input.setAttribute(attribute, value);
+  }
+
+  #parseInputValue(value, fallback) {
+    const parsed = parseLocalizedNumber(value, NaN);
+    if (Number.isNaN(parsed)) return fallback;
+
+    return parsed;
+  }
+
+  #formatRangeValue(value) {
+    if (Number.isInteger(value)) return value.toString();
+
+    const decimals = this.#currencyDecimals();
+    return value.toFixed(decimals);
+  }
+
+  #formatInputValue(value) {
+    return this.#formatRangeValue(value);
+  }
+
+  #minorUnitFactor() {
+    const factor = parseInt(this.dataset.minorUnitFactor || '100', 10);
+    return Number.isNaN(factor) ? 100 : Math.max(factor, 1);
+  }
+
+  #toMinorUnits(value) {
+    return Math.round(value * this.#minorUnitFactor());
+  }
+
+  #toRangeUnits(value) {
+    return value / this.#minorUnitFactor();
+  }
+
+  #formatDisplayMoney(cents) {
+    const template = this.dataset.moneyFormat || '{{amount}}';
+    const currency = this.dataset.currency || '';
+
+    return formatMoneyFromTemplate(template, cents, currency);
+  }
+
+  #currencyDecimals() {
+    return getCurrencyDecimals(this.dataset.currency || '');
   }
 }
 
@@ -744,35 +1024,25 @@ class FacetStatusComponent extends Component {
     const minInputValue = minInput.value;
     const maxInputValue = maxInput.value;
     const { facetStatus } = this.refs;
+    const currency = facetStatus.dataset.currency || '';
+    const rangeMin = parseInt(facetStatus.dataset.rangeMin || '0', 10);
+    const rangeMax = parseInt(facetStatus.dataset.rangeMax || String(rangeMin), 10);
+    const safeRangeMin = Number.isNaN(rangeMin) ? 0 : rangeMin;
+    const safeRangeMax = Number.isNaN(rangeMax) ? safeRangeMin : Math.max(rangeMax, safeRangeMin);
 
     if (!minInputValue && !maxInputValue) {
       facetStatus.innerHTML = '';
       return;
     }
 
-    const minInputNum = this.#parseCents(minInputValue, '0');
-    const maxInputNum = this.#parseCents(maxInputValue, facetStatus.dataset.rangeMax);
+    const minInputNum = minInputValue
+      ? parseMinorUnits(minInputValue, safeRangeMin, currency)
+      : safeRangeMin;
+    const maxInputNum = maxInputValue
+      ? parseMinorUnits(maxInputValue, safeRangeMax, currency)
+      : safeRangeMax;
+
     facetStatus.innerHTML = `${this.#formatMoney(minInputNum)}–${this.#formatMoney(maxInputNum)}`;
-  }
-
-  /**
-   * Parses a decimal number as cents
-   * @param {string} value - The stringified decimal number to parse
-   * @param {string} fallback - The fallback value in case `value` is invalid
-   * @returns {number} The money value in cents
-   */
-  #parseCents(value, fallback = '0') {
-    const parts = value ? value.trim().split(/[^0-9]/) : (parseInt(fallback, 10) / 100).toString();
-    const [wholeStr, fractionStr, ...rest] = parts;
-    if (typeof wholeStr !== 'string' || rest.length > 0) return parseInt(fallback, 10);
-
-    const whole = parseInt(wholeStr, 10);
-    let fraction = parseInt(fractionStr || '0', 10);
-
-    // Use two most-significant digits, e.g. 1 -> 10, 12 -> 12, 123 -> 12.3, 1234 -> 12.34, etc
-    fraction = fraction * Math.pow(10, 2 - fraction.toString().length);
-
-    return whole * 100 + fraction;
   }
 
   /**
@@ -785,65 +1055,7 @@ class FacetStatusComponent extends Component {
 
     const template = this.refs.moneyFormat.content.textContent || '{{amount}}';
     const currency = this.refs.facetStatus.dataset.currency || '';
-
-    return template.replace(/{{\s*(\w+)\s*}}/g, (_, placeholder) => {
-      if (typeof placeholder !== 'string') return '';
-      if (placeholder === 'currency') return currency;
-
-      let thousandsSeparator = ',';
-      let decimalSeparator = '.';
-      let precision = CURRENCY_DECIMALS[currency.toUpperCase()] ?? DEFAULT_CURRENCY_DECIMALS;
-
-      if (placeholder === 'amount') {
-        // Check first since it's the most common, use defaults.
-      } else if (placeholder === 'amount_no_decimals') {
-        precision = 0;
-      } else if (placeholder === 'amount_with_comma_separator') {
-        thousandsSeparator = '.';
-        decimalSeparator = ',';
-      } else if (placeholder === 'amount_no_decimals_with_comma_separator') {
-        // Weirdly, this is correct. It uses amount_with_comma_separator's
-        // behaviour but removes decimals, resulting in an unintuitive
-        // output that can't possibly include commas, despite the name.
-        thousandsSeparator = '.';
-        precision = 0;
-      } else if (placeholder === 'amount_no_decimals_with_space_separator') {
-        thousandsSeparator = ' ';
-        precision = 0;
-      } else if (placeholder === 'amount_with_space_separator') {
-        thousandsSeparator = ' ';
-        decimalSeparator = ',';
-      } else if (placeholder === 'amount_with_period_and_space_separator') {
-        thousandsSeparator = ' ';
-        decimalSeparator = '.';
-      } else if (placeholder === 'amount_with_apostrophe_separator') {
-        thousandsSeparator = "'";
-        decimalSeparator = '.';
-      }
-
-      return this.#formatCents(moneyValue, thousandsSeparator, decimalSeparator, precision);
-    });
-  }
-
-  /**
-   * Formats money in cents
-   * @param {number} moneyValue - The money value in cents (hundredths of one major currency unit)
-   * @param {string} thousandsSeparator - The thousands separator
-   * @param {string} decimalSeparator - The decimal separator
-   * @param {number} precision - The precision
-   * @returns {string} The formatted money value
-   */
-  #formatCents(moneyValue, thousandsSeparator, decimalSeparator, precision) {
-    const roundedNumber = (moneyValue / 100).toFixed(precision);
-
-    let [a, b] = roundedNumber.split('.');
-    if (!a) a = '0';
-    if (!b) b = '';
-
-    // Split by groups of 3 digits
-    a = a.replace(/\d(?=(\d\d\d)+(?!\d))/g, (digit) => digit + thousandsSeparator);
-
-    return precision <= 0 ? a : a + decimalSeparator + b.padEnd(precision, '0');
+    return formatMoneyFromTemplate(template, moneyValue, currency);
   }
 
   /**
