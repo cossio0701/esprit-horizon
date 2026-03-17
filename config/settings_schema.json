@@ -2293,6 +2293,26 @@
         "label": "t:settings.border_opacity",
         "default": 10,
         "visible_if": "{{ settings.variant_swatch_border_style != 'none' }}"
+      },
+      {
+        "type": "header",
+        "content": "Color siblings"
+      },
+      {
+        "type": "select",
+        "id": "color_siblings_style",
+        "label": "Estilo de swatches de color",
+        "options": [
+          {
+            "value": "image",
+            "label": "Foto del producto"
+          },
+          {
+            "value": "color",
+            "label": "Color (hexadecimal)"
+          }
+        ],
+        "default": "image"
       }
     ]
   },

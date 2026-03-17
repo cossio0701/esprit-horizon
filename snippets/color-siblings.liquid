@@ -13,28 +13,31 @@
 {%- liquid
   assign siblings = product.metafields.custom.color_siblings.value
   assign sibling_mode = mode | default: 'card'
+  assign sibling_style = settings.color_siblings_style | default: 'image'
 
   # El color del producto activo viene del propio metafield (entrada con self: true)
   # El script de sync lo escribe así para evitar cross-lookup via all_products
-  assign current_color = nil
-  assign current_color_name = nil
+  assign current_color_name = null
+  assign self_swatch_color = null
   for s in siblings
     if s.self
-      assign current_color = s.swatch
       assign current_color_name = s.color | default: s.title
+      assign self_swatch_color = s.swatch
       break
     endif
   endfor
+  assign self_swatch_img = product.images[1] | default: product.images[0]
 -%}
 
 {%- if siblings and siblings.size > 0 -%}
   <div
     class="color-siblings color-siblings--{{ sibling_mode }}"
     aria-label="Colores disponibles"
-    {% if section_id %}data-section-id="{{ section_id }}"{% endif %}
+    {% if section_id %}
+      data-section-id="{{ section_id }}"
+    {% endif %}
     data-product-title="{{ product.title | escape }}"
   >
-
     {%- if sibling_mode == 'pdp' and current_color_name -%}
       <p class="color-siblings__label">
         Color: <span class="color-siblings__label-value">{{ current_color_name }}</span>
@@ -50,8 +53,21 @@
       title="{{ product.title }}"
       data-handle="{{ product.handle }}"
     >
-      {%- if current_color -%}
-        <span class="color-siblings__swatch-dot" style="background: {{ current_color }};"></span>
+      {%- if sibling_style == 'color' -%}
+        {%- if self_swatch_color -%}
+          <span class="color-siblings__swatch-dot" style="background-color: {{ self_swatch_color }};"></span>
+        {%- else -%}
+          <span class="color-siblings__swatch-fallback"></span>
+        {%- endif -%}
+      {%- elsif self_swatch_img -%}
+        <span class="color-siblings__swatch-media">
+          <img
+            src="{{ self_swatch_img | image_url: width: 200 }}"
+            alt="{{ current_color_name | escape }}"
+            loading="lazy"
+            class="color-siblings__swatch-img"
+          >
+        </span>
       {%- else -%}
         <span class="color-siblings__swatch-fallback"></span>
       {%- endif -%}
@@ -67,19 +83,36 @@
           title="{{ sibling.color | default: sibling.title }}"
           data-handle="{{ sibling.handle }}"
         >
-          {%- if sibling.swatch -%}
-            <span class="color-siblings__swatch-dot" style="background: {{ sibling.swatch }};"></span>
+          {%- if sibling_style == 'color' -%}
+            {%- if sibling.swatch -%}
+              <span class="color-siblings__swatch-dot" style="background-color: {{ sibling.swatch }};"></span>
+            {%- else -%}
+              <span class="color-siblings__swatch-fallback"></span>
+            {%- endif -%}
+          {%- elsif sibling.image -%}
+            <span class="color-siblings__swatch-media">
+              <img
+                src="{{ sibling.image | replace: '/cdn/s/', 'https://cdn.shopify.com/s/' }}"
+                alt="{{ sibling.color | default: sibling.title | escape }}"
+                loading="lazy"
+                class="color-siblings__swatch-img"
+                onerror="fixSwatchUrl(this)"
+              >
+            </span>
           {%- else -%}
             <span class="color-siblings__swatch-fallback"></span>
           {%- endif -%}
         </a>
       {%- endunless -%}
     {%- endfor -%}
-
   </div>
 {%- endif -%}
 
 <script>
+  window.fixSwatchUrl = function (img) {
+    img.src = img.src.replace('/cdn/s/', 'https://cdn.shopify.com/s/');
+  };
+
   (function () {
     if (window.__colorSiblingsInitialized) return;
     window.__colorSiblingsInitialized = true;
@@ -105,11 +138,18 @@
       container.classList.add('color-siblings--loading');
 
       fetch('/products/' + handle + '?sections=' + sectionId)
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+          return r.json();
+        })
         .then(function (data) {
           const wrapper = document.getElementById('shopify-section-' + sectionId);
           if (wrapper && data[sectionId]) {
             wrapper.innerHTML = data[sectionId];
+            wrapper.querySelectorAll('.color-siblings__swatch-img').forEach(function (img) {
+              let src = img.getAttribute('src') || '';
+              if (src.startsWith('/cdn/s/')) src = 'https://cdn.shopify.com' + src.substring(4);
+              if (src) img.src = src;
+            });
             history.pushState({}, '', '/products/' + handle);
             const productTitle = wrapper.querySelector('[data-product-title]')?.dataset.productTitle;
             if (productTitle) document.title = productTitle;
@@ -173,11 +213,28 @@
     width: 70%;
   }
 
+  .color-siblings__swatch-media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
+  }
+
+  .color-siblings__swatch-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    transform: scale(3);
+  }
+
   .color-siblings__swatch-dot {
     display: block;
     width: 100%;
     height: 100%;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
   }
 
   .color-siblings__swatch-fallback {
@@ -189,8 +246,8 @@
 
   /* PDP mode */
   .color-siblings--pdp .color-siblings__swatch {
-    width: 28px;
-    height: 28px;
+    width: 40px;
+    height: 40px;
   }
 
   .color-siblings--loading {
