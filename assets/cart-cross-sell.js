@@ -1,5 +1,4 @@
 import { morph } from '@theme/morph';
-import { ThemeEvents } from '@theme/events';
 
 class CartCrossSell extends HTMLElement {
   #abortController = new AbortController();
@@ -7,12 +6,36 @@ class CartCrossSell extends HTMLElement {
   connectedCallback() {
     const { signal } = this.#abortController;
 
+    this.carousel = this.querySelector('.cart-drawer-cross-sell__carousel');
+    this.prevArrow = this.querySelector('.cart-drawer-cross-sell__arrow--prev');
+    this.nextArrow = this.querySelector('.cart-drawer-cross-sell__arrow--next');
+
+    if (!this.carousel) return;
+
+    if (this.prevArrow) {
+      this.prevArrow.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const scrollAmount = this.carousel.offsetWidth * 0.85;
+        this.carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }, { signal });
+    }
+
+    if (this.nextArrow) {
+      this.nextArrow.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const scrollAmount = this.carousel.offsetWidth * 0.85;
+        this.carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }, { signal });
+    }
+
     this.addEventListener('click', this.#handleQuickBuyClick, { signal });
-  }
+  };
 
   disconnectedCallback() {
     this.#abortController.abort();
-  }
+  };
 
   #handleQuickBuyClick = async (event) => {
     const quickBuyBtn = event.target.closest('.cart-cross-sell-card__quick-buy');

@@ -35,14 +35,36 @@
         </summary>
 
         <div class="details__content cart-drawer-cross-sell__content">
-          <div class="cart-drawer-cross-sell__carousel">
-            {%- for product in cross_sell_products limit: cross_sell_max -%}
-              {%- unless cart_product_ids contains product.id -%}
-                <div class="cart-drawer-cross-sell__slide">
-                  {% render 'cart-cross-sell-card', product: product, section_id: cross_sell_section_id %}
-                </div>
-              {%- endunless -%}
-            {%- endfor -%}
+          <div class="cart-drawer-cross-sell__carousel-wrapper">
+            <button
+              type="button"
+              class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--prev"
+              aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </button>
+
+            <div class="cart-drawer-cross-sell__carousel">
+              {%- for product in cross_sell_products limit: cross_sell_max -%}
+                {%- unless cart_product_ids contains product.id -%}
+                  <div class="cart-drawer-cross-sell__slide">
+                    {% render 'cart-cross-sell-card', product: product, section_id: cross_sell_section_id %}
+                  </div>
+                {%- endunless -%}
+              {%- endfor -%}
+            </div>
+
+            <button
+              type="button"
+              class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--next"
+              aria-label="{{ 'accessibility.slideshow_next' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </button>
           </div>
         </div>
       </details>
@@ -54,7 +76,6 @@
   .cart-drawer-cross-sell {
     display: block;
     padding: 0;
-    padding-bottom: 0;
     border: none;
     width: 100%;
   }
@@ -94,6 +115,13 @@
     overflow: hidden;
   }
 
+  .cart-drawer-cross-sell__carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .cart-drawer-cross-sell__carousel {
     display: flex;
     gap: 12px;
@@ -103,16 +131,8 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-right: var(--cart-drawer-padding);
-    margin-right: calc(-1 * var(--cart-drawer-padding));
     padding-bottom: 4px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .cart-drawer-cross-sell__carousel {
-      padding-right: var(--cart-drawer-padding-desktop);
-      margin-right: calc(-1 * var(--cart-drawer-padding-desktop));
-    }
+    flex: 1;
   }
 
   .cart-drawer-cross-sell__carousel::-webkit-scrollbar {
@@ -125,13 +145,56 @@
     width: 55%;
   }
 
-  .cart-drawer-cross-sell__slide:last-child {
-    padding-right: var(--cart-drawer-padding);
+  .cart-drawer-cross-sell__arrow {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
   }
 
-  @media screen and (min-width: 750px) {
-    .cart-drawer-cross-sell__slide:last-child {
-      padding-right: var(--cart-drawer-padding-desktop);
-    }
+  .cart-drawer-cross-sell__arrow:hover {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    border-color: var(--color-foreground);
+  }
+
+  .cart-drawer-cross-sell__arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .cart-drawer-cross-sell__arrow:disabled:hover {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    border-color: var(--color-border);
+  }
+
+  .cart-drawer-cross-sell__arrow .svg-wrapper {
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cart-drawer-cross-sell__arrow .svg-wrapper svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .cart-drawer-cross-sell__arrow--prev .svg-wrapper {
+    transform: rotate(90deg);
+  }
+
+  .cart-drawer-cross-sell__arrow--next .svg-wrapper {
+    transform: rotate(-90deg);
   }
 {% endstylesheet %}
