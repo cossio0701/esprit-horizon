@@ -1,0 +1,137 @@
+{%- doc -%}
+  Renders a cross-sell component inside the cart drawer with accordion and horizontal carousel.
+
+  @param {object} [section] - The section object for section_id
+  @param {string} [heading] - Heading text for the accordion
+  @param {object} [collection] - Collection to show products from
+  @param {number} [max_products] - Maximum number of products to show
+{%- enddoc -%}
+
+<script
+  src="{{ 'cart-cross-sell.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% liquid
+  assign cross_sell_collection = collection | default: collections.all
+  assign cross_sell_max = max_products | default: 8
+  assign cross_sell_heading = heading | default: 'Podría gustarte'
+  assign cross_sell_section_id = section.id | default: 'cart-drawer-cross-sell'
+  assign cross_sell_products = cross_sell_collection.products
+
+  assign cart_product_ids = cart.items | map: 'product_id'
+%}
+
+{%- if cross_sell_products.size > 0 -%}
+  <cart-cross-sell class="cart-drawer-cross-sell" data-section-id="{{ cross_sell_section_id }}">
+    <accordion-custom>
+      <details class="details">
+        <summary class="details__header cart-drawer-cross-sell__header">
+          <span class="cart-drawer-cross-sell__title">{{ cross_sell_heading }}</span>
+          <span class="svg-wrapper icon-caret icon-animated">
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </span>
+        </summary>
+
+        <div class="details__content cart-drawer-cross-sell__content">
+          <div class="cart-drawer-cross-sell__carousel">
+            {%- for product in cross_sell_products limit: cross_sell_max -%}
+              {%- unless cart_product_ids contains product.id -%}
+                <div class="cart-drawer-cross-sell__slide">
+                  {% render 'cart-cross-sell-card', product: product, section_id: cross_sell_section_id %}
+                </div>
+              {%- endunless -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </details>
+    </accordion-custom>
+  </cart-cross-sell>
+{%- endif -%}
+
+{% stylesheet %}
+  .cart-drawer-cross-sell {
+    display: block;
+    padding: 0;
+    padding-bottom: 0;
+    border: none;
+    width: 100%;
+  }
+
+  .cart-drawer-cross-sell__header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 12px 0;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cart-drawer-cross-sell__header::-webkit-details-marker {
+    display: none;
+  }
+
+  .cart-drawer-cross-sell__title {
+    color: var(--color-foreground);
+  }
+
+  .cart-drawer-cross-sell__header .icon-caret {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .cart-drawer-cross-sell details[open] .icon-caret {
+    transform: rotate(180deg);
+  }
+
+  .cart-drawer-cross-sell__content {
+    padding-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .cart-drawer-cross-sell__carousel {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: var(--cart-drawer-padding);
+    margin-right: calc(-1 * var(--cart-drawer-padding));
+    padding-bottom: 4px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-drawer-cross-sell__carousel {
+      padding-right: var(--cart-drawer-padding-desktop);
+      margin-right: calc(-1 * var(--cart-drawer-padding-desktop));
+    }
+  }
+
+  .cart-drawer-cross-sell__carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cart-drawer-cross-sell__slide {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    width: calc(50% - 6px);
+    min-width: 140px;
+  }
+
+  .cart-drawer-cross-sell__slide:last-child {
+    padding-right: var(--cart-drawer-padding);
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-drawer-cross-sell__slide:last-child {
+      padding-right: var(--cart-drawer-padding-desktop);
+    }
+  }
+{% endstylesheet %}

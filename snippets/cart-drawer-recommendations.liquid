@@ -1,0 +1,123 @@
+{%- doc -%}
+  Renders product recommendations in an accordion inside the cart drawer.
+
+  @param {object} section - The section object for section_id
+  @param {string} [heading] - Heading text for the accordion
+  @param {object} [collection] - Collection to show products from
+  @param {number} [max_products] - Maximum number of products to show
+{%- enddoc -%}
+
+{% liquid
+  assign reco_collection = collection | default: collections.all
+  assign reco_max = max_products | default: 6
+  assign reco_heading = heading | default: 'Podría gustarte'
+  assign reco_products = reco_collection.products
+  assign reco_section_id = section.id | default: 'cart-drawer-recommendations'
+%}
+
+{%- if reco_products.size > 0 -%}
+  <accordion-custom class="cart-drawer-recommendations">
+    <details class="details" open>
+      <summary class="details__header cart-drawer-recommendations__header">
+        <span>{{ reco_heading }}</span>
+        <span class="svg-wrapper icon-caret icon-animated">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </summary>
+
+      <div class="details-content cart-drawer-recommendations__content">
+        {% capture carousel_slides %}
+          {% for product in reco_products limit: reco_max %}
+            {% capture slide_content %}
+              <div class="resource-list__item cart-drawer-recommendations__item">
+                {% render 'product-card-simple', product: product, section_id: reco_section_id %}
+              </div>
+            {% endcapture %}
+            {% render 'slideshow-slide',
+              index: forloop.index0,
+              children: slide_content,
+              class: 'cart-drawer-recommendations__slide'
+            %}
+          {% endfor %}
+        {% endcapture %}
+
+        {% capture carousel_arrows %}
+          {% render 'slideshow-arrows', icon_style: 'chevron' %}
+        {% endcapture %}
+
+        <div class="cart-drawer-recommendations__carousel">
+          {% render 'slideshow',
+            ref: 'cartDrawerRecommendations',
+            class: 'cart-drawer-recommendations__slideshow',
+            slides: carousel_slides,
+            slideshow_arrows: carousel_arrows,
+            auto_hide_controls: false,
+            infinite: false,
+            initial_slide: 0,
+            slide_count: reco_max
+          %}
+        </div>
+      </div>
+    </details>
+  </accordion-custom>
+{%- endif -%}
+
+{% stylesheet %}
+  .cart-drawer-recommendations {
+    padding: 0 var(--cart-drawer-padding);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  @media screen and (min-width: 750px) {
+    .cart-drawer-recommendations {
+      padding: 0 var(--cart-drawer-padding-desktop);
+    }
+  }
+
+  .cart-drawer-recommendations__header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 12px 0;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cart-drawer-recommendations__header::-webkit-details-marker {
+    display: none;
+  }
+
+  .cart-drawer-recommendations__header .icon-caret {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .cart-drawer-recommendations details[open] .icon-caret {
+    transform: rotate(180deg);
+  }
+
+  .cart-drawer-recommendations__content {
+    padding-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .cart-drawer-recommendations__carousel {
+    --slide-width-max: 180px;
+  }
+
+  .cart-drawer-recommendations__item {
+    padding: 0 4px;
+  }
+
+  .cart-drawer-recommendations .product-card-simple__title {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .cart-drawer-recommendations .product-card-simple__price {
+    font-size: 0.75rem;
+  }
+{% endstylesheet %}
