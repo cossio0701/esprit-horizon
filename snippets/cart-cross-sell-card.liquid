@@ -11,78 +11,71 @@
 %}
 
 <div class="cart-cross-sell-card" data-product-id="{{ product.id }}" data-product-url="{{ product.url }}">
-  <a href="{{ product.url }}" class="cart-cross-sell-card__link">
-    <div class="cart-cross-sell-card__media">
-      {%- if featured_image != blank -%}
-        {{
-          featured_image
-          | image_url: width: 400
-          | image_tag:
-            loading: 'lazy',
-            class: 'cart-cross-sell-card__image',
-            widths: '200, 300, 400',
-            sizes: '150px'
-        }}
+  <div class="cart-cross-sell-card__media">
+    {%- if featured_image != blank -%}
+      {{
+        featured_image
+        | image_url: width: 200
+        | image_tag:
+          loading: 'lazy',
+          class: 'cart-cross-sell-card__image',
+          widths: '100, 150, 200',
+          sizes: '80px'
+      }}
+    {%- else -%}
+      <div class="cart-cross-sell-card__placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="cart-cross-sell-card__info">
+    <h4 class="cart-cross-sell-card__title">
+      {{ product.title }}
+    </h4>
+
+    <div class="cart-cross-sell-card__price">
+      {%- if product.compare_at_price > product.price -%}
+        <span class="cart-cross-sell-card__price-sale">
+          {{ product.price | money }}
+        </span>
+        <span class="cart-cross-sell-card__price-compare">
+          {{ product.compare_at_price | money }}
+        </span>
       {%- else -%}
-        <div class="cart-cross-sell-card__placeholder">
-          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-        </div>
+        <span class="cart-cross-sell-card__price-regular">
+          {{ product.price | money }}
+        </span>
       {%- endif -%}
     </div>
 
-    <div class="cart-cross-sell-card__info">
-      <h4 class="cart-cross-sell-card__title">
-        {{ product.title }}
-      </h4>
-
-      <div class="cart-cross-sell-card__price">
-        {%- if product.compare_at_price > product.price -%}
-          <span class="cart-cross-sell-card__price-sale">
-            {{ product.price | money }}
-          </span>
-          <span class="cart-cross-sell-card__price-compare">
-            {{ product.compare_at_price | money }}
-          </span>
-        {%- else -%}
-          <span class="cart-cross-sell-card__price-regular">
-            {{ product.price | money }}
-          </span>
-        {%- endif -%}
-      </div>
-    </div>
-  </a>
-
-  <button
-    type="button"
-    class="cart-cross-sell-card__quick-buy"
-    data-product-url="{{ product.url }}"
-    data-product-title="{{ product.title | escape }}"
-    aria-label="{{ 'actions.quick_buy' | t: product: product.title | escape }}"
-  >
-    {{ 'actions.quick_buy' | t }}
-  </button>
+    <button
+      type="button"
+      class="cart-cross-sell-card__quick-buy"
+      data-product-url="{{ product.url }}"
+      data-product-title="{{ product.title | escape }}"
+      aria-label="{{ 'actions.quick_buy' | t: product: product.title | escape }}"
+    >
+      {{ 'actions.quick_buy' | t }}
+    </button>
+  </div>
 </div>
 
 {% stylesheet %}
   .cart-cross-sell-card {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-shrink: 0;
     scroll-snap-align: start;
-    width: calc(50% - 6px);
-    min-width: 140px;
-  }
-
-  .cart-cross-sell-card__link {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
+    width: 100%;
+    gap: 12px;
   }
 
   .cart-cross-sell-card__media {
     position: relative;
-    aspect-ratio: 4 / 5;
+    width: 80px;
+    height: 100px;
+    flex-shrink: 0;
     overflow: hidden;
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
     border-radius: var(--style-border-radius-buttons-primary, 4px);
@@ -112,8 +105,10 @@
   .cart-cross-sell-card__info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding-top: 8px;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
   }
 
   .cart-cross-sell-card__title {
@@ -159,7 +154,6 @@
     background: none;
     border: none;
     padding: 0;
-    margin-top: 4px;
     font-family: var(--font-body--family);
     font-size: 0.7rem;
     font-weight: 500;
