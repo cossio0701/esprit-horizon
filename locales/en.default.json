@@ -144,6 +144,10 @@
       "success": "Comment posted"
     }
   },
+  "cart": {
+    "cross_sell_heading": "You might like",
+    "cross_sell_empty": "No products available"
+  },
   "content": {
     "discount": "Discount",
     "account_title": "Account",

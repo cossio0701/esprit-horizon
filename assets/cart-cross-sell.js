@@ -1,9 +1,47 @@
 import { morph } from '@theme/morph';
 
+/**
+ * @typedef {Object} CarouselState
+ * @property {HTMLElement[]} originalSlides - Original slide elements
+ * @property {HTMLElement[]} allSlides - All slides including clones
+ * @property {number} cloneCount - Number of clones at each end
+ * @property {number} originalCount - Number of original slides
+ * @property {number} slideWidth - Width of each slide including gap
+ */
+
+/**
+ * Custom element for cross-sell carousel with infinite scroll.
+ */
 class CartCrossSell extends HTMLElement {
+  /** @type {AbortController} */
   #abortController = new AbortController();
-  #scrollTimeout = null;
+
+  /** @type {boolean} */
   #isInitialized = false;
+
+  /** @type {CarouselState} */
+  #state = {
+    originalSlides: [],
+    allSlides: [],
+    cloneCount: 2,
+    originalCount: 0,
+    slideWidth: 0
+  };
+
+  /** @type {number} */
+  #gapWidth = 12;
+
+  /** @type {HTMLElement|null} */
+  carousel = null;
+
+  /** @type {HTMLButtonElement|null} */
+  prevArrow = null;
+
+  /** @type {HTMLButtonElement|null} */
+  nextArrow = null;
+
+  /** @type {HTMLDetailsElement|null} */
+  details = null;
 
   connectedCallback() {
     const { signal } = this.#abortController;
@@ -15,13 +53,22 @@ class CartCrossSell extends HTMLElement {
 
     if (!this.carousel) return;
 
-    const detailsElement = this.details;
-    if (detailsElement) {
-      if (detailsElement.open) {
+    this.#setupCarouselInit(signal);
+    this.#setupArrowNavigation(signal);
+    this.#setupQuickBuyHandler(signal);
+  }
+
+  disconnectedCallback() {
+    this.#abortController.abort();
+  }
+
+  #setupCarouselInit(signal) {
+    if (this.details) {
+      if (this.details.open) {
         this.#setupInfiniteCarousel();
       } else {
-        detailsElement.addEventListener('toggle', () => {
-          if (detailsElement.open && !this.#isInitialized) {
+        this.details.addEventListener('toggle', () => {
+          if (this.details?.open && !this.#isInitialized) {
             this.#setupInfiniteCarousel();
           }
         }, { signal });
@@ -29,12 +76,14 @@ class CartCrossSell extends HTMLElement {
     } else {
       this.#setupInfiniteCarousel();
     }
+  }
 
+  #setupArrowNavigation(signal) {
     if (this.prevArrow) {
       this.prevArrow.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        this.#scrollStep(-1);
+        this.#scrollPrev();
       }, { signal });
     }
 
@@ -42,77 +91,127 @@ class CartCrossSell extends HTMLElement {
       this.nextArrow.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        this.#scrollStep(1);
+        this.#scrollNext();
       }, { signal });
     }
+  }
 
-    this.carousel.addEventListener('scroll', this.#onScroll, { signal, passive: true });
-
+  #setupQuickBuyHandler(signal) {
     this.addEventListener('click', this.#handleQuickBuyClick, { signal });
-  };
-
-  disconnectedCallback() {
-    this.#abortController.abort();
-  };
-
-  #originalSlides = [];
-  #allSlides = [];
-  #cloneCount = 2;
-  #originalCount = 0;
-  #slideWidth = 0;
-  #gapWidth = 12;
-  #currentIndex = 0;
-  #isJumping = false;
+  }
 
   #setupInfiniteCarousel() {
+    if (!this.carousel) return;
+
     this.carousel.querySelectorAll('[data-clone]').forEach(clone => clone.remove());
 
-    const originalSlides = Array.from(this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide:not([data-clone])'));
-    
-    if (originalSlides.length <= 1) return;
-    
-    this.#originalSlides = originalSlides;
-    this.#originalCount = originalSlides.length;
-    this.#cloneCount = Math.min(2, originalSlides.length);
+    const originalSlides = Array.from(
+      this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide:not([data-clone])')
+    );
 
-    const lastClones = originalSlides.slice(-this.#cloneCount).map(slide => {
+    if (originalSlides.length <= 1) return;
+
+    this.#state.originalSlides = originalSlides;
+    this.#state.originalCount = originalSlides.length;
+    this.#state.cloneCount = Math.min(2, originalSlides.length);
+
+    const { cloneCount } = this.#state;
+
+    const lastClones = originalSlides.slice(-cloneCount).map(slide => {
       const clone = slide.cloneNode(true);
       clone.setAttribute('data-clone', 'last');
       clone.setAttribute('aria-hidden', 'true');
-      return clone;
+      return /** @type {HTMLElement} */ (clone);
     });
 
-    const firstClones = originalSlides.slice(0, this.#cloneCount).map(slide => {
+    const firstClones = originalSlides.slice(0, cloneCount).map(slide => {
       const clone = slide.cloneNode(true);
       clone.setAttribute('data-clone', 'first');
       clone.setAttribute('aria-hidden', 'true');
-      return clone;
+      return /** @type {HTMLElement} */ (clone);
     });
 
-    lastClones.reverse().forEach(clone => this.carousel.prepend(clone));
-    firstClones.forEach(clone => this.carousel.appendChild(clone));
+    lastClones.reverse().forEach(clone => this.carousel?.prepend(clone));
+    firstClones.forEach(clone => this.carousel?.appendChild(clone));
 
-    this.#allSlides = Array.from(this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide'));
-    
+    this.#state.allSlides = Array.from(
+      this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide')
+    );
+
     requestAnimationFrame(() => {
-      const firstSlide = this.#allSlides[0];
+      const firstSlide = this.#state.allSlides[0];
       if (firstSlide) {
-        this.#slideWidth = firstSlide.offsetWidth + this.#gapWidth;
+        this.#state.slideWidth = firstSlide.offsetWidth + this.#gapWidth;
       }
-      this.#currentIndex = this.#cloneCount;
-      this.#scrollToIndex(this.#currentIndex, false);
+      this.#scrollToIndex(cloneCount, false);
+      this.#isInitialized = true;
     });
   }
 
-  #scrollStep(step) {
-    let nextIndex = this.#currentIndex + step;
-    this.#scrollToIndex(nextIndex, true);
+  /**
+   * Gets current index based on scroll position.
+   * @returns {number}
+   */
+  #getCurrentIndex() {
+    if (!this.carousel || this.#state.slideWidth === 0) return 0;
+    return Math.round(this.carousel.scrollLeft / this.#state.slideWidth);
   }
 
+  /**
+   * Scrolls to previous slide. Repositions first if at boundary.
+   */
+  #scrollPrev() {
+    if (!this.carousel) return;
+
+    const { slideWidth, cloneCount, originalCount } = this.#state;
+    const currentIndex = this.#getCurrentIndex();
+    const firstOriginalIndex = cloneCount;
+
+    if (currentIndex <= firstOriginalIndex) {
+      this.carousel.scrollTo({
+        left: this.carousel.scrollLeft + (originalCount * slideWidth),
+        behavior: 'instant'
+      });
+    }
+
+    requestAnimationFrame(() => {
+      const newIndex = this.#getCurrentIndex();
+      this.#scrollToIndex(newIndex - 1, true);
+    });
+  }
+
+  /**
+   * Scrolls to next slide. Repositions first if at boundary.
+   */
+  #scrollNext() {
+    if (!this.carousel) return;
+
+    const { slideWidth, cloneCount, originalCount } = this.#state;
+    const currentIndex = this.#getCurrentIndex();
+    const lastOriginalIndex = cloneCount + originalCount - 1;
+
+    if (currentIndex >= lastOriginalIndex) {
+      this.carousel.scrollTo({
+        left: this.carousel.scrollLeft - (originalCount * slideWidth),
+        behavior: 'instant'
+      });
+    }
+
+    requestAnimationFrame(() => {
+      const newIndex = this.#getCurrentIndex();
+      this.#scrollToIndex(newIndex + 1, true);
+    });
+  }
+
+  /**
+   * Scrolls to a specific slide index.
+   * @param {number} index - Target slide index
+   * @param {boolean} [smooth=true] - Whether to use smooth scrolling
+   */
   #scrollToIndex(index, smooth = true) {
-    if (this.#allSlides.length === 0) return;
-    
-    const slide = this.#allSlides[index];
+    if (!this.carousel || this.#state.allSlides.length === 0) return;
+
+    const slide = this.#state.allSlides[index];
     if (!slide) return;
 
     this.carousel.scrollTo({
@@ -121,63 +220,19 @@ class CartCrossSell extends HTMLElement {
     });
   }
 
-  #onScroll = () => {
-    if (this.#isJumping) return;
-
-    if (this.#scrollTimeout) clearTimeout(this.#scrollTimeout);
-
-    this.#scrollTimeout = setTimeout(() => {
-      this.#handleInfiniteJump();
-      this.#updateCurrentIndex();
-    }, 50);
-  };
-
-  #handleInfiniteJump() {
-    if (this.#originalCount <= 1 || !this.carousel) return;
-
-    const scrollLeft = this.carousel.scrollLeft;
-    const totalWidth = this.carousel.scrollWidth;
-    const containerWidth = this.carousel.clientWidth;
-
-    if (scrollLeft < this.#slideWidth) {
-      this.#isJumping = true;
-      this.carousel.scrollTo({
-        left: scrollLeft + (this.#originalCount * this.#slideWidth),
-        behavior: 'instant'
-      });
-      setTimeout(() => { this.#isJumping = false; }, 50);
-    } else if (scrollLeft > totalWidth - containerWidth - this.#slideWidth) {
-      this.#isJumping = true;
-      this.carousel.scrollTo({
-        left: scrollLeft - (this.#originalCount * this.#slideWidth),
-        behavior: 'instant'
-      });
-      setTimeout(() => { this.#isJumping = false; }, 50);
-    }
-  }
-
-  #updateCurrentIndex() {
-    if (this.#allSlides.length === 0 || !this.carousel) return;
-    
-    const scrollLeft = this.carousel.scrollLeft;
-    const index = Math.round(scrollLeft / this.#slideWidth);
-
-    if (index !== this.#currentIndex) {
-      this.#currentIndex = index;
-    }
-  }
-
   #handleQuickBuyClick = async (event) => {
-    const quickBuyBtn = event.target.closest('.cart-cross-sell-card__quick-buy');
+    const quickBuyBtn = /** @type {HTMLElement} */ (event.target)?.closest('.cart-cross-sell-card__quick-buy');
     if (!quickBuyBtn) return;
 
     event.preventDefault();
     event.stopPropagation();
 
-    const productUrl = quickBuyBtn.dataset.productUrl;
+    const productUrl = /** @type {string} */ (quickBuyBtn.dataset.productUrl);
     if (!productUrl) return;
 
-    const dialogComponent = document.getElementById('quick-add-dialog');
+    const dialogComponent = /** @type {HTMLElement & { showDialog: () => void }} */ (
+      document.getElementById('quick-add-dialog')
+    );
     if (!dialogComponent || typeof dialogComponent.showDialog !== 'function') return;
 
     const productHtml = await this.#fetchQuickAddSection(productUrl);
@@ -214,7 +269,9 @@ class CartCrossSell extends HTMLElement {
 
     requestAnimationFrame(() => {
       modalContent.querySelectorAll('carousel-component').forEach(el => {
-        if (typeof el.reinit === 'function') el.reinit();
+        if (typeof /** @type {any} */ (el).reinit === 'function') {
+          /** @type {any} */ (el).reinit();
+        }
       });
     });
   }

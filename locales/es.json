@@ -8,6 +8,10 @@
  * ------------------------------------------------------------
  */
 {
+  "cart": {
+    "cross_sell_heading": "Podría gustarte",
+    "cross_sell_empty": "No hay productos disponibles"
+  },
   "blocks": {
     "load_video": "Cargar video: {{ description }}",
     "sold_out": "Agotado",
