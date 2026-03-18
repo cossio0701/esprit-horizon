@@ -1,35 +1,29 @@
 .gco-cookie-banner {
   position: fixed;
-  bottom: 1rem;
+  top: auto;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 999;
 
-  margin: 0 auto;
-  max-width: 350px;
-  padding: 1.5rem 2.5rem;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.5rem;
+
+  padding: 2rem;
 
   background-color: #f9f7f0;
-  border: 2px solid #000;
   color: #000;
   line-height: 1.2;
 
   transition: opacity 0.85s ease-in-out;
 }
 
-.gco-cookie-banner__label {
-  font-weight: bold;
-  letter-spacing: 1px;
-  font-size: 1rem;
-}
-
 .gco-cookie-banner__message {
   text-align: justify;
+  max-width: 400px;
 }
 
 .gco-cookie-banner__message a {
@@ -45,7 +39,7 @@
 .gco-cookie-banner__button {
   width: 100%;
   max-width: 300px;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
 
   cursor: pointer;
   border: 1px solid #000;
@@ -66,9 +60,26 @@
 
 @media (min-width: 768px) {
   .gco-cookie-banner {
-    margin: 1rem;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    right: auto;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+  }
+
+  .gco-cookie-banner__message {
+    text-align: left;
+    max-width: none;
+    flex: 1;
+  }
+
+  .gco-cookie-banner__button {
+    flex-shrink: 0;
+    margin-left: 2rem;
   }
 }
