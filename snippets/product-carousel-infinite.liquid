@@ -23,7 +23,7 @@
   endif
 -%}
 
-<script src="{{ 'carousel-component.js' | asset_url }}" type="module"></script>
+<script src="{{ 'carousel.js' | asset_url }}" type="module" defer></script>
 {{ 'carousel.css' | asset_url | stylesheet_tag }}
 
 <carousel-component
@@ -34,11 +34,23 @@
   show-arrows="{{ show_arrows }}"
   show-dots="false"
   class="product-carousel-infinite"
+  role="region"
+  aria-label="{{ settings.heading | default: 'Productos destacados' }}"
+  aria-roledescription="carousel"
 >
   <div class="carousel-scroller-wrapper">
-    <div role="list" class="carousel-scroller">
+    <div 
+      role="list" 
+      class="carousel-scroller"
+      aria-label="Lista de productos"
+      tabindex="0"
+    >
       {%- for product in products limit: max_products -%}
-        <div role="listitem" class="carousel-slide product-carousel-infinite__slide">
+        <div 
+          role="listitem" 
+          class="carousel-slide product-carousel-infinite__slide"
+          aria-label="Producto {{ forloop.index }} de {{ products.size }}"
+        >
           {% render 'product-card-simple', product: product, section_id: section_id %}
         </div>
       {%- endfor -%}
@@ -50,6 +62,7 @@
         name="previous"
         class="carousel-button prev"
         aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+        aria-controls="carousel-scroller"
       >
         <span class="svg-wrapper">
           {%- if icons_style contains 'chevron' -%}
@@ -64,6 +77,7 @@
         name="next"
         class="carousel-button next"
         aria-label="{{ 'accessibility.slideshow_next' | t }}"
+        aria-controls="carousel-scroller"
       >
         <span class="svg-wrapper">
           {%- if icons_style contains 'chevron' -%}

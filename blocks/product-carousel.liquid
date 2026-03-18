@@ -3,18 +3,15 @@
   assign carousel_ref = 'productCarousel-' | append: block.id
   assign max_products = block.settings.max_products | default: 8
   assign infinite_carousel = block.settings.infinite_carousel | default: false
-
-  # Settings for resource-list
   assign settings = block.settings
+  assign collection = block.settings.carousel_collection | default: collections.all
 %}
-
-<!-- [ProductCarousel Debug] Source: {{ source }}, Block ID: {{ block.id }} -->
 
 <product-carousel
   id="ProductCarousel-{{ block.id }}"
   class="product-carousel"
   data-source="{{ source }}"
-  data-collection-handle="{{ block.settings.carousel_collection.handle | default: 'all' }}"
+  data-collection-handle="{{ collection.handle | default: 'all' }}"
   data-max-products="{{ max_products }}"
   data-sort-by="{{ block.settings.sort_by }}"
   data-section-id="{{ section.id }}"
@@ -26,6 +23,13 @@
     data-shopify-editor-preview
   {% endif %}
 >
+  <div 
+    id="carousel-status-{{ block.id }}" 
+    aria-live="polite" 
+    aria-atomic="true" 
+    class="visually-hidden"
+  ></div>
+  
   {% if block.settings.heading != blank or block.settings.view_all_link != blank %}
     <div class="product-carousel__header">
       {% if block.settings.heading != blank %}
@@ -42,162 +46,15 @@
     </div>
   {% endif %}
 
-  {% case source %}
-    {% when 'collection' %}
-      {% assign collection = block.settings.carousel_collection %}
-      <!-- [ProductCarousel Debug] Collection Selected: {{ collection.title | default: 'None' }} -->
-      {% if collection != blank %}
-        {% liquid
-          assign products = collection.products
-          assign sorted_products = products
-          case block.settings.sort_by
-            when 'date_desc'
-              assign sorted_products = products | sort: 'created_at' | reverse
-            when 'date_asc'
-              assign sorted_products = products | sort: 'created_at'
-            when 'price_asc'
-              assign sorted_products = products | sort: 'price'
-            when 'price_desc'
-              assign sorted_products = products | sort: 'price' | reverse
-            when 'name_asc'
-              assign sorted_products = products | sort: 'title'
-            when 'discount_desc'
-              assign sorted_products = products | sort: 'price'
-          endcase
-        %}
-        <!-- [ProductCarousel Debug] Products Count: {{ sorted_products.size }} -->
-        {% if sorted_products.size > 0 %}
-          {% render 'product-carousel-items',
-            products: sorted_products,
-            max_products: max_products,
-            settings: settings,
-            carousel_ref: carousel_ref,
-            section_id: section.id,
-            infinite: infinite_carousel
-          %}
-        {% else %}
-          <div class="product-carousel__placeholder">This collection has no products.</div>
-        {% endif %}
-      {% else %}
-        {% comment %} Placeholder if no collection selected {% endcomment %}
-        <div class="product-carousel__placeholder">{{ 'content.collection_placeholder' | t }}</div>
-      {% endif %}
-
-    {% when 'new_arrivals' %}
-      {% liquid
-        assign collection = block.settings.carousel_collection | default: collections.all
-        assign products = collection.products | sort: 'created_at' | reverse
-      %}
-      <!-- [ProductCarousel Debug] New Arrivals Count: {{ products.size }} -->
-      {% if products.size > 0 %}
-        {% render 'product-carousel-items',
-          products: products,
-          max_products: max_products,
-          settings: settings,
-          carousel_ref: carousel_ref,
-          section_id: section.id,
-          infinite: infinite_carousel
-        %}
-      {% else %}
-        <div class="product-carousel__placeholder">No new products available.</div>
-      {% endif %}
-
-    {% when 'best_sellers' %}
-      {% liquid
-        assign collection = block.settings.carousel_collection | default: collections.all
-        assign products = collection.products | sort: 'best_selling'
-      %}
-      {% if products.size > 0 %}
-        {% render 'product-carousel-items',
-          products: products,
-          max_products: max_products,
-          settings: settings,
-          carousel_ref: carousel_ref,
-          section_id: section.id,
-          infinite: infinite_carousel
-        %}
-      {% else %}
-        <div class="product-carousel__loading" aria-label="{{ 'accessibility.loading_product_recommendations' | t }}">
-          <div class="loading-spinner"></div>
-        </div>
-      {% endif %}
-
-    {% when 'related' %}
-      {% if recommendations.performed and recommendations.products_count > 0 %}
-        {% render 'product-carousel-items',
-          products: recommendations.products,
-          max_products: max_products,
-          settings: settings,
-          carousel_ref: carousel_ref,
-          section_id: section.id,
-          infinite: infinite_carousel
-        %}
-      {% else %}
-        {% liquid
-          assign collection = block.settings.carousel_collection | default: collections.all
-          assign products = collection.products | sort: 'best_selling'
-        %}
-        {% render 'product-carousel-items',
-          products: products,
-          max_products: max_products,
-          settings: settings,
-          carousel_ref: carousel_ref,
-          section_id: section.id,
-          infinite: infinite_carousel
-        %}
-      {% endif %}
-
-    {% when 'recently_viewed' %}
-      {% liquid
-        assign viewed_products = search.results
-        assign final_products = viewed_products
-
-        if search.performed
-          if viewed_products.size < max_products
-            assign remaining_count = max_products | minus: viewed_products.size
-            assign bs_collection = block.settings.carousel_collection | default: collections.all
-            assign bs_candidates = bs_collection.products | sort: 'best_selling'
-            assign supplementary_products = '' | split: ''
-
-            for candidate in bs_candidates
-              if supplementary_products.size >= remaining_count
-                break
-              endif
-
-              assign is_duplicate = false
-              for viewed in viewed_products
-                if viewed.id == candidate.id
-                  assign is_duplicate = true
-                  break
-                endif
-              endfor
-
-              unless is_duplicate
-                assign candidate_arr = bs_collection.products | where: 'id', candidate.id
-                assign supplementary_products = supplementary_products | concat: candidate_arr
-              endunless
-            endfor
-
-            assign final_products = viewed_products | concat: supplementary_products
-          endif
-        else
-          # First render or empty search: show Best Sellers as full fallback
-          assign bs_collection = block.settings.carousel_collection | default: collections.all
-          assign final_products = bs_collection.products | sort: 'best_selling'
-        endif
-      %}
-
-      {% if final_products.size > 0 %}
-        {% render 'product-carousel-items',
-          products: final_products,
-          max_products: max_products,
-          settings: settings,
-          carousel_ref: carousel_ref,
-          section_id: section.id,
-          infinite: infinite_carousel
-        %}
-      {% endif %}
-  {% endcase %}
+  {% render 'product-carousel-source',
+    source: source,
+    collection: collection,
+    settings: settings,
+    max_products: max_products,
+    carousel_ref: carousel_ref,
+    section_id: section.id,
+    infinite: infinite_carousel
+  %}
 </product-carousel>
 
 {% style %}

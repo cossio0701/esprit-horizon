@@ -1,0 +1,39 @@
+{%- doc -%}
+  Sorts products based on the specified sort criteria.
+  
+  @param {object[]} products - Array of products to sort
+  @param {string} sort_by - Sort criteria: date_desc, date_asc, price_asc, price_desc, name_asc, discount_desc, best_selling, relevance
+  
+  @example
+  {% render 'product-carousel-sort', products: collection.products, sort_by: 'price_asc' %}
+  
+  @note
+  This snippet assigns the sorted products to the parent scope's 'sorted_products' variable.
+  Do NOT use {{ sorted_products }} as it will output ProductDrop objects.
+{%- enddoc -%}
+
+{% liquid
+  # Assign to parent scope variable
+  assign sorted_products = products
+  
+  case sort_by
+    when 'date_desc'
+      assign sorted_products = products | sort: 'created_at' | reverse
+    when 'date_asc'
+      assign sorted_products = products | sort: 'created_at'
+    when 'price_asc'
+      assign sorted_products = products | sort: 'price'
+    when 'price_desc'
+      assign sorted_products = products | sort: 'price' | reverse
+    when 'name_asc'
+      assign sorted_products = products | sort: 'title'
+    when 'discount_desc'
+      assign sorted_products = products | sort: 'price'
+    when 'best_selling'
+      assign sorted_products = products | sort: 'best_selling'
+    when 'relevance'
+      assign sorted_products = products
+    else
+      assign sorted_products = products
+  endcase
+%}

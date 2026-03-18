@@ -1,0 +1,178 @@
+{%- doc -%}
+  Handles product source logic for product carousel.
+  Processes products based on source type and renders carousel items.
+  
+  @param {string} source - Source type: collection, new_arrivals, best_sellers, related, recently_viewed
+  @param {object} collection - Collection object
+  @param {object} settings - Block settings
+  @param {number} max_products - Maximum products to return
+  @param {string} carousel_ref - Reference name for the carousel
+  @param {string} section_id - Section ID for unique styling
+  @param {boolean} infinite - Whether to use infinite loop carousel
+  
+  @example
+  {% render 'product-carousel-source',
+    source: source,
+    collection: collection,
+    settings: block.settings,
+    max_products: 8,
+    carousel_ref: 'carousel-123',
+    section_id: section.id,
+    infinite: true
+  %}
+{%- enddoc -%}
+
+{% liquid
+  assign products = empty
+  assign sorted_products = empty
+  assign collection_to_use = collection | default: collections.all
+%}
+
+{% case source %}
+  {% when 'collection' %}
+    {% liquid
+      assign products = collection_to_use.products
+      
+      # Sort products inline (cannot use render for this)
+      assign sorted_products = products
+      case settings.sort_by
+        when 'date_desc'
+          assign sorted_products = products | sort: 'created_at' | reverse
+        when 'date_asc'
+          assign sorted_products = products | sort: 'created_at'
+        when 'price_asc'
+          assign sorted_products = products | sort: 'price'
+        when 'price_desc'
+          assign sorted_products = products | sort: 'price' | reverse
+        when 'name_asc'
+          assign sorted_products = products | sort: 'title'
+        when 'discount_desc'
+          assign sorted_products = products | sort: 'price'
+        when 'best_selling'
+          assign sorted_products = products | sort: 'best_selling'
+      endcase
+    %}
+    
+    {% if sorted_products.size > 0 %}
+      {% render 'product-carousel-items',
+        products: sorted_products,
+        max_products: max_products,
+        settings: settings,
+        carousel_ref: carousel_ref,
+        section_id: section_id,
+        infinite: infinite
+      %}
+    {% else %}
+      <div class="product-carousel__placeholder">{{ 'content.collection_placeholder' | t }}</div>
+    {% endif %}
+
+  {% when 'new_arrivals' %}
+    {% liquid
+      assign products = collection_to_use.products | sort: 'created_at' | reverse
+    %}
+    
+    {% if products.size > 0 %}
+      {% render 'product-carousel-items',
+        products: products,
+        max_products: max_products,
+        settings: settings,
+        carousel_ref: carousel_ref,
+        section_id: section_id,
+        infinite: infinite
+      %}
+    {% else %}
+      <div class="product-carousel__placeholder">{{ 'products.no_new_arrivals' | t | default: 'No new products available.' }}</div>
+    {% endif %}
+
+  {% when 'best_sellers' %}
+    {% liquid
+      assign products = collection_to_use.products | sort: 'best_selling'
+    %}
+    
+    {% if products.size > 0 %}
+      {% render 'product-carousel-items',
+        products: products,
+        max_products: max_products,
+        settings: settings,
+        carousel_ref: carousel_ref,
+        section_id: section_id,
+        infinite: infinite
+      %}
+    {% else %}
+      <div class="product-carousel__loading" aria-label="{{ 'accessibility.loading_product_recommendations' | t }}">
+        <div class="loading-spinner"></div>
+      </div>
+    {% endif %}
+
+  {% when 'related' %}
+    {% liquid
+      if recommendations.performed and recommendations.products_count > 0
+        assign products = recommendations.products
+      else
+        assign products = collection_to_use.products | sort: 'best_selling'
+      endif
+    %}
+    
+    {% render 'product-carousel-items',
+      products: products,
+      max_products: max_products,
+      settings: settings,
+      carousel_ref: carousel_ref,
+      section_id: section_id,
+      infinite: infinite
+    %}
+
+  {% when 'recently_viewed' %}
+    {% liquid
+      # Process recently viewed inline
+      assign viewed_products = search.results
+      assign final_products = viewed_products
+      assign max = max_products | default: 8
+
+      if search.performed
+        if viewed_products.size < max
+          assign remaining_count = max | minus: viewed_products.size
+          assign bs_collection = collection_to_use
+          assign bs_candidates = bs_collection.products | sort: 'best_selling'
+          assign supplementary_products = '' | split: ''
+
+          for candidate in bs_candidates
+            if supplementary_products.size >= remaining_count
+              break
+            endif
+
+            assign is_duplicate = false
+            for viewed in viewed_products
+              if viewed.id == candidate.id
+                assign is_duplicate = true
+                break
+              endif
+            endfor
+
+            unless is_duplicate
+              assign candidate_arr = bs_collection.products | where: 'id', candidate.id
+              assign supplementary_products = supplementary_products | concat: candidate_arr
+            endunless
+          endfor
+
+          assign final_products = viewed_products | concat: supplementary_products
+        endif
+      else
+        assign bs_collection = collection_to_use
+        assign final_products = bs_collection.products | sort: 'best_selling'
+      endif
+      
+      assign products = final_products
+    %}
+    
+    {% if products.size > 0 %}
+      {% render 'product-carousel-items',
+        products: products,
+        max_products: max_products,
+        settings: settings,
+        carousel_ref: carousel_ref,
+        section_id: section_id,
+        infinite: infinite
+      %}
+    {% endif %}
+{% endcase %}

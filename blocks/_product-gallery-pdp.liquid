@@ -2,7 +2,7 @@
 {% assign current_color = current_variant.option1 %}
 {% assign rendered_colors = '' %}
 
-<script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'carousel.js' | asset_url }}" type="module" defer></script>
 {{ 'carousel.css' | asset_url | stylesheet_tag }}
 
 <div class="gallery-main-container">
