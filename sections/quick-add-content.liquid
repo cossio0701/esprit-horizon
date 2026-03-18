@@ -33,7 +33,7 @@
   {%- comment -%} 1. Photo carousel {%- endcomment -%}
   <div class="quick-add-content__media">
     <carousel-component
-      columns-desktop="1"
+      columns-desktop="2.5"
       columns-mobile="2.25"
       gap="1"
       show-arrows="false"
@@ -171,13 +171,11 @@
 
   .quick-add-content__info {
     padding: var(--padding-lg);
-    padding-inline: 0;
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
   }
 
-  /* 2. Product title */
   .quick-add-content__title {
     color: inherit;
     text-decoration: none;
@@ -197,13 +195,6 @@
     text-decoration: underline;
   }
 
-  @media screen and (min-width: 750px) {
-    .quick-add-content__title {
-      font-size: 16px;
-    }
-  }
-
-  /* 3. Product reference */
   .quick-add-content__reference {
     display: block;
     font-size: 12px;
@@ -212,7 +203,6 @@
     margin-top: -4px;
   }
 
-  /* 4. Product price */
   .quick-add-content__info product-price .price {
     font-size: 16px;
     font-weight: 700;
@@ -224,14 +214,12 @@
     text-decoration: line-through;
   }
 
-  /* Divider after price */
   .quick-add-content__divider {
     border: none;
     border-top: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
     margin: var(--margin-xs) 0;
   }
 
-  /* Force Color (swatches) before Talla (buttons) */
   .quick-add-content .variant-picker__form {
     display: flex;
     flex-direction: column;
@@ -245,14 +233,12 @@
     font-weight: 700;
   }
 
-  /* 7. Model measurements */
   .quick-add-content__model-fit {
     font-size: 13px;
     color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
     line-height: 1.4;
   }
 
-  /* 9. View details link */
   .quick-add-content__view-details {
     display: block;
     text-align: center;
@@ -262,49 +248,22 @@
     text-underline-offset: 3px;
     transition: color 0.2s ease;
     width: 100%;
+    margin-top: var(--margin-md);
+    padding-bottom: var(--padding-lg);
   }
 
   .quick-add-content__view-details:hover {
     color: rgb(var(--color-foreground));
   }
 
-  /* Desktop layout */
-  @media screen and (min-width: 750px) {
-    .quick-add-content {
-      flex-direction: row;
-      min-height: 450px;
-    }
-
-    .quick-add-content__media {
-      width: 50%;
-      flex: 0 0 50%;
-    }
-
-    .quick-add-content__info {
-      width: 50%;
-      flex: 0 0 50%;
-      padding: var(--padding-xl);
-      overflow-y: auto;
-      max-height: 80vh;
-    }
-  }
-
-  /* Variant picker overrides inside quick add */
-  .quick-add-content__info .variant-picker {
-    width: 100%;
-  }
-
-  /* Buy buttons overrides inside quick add */
   .quick-add-content__info .buy-buttons-block {
     width: 100%;
   }
 
-  /* Hide quantity selector — quick add always adds 1 */
   .quick-add-content__info .quantity-selector {
     display: none !important;
   }
 
-  /* Hide accelerated checkout (Buy it now) */
   .quick-add-content__info .accelerated-checkout-block {
     display: none !important;
   }
@@ -324,7 +283,6 @@
     min-width: 100%;
   }
 
-  /* Button color: Black background, white text */
   .quick-add-content__info .add-to-cart-button {
     background-color: #000 !important;
     color: #fff !important;
@@ -336,17 +294,6 @@
   .quick-add-content__info .add-to-cart-button:hover {
     background-color: #333 !important;
     border-color: #333 !important;
-  }
-  /* 9. View Details Link */
-  .quick-add-content__view-details {
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-    margin-top: var(--margin-md);
-    font-size: 14px;
-    text-decoration: underline;
-    color: rgb(var(--color-foreground-rgb));
-    padding-bottom: var(--padding-lg);
   }
 {% endstylesheet %}
 

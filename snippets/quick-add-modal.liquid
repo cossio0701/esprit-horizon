@@ -29,11 +29,20 @@
 {% stylesheet %}
   .quick-add-modal {
     padding: 0;
-    border: var(--style-border-popover);
-    height: fit-content;
     overflow: hidden;
-    min-height: 500px;
-    box-shadow: 0 5px 30px rgb(0 0 0 / var(--opacity-15));
+    box-shadow: var(--shadow-drawer);
+
+    @media screen and (min-width: 750px) {
+      position: fixed;
+      width: var(--sidebar-width);
+      max-width: 95vw;
+      height: 100%;
+      margin: 0 0 0 auto;
+      border: none;
+      border-left: var(--style-border-drawer);
+      border-radius: 0;
+      max-height: 100dvh;
+    }
 
     @media screen and (max-width: 750px) {
       position: fixed;
@@ -44,10 +53,10 @@
       max-width: 100%;
       overflow: hidden;
       padding: 0 !important;
+      border: var(--style-border-popover);
     }
   }
 
-  /* Doubled specificity + !important to beat .dialog-modal base rules in base.css */
   .quick-add-modal.quick-add-modal {
     @media screen and (max-width: 750px) {
       border-radius: 16px 16px 0 0 !important;
@@ -55,7 +64,7 @@
       max-height: 90dvh;
       display: flex;
       flex-direction: column;
-      overflow-y: auto !important; /* Enable scrolling on the dialog itself */
+      overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
       will-change: transform;
     }
@@ -64,6 +73,7 @@
   .quick-add-modal[open] {
     @media screen and (min-width: 750px) {
       display: flex;
+      flex-direction: column;
     }
   }
 
@@ -75,7 +85,7 @@
 
   .quick-add-modal[open] {
     @media screen and (min-width: 751px) {
-      animation: modalSlideInTop var(--animation-speed) var(--animation-easing) forwards;
+      animation: slideInFromRight var(--animation-speed) var(--animation-easing) forwards;
     }
     @media screen and (max-width: 750px) {
       animation: bottomSheetSlideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -84,7 +94,7 @@
 
   .quick-add-modal.dialog-closing {
     @media screen and (min-width: 751px) {
-      animation: modalSlideOutTop var(--animation-speed) var(--animation-easing) forwards;
+      animation: slideOutToRight var(--animation-speed) var(--animation-easing) forwards;
     }
     @media screen and (max-width: 750px) {
       animation: bottomSheetSlideOut 0.8s cubic-bezier(0.55, 0, 1, 0.45) forwards;
@@ -107,7 +117,6 @@
     transform: scale(0.8);
   }
 
-  /* ── Drag handle (mobile bottom-sheet affordance) ── */
   .quick-add-modal__drag-handle {
     display: none;
 
@@ -137,23 +146,25 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    max-width: var(--wide-content-width);
     overflow-y: auto;
-    max-height: 100vh;
-    width: 900px;
+    height: 100%;
 
-    @media screen and (max-width: 1200px) {
-      width: 800px;
+    @media screen and (min-width: 750px) {
+      width: 100%;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     @media screen and (max-width: 750px) {
       width: 100vw;
+      max-width: var(--wide-content-width);
+      max-height: 100vh;
       padding-inline: var(--padding-lg);
-      padding-block: var(--padding-lg) 60px; /* Some padding for the bottom link */
+      padding-block: var(--padding-lg) 60px;
       gap: var(--gap-lg);
-      flex: 0 0 auto; /* Don't flex, let the dialog handle scroll */
+      flex: 0 0 auto;
       min-height: 0;
-      overflow: visible; /* Content itself doesn't scroll, the dialog does */
+      overflow: visible;
       height: auto;
     }
   }
@@ -406,6 +417,22 @@
     /* No 'from' state to allow animating from the current drag position */
     to {
       transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutToRight {
+    to {
+      transform: translateX(100%);
       opacity: 0;
     }
   }
