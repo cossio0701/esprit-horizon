@@ -332,7 +332,10 @@
       "quantity_minimum": "Minimum of {{ minimum }}",
       "quantity_maximum": "Maximum of {{ maximum }}",
       "in_cart": "in cart",
-      "view_full_details": "View all details"
+      "view_full_details": "View all details",
+      "select_options": "Please select options",
+      "connection_error": "Connection error",
+      "reference": "Ref: {{ reference }}"
     }
   }
 }

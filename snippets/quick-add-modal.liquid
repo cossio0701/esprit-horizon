@@ -1,12 +1,12 @@
 <script src="{{ 'carousel-component.js' | asset_url }}" type="module" fetchpriority="low"></script>
 {{ 'carousel.css' | asset_url | stylesheet_tag }}
+
 <quick-add-dialog id="quick-add-dialog">
   <dialog
     class="quick-add-modal dialog-modal color-{{ settings.popover_color_scheme }}"
     ref="dialog"
     scroll-lock
   >
-    {%- comment -%} Drag handle – mobile only (tap or swipe-down to close) {%- endcomment -%}
     <div ref="dragHandle" class="quick-add-modal__drag-handle">
       <span class="quick-add-modal__drag-handle-bar"></span>
     </div>
@@ -19,6 +19,7 @@
     >
       {{- 'icon-close.svg' | inline_asset_content -}}
     </button>
+
     <div
       id="quick-add-modal-content"
       class="quick-add-modal__content"
@@ -28,23 +29,26 @@
 
 {% stylesheet %}
   .quick-add-modal {
+    --modal-border-radius-mobile: 16px;
+    --modal-max-height-mobile: 90dvh;
+
     padding: 0;
     overflow: hidden;
     box-shadow: var(--shadow-drawer);
 
     @media screen and (min-width: 750px) {
       position: fixed;
-      width: var(--sidebar-width);
+      width: calc(var(--sidebar-width) - 40px);
       max-width: 95vw;
       height: 100%;
       margin: 0 0 0 auto;
       border: none;
-      border-left: var(--style-border-drawer);
+      border-inline-start: var(--style-border-drawer);
       border-radius: 0;
       max-height: 100dvh;
     }
 
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 749px) {
       position: fixed;
       display: flex;
       flex-direction: column;
@@ -52,19 +56,11 @@
       min-height: unset;
       max-width: 100%;
       overflow: hidden;
-      padding: 0 !important;
+      padding: 0;
       border: var(--style-border-popover);
-    }
-  }
-
-  .quick-add-modal.quick-add-modal {
-    @media screen and (max-width: 750px) {
-      border-radius: 16px 16px 0 0 !important;
-      height: auto !important;
-      max-height: 90dvh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto !important;
+      border-radius: var(--modal-border-radius-mobile) var(--modal-border-radius-mobile) 0 0;
+      height: auto;
+      max-height: var(--modal-max-height-mobile);
       -webkit-overflow-scrolling: touch;
       will-change: transform;
     }
@@ -74,41 +70,32 @@
     @media screen and (min-width: 750px) {
       display: flex;
       flex-direction: column;
-    }
-  }
-
-  .quick-add-modal .view-more-details__wrapper {
-    @media screen and (max-width: 750px) {
-      display: none;
-    }
-  }
-
-  .quick-add-modal[open] {
-    @media screen and (min-width: 751px) {
       animation: slideInFromRight var(--animation-speed) var(--animation-easing) forwards;
     }
-    @media screen and (max-width: 750px) {
+
+    @media screen and (max-width: 749px) {
       animation: bottomSheetSlideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
   }
 
   .quick-add-modal.dialog-closing {
-    @media screen and (min-width: 751px) {
+    @media screen and (min-width: 750px) {
       animation: slideOutToRight var(--animation-speed) var(--animation-easing) forwards;
     }
-    @media screen and (max-width: 750px) {
+
+    @media screen and (max-width: 749px) {
       animation: bottomSheetSlideOut 0.8s cubic-bezier(0.55, 0, 1, 0.45) forwards;
     }
   }
 
   .quick-add-modal__close {
     position: absolute;
-    top: var(--margin-2xs);
-    right: var(--margin-2xs);
+    inset-block-start: var(--margin-2xs);
+    inset-inline-end: var(--margin-2xs);
     transition: transform 0.15s var(--animation-timing-bounce);
     z-index: var(--layer-raised);
 
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 749px) {
       display: none;
     }
   }
@@ -120,19 +107,19 @@
   .quick-add-modal__drag-handle {
     display: none;
 
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 749px) {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 14px 0 10px;
+      padding-block: 14px 10px;
       cursor: pointer;
       touch-action: none;
     }
   }
 
   .quick-add-modal__drag-handle-bar {
-    width: 36px;
-    height: 4px;
+    inline-size: 36px;
+    block-size: 4px;
     border-radius: 2px;
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
     transition: transform 0.15s ease;
@@ -148,6 +135,7 @@
     position: relative;
     overflow-y: auto;
     height: 100%;
+    min-height: 0;
 
     @media screen and (min-width: 750px) {
       width: 100%;
@@ -155,17 +143,17 @@
       max-height: 100%;
     }
 
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 749px) {
       width: 100vw;
       max-width: var(--wide-content-width);
       max-height: 100vh;
       padding-inline: var(--padding-lg);
       padding-block: var(--padding-lg) 60px;
       gap: var(--gap-lg);
-      flex: 0 0 auto;
-      min-height: 0;
-      overflow: visible;
-      height: auto;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      height: 100%;
     }
   }
 
@@ -173,6 +161,10 @@
     display: flex;
     justify-content: center;
     width: 100%;
+
+    @media screen and (max-width: 749px) {
+      display: none;
+    }
   }
 
   .view-more-details__wrapper .view-more-details {
@@ -185,12 +177,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-2xs);
-    margin-bottom: var(--margin-sm);
+    margin-block-end: var(--margin-sm);
   }
 
   .quick-add-modal__content .product-header a:not(product-price *) {
     @media screen and (max-width: 749px) {
-      font-size: var(--font-size--md);
+      font-size: var(--font-size-md, 14px);
       font-weight: 500;
       color: inherit;
       width: fit-content;
@@ -199,7 +191,7 @@
 
   .quick-add-modal__content variant-picker,
   .quick-add-modal__content product-form-component {
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 749px) {
       grid-column: 1 / -1;
     }
   }
@@ -209,7 +201,7 @@
   }
 
   .quick-add-modal__content .variant-option + .variant-option {
-    margin-top: var(--padding-lg);
+    margin-block-start: var(--padding-lg);
   }
 
   .quick-add-modal__content .product-media-container__zoom-button {
@@ -261,27 +253,24 @@
   }
 
   .quick-add-modal__content .product-title-row__link {
-    font-size: var(--font-size--xl) !important;
-  }
+    font-size: var(--font-size-xl, 18px);
 
-  @media screen and (max-width: 749px) {
-    .quick-add-modal__content .product-title-row__link {
-      font-size: 14px !important;
+    @media screen and (max-width: 749px) {
+      font-size: 14px;
     }
   }
 
   .quick-add-modal__content .view-product-title {
     display: flex;
     padding-block: 0;
-    /* Prevent overlap between title and close button */
     padding-inline: 0 calc(var(--minimum-touch-target) / 2);
   }
 
   .quick-add-modal__content .view-product-title a {
     color: inherit;
     text-decoration: none;
-    text-align: left;
-    font-size: var(--font-size--xl);
+    text-align: start;
+    font-size: var(--font-size-xl, 18px);
     font-weight: 600;
     line-height: 1.2;
     display: -webkit-box;
@@ -293,12 +282,8 @@
     transition: color 0.2s var(--animation-easing);
 
     @media screen and (max-width: 749px) {
-      font-size: 14px !important;
+      font-size: 14px;
     }
-  }
-
-  .quick-add-modal__content .view-product-title {
-    display: flex;
   }
 
   .quick-add-modal__content
@@ -320,8 +305,7 @@
       .view-more-details__wrapper *
     ) {
     @media screen and (min-width: 750px) {
-      /* stylelint-disable-next-line declaration-no-important */
-      display: none !important;
+      display: none;
     }
   }
 
@@ -361,11 +345,11 @@
     }
 
     .quick-add-modal__content .media-gallery--grid .product-media-container:first-child {
-      border-top-right-radius: var(--style-border-radius-popover, 0);
+      border-start-end-radius: var(--style-border-radius-popover, 0);
     }
 
     .quick-add-modal__content .media-gallery--grid .product-media-container:last-child {
-      border-bottom-right-radius: var(--style-border-radius-popover, 0);
+      border-end-end-radius: var(--style-border-radius-popover, 0);
     }
   }
 
@@ -384,24 +368,12 @@
 
   .quick-add-modal__content .sticky-content,
   .quick-add-modal__content .sticky-content--desktop {
-    top: 0;
+    inset-block-start: 0;
   }
 
   .quick-add-modal__content .text-block.rte:not(product-price),
   .quick-add-modal__content .view-more-details__wrapper {
     display: none;
-  }
-
-  @keyframes fadeSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   @keyframes bottomSheetSlideIn {
@@ -414,7 +386,6 @@
   }
 
   @keyframes bottomSheetSlideOut {
-    /* No 'from' state to allow animating from the current drag position */
     to {
       transform: translateY(100%);
       opacity: 0;

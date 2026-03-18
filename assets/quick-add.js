@@ -4,11 +4,53 @@ import { CartUpdateEvent, ThemeEvents } from '@theme/events';
 import { DialogComponent, DialogCloseEvent } from '@theme/dialog';
 import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utilities';
 
+const MAX_CACHE_SIZE = 20;
+
+class LRUCache {
+  /** @type {Map<string, string>} */
+  #cache = new Map();
+
+  /** @type {number} */
+  #maxSize;
+
+  /** @param {number} maxSize */
+  constructor(maxSize = MAX_CACHE_SIZE) {
+    this.#maxSize = maxSize;
+  }
+
+  /** @param {string} key */
+  get(key) {
+    if (!this.#cache.has(key)) return undefined;
+    const value = this.#cache.get(key);
+    this.#cache.delete(key);
+    this.#cache.set(key, /** @type {string} */ (value));
+    return value;
+  }
+
+  /** @param {string} key @param {string} value */
+  set(key, value) {
+    if (this.#cache.has(key)) this.#cache.delete(key);
+    else if (this.#cache.size >= this.#maxSize) {
+      const oldestKey = this.#cache.keys().next().value;
+      if (oldestKey) this.#cache.delete(oldestKey);
+    }
+    this.#cache.set(key, value);
+  }
+
+  has(key) {
+    return this.#cache.has(key);
+  }
+
+  clear() {
+    this.#cache.clear();
+  }
+}
+
 export class QuickAddComponent extends Component {
   /** @type {AbortController | null} */
   #abortController = null;
-  /** @type {Map<string, string>} */
-  #cachedContent = new Map();
+  /** @type {LRUCache} */
+  #cache = new LRUCache(MAX_CACHE_SIZE);
 
   get productPageUrl() {
     const productCard = /** @type {import('./product-card').ProductCard | null} */ (this.closest('product-card'));
@@ -56,30 +98,19 @@ export class QuickAddComponent extends Component {
     event.preventDefault();
 
     const currentUrl = this.productPageUrl;
-    console.log('[QuickAdd] handleClick - URL:', currentUrl);
+    if (!currentUrl) return;
 
-    // Check if we have cached content for this URL
-    /** @type {string | null | undefined} */
-    let productHtml = this.#cachedContent.get(currentUrl);
+    let productHtml = this.#cache.get(currentUrl);
 
     if (!productHtml) {
-      console.log('[QuickAdd] Cache miss. Fetching section...');
-      // Fetch and cache the content
       productHtml = await this.fetchQuickAddSection(currentUrl);
       if (productHtml) {
-        this.#cachedContent.set(currentUrl, productHtml);
-      } else {
-        console.error('[QuickAdd] FAILED to fetch quick add section');
+        this.#cache.set(currentUrl, productHtml);
       }
-    } else {
-      console.log('[QuickAdd] Cache hit.');
     }
 
     if (productHtml) {
-      console.log('[QuickAdd] Updating modal...');
       await this.updateQuickAddModal(productHtml);
-    } else {
-      console.error('[QuickAdd] No content to display');
     }
 
     this.#openQuickAddModal();
@@ -121,7 +152,6 @@ export class QuickAddComponent extends Component {
     const url = new URL(productPageUrl);
     url.searchParams.set('section_id', 'quick-add-content');
 
-    // We use this to abort the previous fetch request if it's still pending.
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
@@ -134,14 +164,12 @@ export class QuickAddComponent extends Component {
         throw new Error(`Failed to fetch quick add section: HTTP error ${response.status}`);
       }
 
-      const responseText = await response.text();
-      return responseText;
+      return await response.text();
     } catch (error) {
-      if (error.name === 'AbortError') {
+      if (/** @type {Error} */ (error).name === 'AbortError') {
         return null;
-      } else {
-        throw error;
       }
+      throw error;
     } finally {
       this.#abortController = null;
     }
@@ -158,20 +186,14 @@ export class QuickAddComponent extends Component {
 
     morph(modalContent, html);
 
-    // morph preserves custom elements without calling connectedCallback again.
-    // We must manually re-initialize the carousel so it re-reads its attributes
-    // and rebuilds any dynamically-generated nodes (dots, arrows visibility, CSS vars).
     requestAnimationFrame(() => {
-      modalContent.querySelectorAll('carousel-component').forEach(el => {
-        // @ts-ignore — reinit() is defined on CarouselComponent
+      modalContent.querySelectorAll('carousel-component').forEach((el) => {
         if (typeof el.reinit === 'function') el.reinit();
       });
     });
 
     this.#syncVariantSelection(modalContent);
   }
-
-
 
   /**
    * Syncs the variant selection from the product card to the modal
@@ -181,7 +203,6 @@ export class QuickAddComponent extends Component {
     const selectedVariantId = this.#getSelectedVariantId();
     if (!selectedVariantId) return;
 
-    // Find and check the corresponding input in the modal
     const modalInputs = modalContent.querySelectorAll('input[type="radio"][data-variant-id]');
     for (const input of modalInputs) {
       if (input instanceof HTMLInputElement && input.dataset.variantId === selectedVariantId && !input.checked) {
@@ -198,9 +219,8 @@ if (!customElements.get('quick-add-component')) {
 }
 
 class QuickAddDialog extends DialogComponent {
+  /** @type {AbortController} */
   #abortController = new AbortController();
-
-  /* ── Drag-to-dismiss gesture (mobile bottom-sheet) ── */
 
   /** @type {number} */
   #touchStartX = 0;
@@ -227,11 +247,10 @@ class QuickAddDialog extends DialogComponent {
 
     const { signal } = this.#abortController;
 
-    this.addEventListener(ThemeEvents.cartUpdate, this.handleCartUpdate, { signal });
+    this.addEventListener(ThemeEvents.cartUpdate, this.#handleCartUpdate, { signal });
     this.addEventListener(ThemeEvents.variantUpdate, this.#handleVariantUpdate, { signal });
     this.addEventListener(DialogCloseEvent.eventName, this.#handleDialogClose, { signal });
 
-    // Drag handle: tap to close + swipe-down to dismiss
     this.#initDragHandle();
   }
 
@@ -247,16 +266,17 @@ class QuickAddDialog extends DialogComponent {
 
     const { signal } = this.#abortController;
 
-    // Tap handle to close
     handle.addEventListener('click', () => this.closeDialog(), { signal });
 
-    // Drag gesture on the entire dialog
     dialog.addEventListener('touchstart', this.#onTouchStart, { passive: true, signal });
     dialog.addEventListener('touchmove', this.#onTouchMove, { passive: false, signal });
     dialog.addEventListener('touchend', this.#onTouchEnd, { passive: true, signal });
   }
 
-  #onTouchStart = (/** @type {TouchEvent} */ e) => {
+  /**
+   * @param {TouchEvent} e
+   */
+  #onTouchStart = (e) => {
     if (!isMobileBreakpoint()) return;
 
     const touch = e.touches[0];
@@ -271,7 +291,10 @@ class QuickAddDialog extends DialogComponent {
     this.#velocity = 0;
   };
 
-  #onTouchMove = (/** @type {TouchEvent} */ e) => {
+  /**
+   * @param {TouchEvent} e
+   */
+  #onTouchMove = (e) => {
     if (!this.#isDragging || !isMobileBreakpoint()) return;
 
     const touch = e.touches[0];
@@ -282,7 +305,6 @@ class QuickAddDialog extends DialogComponent {
     const currentTime = Date.now();
     const timeDelta = currentTime - this.#lastTouchTime;
 
-    // Calculate instantaneous velocity
     if (timeDelta > 0) {
       this.#velocity = (touch.clientY - this.#lastTouchY) / timeDelta;
     }
@@ -292,42 +314,39 @@ class QuickAddDialog extends DialogComponent {
     const dialog = this.refs.dialog;
     if (!(dialog instanceof HTMLElement)) return;
 
-    // If we haven't confirmed the drag yet, check if we should
     if (!this.#dragConfirmed) {
-      // Don't drag if scrolling horizontally (e.g. inside a carousel)
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         this.#isDragging = false;
         return;
       }
 
-      // Don't drag if we are scrolling down INSIDE the modal content
       if (dialog.scrollTop > 5) {
         return;
       }
 
-      // Only start drag if moving downward
       if (deltaY > 5) {
         this.#dragConfirmed = true;
         dialog.style.transition = 'none';
-        dialog.style.animation = 'none'; // CRITICAL: Prevent CSS animation from locking transform
+        dialog.style.animation = 'none';
       } else {
         return;
       }
     }
 
-    // If drag is confirmed, move the dialog and update backdrop
     if (this.#dragConfirmed) {
       e.preventDefault();
       const moveY = Math.max(0, deltaY);
       dialog.style.transform = `translateY(${moveY}px)`;
 
-      // Backdrop opacity scaling
       const opacity = Math.max(0, 1 - (moveY / (window.innerHeight * 0.5)));
       dialog.style.setProperty('--backdrop-opacity-multiplier', opacity.toString());
     }
   };
 
-  #onTouchEnd = (/** @type {TouchEvent} */ e) => {
+  /**
+   * @param {TouchEvent} e
+   */
+  #onTouchEnd = (e) => {
     if (!this.#isDragging || !this.#dragConfirmed) {
       this.#isDragging = false;
       return;
@@ -339,74 +358,59 @@ class QuickAddDialog extends DialogComponent {
 
     const deltaY = (e.changedTouches[0]?.clientY ?? 0) - this.#touchStartY;
 
-    // Dismiss if crossed threshold OR velocity is high enough
     if (deltaY > QuickAddDialog.SWIPE_THRESHOLD || this.#velocity > QuickAddDialog.VELOCITY_THRESHOLD) {
       this.#dismissFromDrag();
     } else {
-      // Snap back
       dialog.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
       dialog.style.transform = '';
       dialog.style.removeProperty('--backdrop-opacity-multiplier');
     }
   };
 
-  /**
-   * Finalizes the dismissal after a successful drag gesture
-   */
   async #dismissFromDrag() {
     const { dialog } = this.refs;
     if (!(dialog instanceof HTMLDialogElement)) return;
 
-    // Reset local dragging state immediately to prevent multi-triggering
     this.#isDragging = false;
     this.#dragConfirmed = false;
 
-    // Reset backdrop multiplier so it doesn't conflict with final removal
     dialog.style.removeProperty('--backdrop-opacity-multiplier');
 
-    // Use the standard close method.
-    // Because we removed the 'from' in bottomSheetSlideOut CSS,
-    // it will now animate correctly from the current deltaY position.
     await this.closeDialog();
 
-    // Cleanup inline styles after it's closed
     dialog.style.transform = '';
     dialog.style.transition = '';
     dialog.style.animation = '';
   }
 
-  /* ── Existing handlers ── */
-
   /**
-   * Closes the dialog
-   * @param {CartUpdateEvent} event - The cart update event
+   * @param {CartUpdateEvent} event
    */
-  handleCartUpdate = (event) => {
+  #handleCartUpdate = (event) => {
     if (event.detail.data.didError) return;
     this.closeDialog();
   };
 
-  #handleVariantUpdate = (/** @type {CustomEvent} */ event) => {
+  /**
+   * @param {CustomEvent} event
+   */
+  #handleVariantUpdate = (event) => {
     const html = event.detail?.data?.html;
     if (!html) return;
 
-    // 1. Update Gallery
     const galleryContainer = /** @type {HTMLElement | null} */ (this.querySelector('.quick-add-content__media'));
     const newGallerySource = html.querySelector('.quick-add-content__media');
 
     if (galleryContainer && newGallerySource) {
       morph(galleryContainer, newGallerySource);
 
-      // Re-initialize any carousel in the newly morphed gallery
       requestAnimationFrame(() => {
-        galleryContainer.querySelectorAll('carousel-component').forEach(el => {
-          // @ts-ignore
+        galleryContainer.querySelectorAll('carousel-component').forEach((el) => {
           if (typeof el.reinit === 'function') el.reinit();
         });
       });
     }
 
-    // 2. Update Links (Title & View Details)
     const variantPicker = html.querySelector('variant-picker');
     const productUrl = variantPicker?.dataset?.productUrl;
     if (!productUrl) return;
@@ -425,15 +429,11 @@ class QuickAddDialog extends DialogComponent {
 
   #handleDialogClose = () => {
     const iosVersion = getIOSVersion();
-    /**
-     * This is a patch to solve an issue with the UI freezing when the dialog is closed.
-     * To reproduce it, use iOS 16.0.
-     */
+
     if (!iosVersion || iosVersion.major >= 17 || (iosVersion.major === 16 && iosVersion.minor >= 4)) return;
 
     requestAnimationFrame(() => {
-      /** @type {HTMLElement | null} */
-      const grid = document.querySelector('#ResultsList [product-grid-view]');
+      const grid = /** @type {HTMLElement | null} */ (document.querySelector('#ResultsList [product-grid-view]'));
       if (grid) {
         const currentWidth = grid.getBoundingClientRect().width;
         grid.style.width = `${currentWidth - 1}px`;

@@ -1,0 +1,282 @@
+.quick-add-custom {
+  --quick-add-gap: var(--gap-sm, 12px);
+  --quick-add-size-font: 16px;
+  --quick-add-color-size: 20px;
+  --quick-add-underline-height: 1.5px;
+
+  display: block;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  margin: var(--padding-sm);
+  z-index: var(--layer-raised);
+
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  padding: var(--padding-sm) var(--padding-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-popover);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--animation-speed, 0.2s) ease,
+    transform var(--animation-speed, 0.2s) ease,
+    visibility var(--animation-speed, 0.2s) ease;
+  pointer-events: none;
+}
+
+.card-gallery:hover .quick-add-custom,
+.card-gallery:focus-within .quick-add-custom,
+.quick-add-custom:hover,
+.quick-add-custom.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+@media screen and (max-width: 749px) {
+  .quick-add-custom {
+    display: none !important;
+  }
+}
+
+.quick-add-custom__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--quick-add-gap);
+}
+
+.quick-add-custom__sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.quick-add-custom__size-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  font-family: var(--font-body--family);
+  font-size: var(--quick-add-size-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+  cursor: pointer;
+  position: relative;
+}
+
+.quick-add-custom__size-btn::after {
+  content: '';
+  position: absolute;
+  inset-block-end: -3px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  inline-size: 0%;
+  block-size: var(--quick-add-underline-height);
+  background-color: var(--color-foreground);
+  transition: inline-size 0.2s ease-in-out;
+}
+
+.quick-add-custom__size-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+  inline-size: 80%;
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+}
+
+.quick-add-custom__size-btn.is-selected {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.quick-add-custom__size-btn.is-selected::after {
+  inline-size: 100%;
+}
+
+.quick-add-custom__size-btn.is-unavailable {
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.quick-add-custom__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.quick-add-custom__color-btn {
+  inline-size: var(--quick-add-color-size);
+  block-size: var(--quick-add-color-size);
+  border-radius: 0;
+  border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+  padding: 0;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  outline: none;
+}
+
+.quick-add-custom__color-btn::after {
+  content: '';
+  position: absolute;
+  inset-block-end: -4px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  inline-size: 0%;
+  block-size: var(--quick-add-underline-height);
+  background-color: var(--color-foreground);
+  transition: inline-size 0.2s ease-in-out;
+}
+
+.quick-add-custom__color-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+  inline-size: 60%;
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+}
+
+.quick-add-custom__color-btn.is-selected::after {
+  inline-size: 82%;
+}
+
+.quick-add-custom__color-btn.is-unavailable {
+  opacity: var(--opacity-35-55);
+  cursor: not-allowed;
+}
+
+.quick-add-custom__color-btn.is-unavailable::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline: -1px;
+  block-size: 1px;
+  background-color: var(--color-foreground);
+  transform: rotate(-45deg);
+}
+
+.quick-add-custom__action {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-block-start: var(--gap-2xs);
+  position: relative;
+}
+
+.quick-add-custom__form {
+  display: contents;
+}
+
+.quick-add-custom__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-2xs);
+  background: transparent;
+  border: none;
+  padding: var(--padding-2xs) 0;
+
+  font-family: var(--font-body--family);
+  font-size: var(--font-size--sm, 12px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color var(--animation-speed, 0.2s) ease;
+  text-decoration: none;
+}
+
+.quick-add-custom__submit:hover:not(:disabled) {
+  color: var(--color-primary-hover);
+}
+
+.quick-add-custom__submit:disabled {
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+  cursor: not-allowed;
+}
+
+.quick-add-custom__submit-arrow {
+  transition: transform var(--animation-speed, 0.2s) ease;
+}
+
+.quick-add-custom__submit:hover:not(:disabled) .quick-add-custom__submit-arrow {
+  transform: translateX(4px);
+}
+
+.quick-add-custom__feedback {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body--family);
+  font-size: var(--font-size--xs, 11px);
+  color: var(--color-foreground-muted);
+}
+
+.quick-add-custom__feedback[hidden] {
+  display: none;
+}
+
+.quick-add-custom.needs-selection .quick-add-custom__submit {
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+}
+
+.quick-add-custom.is-loading .quick-add-custom__submit-text {
+  opacity: var(--opacity-40-60);
+}
+
+.quick-add-custom.is-added .quick-add-custom__submit-text::after {
+  content: ' ✓';
+}
+
+@media screen and (max-width: 749px) {
+  .quick-add-custom {
+    margin: var(--padding-xs);
+    padding: var(--padding-xs) var(--padding-sm);
+  }
+
+  .quick-add-custom__inner {
+    gap: var(--gap-xs);
+  }
+
+  .quick-add-custom__size-btn {
+    font-size: 10px;
+  }
+
+  .quick-add-custom__color-btn {
+    inline-size: 14px;
+    block-size: 14px;
+  }
+
+  .quick-add-custom__submit {
+    font-size: 11px;
+  }
+}
+
+@container card-gallery-container (max-width: 200px) {
+  .quick-add-custom__sizes {
+    gap: 8px;
+  }
+
+  .quick-add-custom__size-btn {
+    font-size: 9px;
+  }
+
+  .quick-add-custom__colors {
+    gap: 4px;
+  }
+
+  .quick-add-custom__color-btn {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+
+  .quick-add-custom__submit {
+    font-size: 10px;
+  }
+}

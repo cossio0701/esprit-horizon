@@ -296,7 +296,10 @@
       "quantity_minimum": "Mínimo de {{ minimum }}",
       "quantity_maximum": "Máximo de {{ maximum }}",
       "in_cart": "en el carrito",
-      "view_full_details": "Ver todos los detalles"
+      "view_full_details": "Ver todos los detalles",
+      "select_options": "Selecciona talla y color",
+      "connection_error": "Error de conexión",
+      "reference": "Ref: {{ reference }}"
     }
   },
   "fields": {
