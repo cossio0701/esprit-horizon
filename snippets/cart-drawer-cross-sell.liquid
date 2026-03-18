@@ -133,14 +133,15 @@
     color: var(--color-foreground);
   }
 
-  .cart-drawer-cross-sell__header .icon-caret {
+  .cart-drawer-cross-sell__header .svg-wrapper.icon-caret svg {
     width: var(--cross-sell-icon-size);
     height: var(--cross-sell-icon-size);
     transition: transform var(--animation-speed-slow) var(--animation-easing);
+    transform: rotate(180deg);
   }
 
-  .cart-drawer-cross-sell details[open] .icon-caret {
-    transform: rotate(180deg);
+  .cart-drawer-cross-sell details[open] .svg-wrapper.icon-caret svg {
+    transform: rotate(0deg);
   }
 
   .cart-drawer-cross-sell__content {
