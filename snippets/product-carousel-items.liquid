@@ -1,28 +1,55 @@
-{% liquid
+{%- doc -%}
+  Renders product carousel items - either as infinite loop carousel or standard carousel.
+
+  @param {object[]} products - Array of products to display
+  @param {number} [max_products] - Maximum number of products to show (default: 8)
+  @param {object} settings - Block or section settings
+  @param {string} [carousel_ref] - Reference name for the carousel
+  @param {string} [section_id] - Section ID for unique styling
+  @param {boolean} [infinite] - Whether to use infinite loop carousel (default: false)
+
+  @example
+  {% render 'product-carousel-items', products: collection.products, max_products: 8, settings: block.settings, infinite: true %}
+{%- enddoc -%}
+
+{%- liquid
   assign max_products = max_products | default: 8
-%}
+  assign infinite = infinite | default: false
+-%}
 
-{% capture list_items %}
-  {% for product in products limit: max_products %}
-    <div class="resource-list__item">
-      {% render 'product-card-simple', product: product, section_id: section.id %}
-    </div>
-    {% unless forloop.last %}
-      <!--@list/split-->
-    {% endunless %}
-  {% endfor %}
-{% endcapture %}
+{%- if infinite -%}
+  {%- render 'product-carousel-infinite',
+    products: products,
+    max_products: max_products,
+    settings: settings,
+    section_id: section_id
+  -%}
+{%- else -%}
+  {%- liquid
+    assign section_id_value = section_id | default: section.id
+  -%}
+  {% capture list_items %}
+    {% for product in products limit: max_products %}
+      <div class="resource-list__item">
+        {% render 'product-card-simple', product: product, section_id: section_id_value %}
+      </div>
+      {% unless forloop.last %}
+        <!--@list/split-->
+      {% endunless %}
+    {% endfor %}
+  {% endcapture %}
 
-{% liquid
-  assign list_items_array = list_items | strip | split: '<!--@list/split-->'
-%}
+  {% liquid
+    assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+  %}
 
-{% render 'resource-list',
-  list_items: list_items,
-  list_items_array: list_items_array,
-  settings: settings,
-  carousel_ref: carousel_ref,
-  slide_count: products.size,
-  content_type: 'products',
-  layout_type: 'carousel'
-%}
+  {% render 'resource-list',
+    list_items: list_items,
+    list_items_array: list_items_array,
+    settings: settings,
+    carousel_ref: carousel_ref,
+    slide_count: products.size,
+    content_type: 'products',
+    layout_type: 'carousel'
+  %}
+{%- endif -%}

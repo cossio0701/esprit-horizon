@@ -319,23 +319,25 @@ class CarouselComponent extends HTMLElement {
         if (!firstSlide) return;
 
         const slideWidth = firstSlide.offsetWidth;
+        const gap = parseFloat(getComputedStyle(this.scroller).gap) || parseFloat(this.style.getPropertyValue('--carousel-gap')) || 0;
+        const slideWidthWithGap = slideWidth + gap;
         const totalWidth = this.scroller.scrollWidth;
         const containerWidth = this.scroller.offsetWidth;
 
-        // Jump de principio a fin real
-        if (scrollLeft < slideWidth) {
+        // Jump de principio a fin real (cuando está en los clones del final)
+        if (scrollLeft < slideWidthWithGap) {
             this.isJumping = true;
             this.scroller.scrollTo({
-                left: scrollLeft + (this.originalCount * slideWidth),
+                left: scrollLeft + (this.originalCount * slideWidthWithGap),
                 behavior: 'instant'
             });
             setTimeout(() => { this.isJumping = false; }, 50);
         }
-        // Jump de fin a principio real
-        else if (scrollLeft > totalWidth - containerWidth - slideWidth) {
+        // Jump de fin a principio real (cuando está en los clones del principio)
+        else if (scrollLeft > totalWidth - containerWidth - slideWidthWithGap) {
             this.isJumping = true;
             this.scroller.scrollTo({
-                left: scrollLeft - (this.originalCount * slideWidth),
+                left: scrollLeft - (this.originalCount * slideWidthWithGap),
                 behavior: 'instant'
             });
             setTimeout(() => { this.isJumping = false; }, 50);
@@ -346,7 +348,9 @@ class CarouselComponent extends HTMLElement {
         if (!this.scroller) return;
         const scrollLeft = this.scroller.scrollLeft;
         const slideWidth = this.slides[0]?.offsetWidth || this.scroller.offsetWidth;
-        const index = Math.round(scrollLeft / slideWidth);
+        const gap = parseFloat(getComputedStyle(this.scroller).gap) || parseFloat(this.style.getPropertyValue('--carousel-gap')) || 0;
+        const slideWidthWithGap = slideWidth + gap;
+        const index = Math.round(scrollLeft / slideWidthWithGap);
 
         if (index !== this.currentIndex) {
             this.currentIndex = index;

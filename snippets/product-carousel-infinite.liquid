@@ -1,0 +1,137 @@
+{%- doc -%}
+  Renders an infinite loop product carousel using carousel-component with slide cloning.
+
+  @param {object[]} products - Array of products to display
+  @param {number} [max_products] - Maximum number of products to show (default: 8)
+  @param {object} settings - Block or section settings
+  @param {string} [section_id] - Section ID for unique styling
+  @param {string} [carousel_ref] - Reference name for the carousel
+
+  @example
+  {% render 'product-carousel-infinite', products: collection.products, max_products: 8, settings: block.settings %}
+{%- enddoc -%}
+
+{%- liquid
+  assign max_products = max_products | default: 8
+  assign columns_desktop = settings.columns | default: 4
+  assign columns_mobile = settings.mobile_columns | default: 1
+  assign gap = settings.columns_gap | default: 16
+  assign icons_style = settings.icons_style | default: 'chevron'
+  assign show_arrows = true
+  if icons_style == 'none'
+    assign show_arrows = false
+  endif
+-%}
+
+<script src="{{ 'carousel-component.js' | asset_url }}" type="module"></script>
+{{ 'carousel.css' | asset_url | stylesheet_tag }}
+
+<carousel-component
+  loop="true"
+  columns-desktop="{{ columns_desktop }}"
+  columns-mobile="{{ columns_mobile }}"
+  gap="{{ gap }}"
+  show-arrows="{{ show_arrows }}"
+  show-dots="false"
+  class="product-carousel-infinite"
+>
+  <div class="carousel-scroller-wrapper">
+    <div role="list" class="carousel-scroller">
+      {%- for product in products limit: max_products -%}
+        <div role="listitem" class="carousel-slide product-carousel-infinite__slide">
+          {% render 'product-card-simple', product: product, section_id: section_id %}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if show_arrows -%}
+      <button
+        type="button"
+        name="previous"
+        class="carousel-button prev"
+        aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+      >
+        <span class="svg-wrapper">
+          {%- if icons_style contains 'chevron' -%}
+            {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+          {%- else -%}
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          {%- endif -%}
+        </span>
+      </button>
+      <button
+        type="button"
+        name="next"
+        class="carousel-button next"
+        aria-label="{{ 'accessibility.slideshow_next' | t }}"
+      >
+        <span class="svg-wrapper">
+          {%- if icons_style contains 'chevron' -%}
+            {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+          {%- else -%}
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          {%- endif -%}
+        </span>
+      </button>
+    {%- endif -%}
+  </div>
+</carousel-component>
+
+{% stylesheet %}
+  .product-carousel-infinite {
+    width: 100%;
+  }
+
+  .product-carousel-infinite .carousel-scroller {
+    padding-block: var(--padding-xs, 8px);
+  }
+
+  .product-carousel-infinite__slide {
+    scroll-snap-align: start;
+  }
+
+  .product-carousel-infinite .carousel-button {
+    background: var(--color-background, #fff);
+    border: var(--style-border-width, 1px) solid var(--color-border, rgba(0,0,0,0.1));
+    border-radius: var(--style-border-radius-50, 50%);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-carousel-infinite .carousel-button:hover {
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+    border-color: var(--color-foreground, #000);
+  }
+
+  .product-carousel-infinite .carousel-button .svg-wrapper {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-carousel-infinite .carousel-button .svg-wrapper svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .product-carousel-infinite .carousel-button {
+      width: 32px;
+      height: 32px;
+    }
+
+    .product-carousel-infinite .carousel-button .svg-wrapper {
+      width: 12px;
+      height: 12px;
+    }
+  }
+{% endstylesheet %}

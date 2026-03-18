@@ -2,6 +2,7 @@
   assign source = block.settings.source
   assign carousel_ref = 'productCarousel-' | append: block.id
   assign max_products = block.settings.max_products | default: 8
+  assign infinite_carousel = block.settings.infinite_carousel | default: false
 
   # Settings for resource-list
   assign settings = block.settings
@@ -70,7 +71,9 @@
             products: sorted_products,
             max_products: max_products,
             settings: settings,
-            carousel_ref: carousel_ref
+            carousel_ref: carousel_ref,
+            section_id: section.id,
+            infinite: infinite_carousel
           %}
         {% else %}
           <div class="product-carousel__placeholder">This collection has no products.</div>
@@ -91,7 +94,9 @@
           products: products,
           max_products: max_products,
           settings: settings,
-          carousel_ref: carousel_ref
+          carousel_ref: carousel_ref,
+          section_id: section.id,
+          infinite: infinite_carousel
         %}
       {% else %}
         <div class="product-carousel__placeholder">No new products available.</div>
@@ -107,7 +112,9 @@
           products: products,
           max_products: max_products,
           settings: settings,
-          carousel_ref: carousel_ref
+          carousel_ref: carousel_ref,
+          section_id: section.id,
+          infinite: infinite_carousel
         %}
       {% else %}
         <div class="product-carousel__loading" aria-label="{{ 'accessibility.loading_product_recommendations' | t }}">
@@ -121,7 +128,9 @@
           products: recommendations.products,
           max_products: max_products,
           settings: settings,
-          carousel_ref: carousel_ref
+          carousel_ref: carousel_ref,
+          section_id: section.id,
+          infinite: infinite_carousel
         %}
       {% else %}
         {% liquid
@@ -132,7 +141,9 @@
           products: products,
           max_products: max_products,
           settings: settings,
-          carousel_ref: carousel_ref
+          carousel_ref: carousel_ref,
+          section_id: section.id,
+          infinite: infinite_carousel
         %}
       {% endif %}
 
@@ -181,7 +192,9 @@
           products: final_products,
           max_products: max_products,
           settings: settings,
-          carousel_ref: carousel_ref
+          carousel_ref: carousel_ref,
+          section_id: section.id,
+          infinite: infinite_carousel
         %}
       {% endif %}
   {% endcase %}
@@ -689,6 +702,13 @@
         }
       ],
       "default": "chevron"
+    },
+    {
+      "type": "checkbox",
+      "id": "infinite_carousel",
+      "label": "Carrusel infinito (loop continuo)",
+      "default": false,
+      "info": "Activa el loop infinito suave con clonación de slides"
     },
     {
       "type": "header",
