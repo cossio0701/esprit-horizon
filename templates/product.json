@@ -267,175 +267,783 @@
               },
               "block_order": []
             },
-            "size_guide_WFhmCy": {
-              "type": "_size-guide",
-              "name": "Size Guide",
+            "ui_modal_qzjx4x": {
+              "type": "ui-modal",
+              "name": "UI Modal",
               "settings": {
-                "button_label": "Guia de tallas",
-                "modal_title": "Guia de tallas",
-                "alignment": "left"
+                "show_trigger": true,
+                "trigger_label": "Guía de tallas",
+                "trigger_font_size": 14,
+                "trigger_background_color": "#ffffff",
+                "trigger_text_color": "#111111",
+                "trigger_border_color": "#111111",
+                "trigger_border_width": 2,
+                "trigger_border_radius": 0,
+                "title": "GUÍA DE TALLAS",
+                "title_font_size": 28,
+                "size": "large",
+                "close_on_overlay": true,
+                "close_on_escape": true,
+                "custom_css": ".ui-modal__title {\n    margin: 10px 0 !important;\n  }\n.ui-modal__trigger {\n  padding: 0 18px;\n}"
               },
               "blocks": {
-                "size_guide_category_YKDUTT": {
-                  "type": "_size-guide-category",
-                  "name": "Superiores",
+                "ui_tabs_RRAP3U": {
+                  "type": "ui-tabs",
+                  "name": "UI Tabs",
                   "settings": {
-                    "category_title": "Superiores",
-                    "description_position": "with_table",
-                    "body_measure_image": "shopify://shop_images/tallas-image.png",
-                    "table_image_cm": "shopify://shop_images/tallas-prendas-superiores-cut.png"
+                    "aria_label": "Tabs",
+                    "initial_index": 1
                   },
                   "blocks": {
-                    "text_EeLezp": {
-                      "type": "text",
+                    "ui_tab_yz6bqG": {
+                      "type": "_ui-tab",
                       "settings": {
-                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p><p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
-                        "enable_collapse": false,
-                        "collapsed_height": 50,
-                        "show_more_text": "Ver más",
-                        "show_less_text": "Ver menos",
-                        "enable_fade": true,
-                        "width": "fit-content",
-                        "max_width": "normal",
-                        "alignment": "left",
-                        "use_mobile_font_size": false,
-                        "type_preset": "rte",
-                        "font": "var(--font-body--family)",
-                        "font_size": "1rem",
-                        "font_size_mobile": "1rem",
-                        "line_height": "normal",
-                        "letter_spacing": "normal",
-                        "case": "none",
-                        "wrap": "pretty",
-                        "color": "var(--color-foreground)",
-                        "background": false,
-                        "background_color": "#00000026",
-                        "corner_radius": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 20,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0,
-                        "use_mobile_padding": false,
-                        "padding-block-start-mobile": 0,
-                        "padding-block-end-mobile": 0,
-                        "padding-inline-start-mobile": 0,
-                        "padding-inline-end-mobile": 0
+                        "title": "Superiores"
                       },
-                      "blocks": {}
+                      "blocks": {
+                        "container_EhHjqV": {
+                          "type": "container",
+                          "name": "Container - Superiores",
+                          "settings": {
+                            "html_tag": "div",
+                            "enable_section_width": false,
+                            "section_width": "page-width",
+                            "desktop_direction": "row",
+                            "mobile_direction": "row",
+                            "gap_unit": "px",
+                            "gap": 12,
+                            "gap_mobile": 12,
+                            "border": "none",
+                            "border_width": 1,
+                            "border_radius": 0,
+                            "border_color": "#000000",
+                            "padding_unit": "px",
+                            "padding_top": 0,
+                            "padding_top_mobile": 0,
+                            "padding_bottom": 0,
+                            "padding_bottom_mobile": 0,
+                            "padding_left": 0,
+                            "padding_left_mobile": 0,
+                            "padding_right": 0,
+                            "padding_right_mobile": 0,
+                            "container_class": "container",
+                            "custom_css": ""
+                          },
+                          "blocks": {
+                            "image_LLY4qm": {
+                              "type": "image",
+                              "name": "t:names.image",
+                              "settings": {
+                                "image": "shopify://shop_images/tallas-image.png",
+                                "use_mobile_image": false,
+                                "link": "",
+                                "image_ratio": "adapt",
+                                "width": "custom",
+                                "custom_width": 85,
+                                "width_mobile": "fill",
+                                "custom_width_mobile": 100,
+                                "height": "fit",
+                                "custom_height": 400,
+                                "custom_height_mobile": 0,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_opacity": 100,
+                                "border_radius": 0,
+                                "padding-block-start": 0,
+                                "padding-block-end": 0,
+                                "padding-inline-start": 0,
+                                "padding-inline-end": 0
+                              },
+                              "blocks": {}
+                            },
+                            "container_9K4X3W": {
+                              "type": "container",
+                              "name": "Container - medias y texto",
+                              "settings": {
+                                "html_tag": "div",
+                                "enable_section_width": false,
+                                "section_width": "page-width",
+                                "desktop_direction": "column",
+                                "mobile_direction": "row",
+                                "gap_unit": "px",
+                                "gap": 12,
+                                "gap_mobile": 12,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_radius": 0,
+                                "border_color": "#000000",
+                                "padding_unit": "px",
+                                "padding_top": 0,
+                                "padding_top_mobile": 0,
+                                "padding_bottom": 0,
+                                "padding_bottom_mobile": 0,
+                                "padding_left": 0,
+                                "padding_left_mobile": 0,
+                                "padding_right": 0,
+                                "padding_right_mobile": 0,
+                                "container_class": "container",
+                                "custom_css": ""
+                              },
+                              "blocks": {
+                                "container_yH9jiq": {
+                                  "type": "container",
+                                  "name": "Container - Texto con icono",
+                                  "settings": {
+                                    "html_tag": "div",
+                                    "enable_section_width": false,
+                                    "section_width": "page-width",
+                                    "desktop_direction": "row",
+                                    "mobile_direction": "row",
+                                    "gap_unit": "px",
+                                    "gap": 12,
+                                    "gap_mobile": 12,
+                                    "border": "none",
+                                    "border_width": 1,
+                                    "border_radius": 0,
+                                    "border_color": "#000000",
+                                    "padding_unit": "px",
+                                    "padding_top": 0,
+                                    "padding_top_mobile": 0,
+                                    "padding_bottom": 0,
+                                    "padding_bottom_mobile": 0,
+                                    "padding_left": 0,
+                                    "padding_left_mobile": 0,
+                                    "padding_right": 0,
+                                    "padding_right_mobile": 0,
+                                    "container_class": "container",
+                                    "custom_css": ""
+                                  },
+                                  "blocks": {
+                                    "icon_6fELhi": {
+                                      "type": "icon",
+                                      "name": "t:names.icon",
+                                      "settings": {
+                                        "icon": "price_tag",
+                                        "image_upload": "shopify://shop_images/icon-medida-talla___77e67a867b274462aedcf44dde93d402.svg",
+                                        "width": 24,
+                                        "link": "",
+                                        "open_in_new_tab": false
+                                      },
+                                      "blocks": {}
+                                    },
+                                    "text_tiYeyt": {
+                                      "type": "text",
+                                      "name": "t:names.text",
+                                      "settings": {
+                                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p>",
+                                        "enable_collapse": false,
+                                        "collapsed_height": 50,
+                                        "show_more_text": "Ver más",
+                                        "show_less_text": "Ver menos",
+                                        "enable_fade": true,
+                                        "width": "fit-content",
+                                        "max_width": "normal",
+                                        "alignment": "left",
+                                        "type_preset": "rte",
+                                        "font": "var(--font-body--family)",
+                                        "font_size": "1rem",
+                                        "font_size_mobile": "0.875rem",
+                                        "line_height": "normal",
+                                        "letter_spacing": "normal",
+                                        "case": "none",
+                                        "wrap": "pretty",
+                                        "color": "var(--color-foreground)",
+                                        "background": false,
+                                        "background_color": "#00000026",
+                                        "corner_radius": 0,
+                                        "padding-block-start": 0,
+                                        "padding-block-end": 0,
+                                        "padding-inline-start": 0,
+                                        "padding-inline-end": 0,
+                                        "use_mobile_padding": false,
+                                        "padding-block-start-mobile": 0,
+                                        "padding-block-end-mobile": 0,
+                                        "padding-inline-start-mobile": 0,
+                                        "padding-inline-end-mobile": 0
+                                      },
+                                      "blocks": {}
+                                    }
+                                  },
+                                  "block_order": [
+                                    "icon_6fELhi",
+                                    "text_tiYeyt"
+                                  ]
+                                },
+                                "text_TDjww7": {
+                                  "type": "text",
+                                  "name": "t:names.text",
+                                  "settings": {
+                                    "text": "<p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
+                                    "enable_collapse": false,
+                                    "collapsed_height": 50,
+                                    "show_more_text": "Ver más",
+                                    "show_less_text": "Ver menos",
+                                    "enable_fade": true,
+                                    "width": "fit-content",
+                                    "max_width": "normal",
+                                    "alignment": "left",
+                                    "type_preset": "rte",
+                                    "font": "var(--font-body--family)",
+                                    "font_size": "1rem",
+                                    "font_size_mobile": "0.875rem",
+                                    "line_height": "normal",
+                                    "letter_spacing": "normal",
+                                    "case": "none",
+                                    "wrap": "pretty",
+                                    "color": "var(--color-foreground)",
+                                    "background": false,
+                                    "background_color": "#00000026",
+                                    "corner_radius": 0,
+                                    "padding-block-start": 8,
+                                    "padding-block-end": 15,
+                                    "padding-inline-start": 0,
+                                    "padding-inline-end": 0,
+                                    "use_mobile_padding": false,
+                                    "padding-block-start-mobile": 0,
+                                    "padding-block-end-mobile": 0,
+                                    "padding-inline-start-mobile": 0,
+                                    "padding-inline-end-mobile": 0
+                                  },
+                                  "blocks": {}
+                                },
+                                "image_yE8Re8": {
+                                  "type": "image",
+                                  "name": "t:names.image",
+                                  "settings": {
+                                    "image": "shopify://shop_images/tallas-prendas-superiores-cut.png",
+                                    "use_mobile_image": false,
+                                    "link": "",
+                                    "image_ratio": "adapt",
+                                    "width": "fill",
+                                    "custom_width": 100,
+                                    "width_mobile": "fill",
+                                    "custom_width_mobile": 100,
+                                    "height": "fit",
+                                    "custom_height": 400,
+                                    "custom_height_mobile": 0,
+                                    "border": "none",
+                                    "border_width": 1,
+                                    "border_opacity": 100,
+                                    "border_radius": 0,
+                                    "padding-block-start": 0,
+                                    "padding-block-end": 0,
+                                    "padding-inline-start": 0,
+                                    "padding-inline-end": 0
+                                  },
+                                  "blocks": {}
+                                }
+                              },
+                              "block_order": [
+                                "container_yH9jiq",
+                                "text_TDjww7",
+                                "image_yE8Re8"
+                              ]
+                            }
+                          },
+                          "block_order": [
+                            "image_LLY4qm",
+                            "container_9K4X3W"
+                          ]
+                        }
+                      },
+                      "block_order": [
+                        "container_EhHjqV"
+                      ]
+                    },
+                    "ui_tab_bdAkAj": {
+                      "type": "_ui-tab",
+                      "settings": {
+                        "title": "Inferiores"
+                      },
+                      "blocks": {
+                        "container_RAWK84": {
+                          "type": "container",
+                          "name": "Container - Inferiores",
+                          "settings": {
+                            "html_tag": "div",
+                            "enable_section_width": false,
+                            "section_width": "page-width",
+                            "desktop_direction": "row",
+                            "mobile_direction": "row",
+                            "gap_unit": "px",
+                            "gap": 12,
+                            "gap_mobile": 12,
+                            "border": "none",
+                            "border_width": 1,
+                            "border_radius": 0,
+                            "border_color": "#000000",
+                            "padding_unit": "px",
+                            "padding_top": 0,
+                            "padding_top_mobile": 0,
+                            "padding_bottom": 0,
+                            "padding_bottom_mobile": 0,
+                            "padding_left": 0,
+                            "padding_left_mobile": 0,
+                            "padding_right": 0,
+                            "padding_right_mobile": 0,
+                            "container_class": "container",
+                            "custom_css": ""
+                          },
+                          "blocks": {
+                            "image_L8PzWq": {
+                              "type": "image",
+                              "name": "t:names.image",
+                              "settings": {
+                                "image": "shopify://shop_images/tallas-image.png",
+                                "use_mobile_image": false,
+                                "link": "",
+                                "image_ratio": "adapt",
+                                "width": "custom",
+                                "custom_width": 85,
+                                "width_mobile": "fill",
+                                "custom_width_mobile": 100,
+                                "height": "fit",
+                                "custom_height": 400,
+                                "custom_height_mobile": 0,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_opacity": 100,
+                                "border_radius": 0,
+                                "padding-block-start": 0,
+                                "padding-block-end": 0,
+                                "padding-inline-start": 0,
+                                "padding-inline-end": 0
+                              },
+                              "blocks": {}
+                            },
+                            "container_XFwVQU": {
+                              "type": "container",
+                              "name": "Container - medias y texto",
+                              "settings": {
+                                "html_tag": "div",
+                                "enable_section_width": false,
+                                "section_width": "page-width",
+                                "desktop_direction": "column",
+                                "mobile_direction": "row",
+                                "gap_unit": "px",
+                                "gap": 12,
+                                "gap_mobile": 12,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_radius": 0,
+                                "border_color": "#000000",
+                                "padding_unit": "px",
+                                "padding_top": 0,
+                                "padding_top_mobile": 0,
+                                "padding_bottom": 0,
+                                "padding_bottom_mobile": 0,
+                                "padding_left": 0,
+                                "padding_left_mobile": 0,
+                                "padding_right": 0,
+                                "padding_right_mobile": 0,
+                                "container_class": "container",
+                                "custom_css": ""
+                              },
+                              "blocks": {
+                                "container_dcpR8C": {
+                                  "type": "container",
+                                  "name": "Container - Texto con icono",
+                                  "settings": {
+                                    "html_tag": "div",
+                                    "enable_section_width": false,
+                                    "section_width": "page-width",
+                                    "desktop_direction": "row",
+                                    "mobile_direction": "row",
+                                    "gap_unit": "px",
+                                    "gap": 12,
+                                    "gap_mobile": 12,
+                                    "border": "none",
+                                    "border_width": 1,
+                                    "border_radius": 0,
+                                    "border_color": "#000000",
+                                    "padding_unit": "px",
+                                    "padding_top": 0,
+                                    "padding_top_mobile": 0,
+                                    "padding_bottom": 0,
+                                    "padding_bottom_mobile": 0,
+                                    "padding_left": 0,
+                                    "padding_left_mobile": 0,
+                                    "padding_right": 0,
+                                    "padding_right_mobile": 0,
+                                    "container_class": "container",
+                                    "custom_css": ""
+                                  },
+                                  "blocks": {
+                                    "icon_4xWyrk": {
+                                      "type": "icon",
+                                      "name": "t:names.icon",
+                                      "settings": {
+                                        "icon": "price_tag",
+                                        "image_upload": "shopify://shop_images/icon-medida-talla___77e67a867b274462aedcf44dde93d402.svg",
+                                        "width": 24,
+                                        "link": "",
+                                        "open_in_new_tab": false
+                                      },
+                                      "blocks": {}
+                                    },
+                                    "text_WTFib9": {
+                                      "type": "text",
+                                      "name": "t:names.text",
+                                      "settings": {
+                                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p>",
+                                        "enable_collapse": false,
+                                        "collapsed_height": 50,
+                                        "show_more_text": "Ver más",
+                                        "show_less_text": "Ver menos",
+                                        "enable_fade": true,
+                                        "width": "fit-content",
+                                        "max_width": "normal",
+                                        "alignment": "left",
+                                        "type_preset": "rte",
+                                        "font": "var(--font-body--family)",
+                                        "font_size": "1rem",
+                                        "font_size_mobile": "0.875rem",
+                                        "line_height": "normal",
+                                        "letter_spacing": "normal",
+                                        "case": "none",
+                                        "wrap": "pretty",
+                                        "color": "var(--color-foreground)",
+                                        "background": false,
+                                        "background_color": "#00000026",
+                                        "corner_radius": 0,
+                                        "padding-block-start": 0,
+                                        "padding-block-end": 0,
+                                        "padding-inline-start": 0,
+                                        "padding-inline-end": 0,
+                                        "use_mobile_padding": false,
+                                        "padding-block-start-mobile": 0,
+                                        "padding-block-end-mobile": 0,
+                                        "padding-inline-start-mobile": 0,
+                                        "padding-inline-end-mobile": 0
+                                      },
+                                      "blocks": {}
+                                    }
+                                  },
+                                  "block_order": [
+                                    "icon_4xWyrk",
+                                    "text_WTFib9"
+                                  ]
+                                },
+                                "text_JHA7de": {
+                                  "type": "text",
+                                  "name": "t:names.text",
+                                  "settings": {
+                                    "text": "<p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
+                                    "enable_collapse": false,
+                                    "collapsed_height": 50,
+                                    "show_more_text": "Ver más",
+                                    "show_less_text": "Ver menos",
+                                    "enable_fade": true,
+                                    "width": "fit-content",
+                                    "max_width": "normal",
+                                    "alignment": "left",
+                                    "type_preset": "rte",
+                                    "font": "var(--font-body--family)",
+                                    "font_size": "1rem",
+                                    "font_size_mobile": "0.875rem",
+                                    "line_height": "normal",
+                                    "letter_spacing": "normal",
+                                    "case": "none",
+                                    "wrap": "pretty",
+                                    "color": "var(--color-foreground)",
+                                    "background": false,
+                                    "background_color": "#00000026",
+                                    "corner_radius": 0,
+                                    "padding-block-start": 8,
+                                    "padding-block-end": 15,
+                                    "padding-inline-start": 0,
+                                    "padding-inline-end": 0,
+                                    "use_mobile_padding": false,
+                                    "padding-block-start-mobile": 0,
+                                    "padding-block-end-mobile": 0,
+                                    "padding-inline-start-mobile": 0,
+                                    "padding-inline-end-mobile": 0
+                                  },
+                                  "blocks": {}
+                                },
+                                "image_KJGyhz": {
+                                  "type": "image",
+                                  "name": "t:names.image",
+                                  "settings": {
+                                    "image": "shopify://shop_images/tallas-prendas-inferiores-cut.png",
+                                    "use_mobile_image": false,
+                                    "link": "",
+                                    "image_ratio": "adapt",
+                                    "width": "fill",
+                                    "custom_width": 100,
+                                    "width_mobile": "fill",
+                                    "custom_width_mobile": 100,
+                                    "height": "fit",
+                                    "custom_height": 400,
+                                    "custom_height_mobile": 0,
+                                    "border": "none",
+                                    "border_width": 1,
+                                    "border_opacity": 100,
+                                    "border_radius": 0,
+                                    "padding-block-start": 0,
+                                    "padding-block-end": 0,
+                                    "padding-inline-start": 0,
+                                    "padding-inline-end": 0
+                                  },
+                                  "blocks": {}
+                                }
+                              },
+                              "block_order": [
+                                "container_dcpR8C",
+                                "text_JHA7de",
+                                "image_KJGyhz"
+                              ]
+                            }
+                          },
+                          "block_order": [
+                            "image_L8PzWq",
+                            "container_XFwVQU"
+                          ]
+                        }
+                      },
+                      "block_order": [
+                        "container_RAWK84"
+                      ]
+                    },
+                    "ui_tab_PeECQM": {
+                      "type": "_ui-tab",
+                      "name": "UI Tab",
+                      "settings": {
+                        "title": "Calzado"
+                      },
+                      "blocks": {
+                        "container_ipQdyX": {
+                          "type": "container",
+                          "name": "Container - Inferiores",
+                          "settings": {
+                            "html_tag": "div",
+                            "enable_section_width": false,
+                            "section_width": "page-width",
+                            "desktop_direction": "row",
+                            "mobile_direction": "row",
+                            "gap_unit": "px",
+                            "gap": 12,
+                            "gap_mobile": 12,
+                            "border": "none",
+                            "border_width": 1,
+                            "border_radius": 0,
+                            "border_color": "#000000",
+                            "padding_unit": "px",
+                            "padding_top": 0,
+                            "padding_top_mobile": 0,
+                            "padding_bottom": 0,
+                            "padding_bottom_mobile": 0,
+                            "padding_left": 0,
+                            "padding_left_mobile": 0,
+                            "padding_right": 0,
+                            "padding_right_mobile": 0,
+                            "container_class": "container",
+                            "custom_css": ""
+                          },
+                          "blocks": {
+                            "container_Yzbnhg": {
+                              "type": "container",
+                              "name": "Container - medias y texto",
+                              "settings": {
+                                "html_tag": "div",
+                                "enable_section_width": true,
+                                "section_width": "page-width",
+                                "desktop_direction": "column",
+                                "mobile_direction": "column",
+                                "gap_unit": "px",
+                                "gap": 12,
+                                "gap_mobile": 12,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_radius": 0,
+                                "border_color": "#000000",
+                                "padding_unit": "px",
+                                "padding_top": 0,
+                                "padding_top_mobile": 0,
+                                "padding_bottom": 0,
+                                "padding_bottom_mobile": 0,
+                                "padding_left": 0,
+                                "padding_left_mobile": 0,
+                                "padding_right": 0,
+                                "padding_right_mobile": 0,
+                                "container_class": "container",
+                                "custom_css": ""
+                              },
+                              "blocks": {
+                                "container_HtR9ma": {
+                                  "type": "container",
+                                  "name": "Container - Texto con icono",
+                                  "settings": {
+                                    "html_tag": "div",
+                                    "enable_section_width": false,
+                                    "section_width": "page-width",
+                                    "desktop_direction": "row",
+                                    "mobile_direction": "row",
+                                    "gap_unit": "px",
+                                    "gap": 12,
+                                    "gap_mobile": 12,
+                                    "border": "none",
+                                    "border_width": 1,
+                                    "border_radius": 0,
+                                    "border_color": "#000000",
+                                    "padding_unit": "px",
+                                    "padding_top": 0,
+                                    "padding_top_mobile": 0,
+                                    "padding_bottom": 0,
+                                    "padding_bottom_mobile": 0,
+                                    "padding_left": 0,
+                                    "padding_left_mobile": 0,
+                                    "padding_right": 0,
+                                    "padding_right_mobile": 0,
+                                    "container_class": "container",
+                                    "custom_css": ""
+                                  },
+                                  "blocks": {
+                                    "icon_8JrRE6": {
+                                      "type": "icon",
+                                      "name": "t:names.icon",
+                                      "settings": {
+                                        "icon": "price_tag",
+                                        "image_upload": "shopify://shop_images/icon-medida-talla___77e67a867b274462aedcf44dde93d402.svg",
+                                        "width": 24,
+                                        "link": "",
+                                        "open_in_new_tab": false
+                                      },
+                                      "blocks": {}
+                                    },
+                                    "text_KGCeX7": {
+                                      "type": "text",
+                                      "name": "t:names.text",
+                                      "settings": {
+                                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p>",
+                                        "enable_collapse": false,
+                                        "collapsed_height": 50,
+                                        "show_more_text": "Ver más",
+                                        "show_less_text": "Ver menos",
+                                        "enable_fade": true,
+                                        "width": "fit-content",
+                                        "max_width": "normal",
+                                        "alignment": "left",
+                                        "type_preset": "rte",
+                                        "font": "var(--font-body--family)",
+                                        "font_size": "1rem",
+                                        "font_size_mobile": "0.875rem",
+                                        "line_height": "normal",
+                                        "letter_spacing": "normal",
+                                        "case": "none",
+                                        "wrap": "pretty",
+                                        "color": "var(--color-foreground)",
+                                        "background": false,
+                                        "background_color": "#00000026",
+                                        "corner_radius": 0,
+                                        "padding-block-start": 0,
+                                        "padding-block-end": 0,
+                                        "padding-inline-start": 0,
+                                        "padding-inline-end": 0,
+                                        "use_mobile_padding": false,
+                                        "padding-block-start-mobile": 0,
+                                        "padding-block-end-mobile": 0,
+                                        "padding-inline-start-mobile": 0,
+                                        "padding-inline-end-mobile": 0
+                                      },
+                                      "blocks": {}
+                                    }
+                                  },
+                                  "block_order": [
+                                    "icon_8JrRE6",
+                                    "text_KGCeX7"
+                                  ]
+                                },
+                                "text_ddhHxg": {
+                                  "type": "text",
+                                  "name": "t:names.text",
+                                  "settings": {
+                                    "text": "<p><strong>A. ¿Cómo medir tu pie?</strong><br/>Coloca una hoja de papel en el suelo y ubicala contra la pared, párate sobre el papel y asegurate que con el talón puedas tocar la pared. Dibuja en la hoja de papel el contorno de tu pie, identificando cuales son los puntos más extremos.</p><p><strong>B. Mide tu pie</strong><br/>Después de dibujar el contorno con ayuda de una regla mide los centímetros que existen en tre el talón y la punta de tus pies. Toma la medida mas larga de tus pies y revisa nuestra tabla de medidas para encontrar tu talla ideal.</p>",
+                                    "enable_collapse": false,
+                                    "collapsed_height": 50,
+                                    "show_more_text": "Ver más",
+                                    "show_less_text": "Ver menos",
+                                    "enable_fade": true,
+                                    "width": "fit-content",
+                                    "max_width": "normal",
+                                    "alignment": "left",
+                                    "type_preset": "rte",
+                                    "font": "var(--font-body--family)",
+                                    "font_size": "1rem",
+                                    "font_size_mobile": "0.875rem",
+                                    "line_height": "normal",
+                                    "letter_spacing": "normal",
+                                    "case": "none",
+                                    "wrap": "pretty",
+                                    "color": "var(--color-foreground)",
+                                    "background": false,
+                                    "background_color": "#00000026",
+                                    "corner_radius": 0,
+                                    "padding-block-start": 8,
+                                    "padding-block-end": 15,
+                                    "padding-inline-start": 0,
+                                    "padding-inline-end": 0,
+                                    "use_mobile_padding": false,
+                                    "padding-block-start-mobile": 0,
+                                    "padding-block-end-mobile": 0,
+                                    "padding-inline-start-mobile": 0,
+                                    "padding-inline-end-mobile": 0
+                                  },
+                                  "blocks": {}
+                                }
+                              },
+                              "block_order": [
+                                "container_HtR9ma",
+                                "text_ddhHxg"
+                              ]
+                            },
+                            "image_jQMJH7": {
+                              "type": "image",
+                              "name": "t:names.image",
+                              "settings": {
+                                "image": "shopify://shop_images/d629a009-58a8-4a31-b4f9-8f1d62d44e6e___a4012b84988b05dce7d654cd7d8b9f9a.webp",
+                                "use_mobile_image": false,
+                                "link": "",
+                                "image_ratio": "adapt",
+                                "width": "custom",
+                                "custom_width": 100,
+                                "width_mobile": "fill",
+                                "custom_width_mobile": 100,
+                                "height": "fit",
+                                "custom_height": 600,
+                                "custom_height_mobile": 0,
+                                "border": "none",
+                                "border_width": 1,
+                                "border_opacity": 100,
+                                "border_radius": 0,
+                                "padding-block-start": 0,
+                                "padding-block-end": 0,
+                                "padding-inline-start": 0,
+                                "padding-inline-end": 0
+                              },
+                              "blocks": {}
+                            }
+                          },
+                          "block_order": [
+                            "container_Yzbnhg",
+                            "image_jQMJH7"
+                          ]
+                        }
+                      },
+                      "block_order": [
+                        "container_ipQdyX"
+                      ]
                     }
                   },
                   "block_order": [
-                    "text_EeLezp"
-                  ]
-                },
-                "size_guide_category_Gfpi4m": {
-                  "type": "_size-guide-category",
-                  "name": "Inferiores",
-                  "settings": {
-                    "category_title": "Inferiores",
-                    "description_position": "with_table",
-                    "body_measure_image": "shopify://shop_images/tallas-image.png",
-                    "table_image_cm": "shopify://shop_images/tallas-prendas-inferiores-cut.png"
-                  },
-                  "blocks": {
-                    "text_3tQFXR": {
-                      "type": "text",
-                      "settings": {
-                        "text": "<p><strong>Toma las medidas de tu cuerpo y encuentra tu talla ideal</strong></p><p><strong>A. Busto</strong><br/>Pasa por el punto mas saliente del busto y espalda, formando una circunferencia lo más recta posible.</p><p><strong>B. Cintura</strong><br/>Rodea el cuerpo por la cintura natural formando una circunferencia lo más recta posible.</p><p><strong>C. Cadera</strong><br/>Rodea el cuerpo por el punto más saliente de la cadera, formando una circunferencia lo más recta posible.</p><p><strong>D. Entrepierna</strong><br/>Medida tomada con la cinta métrica sin holgura desde la parte superior de la entrepierna hasta el piso.</p>",
-                        "enable_collapse": false,
-                        "collapsed_height": 50,
-                        "show_more_text": "Ver más",
-                        "show_less_text": "Ver menos",
-                        "enable_fade": true,
-                        "width": "fit-content",
-                        "max_width": "normal",
-                        "alignment": "left",
-                        "use_mobile_font_size": false,
-                        "type_preset": "rte",
-                        "font": "var(--font-body--family)",
-                        "font_size": "1rem",
-                        "font_size_mobile": "1rem",
-                        "line_height": "normal",
-                        "letter_spacing": "normal",
-                        "case": "none",
-                        "wrap": "pretty",
-                        "color": "var(--color-foreground)",
-                        "background": false,
-                        "background_color": "#00000026",
-                        "corner_radius": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0,
-                        "use_mobile_padding": false,
-                        "padding-block-start-mobile": 0,
-                        "padding-block-end-mobile": 0,
-                        "padding-inline-start-mobile": 0,
-                        "padding-inline-end-mobile": 0
-                      },
-                      "blocks": {}
-                    }
-                  },
-                  "block_order": [
-                    "text_3tQFXR"
-                  ]
-                },
-                "size_guide_category_NaFPkm": {
-                  "type": "_size-guide-category",
-                  "name": "Calzado",
-                  "settings": {
-                    "category_title": "Calzado",
-                    "description_position": "with_body",
-                    "table_image_cm": "shopify://shop_images/d629a009-58a8-4a31-b4f9-8f1d62d44e6e___a4012b84988b05dce7d654cd7d8b9f9a.webp"
-                  },
-                  "blocks": {
-                    "text_7qPjLT": {
-                      "type": "text",
-                      "settings": {
-                        "text": "<p><strong>Toma las medidas de tus pies y encuentra tu talla ideal</strong></p><p><strong>A. ¿Cómo medir tu pie?</strong><br/>Coloca una hoja de papel en el suelo y ubicala contra la pared, párate sobre el papel y asegurate que con el talón puedas tocar la pared. Dibuja en la hoja de papel el contorno de tu pie, identificando cuales son los puntos más extremos.</p><p><strong>B. Mide tu pie</strong><br/>Después de dibujar el contorno con ayuda de una regla mide los centímetros que existen en tre el talón y la punta de tus pies. Toma la medida mas larga de tus pies y revisa nuestra tabla de medidas para encontrar tu talla ideal.</p>",
-                        "enable_collapse": false,
-                        "collapsed_height": 50,
-                        "show_more_text": "Ver más",
-                        "show_less_text": "Ver menos",
-                        "enable_fade": true,
-                        "width": "fit-content",
-                        "max_width": "normal",
-                        "alignment": "left",
-                        "use_mobile_font_size": false,
-                        "type_preset": "rte",
-                        "font": "var(--font-body--family)",
-                        "font_size": "1rem",
-                        "font_size_mobile": "1rem",
-                        "line_height": "normal",
-                        "letter_spacing": "normal",
-                        "case": "none",
-                        "wrap": "pretty",
-                        "color": "var(--color-foreground)",
-                        "background": false,
-                        "background_color": "#00000026",
-                        "corner_radius": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0,
-                        "use_mobile_padding": false,
-                        "padding-block-start-mobile": 0,
-                        "padding-block-end-mobile": 0,
-                        "padding-inline-start-mobile": 0,
-                        "padding-inline-end-mobile": 0
-                      },
-                      "blocks": {}
-                    }
-                  },
-                  "block_order": [
-                    "text_7qPjLT"
+                    "ui_tab_yz6bqG",
+                    "ui_tab_bdAkAj",
+                    "ui_tab_PeECQM"
                   ]
                 }
               },
               "block_order": [
-                "size_guide_category_YKDUTT",
-                "size_guide_category_Gfpi4m",
-                "size_guide_category_NaFPkm"
+                "ui_tabs_RRAP3U"
               ]
             },
             "installments_banner_hLzt6J": {
@@ -599,7 +1207,7 @@
             "variant_picker_EQ4gcg",
             "product_model_fit_dmTpMP",
             "buy_buttons_JqjPaM",
-            "size_guide_WFhmCy",
+            "ui_modal_qzjx4x",
             "installments_banner_hLzt6J",
             "divider_A4UTje",
             "text_xWt7wD",

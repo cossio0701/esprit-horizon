@@ -63,7 +63,6 @@
     justify-content: space-between;
     align-items: stretch;
     gap: var(--gap-sm);
-    background-color: rgb(var(--color-background-rgb));
     background-image: var(--to-top-gradient-background);
     z-index: var(--facets-sticky-z-index);
     padding-block-start: var(--padding-xs);
@@ -131,20 +130,26 @@
     background-color: transparent;
   }
 
-  /* Clear all wrapper — equal flex child */
-  .facets__actions > facet-remove-component {
-    flex: 1 1 0;
-  }
-
   /* Clear all button */
   .facets__clear-all {
     display: none;
     cursor: pointer;
+    min-width: var(--facets-clear-all-min-width);
     transition: transform var(--animation-values), opacity var(--animation-values);
     opacity: 0;
     transform: translateY(100%);
-    width: 100%;
+    flex-grow: 1;
     padding-block: var(--padding-lg);
+    width: 100%;
+  }
+
+  .facets__actions > facet-remove-component {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .facets__actions > facet-remove-component:not(:has(.active)) {
+    display: none;
   }
 
   .facets:not(.facets--drawer) .facets__clear-all {
@@ -212,8 +217,15 @@
   }
 
   .facets__see-results {
-    flex: 1 1 0;
+    min-width: 0;
+    flex-grow: 1;
     padding-block: var(--padding-lg);
+    flex: 1 1 0;
+  }
+
+  .facets__actions--active .facets__see-results {
+    padding: 0;
+    transition: padding var(--animation-speed) var(--animation-easing);
   }
 
   .facets:not(.facets--drawer) .facets__see-results {

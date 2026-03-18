@@ -1,0 +1,83 @@
+<script src="{{ 'tabs.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="ui-tabs"
+  data-tabs
+  data-tabs-initial="{{ block.settings.initial_index }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ui-tabs__list" data-tablist role="tablist" aria-label="{{ block.settings.aria_label | escape }}">
+  </div>
+
+  <div class="ui-tabs__panels">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .ui-tabs {
+    width: 100%;
+  }
+
+  .ui-tabs__list {
+    display: flex;
+    width: 100%;
+    margin: 0 0 var(--padding-sm);
+    border-bottom: 1px solid rgba(17, 17, 17, 0.14);
+  }
+
+  .ui-tabs__tab {
+    cursor: pointer;
+    flex: 1 1 0;
+    min-width: 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: rgba(17, 17, 17, 0.45);
+    padding: 0.85rem 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+
+  .ui-tabs__tab[data-state='active'] {
+    color: #111;
+    border-bottom-color: #111;
+  }
+
+  .ui-tabs__panel[hidden] {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "UI Tabs",
+  "blocks": [
+    { "type": "_ui-tab" }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessible label",
+      "default": "Tabs"
+    },
+    {
+      "type": "range",
+      "id": "initial_index",
+      "label": "Initial tab",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "UI Tabs"
+    }
+  ]
+}
+{% endschema %}
