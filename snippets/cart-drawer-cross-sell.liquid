@@ -2,7 +2,7 @@
   Renders a cross-sell component inside the cart drawer with accordion and horizontal carousel.
 
   @param {object} [section] - The section object for section_id
-  @param {string} [heading] - Heading text for the accordion
+  @param {string} [heading] - Heading text for the accordion (translation key)
   @param {object} [collection] - Collection to show products from
   @param {number} [max_products] - Maximum number of products to show
 {%- enddoc -%}
@@ -16,7 +16,7 @@
 {% liquid
   assign cross_sell_collection = collection | default: collections.all
   assign cross_sell_max = max_products | default: 8
-  assign cross_sell_heading = heading | default: 'Podría gustarte'
+  assign cross_sell_heading = heading | default: 'cart.cross_sell_heading' | t
   assign cross_sell_section_id = section.id | default: 'cart-drawer-cross-sell'
   assign cross_sell_products = cross_sell_collection.products
 
@@ -74,6 +74,11 @@
 
 {% stylesheet %}
   .cart-drawer-cross-sell {
+    --cross-sell-arrow-size: 28px;
+    --cross-sell-icon-size: 12px;
+    --cross-sell-slide-width: 70%;
+    --cross-sell-padding-inline: 36px;
+
     display: block;
     padding: 0;
     border: none;
@@ -81,10 +86,10 @@
   }
 
   .cart-drawer-cross-sell__header {
-    font-size: 0.875rem;
+    font-size: var(--font-size--sm);
     font-weight: 600;
-    padding-top: 12px;
-    padding-bottom: 0;
+    padding-block-start: var(--padding-sm);
+    padding-block-end: 0;
     list-style: none;
     cursor: pointer;
     display: flex;
@@ -101,9 +106,9 @@
   }
 
   .cart-drawer-cross-sell__header .icon-caret {
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s ease;
+    width: var(--cross-sell-icon-size);
+    height: var(--cross-sell-icon-size);
+    transition: transform var(--animation-speed-slow) var(--animation-easing);
   }
 
   .cart-drawer-cross-sell details[open] .icon-caret {
@@ -111,7 +116,7 @@
   }
 
   .cart-drawer-cross-sell__content {
-    padding-bottom: 12px;
+    padding-block-end: var(--padding-sm);
     overflow: hidden;
   }
 
@@ -121,14 +126,15 @@
 
   .cart-drawer-cross-sell__carousel {
     display: flex;
-    gap: 12px;
+    gap: var(--gap-sm);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: 4px 36px;
+    padding-block: var(--padding-2xs);
+    padding-inline: var(--cross-sell-padding-inline);
   }
 
   .cart-drawer-cross-sell__carousel::-webkit-scrollbar {
@@ -138,52 +144,58 @@
   .cart-drawer-cross-sell__slide {
     flex-shrink: 0;
     scroll-snap-align: start;
-    width: 70%;
+    width: var(--cross-sell-slide-width);
+    min-width: 0;
   }
 
   .cart-drawer-cross-sell__arrow {
     position: absolute;
-    top: 50%;
+    inset-block-start: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    width: var(--cross-sell-arrow-size);
+    height: var(--cross-sell-arrow-size);
+    border-radius: var(--style-border-radius-50);
     background-color: var(--color-background);
-    border: 1px solid var(--color-border);
+    border: var(--style-border-width) solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all var(--animation-speed-slow) var(--animation-easing);
+    z-index: var(--layer-flat);
+    box-shadow: 0 2px 4px rgb(var(--color-shadow-rgb) / var(--opacity-10));
+
+    &:hover {
+      background-color: var(--color-foreground);
+      color: var(--color-background);
+      border-color: var(--color-foreground);
+    }
+
+    &:focus-visible {
+      outline: var(--focus-outline-width) solid var(--color-foreground);
+      outline-offset: var(--focus-outline-offset);
+    }
   }
 
   .cart-drawer-cross-sell__arrow--prev {
-    left: 0;
+    inset-inline-start: 0;
   }
 
   .cart-drawer-cross-sell__arrow--next {
-    right: 0;
-  }
-
-  .cart-drawer-cross-sell__arrow:hover {
-    background-color: var(--color-foreground);
-    color: var(--color-background);
-    border-color: var(--color-foreground);
+    inset-inline-end: 0;
   }
 
   .cart-drawer-cross-sell__arrow .svg-wrapper {
-    width: 12px;
-    height: 12px;
+    width: var(--cross-sell-icon-size);
+    height: var(--cross-sell-icon-size);
     display: flex;
     align-items: center;
     justify-content: center;
-  }
 
-  .cart-drawer-cross-sell__arrow .svg-wrapper svg {
-    width: 100%;
-    height: 100%;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .cart-drawer-cross-sell__arrow--prev .svg-wrapper {
@@ -192,5 +204,19 @@
 
   .cart-drawer-cross-sell__arrow--next .svg-wrapper {
     transform: rotate(-90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart-drawer-cross-sell__carousel {
+      scroll-behavior: auto;
+    }
+
+    .cart-drawer-cross-sell__header .icon-caret {
+      transition: none;
+    }
+
+    .cart-drawer-cross-sell__arrow {
+      transition: none;
+    }
   }
 {% endstylesheet %}
