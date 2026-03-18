@@ -1,60 +1,272 @@
-{{ 'gco-cookies.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign cookie_id = 'CookieBanner-' | append: section.id
+-%}
 
-<section
-  class="gco-cookie-banner"
-  style="opacity:0; pointer-events:none;"
+<cookie-banner
+  id="{{ cookie_id }}"
+  class="cookie-banner"
+  role="dialog"
+  aria-modal="true"
+  aria-describedby="{{ cookie_id }}-desc"
+  hidden
+  style="--cookie-bg: {{ section.settings.background_color }}; --cookie-text: {{ section.settings.text_color }}; --cookie-accent: {{ section.settings.accent_color }};"
 >
-  {% if section.settings.image_cookies != blank %}
+  {%- if section.settings.image != blank -%}
     <img
-      width="auto"
-      height="auto"
-      src="{{ section.settings.image_cookies | image_url }}"
-      class="gco-cookie-banner__icon"
+      src="{{ section.settings.image | image_url: width: 48 }}"
+      class="cookie-banner__icon"
+      alt=""
+      width="{{ section.settings.image.width }}"
+      height="{{ section.settings.image.height }}"
+      loading="lazy"
     >
-  {% endif %}
+  {%- endif -%}
 
-  <div class="gco-cookie-banner__message">
-    {{ section.settings.text_policies }}
+  <div id="{{ cookie_id }}-desc" class="cookie-banner__message">
+    {{ section.settings.message }}
   </div>
 
-  <button class="gco-cookie-banner__button">
-    {{ section.settings.cookies_button_label }}
+  <button type="button" class="cookie-banner__button" data-cookie-accept>
+    {{ section.settings.button_label }}
   </button>
-</section>
+</cookie-banner>
 
-<script src="{{ 'gco-cookies.js' | asset_url }}" defer></script>
+{% stylesheet %}
+  .cookie-banner {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0;
+    z-index: var(--cookie-z-index, 100);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md, 1.5rem);
+
+    padding: var(--space-lg, 2rem);
+    max-inline-size: 100%;
+
+    background-color: var(--cookie-bg, #f9f7f0);
+    color: var(--cookie-text, #000);
+    line-height: 1.2;
+
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+  }
+
+  .cookie-banner[hidden] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .cookie-banner:not([hidden]) {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .cookie-banner__icon {
+    inline-size: 32px;
+    block-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .cookie-banner__message {
+    text-align: justify;
+    max-inline-size: 400px;
+    font-size: var(--font-size-sm, 0.875rem);
+  }
+
+  .cookie-banner__message a {
+    color: var(--cookie-text, #000);
+    font-weight: 600;
+    letter-spacing: 0.0625em;
+  }
+
+  .cookie-banner__message a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .cookie-banner__button {
+    inline-size: 100%;
+    max-inline-size: 300px;
+    padding: var(--space-sm, 1rem) var(--space-lg, 2rem);
+
+    cursor: pointer;
+    border: 1px solid var(--cookie-accent, #000);
+    border-radius: 0;
+
+    background-color: var(--cookie-accent, #000);
+    color: var(--cookie-bg, #f9f7f0);
+
+    font-weight: 600;
+    letter-spacing: 0.0625em;
+
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .cookie-banner__button:hover {
+    background-color: transparent;
+    color: var(--cookie-accent, #000);
+  }
+
+  .cookie-banner__button:focus-visible {
+    outline: 2px solid var(--cookie-accent, #000);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) {
+    .cookie-banner {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md, 1.5rem) var(--space-xl, 3rem);
+    }
+
+    .cookie-banner__message {
+      text-align: left;
+      max-inline-size: none;
+      flex: 1;
+    }
+
+    .cookie-banner__button {
+      flex-shrink: 0;
+      inline-size: auto;
+      margin-inline-start: var(--space-lg, 2rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cookie-banner {
+      transition-duration: 0.01ms;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class CookieBanner extends HTMLElement {
+    #cookieName = 'tplCookieConsent';
+    #cookieLifetime = 60;
+    #boundKeydown = null;
+
+    connectedCallback() {
+      if (this.#getCookie(this.#cookieName)) return;
+
+      this.hidden = false;
+      this.#trapFocus();
+      this.button?.addEventListener('click', this.#handleAccept.bind(this));
+      this.#boundKeydown = this.#handleKeydown.bind(this);
+      document.addEventListener('keydown', this.#boundKeydown);
+    }
+
+    disconnectedCallback() {
+      if (this.#boundKeydown) {
+        document.removeEventListener('keydown', this.#boundKeydown);
+      }
+    }
+
+    get button() {
+      return this.querySelector('[data-cookie-accept]');
+    }
+
+    #handleAccept() {
+      const consent = {
+        analytics: true,
+        statistics: true,
+        marketing: true,
+        preferences: true,
+        timestamp: new Date().toISOString()
+      };
+
+      this.#setCookie('CookieConsent', JSON.stringify(consent), this.#cookieLifetime);
+      this.#setCookie(this.#cookieName, '1', this.#cookieLifetime);
+
+      window.dispatchEvent(new CustomEvent('cookieConsentUpdate', {
+        detail: consent,
+        bubbles: true
+      }));
+
+      this.hidden = true;
+    }
+
+    #handleKeydown(event) {
+      if (event.key === 'Escape' && !this.hidden) {
+        this.#handleAccept();
+      }
+    }
+
+    #trapFocus() {
+      this.button?.focus();
+    }
+
+    #setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `${name}=${encodeURIComponent(value)};path=/;expires=${expires.toUTCString()};SameSite=Lax`;
+    }
+
+    #getCookie(name) {
+      const cookies = document.cookie.split('; ');
+      for (const cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === name) return decodeURIComponent(value);
+      }
+      return null;
+    }
+  }
+
+  customElements.define('cookie-banner', CookieBanner);
+{% endjavascript %}
 
 {% schema %}
 {
-  "name": "GCO Cookies popup",
+  "name": "t:names.cookie_banner",
   "settings": [
     {
-      "type": "image_picker",
-      "id": "image_cookies",
-      "label": "Imagen / Ícono cookies"
+      "type": "header",
+      "content": "t:content.content"
     },
     {
-      "type": "text",
-      "id": "cookies_label",
-      "label": "Titulo popup",
-      "default": "Utilizamos cookies"
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.icon"
     },
     {
       "type": "richtext",
-      "id": "text_policies",
-      "label": "Politica",
+      "id": "message",
+      "label": "t:settings.message",
       "default": "<p>ESPRIT usa cookies para darte la mejor experiencia de navegación. Al navegar en el sitio estas aceptando su uso, si deseas saber más acerca de nuestra política has <a href=\"/pages/terminos-condiciones?category=politica-cookies\">click aquí</a>.</p>"
     },
     {
       "type": "text",
-      "id": "cookies_button_label",
-      "label": "Texto de botón aceptar",
+      "id": "button_label",
+      "label": "t:settings.button_label",
       "default": "Aceptar cookies"
+    },
+    {
+      "type": "header",
+      "content": "t:content.colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background",
+      "default": "#f9f7f0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "t:settings.accent",
+      "default": "#000000"
     }
   ],
   "presets": [
     {
-      "name": "GCO Cookies popup"
+      "name": "t:names.cookie_banner"
     }
   ]
 }

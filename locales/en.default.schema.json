@@ -53,6 +53,7 @@
     "carousel_pagination": "Carousel pagination",
     "cart_features": "Cart features",
     "colors": "Colors",
+    "content": "Content",
     "collection_page": "Collection page",
     "complementary_products": "Complementary products must be set up using the Search & Discovery app. [Learn more](https://help.shopify.com/manual/online-store/search-and-discovery)",
     "content_width": "Content width only applies when the section width is set to full width.",
@@ -227,6 +228,7 @@
     "media_type_info": "Features are populated from your menu links"
   },
   "names": {
+    "cookie_banner": "Cookie banner",
     "column": "Column",
     "product_title": "Product title",
     "custom_liquid": "Custom Liquid",
@@ -940,6 +942,7 @@
     "make_details_sticky_desktop": "Sticky on desktop",
     "make_section_full_width": "Make section full width",
     "max_width": "Max width",
+    "message": "Message",
     // Section header for product card media settings
     "media": "Media",
     "media_fit": "Media fit",

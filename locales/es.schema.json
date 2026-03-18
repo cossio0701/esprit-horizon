@@ -9,6 +9,7 @@
  */
 {
   "names": {
+    "cookie_banner": "Banner de cookies",
     "404": "404",
     "borders": "Bordes",
     "column": "Columna",
@@ -388,6 +389,7 @@
     "loop": "Bucle",
     "make_details_sticky_desktop": "Fijo en el escritorio",
     "max_width": "Anchura máxima",
+    "message": "Mensaje",
     "media_height": "Altura del elemento multimedia",
     "media_overlay": "Sobreposición del elemento multimedia",
     "media_position": "Posición del elemento multimedia",
@@ -919,6 +921,7 @@
     "width": "Ancho",
     "carousel": "Carrusel",
     "colors": "Colores",
+    "content": "Contenido",
     "collection_page": "Página de colección",
     "customer_account": "Cuenta de cliente",
     "edit_empty_state_collection_in_theme_settings": "Edita el estado vacío de la colección en [configuración del tema ](/editor?context=theme&category=search)",
