@@ -1,10 +1,12 @@
 {%- doc -%}
   Renders a cross-sell component inside the cart drawer with accordion and horizontal carousel.
 
-  @param {object} [section] - The section object for section_id
-  @param {string} [heading] - Heading text for the accordion (translation key)
-  @param {object} [collection] - Collection to show products from
-  @param {number} [max_products] - Maximum number of products to show
+  @param {object} [block] - The block object containing settings.
+  @param {string} [source] - Source for products: 'recommendations' or 'collection'. Defaults to 'recommendations'.
+  @param {object} [collection] - Collection to show products from when source is 'collection'.
+  @param {string} [recommendation_type] - Type of recommendations: 'complementary' or 'related'. Defaults to 'complementary'.
+  @param {string} [heading] - Heading text for the accordion.
+  @param {number} [max_products] - Maximum number of products to show. Defaults to 8.
 {%- enddoc -%}
 
 <script
@@ -14,39 +16,54 @@
 ></script>
 
 {% liquid
+  assign cross_sell_source = source | default: 'recommendations'
   assign cross_sell_collection = collection | default: collections.all
+  assign cross_sell_recommendation_type = recommendation_type | default: 'complementary'
   assign cross_sell_max = max_products | default: 8
   assign cross_sell_heading = heading | default: 'cart.cross_sell_heading' | t
-  assign cross_sell_section_id = section.id | default: 'cart-drawer-cross-sell'
-  assign cross_sell_products = cross_sell_collection.products
+  assign cross_sell_section_id = 'cart-drawer-cross-sell'
 
   assign cart_product_ids = cart.items | map: 'product_id'
+  assign cart_first_product_id = cart.items.first.product_id
 %}
 
-{%- if cross_sell_products.size > 0 -%}
-  <cart-cross-sell class="cart-drawer-cross-sell" data-section-id="{{ cross_sell_section_id }}">
-    <accordion-custom>
-      <details class="details">
-        <summary class="details__header cart-drawer-cross-sell__header">
-          <span class="cart-drawer-cross-sell__title">{{ cross_sell_heading }}</span>
-          <span class="svg-wrapper icon-caret icon-animated">
-            {{- 'icon-caret.svg' | inline_asset_content -}}
-          </span>
-        </summary>
+<cart-cross-sell
+  class="cart-drawer-cross-sell"
+  data-section-id="{{ cross_sell_section_id }}"
+  data-source="{{ cross_sell_source }}"
+  {% if cross_sell_source == 'recommendations' and cart_first_product_id %}
+    data-recommendations-url="{{ routes.product_recommendations_url }}?product_id={{ cart_first_product_id }}&limit={{ cross_sell_max }}&intent={{ cross_sell_recommendation_type }}"
+    data-recommendations-intent="{{ cross_sell_recommendation_type }}"
+  {% endif %}
+  data-max-products="{{ cross_sell_max }}"
+  data-cart-product-ids="{{ cart_product_ids | join: ',' }}"
+>
+  <accordion-custom>
+    <details class="details" open>
+      <summary class="details__header cart-drawer-cross-sell__header">
+        <span class="cart-drawer-cross-sell__title">{{ cross_sell_heading }}</span>
+        <span class="svg-wrapper icon-caret icon-animated">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </summary>
 
-        <div class="details__content cart-drawer-cross-sell__content">
-          <div class="cart-drawer-cross-sell__carousel-wrapper">
-            <button
-              type="button"
-              class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--prev"
-              aria-label="{{ 'accessibility.slideshow_previous' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-caret.svg' | inline_asset_content -}}
-              </span>
-            </button>
+      <div class="details__content cart-drawer-cross-sell__content">
+        <div class="cart-drawer-cross-sell__carousel-wrapper">
+          <button
+            type="button"
+            class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--prev"
+            aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </button>
 
-            <div class="cart-drawer-cross-sell__carousel">
+          <div class="cart-drawer-cross-sell__carousel" data-carousel>
+            {% if cross_sell_source == 'collection' %}
+              {% liquid
+                assign cross_sell_products = cross_sell_collection.products
+              %}
               {%- for product in cross_sell_products limit: cross_sell_max -%}
                 {%- unless cart_product_ids contains product.id -%}
                   <div class="cart-drawer-cross-sell__slide">
@@ -54,23 +71,34 @@
                   </div>
                 {%- endunless -%}
               {%- endfor -%}
-            </div>
-
-            <button
-              type="button"
-              class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--next"
-              aria-label="{{ 'accessibility.slideshow_next' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-caret.svg' | inline_asset_content -}}
-              </span>
-            </button>
+            {% else %}
+              {% comment %} Recommendations mode: show skeleton loaders initially, JS will populate {% endcomment %}
+              {%- for i in (1..cross_sell_max) -%}
+                <div class="cart-drawer-cross-sell__slide cart-drawer-cross-sell__slide--skeleton" data-skeleton>
+                  <div class="cart-cross-sell-card cart-cross-sell-card--skeleton">
+                    <div class="skeleton skeleton--image"></div>
+                    <div class="skeleton skeleton--text"></div>
+                    <div class="skeleton skeleton--text skeleton--short"></div>
+                  </div>
+                </div>
+              {%- endfor -%}
+            {% endif %}
           </div>
+
+          <button
+            type="button"
+            class="cart-drawer-cross-sell__arrow cart-drawer-cross-sell__arrow--next"
+            aria-label="{{ 'accessibility.slideshow_next' | t }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </button>
         </div>
-      </details>
-    </accordion-custom>
-  </cart-cross-sell>
-{%- endif -%}
+      </div>
+    </details>
+  </accordion-custom>
+</cart-cross-sell>
 
 {% stylesheet %}
   .cart-drawer-cross-sell {
@@ -206,6 +234,47 @@
     transform: rotate(-90deg);
   }
 
+  .cart-cross-sell-card--skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-foreground) var(--opacity-10) 25%,
+      var(--color-foreground) var(--opacity-5) 50%,
+      var(--color-foreground) var(--opacity-10) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: var(--style-border-radius-sm);
+  }
+
+  .skeleton--image {
+    aspect-ratio: 4/5;
+    width: 100%;
+  }
+
+  .skeleton--text {
+    height: 14px;
+    width: 100%;
+  }
+
+  .skeleton--short {
+    width: 60%;
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .cart-drawer-cross-sell__carousel {
       scroll-behavior: auto;
@@ -217,6 +286,10 @@
 
     .cart-drawer-cross-sell__arrow {
       transition: none;
+    }
+
+    .skeleton {
+      animation: none;
     }
   }
 {% endstylesheet %}

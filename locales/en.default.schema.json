@@ -52,6 +52,7 @@
     "carousel_navigation": "Carousel navigation",
     "carousel_pagination": "Carousel pagination",
     "cart_features": "Cart features",
+    "cross_sell_recommendations_info": "Recommendations are based on products in the cart using Shopify's AI. Complementary products work best for cross-selling. Setup requires the Search & Discovery app.",
     "colors": "Colors",
     "content": "Content",
     "collection_page": "Collection page",
@@ -645,6 +646,7 @@
     "recycle": "Recycle",
     "regular": "Regular",
     // Product recommendation type option in dropdown
+    "recommendations": "Recommendations",
     "related": "Related",
     "recently_viewed": "Recently viewed",
     "related_products": "Related products",
@@ -1003,6 +1005,8 @@
     "product_card_carousel": "Show carousel",
     "product_cards": "Product cards",
     "product_count": "Product count",
+    "cross_sell_heading": "You might like",
+    "recommendation_type": "Recommendation type",
     "product_pages": "Product pages",
     "product_templates": "Product templates",
     // Setting label for text capitalization of product titles

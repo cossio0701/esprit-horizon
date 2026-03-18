@@ -6,6 +6,13 @@
   @param {boolean} [settings.auto_open_cart_drawer] - If `true`, the cart drawer opens automatically after an item is
   added.
   @param {string} [settings.drawer_color_scheme] - The color scheme for the drawer.
+  @param {object} [block] - The block object containing cross-sell settings.
+
+  @param {string} [block.settings.cross_sell_source] - Source for cross-sell products: 'recommendations' or 'collection'.
+  @param {object} [block.settings.cross_sell_collection] - Collection to use when source is 'collection'.
+  @param {string} [block.settings.cross_sell_recommendation_type] - Type of recommendations: 'complementary' or 'related'.
+  @param {string} [block.settings.cross_sell_heading] - Custom heading for the cross-sell section.
+  @param {number} [block.settings.cross_sell_max_products] - Maximum number of products to show.
 {%- enddoc -%}
 
 <script
@@ -107,7 +114,14 @@
             </scroll-hint>
 
             <div class="cart-drawer__summary">
-              {% render 'cart-drawer-cross-sell' %}
+              {% render 'cart-drawer-cross-sell',
+                block: block,
+                source: block.settings.cross_sell_source,
+                collection: block.settings.cross_sell_collection,
+                recommendation_type: block.settings.cross_sell_recommendation_type,
+                heading: block.settings.cross_sell_heading,
+                max_products: block.settings.cross_sell_max_products
+              %}
               {% render 'cart-summary', simple: true %}
             </div>
           {%- endif -%}
