@@ -30,6 +30,7 @@
     "menu": "Menu",
     "nested_product": "{{ product_title }} for {{ parent_title }}",
     "new_window": "Opens in a new window.",
+    "help_modal": "Open help",
     "quantity": "Quantity",
     "pause_video": "Pause video",
     "play_model": "Play 3D model",
@@ -287,8 +288,12 @@
     "recipient_form_error": "There was an error with the form submission",
     "product_custom_property_character_count": "{{ used_chars }}/{{ max_chars }} characters used"
   },
+  "content": {
+    "how_can_we_help": "HOW CAN WE HELP YOU?",
+    "write_whatsapp": "Write us on WhatsApp",
+    "changes_pqr": "Changes, warranties and PQRs"
+  },
   "fields": {
-    // Separates min and max values in price range filter
     "separator": "to"
   },
   "gift_cards": {
