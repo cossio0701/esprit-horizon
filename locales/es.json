@@ -77,11 +77,6 @@
     "nested_product": "{{ product_title }} para {{ parent_title }}",
     "help_modal": "Abrir ayuda"
   },
-  "content": {
-    "how_can_we_help": "¿CÓMO PODEMOS AYUDARTE?",
-    "write_whatsapp": "Escríbenos por WhatsApp",
-    "changes_pqr": "Cambios, garantías y PQRs"
-  },
   "actions": {
     "add_to_cart": "Agregar al carrito",
     "clear_all": "Limpiar",
@@ -125,6 +120,9 @@
     "quick_buy": "Compra rápida"
   },
   "content": {
+    "how_can_we_help": "¿Cómo podemos ayudarte?",
+    "write_whatsapp": "Escríbenos por WhatsApp",
+    "changes_pqr": "Cambios, garantías y PQRs",
     "reviews": "reseñas",
     "language": "Idioma",
     "localization_region_and_language": "Región e idioma",

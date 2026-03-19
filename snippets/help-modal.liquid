@@ -1,186 +1,171 @@
-{% liquid
-  assign help_modal_id = 'help-modal-' | append: section.id
-%}
+{%- liquid
+  assign help_modal_id = help_modal_id | default: 'help-modal'
+  assign whatsapp_url = whatsapp_url | default: 'https://wa.link/jhyooy'
+  assign pqr_url = pqr_url | default: '/pages/ayuda-pqr'
+  assign show_fab = show_fab | default: true
+-%}
 
-<div class="help-fab" data-help-fab>
+<script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
+
+{%- if show_fab -%}
   <button
     type="button"
     class="help-fab__button"
     aria-label="{{ 'accessibility.help_modal' | t }}"
-    data-modal-trigger="{{ help_modal_id }}"
+    on:click="#{{ help_modal_id }}-wrapper/showDialog"
   >
     <span class="help-fab__icon">
       {{- 'icon-informacion.svg' | inline_asset_content -}}
     </span>
   </button>
-</div>
+{%- endif -%}
 
-<dialog
-  id="{{ help_modal_id }}"
-  class="help-modal"
-  aria-modal="true"
-  aria-labelledby="{{ help_modal_id }}-title"
+<dialog-component
+  id="{{ help_modal_id }}-wrapper"
+  class="help-modal-wrapper"
 >
-  <div class="help-modal__inner">
-    <header class="help-modal__header">
-      <div class="help-modal__logo">
-        {% if settings.logo != blank %}
-          {{
-            settings.logo
-            | image_url: width: 200
-            | image_tag: loading: 'lazy', class: 'help-modal__logo-image', alt: shop.name
-          }}
-        {% else %}
-          <span class="help-modal__shop-name">{{ shop.name }}</span>
-        {% endif %}
-      </div>
-      <button
-        type="button"
-        class="help-modal__close"
-        aria-label="{{ 'accessibility.close' | t }}"
-        data-modal-close
-      >
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </header>
-
-    <div class="help-modal__body">
-      <h2 id="{{ help_modal_id }}-title" class="help-modal__title">
-        {{ 'content.how_can_we_help' | t }}
-      </h2>
-
-      <div class="help-modal__buttons">
-        <a
-          href="https://wa.link/jhyooy"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="help-modal__button help-modal__button--whatsapp"
+  <dialog
+    ref="dialog"
+    class="help-modal"
+    scroll-lock
+    aria-modal="true"
+    aria-labelledby="{{ help_modal_id }}-title"
+    on:click="/closeDialogOnClickOutside"
+    on:keydown="/closeDialogOnEscapePress"
+  >
+    <div class="help-modal__inner">
+      <header class="help-modal__header">
+        <div class="help-modal__logo">
+          {%- if settings.logo != blank -%}
+            {{
+              settings.logo
+              | image_url: width: 200
+              | image_tag: loading: 'lazy', class: 'help-modal__logo-image', alt: shop.name
+            -}}
+          {%- else -%}
+            <span class="help-modal__shop-name">{{ shop.name }}</span>
+          {%- endif -%}
+        </div>
+        <button
+          type="button"
+          class="help-modal__close"
+          aria-label="{{ 'accessibility.close' | t }}"
+          on:click="dialog-component/closeDialog"
         >
-          <span class="help-modal__button-icon">
-            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-              {% render 'icon', icon: 'whatsapp' %}
-            </svg>
-          </span>
-          <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
-        </a>
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+      </header>
 
-        <a
-          href="/pages/ayuda-pqr"
-          class="help-modal__button help-modal__button--pqr"
-        >
-          <span class="help-modal__button-icon">
-            <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
-              {{- 'icon-cambios.svg' | inline_asset_content -}}
-            </svg>
-          </span>
-          <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
-        </a>
+      <div class="help-modal__body">
+        <h2 id="{{ help_modal_id }}-title" class="help-modal__title">
+          {{ 'content.how_can_we_help' | t }}
+        </h2>
+
+        <div class="help-modal__buttons">
+          <a
+            href="{{ whatsapp_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="help-modal__button help-modal__button--whatsapp"
+          >
+            <span class="help-modal__button-icon">
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                {%- render 'icon', icon: 'whatsapp' -%}
+              </svg>
+            </span>
+            <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
+          </a>
+
+          <a
+            href="{{ pqr_url }}"
+            class="help-modal__button help-modal__button--pqr"
+          >
+            <span class="help-modal__button-icon">
+              <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+                {{- 'icon-cambios.svg' | inline_asset_content -}}
+              </svg>
+            </span>
+            <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
-</dialog>
-
-{% javascript %}
-  (function () {
-    const fab = document.querySelector('[data-help-fab]');
-    if (!fab) return;
-
-    const trigger = fab.querySelector('[data-modal-trigger]');
-    const modal = document.getElementById(trigger.dataset.modalTrigger);
-    if (!modal) return;
-
-    trigger.addEventListener('click', function () {
-      modal.showModal();
-      document.body.style.overflow = 'hidden';
-    });
-
-    const closeBtn = modal.querySelector('[data-modal-close]');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function () {
-        modal.close();
-        document.body.style.overflow = '';
-      });
-    }
-
-    modal.addEventListener('click', function (e) {
-      if (e.target === modal) {
-        modal.close();
-        document.body.style.overflow = '';
-      }
-    });
-
-    modal.addEventListener('close', function () {
-      document.body.style.overflow = '';
-    });
-  })();
-{% endjavascript %}
+  </dialog>
+</dialog-component>
 
 {% stylesheet %}
-  .help-fab {
-    position: fixed;
-    bottom: var(--padding-lg, 16px);
-    right: var(--padding-lg, 16px);
-    z-index: var(--layer-sticky, 100);
+  .help-modal-wrapper {
+    --help-modal-max-width: 600px;
   }
 
   .help-fab__button {
+    --help-fab-size: 50px;
+    --help-fab-icon-size: 40px;
+
+    position: fixed;
+    inset-inline-end: var(--space-md, 16px);
+    inset-block-end: var(--space-md, 16px);
+    z-index: var(--layer-sticky, 100);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
+    inline-size: var(--help-fab-size);
+    block-size: var(--help-fab-size);
     border-radius: 50%;
-    background-color: #ffffff;
-    color: #000000;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
-    transition: transform 0.2s var(--animation-easing), box-shadow 0.2s var(--animation-easing);
-  }
+    box-shadow: var(--shadow-lg, 0 4px 12px rgb(0 0 0 / 0.15));
+    transition: transform var(--duration-fast, 0.2s) var(--ease-out, ease),
+      box-shadow var(--duration-fast, 0.2s) var(--ease-out, ease);
 
-  .help-fab__button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgb(0 0 0 / 0.2);
-  }
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl, 0 6px 16px rgb(0 0 0 / 0.2));
+    }
 
-  .help-fab__button:active {
-    transform: scale(0.95);
+    &:active {
+      transform: scale(0.95);
+    }
   }
 
   .help-fab__icon {
     display: flex;
-    width: 28px;
-    height: 28px;
-  }
+    inline-size: var(--help-fab-icon-size);
+    block-size: var(--help-fab-icon-size);
 
-  .help-fab__icon svg {
-    width: 100%;
-    height: 100%;
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+    }
   }
 
   .help-modal {
     padding: 0;
     border: none;
     border-radius: var(--border-radius-lg, 12px);
-    box-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
-    background: var(--color-background, #fff);
-    color: var(--color-foreground, #111);
-    max-width: min(90vw, 520px);
-    width: 100%;
-    max-height: 90dvh;
+    box-shadow: var(--shadow-2xl, 0 20px 60px rgb(0 0 0 / 0.25));
+    background: var(--color-background);
+    color: var(--color-foreground);
+    max-inline-size: min(90vw, var(--help-modal-max-width));
+    inline-size: 100%;
+    max-block-size: 90dvh;
     overflow: hidden;
-  }
 
-  .help-modal::backdrop {
-    background: rgb(0 0 0 / 0.5);
-  }
+    &::backdrop {
+      background: rgb(0 0 0 / 0.5);
+    }
 
-  .help-modal[open] {
-    animation: helpModalIn var(--animation-speed, 0.3s) var(--animation-easing) forwards;
-  }
+    &[open] {
+      animation: helpModalIn var(--duration-normal, 0.3s) var(--ease-out, ease) forwards;
+    }
 
-  .help-modal.closing {
-    animation: helpModalOut var(--animation-speed, 0.3s) var(--animation-easing) forwards;
+    &.dialog-closing {
+      animation: helpModalOut var(--duration-normal, 0.3s) var(--ease-out, ease) forwards;
+    }
   }
 
   @keyframes helpModalIn {
@@ -215,8 +200,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--padding-lg, 24px);
-    border-bottom: 1px solid var(--color-border, #e6e6e6);
+    padding: var(--space-lg, 24px);
+    border-block-end: 1px solid var(--color-border);
     position: relative;
   }
 
@@ -227,111 +212,103 @@
   }
 
   .help-modal__logo-image {
-    max-height: 48px;
-    width: auto;
+    max-block-size: 48px;
+    inline-size: auto;
     object-fit: contain;
   }
 
   .help-modal__shop-name {
-    font-size: var(--font-size--lg, 18px);
+    font-size: var(--font-size-lg, 18px);
     font-weight: 600;
-    font-family: var(--font-body--family);
+    font-family: var(--font-body-family);
   }
 
   .help-modal__close {
     position: absolute;
-    top: var(--padding-md, 16px);
-    right: var(--padding-md, 16px);
+    inset-block-start: var(--space-md, 16px);
+    inset-inline-end: var(--space-md, 16px);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    inline-size: 36px;
+    block-size: 36px;
     border-radius: 50%;
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 24px;
-    line-height: 1;
-    color: var(--color-foreground, #111);
-    transition: background-color 0.15s var(--animation-easing);
-  }
+    color: var(--color-foreground);
+    transition: background-color var(--duration-fast, 0.15s) var(--ease-out, ease);
 
-  .help-modal__close:hover {
-    background-color: rgb(0 0 0 / 0.05);
+    &:hover {
+      background-color: rgb(0 0 0 / 0.05);
+    }
   }
 
   .help-modal__body {
-    padding: var(--padding-xl, 24px);
+    padding: var(--space-xl, 24px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-xl, 24px);
+    gap: var(--space-xl, 24px);
   }
 
   .help-modal__title {
     margin: 0;
-    font-size: var(--font-size--lg, 18px);
+    font-size: var(--font-size-lg, 18px);
     font-weight: 600;
-    font-family: var(--font-heading--family);
+    font-family: var(--font-heading-family);
     text-align: center;
     letter-spacing: 0.02em;
-    color: var(--color-foreground-heading, var(--color-foreground, #111));
+    color: var(--color-foreground);
   }
 
   .help-modal__buttons {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-md, 16px);
-    width: 100%;
+    gap: var(--space-md, 16px);
+    inline-size: 100%;
   }
 
   .help-modal__button {
-    gap: 5px;
+    gap: var(--space-xs, 8px);
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    padding: var(--padding-md, 16px) var(--padding-lg, 24px);
+    padding: var(--space-md, 16px) var(--space-lg, 24px);
     border-radius: var(--border-radius-md, 8px);
     text-decoration: none;
     color: inherit;
-    border: 1px solid #111;
+    border: 1px solid var(--color-foreground);
     flex: 1;
-    width: 100%;
+    inline-size: 100%;
     box-sizing: border-box;
-  }
+    transition: background-color var(--duration-fast, 0.15s) var(--ease-out, ease);
 
-  .help-modal__button:hover {
-    background-color: rgb(0 0 0 / 0.06);
+    &:hover {
+      background-color: rgb(0 0 0 / 0.06);
+    }
   }
 
   .help-modal__button-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    inline-size: 24px;
+    block-size: 24px;
     flex-shrink: 0;
-  }
 
-  .help-modal__button-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
-  }
-
-  .help-modal__button-icon img,
-  .help-modal__button-icon object {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+      fill: currentColor;
+    }
   }
 
   .help-modal__button-text {
-    font-size: var(--font-size--sm, 14px);
+    font-size: var(--font-size-sm, 14px);
     font-weight: 500;
-    text-align: left;
+    text-align: start;
     line-height: 1.4;
   }
 
