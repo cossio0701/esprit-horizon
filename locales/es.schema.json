@@ -188,7 +188,8 @@
     "excerpt": "Extracto",
     "footer_password": "Pie de página de contraseña",
     "policies_and_links": "Políticas y enlaces",
-    "customer_account": "Cuenta de cliente"
+    "customer_account": "Cuenta de cliente",
+    "help": "Ayuda"
   },
   "settings": {
     "alignment": "Alineación",
@@ -250,6 +251,8 @@
     "color_scheme": "Esquema de colores",
     "inherit_color_scheme": "Heredar esquema de colores",
     "product_count": "Conteo de productos",
+    "cross_sell_heading": "Podría gustarte",
+    "recommendation_type": "Tipo de recomendación",
     "product_type": "Tipo de producto",
     "content_width": "Ancho del contenido",
     "collection": "Colección",
@@ -562,7 +565,10 @@
     "custom_mobile_media": "Multimedia personalizada para móvil",
     "stack_media_on_mobile": "Apilar multimedia",
     "media_type_1": "Tipo de multimedia",
-    "media_type_2": "Tipo de multimedia 2"
+    "media_type_2": "Tipo de multimedia 2",
+    "help_display_type": "Tipo de visualización",
+    "help_whatsapp_url": "URL de WhatsApp",
+    "help_pqr_url": "URL de PQR"
   },
   "options": {
     "adapt_to_image": "Adaptar a la imagen",
@@ -758,6 +764,7 @@
     "media_first": "Primer elemento multimedia",
     "media_second": "Segundo elemento multimedia",
     "modal": "Modal",
+    "floating_buttons": "Botones flotantes",
     "narrow": "Estrecho",
     "never": "Nunca",
     "next_to_carousel": "Junto al carrusel",
@@ -777,6 +784,7 @@
     "rectangle": "Rectángulo",
     "regular": "Normal",
     "related": "Relacionado",
+    "recommendations": "Recomendaciones",
     "best_sellers": "Más vendidos",
     "new_arrivals": "New",
     "recently_viewed": "Vistos recientemente",
@@ -963,6 +971,7 @@
     "block_link": "Enlace del bloque",
     "submenu_feature": "Función del submenú",
     "cart_features": "Funciones del carrito",
+    "cross_sell_recommendations_info": "Las recomendaciones se basan en los productos de la bolsa usando la IA de Shopify. Los productos complementarios funcionan mejor para venta cruzada. Requiere la app Search & Discovery.",
     "email_signup": "Suscriptor de correo electrónico",
     "submissions_are_sent_to_store_email_address": "Los envíos se mandan a la [dirección de correo electrónico del remitente ](https://admin.shopify.com/settings/notifications) de tu tienda",
     "mobile_media": "Multimedia para móvil",

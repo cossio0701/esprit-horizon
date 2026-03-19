@@ -2265,5 +2265,38 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "t:names.help",
+    "settings": [
+      {
+        "type": "select",
+        "id": "help_display_type",
+        "label": "t:settings.help_display_type",
+        "options": [
+          {
+            "value": "modal",
+            "label": "t:options.modal"
+          },
+          {
+            "value": "floating_buttons",
+            "label": "t:options.floating_buttons"
+          }
+        ],
+        "default": "modal"
+      },
+      {
+        "type": "text",
+        "id": "help_whatsapp_url",
+        "label": "t:settings.help_whatsapp_url",
+        "default": "https://wa.link/jhyooy"
+      },
+      {
+        "type": "text",
+        "id": "help_pqr_url",
+        "label": "t:settings.help_pqr_url",
+        "default": "/pages/ayuda-pqr"
+      }
+    ]
   }
 ]

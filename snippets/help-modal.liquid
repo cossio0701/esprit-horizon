@@ -1,0 +1,493 @@
+{%- liquid
+  assign help_modal_id = help_modal_id | default: 'help-modal'
+  assign display_type = display_type | default: 'modal'
+  assign whatsapp_url = whatsapp_url | default: 'https://wa.link/jhyooy'
+  assign pqr_url = pqr_url | default: '/pages/ayuda-pqr'
+  assign show_fab = show_fab | default: true
+-%}
+
+{% stylesheet %}
+  .help-floating {
+    position: fixed;
+    inset-inline-end: var(--space-md, 16px);
+    inset-block-end: var(--space-md, 16px);
+    z-index: var(--layer-sticky, 100);
+    margin: 0;
+
+    summary {
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+  }
+
+  .help-fab-wrapper {
+    position: fixed;
+    inset-inline-end: var(--space-md, 16px);
+    inset-block-end: var(--space-md, 16px);
+    z-index: var(--layer-sticky, 100);
+  }
+
+  .help-fab {
+    --help-fab-size: 50px;
+    --help-fab-icon-size: 40px;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--help-fab-size);
+    block-size: var(--help-fab-size);
+    border-radius: 50%;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg, 0 4px 12px rgb(0 0 0 / 0.15));
+    transition: transform var(--duration-fast, 0.2s) var(--ease-out, ease),
+      box-shadow var(--duration-fast, 0.2s) var(--ease-out, ease);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl, 0 6px 16px rgb(0 0 0 / 0.2));
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .help-fab__icon {
+    display: flex;
+    inline-size: var(--help-fab-icon-size);
+    block-size: var(--help-fab-icon-size);
+    position: absolute;
+    transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+    }
+  }
+
+  .help-fab__icon--close {
+    --help-close-icon-size: 20px;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+    inline-size: var(--help-close-icon-size);
+    block-size: var(--help-close-icon-size);
+  }
+
+  .help-floating[open] .help-fab__icon--help {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
+
+  .help-floating[open] .help-fab__icon--close {
+    opacity: 1;
+    transform: rotate(0);
+  }
+
+  .help-floating__buttons {
+    position: absolute;
+    inset-block-end: calc(100% + var(--space-sm, 8px));
+    inset-inline-end: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs, 8px);
+    pointer-events: none;
+  }
+
+  .help-floating__button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs, 8px);
+    padding: var(--space-sm, 12px) var(--space-md, 16px);
+    border-radius: var(--border-radius-lg, 12px);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    text-decoration: none;
+    border: none;
+    box-shadow: var(--shadow-lg, 0 4px 12px rgb(0 0 0 / 0.15));
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow var(--duration-fast, 0.2s) var(--ease-out, ease);
+
+    &:nth-child(1) {
+      transition-delay: 0ms;
+    }
+
+    &:nth-child(2) {
+      transition-delay: 80ms;
+    }
+  }
+
+  .help-floating[open] .help-floating__button {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .help-floating[open] .help-floating__button:hover {
+    transform: translateX(-4px) scale(1);
+    box-shadow: var(--shadow-xl, 0 6px 16px rgb(0 0 0 / 0.2));
+  }
+
+  .help-floating[open] .help-floating__button:active {
+    transform: translateX(-2px) scale(0.98);
+  }
+
+  .help-floating__button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 24px;
+    block-size: 24px;
+    flex-shrink: 0;
+
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+      fill: currentColor;
+    }
+  }
+
+  .help-floating__button-text {
+    font-size: var(--font-size-sm, 14px);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .help-modal-wrapper {
+    --help-modal-max-width: 600px;
+  }
+
+  .help-modal {
+    padding: 0;
+    border: none;
+    border-radius: var(--border-radius-lg, 12px);
+    box-shadow: var(--shadow-2xl, 0 20px 60px rgb(0 0 0 / 0.25));
+    background: var(--color-background);
+    color: var(--color-foreground);
+    max-inline-size: min(90vw, var(--help-modal-max-width));
+    inline-size: 100%;
+    max-block-size: 90dvh;
+    overflow: hidden;
+
+    &::backdrop {
+      background: rgb(0 0 0 / 0.5);
+    }
+
+    &[open] {
+      animation: helpModalIn var(--duration-normal, 0.3s) var(--ease-out, ease) forwards;
+    }
+
+    &.dialog-closing {
+      animation: helpModalOut var(--duration-normal, 0.3s) var(--ease-out, ease) forwards;
+    }
+  }
+
+  @keyframes helpModalIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes helpModalOut {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+  }
+
+  .help-modal__inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .help-modal__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg, 24px);
+    border-block-end: 1px solid var(--color-border);
+    position: relative;
+  }
+
+  .help-modal__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .help-modal__logo-image {
+    max-block-size: 48px;
+    inline-size: auto;
+    object-fit: contain;
+  }
+
+  .help-modal__shop-name {
+    font-size: var(--font-size-lg, 18px);
+    font-weight: 600;
+    font-family: var(--font-body-family);
+  }
+
+  .help-modal__close {
+    position: absolute;
+    inset-block-start: var(--space-md, 16px);
+    inset-inline-end: var(--space-md, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 36px;
+    block-size: 36px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-foreground);
+    transition: background-color var(--duration-fast, 0.15s) var(--ease-out, ease);
+
+    &:hover {
+      background-color: rgb(0 0 0 / 0.05);
+    }
+  }
+
+  .help-modal__body {
+    padding: var(--space-xl, 24px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl, 24px);
+  }
+
+  .help-modal__title {
+    margin: 0;
+    font-size: var(--font-size-lg, 18px);
+    font-weight: 600;
+    font-family: var(--font-heading-family);
+    text-align: center;
+    letter-spacing: 0.02em;
+    color: var(--color-foreground);
+  }
+
+  .help-modal__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md, 16px);
+    inline-size: 100%;
+  }
+
+  .help-modal__button {
+    gap: var(--space-xs, 8px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--space-md, 16px) var(--space-lg, 24px);
+    border-radius: var(--border-radius-md, 8px);
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-foreground);
+    flex: 1;
+    inline-size: 100%;
+    box-sizing: border-box;
+    transition: background-color var(--duration-fast, 0.15s) var(--ease-out, ease);
+
+    &:hover {
+      background-color: rgb(0 0 0 / 0.06);
+    }
+  }
+
+  .help-modal__button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 24px;
+    block-size: 24px;
+    flex-shrink: 0;
+
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+      fill: currentColor;
+    }
+  }
+
+  .help-modal__button-text {
+    font-size: var(--font-size-sm, 14px);
+    font-weight: 500;
+    text-align: start;
+    line-height: 1.4;
+  }
+
+  @media screen and (min-width: 750px) {
+    .help-modal__buttons {
+      flex-direction: row;
+    }
+
+    .help-modal__button {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .help-modal__button-text {
+      text-align: center;
+    }
+  }
+{% endstylesheet %}
+
+{%- if display_type == 'floating_buttons' -%}
+  <help-floating-component>
+    <details class="help-floating">
+      <summary class="help-fab" aria-label="{{ 'accessibility.help_modal' | t }}">
+        <span class="help-fab__icon help-fab__icon--help">
+          {{- 'icon-informacion.svg' | inline_asset_content -}}
+        </span>
+        <span class="help-fab__icon help-fab__icon--close">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </span>
+      </summary>
+
+      <div class="help-floating__buttons">
+        <a
+          href="{{ whatsapp_url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="help-floating__button help-floating__button--whatsapp"
+        >
+          <span class="help-floating__button-icon">
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              {%- render 'icon', icon: 'whatsapp' -%}
+            </svg>
+          </span>
+          <span class="help-floating__button-text">{{ 'content.write_whatsapp' | t }}</span>
+        </a>
+
+        <a
+          href="{{ pqr_url }}"
+          class="help-floating__button help-floating__button--pqr"
+        >
+          <span class="help-floating__button-icon">
+            <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+              {{- 'icon-cambios.svg' | inline_asset_content -}}
+            </svg>
+          </span>
+          <span class="help-floating__button-text">{{ 'content.changes_pqr' | t }}</span>
+        </a>
+      </div>
+    </details>
+  </help-floating-component>
+
+{%- else -%}
+  <script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
+
+  {%- if show_fab -%}
+    <div class="help-fab-wrapper">
+      <button
+        type="button"
+        class="help-fab"
+        aria-label="{{ 'accessibility.help_modal' | t }}"
+        on:click="#{{ help_modal_id }}-wrapper/showDialog"
+      >
+        <span class="help-fab__icon">
+          {{- 'icon-informacion.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+  {%- endif -%}
+
+  <dialog-component
+    id="{{ help_modal_id }}-wrapper"
+    class="help-modal-wrapper"
+  >
+    <dialog
+      ref="dialog"
+      class="help-modal"
+      scroll-lock
+      aria-modal="true"
+      aria-labelledby="{{ help_modal_id }}-title"
+      on:click="/closeDialogOnClickOutside"
+      on:keydown="/closeDialogOnEscapePress"
+    >
+      <div class="help-modal__inner">
+        <header class="help-modal__header">
+          <div class="help-modal__logo">
+            {%- if settings.logo != blank -%}
+              {{
+                settings.logo
+                | image_url: width: 200
+                | image_tag: loading: 'lazy', class: 'help-modal__logo-image', alt: shop.name
+              -}}
+            {%- else -%}
+              <span class="help-modal__shop-name">{{ shop.name }}</span>
+            {%- endif -%}
+          </div>
+          <button
+            type="button"
+            class="help-modal__close"
+            aria-label="{{ 'accessibility.close' | t }}"
+            on:click="dialog-component/closeDialog"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="help-modal__body">
+          <h2 id="{{ help_modal_id }}-title" class="help-modal__title">
+            {{ 'content.how_can_we_help' | t }}
+          </h2>
+
+          <div class="help-modal__buttons">
+            <a
+              href="{{ whatsapp_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="help-modal__button help-modal__button--whatsapp"
+            >
+              <span class="help-modal__button-icon">
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  {%- render 'icon', icon: 'whatsapp' -%}
+                </svg>
+              </span>
+              <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
+            </a>
+
+            <a
+              href="{{ pqr_url }}"
+              class="help-modal__button help-modal__button--pqr"
+            >
+              <span class="help-modal__button-icon">
+                <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+                  {{- 'icon-cambios.svg' | inline_asset_content -}}
+                </svg>
+              </span>
+              <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </dialog>
+  </dialog-component>
+{%- endif -%}

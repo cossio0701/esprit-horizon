@@ -1,0 +1,17 @@
+{%- comment -%}
+  This section is used by the cart drawer cross-sell recommendations API.
+  It renders individual product slides that will be injected into the carousel.
+{%- endcomment -%}
+
+{% liquid
+  assign max_products = 8
+  assign cart_product_ids = cart.items | map: 'product_id'
+%}
+
+{%- for product in recommendations.products limit: max_products -%}
+  {%- unless cart_product_ids contains product.id -%}
+    <div class="cart-drawer-cross-sell__slide" data-product-id="{{ product.id }}">
+      {% render 'cart-cross-sell-card', product: product, section_id: 'cart-drawer-cross-sell' %}
+    </div>
+  {%- endunless -%}
+{%- endfor -%}

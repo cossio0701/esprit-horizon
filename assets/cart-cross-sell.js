@@ -10,7 +10,7 @@ import { morph } from '@theme/morph';
  */
 
 /**
- * Custom element for cross-sell carousel with infinite scroll.
+ * Custom element for cross-sell carousel with infinite scroll and Shopify recommendations API support.
  */
 class CartCrossSell extends HTMLElement {
   /** @type {AbortController} */
@@ -43,19 +43,29 @@ class CartCrossSell extends HTMLElement {
   /** @type {HTMLDetailsElement|null} */
   details = null;
 
+  /** @type {boolean} */
+  #recommendationsLoaded = false;
+
   connectedCallback() {
     const { signal } = this.#abortController;
 
-    this.carousel = this.querySelector('.cart-drawer-cross-sell__carousel');
+    this.carousel = this.querySelector('[data-carousel]');
     this.prevArrow = this.querySelector('.cart-drawer-cross-sell__arrow--prev');
     this.nextArrow = this.querySelector('.cart-drawer-cross-sell__arrow--next');
     this.details = this.querySelector('details');
 
     if (!this.carousel) return;
 
+    const source = this.dataset.source;
+
+    if (source === 'recommendations' && !this.#recommendationsLoaded) {
+      this.#loadRecommendations(signal);
+    }
+
     this.#setupCarouselInit(signal);
     this.#setupArrowNavigation(signal);
     this.#setupQuickBuyHandler(signal);
+    this.#setupCartUpdateListener(signal);
   }
 
   disconnectedCallback() {
@@ -100,13 +110,99 @@ class CartCrossSell extends HTMLElement {
     this.addEventListener('click', this.#handleQuickBuyClick, { signal });
   }
 
+  #setupCartUpdateListener(signal) {
+    document.addEventListener('cart:updated', () => {
+      if (this.dataset.source === 'recommendations') {
+        this.#recommendationsLoaded = false;
+        this.#loadRecommendations(signal);
+      }
+    }, { signal });
+  }
+
+  async #loadRecommendations(signal) {
+    const recommendationsUrl = this.dataset.recommendationsUrl;
+    const cartProductIds = (this.dataset.cartProductIds || '').split(',').filter(Boolean);
+    const maxProducts = parseInt(this.dataset.maxProducts || '8', 10);
+
+    if (!recommendationsUrl) {
+      this.#handleNoRecommendations();
+      return;
+    }
+
+    try {
+      const url = new URL(recommendationsUrl, window.location.origin);
+      url.searchParams.set('section_id', 'cart-drawer-cross-sell-product');
+
+      const response = await fetch(url.toString(), { signal });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch recommendations: ${response.status}`);
+      }
+
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const slides = doc.querySelectorAll('.cart-drawer-cross-sell__slide');
+
+      const filteredSlides = [];
+      slides.forEach(slide => {
+        const productId = slide.dataset.productId;
+        if (productId && !cartProductIds.includes(productId) && filteredSlides.length < maxProducts) {
+          filteredSlides.push(slide);
+        }
+      });
+
+      if (filteredSlides.length === 0) {
+        this.#handleNoRecommendations();
+        return;
+      }
+
+      this.#updateCarouselWithRecommendations(filteredSlides);
+      this.#recommendationsLoaded = true;
+
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      console.error('[CartCrossSell] Error loading recommendations:', error);
+      this.#handleNoRecommendations();
+    }
+  }
+
+  #updateCarouselWithRecommendations(slides) {
+    if (!this.carousel) return;
+
+    this.carousel.querySelectorAll('[data-skeleton]').forEach(el => el.remove());
+    this.carousel.querySelectorAll('[data-clone]').forEach(el => el.remove());
+
+    slides.forEach(slide => {
+      this.carousel?.appendChild(slide);
+    });
+
+    this.#state.originalSlides = [];
+    this.#isInitialized = false;
+
+    requestAnimationFrame(() => {
+      this.#setupInfiniteCarousel();
+    });
+  }
+
+  #handleNoRecommendations() {
+    if (!this.carousel) return;
+
+    this.carousel.querySelectorAll('[data-skeleton]').forEach(el => {
+      el.innerHTML = `
+        <div class="cart-cross-sell-card cart-cross-sell-card--empty">
+          <span class="cart-cross-sell-card__empty-text">${this.dataset.emptyText || 'No products available'}</span>
+        </div>
+      `;
+    });
+  }
+
   #setupInfiniteCarousel() {
     if (!this.carousel) return;
 
     this.carousel.querySelectorAll('[data-clone]').forEach(clone => clone.remove());
 
     const originalSlides = Array.from(
-      this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide:not([data-clone])')
+      this.carousel.querySelectorAll('.cart-drawer-cross-sell__slide:not([data-clone]):not([data-skeleton])')
     );
 
     if (originalSlides.length <= 1) return;
@@ -148,18 +244,11 @@ class CartCrossSell extends HTMLElement {
     });
   }
 
-  /**
-   * Gets current index based on scroll position.
-   * @returns {number}
-   */
   #getCurrentIndex() {
     if (!this.carousel || this.#state.slideWidth === 0) return 0;
     return Math.round(this.carousel.scrollLeft / this.#state.slideWidth);
   }
 
-  /**
-   * Scrolls to previous slide. Repositions first if at boundary.
-   */
   #scrollPrev() {
     if (!this.carousel) return;
 
@@ -180,9 +269,6 @@ class CartCrossSell extends HTMLElement {
     });
   }
 
-  /**
-   * Scrolls to next slide. Repositions first if at boundary.
-   */
   #scrollNext() {
     if (!this.carousel) return;
 
@@ -203,11 +289,6 @@ class CartCrossSell extends HTMLElement {
     });
   }
 
-  /**
-   * Scrolls to a specific slide index.
-   * @param {number} index - Target slide index
-   * @param {boolean} [smooth=true] - Whether to use smooth scrolling
-   */
   #scrollToIndex(index, smooth = true) {
     if (!this.carousel || this.#state.allSlides.length === 0) return;
 

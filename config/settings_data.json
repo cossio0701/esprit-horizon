@@ -12,7 +12,6 @@
     "logo": "shopify://shop_images/Logo-01.png",
     "logo_inverse": "shopify://shop_images/Logo-02.png",
     "logo_height": 36,
-    "logo_height_mobile": 28,
     "favicon": "shopify://shop_images/Logo-03.png",
     "type_body_font": "sans_serif_n4",
     "type_subheading_font": "sans_serif_n4",
@@ -37,7 +36,6 @@
     "type_case_h3": "none",
     "type_font_h4": "heading",
     "type_size_h4": "18",
-    "type_size_h4_mobile": 15,
     "type_line_height_h4": "display-tight",
     "type_font_h5": "heading",
     "type_size_h5": "14",
@@ -72,7 +70,6 @@
     "currency_code_enabled_product_pages": false,
     "currency_code_enabled_product_cards": false,
     "currency_code_enabled_cart_items": false,
-    "mobile_quick_add": true,
     "product_corner_radius": 0,
     "card_corner_radius": 4,
     "show_variant_image": false,
@@ -82,6 +79,22 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "help_display_type": "floating_buttons",
+    "logo_height_mobile": 28,
+    "type_size_h4_mobile": 15,
+    "mobile_quick_add": true,
+    "sections": {
+      "gco-cookies": {
+        "type": "gco-cookies",
+        "settings": {
+          "message": "<p>ESPRIT usa cookies para darte la mejor experiencia de navegación. Al navegar en el sitio estas aceptando su uso, si deseas saber más acerca de nuestra política has <a href=\"/pages/terminos-condiciones?category=politica-cookies\">click aquí</a>.</p>",
+          "button_label": "Aceptar cookies",
+          "background_color": "#f9f7f0",
+          "text_color": "#000000",
+          "accent_color": "#000000"
+        }
+      }
+    },
     "content_for_index": [],
     "color_schemes": {
       "scheme-1": {

@@ -18,7 +18,7 @@
     assign cart_type = section.settings.cart_type | default: settings.cart_type
   %}
   {% if cart_type == 'drawer' and template.name != 'cart' %}
-    {% render 'cart-drawer' %}
+    {% render 'cart-drawer', block: block %}
   {% else %}
     <a
       href="{{ routes.cart_url }}"
@@ -43,6 +43,62 @@
   "name": "t:names.cart",
   "tag": null,
   "settings": [
+    {
+      "type": "header",
+      "content": "t:content.cart_features"
+    },
+    {
+      "type": "select",
+      "id": "cross_sell_source",
+      "label": "t:settings.source",
+      "options": [
+        {
+          "value": "recommendations",
+          "label": "t:options.recommendations"
+        },
+        {
+          "value": "collection",
+          "label": "t:options.collection_source"
+        }
+      ],
+      "default": "recommendations"
+    },
+    {
+      "type": "collection",
+      "id": "cross_sell_collection",
+      "label": "t:settings.collection"
+    },
+    {
+      "type": "select",
+      "id": "cross_sell_recommendation_type",
+      "label": "t:settings.recommendation_type",
+      "options": [
+        {
+          "value": "complementary",
+          "label": "t:options.complementary"
+        },
+        {
+          "value": "related",
+          "label": "t:options.related"
+        }
+      ],
+      "default": "complementary"
+    },
+    {
+      "type": "text",
+      "id": "cross_sell_heading",
+      "label": "t:settings.heading",
+      "placeholder": "t:settings.cross_sell_heading"
+    },
+    {
+      "type": "range",
+      "id": "cross_sell_max_products",
+      "label": "t:settings.product_count",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
     {
       "type": "header",
       "content": "t:content.padding"
