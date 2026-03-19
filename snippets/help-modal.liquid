@@ -1,101 +1,157 @@
 {%- liquid
   assign help_modal_id = help_modal_id | default: 'help-modal'
+  assign display_type = display_type | default: 'modal'
   assign whatsapp_url = whatsapp_url | default: 'https://wa.link/jhyooy'
   assign pqr_url = pqr_url | default: '/pages/ayuda-pqr'
   assign show_fab = show_fab | default: true
 -%}
 
-<script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
-
-{%- if show_fab -%}
-  <button
-    type="button"
-    class="help-fab__button"
-    aria-label="{{ 'accessibility.help_modal' | t }}"
-    on:click="#{{ help_modal_id }}-wrapper/showDialog"
-  >
-    <span class="help-fab__icon">
-      {{- 'icon-informacion.svg' | inline_asset_content -}}
-    </span>
-  </button>
-{%- endif -%}
-
-<dialog-component
-  id="{{ help_modal_id }}-wrapper"
-  class="help-modal-wrapper"
->
-  <dialog
-    ref="dialog"
-    class="help-modal"
-    scroll-lock
-    aria-modal="true"
-    aria-labelledby="{{ help_modal_id }}-title"
-    on:click="/closeDialogOnClickOutside"
-    on:keydown="/closeDialogOnEscapePress"
-  >
-    <div class="help-modal__inner">
-      <header class="help-modal__header">
-        <div class="help-modal__logo">
-          {%- if settings.logo != blank -%}
-            {{
-              settings.logo
-              | image_url: width: 200
-              | image_tag: loading: 'lazy', class: 'help-modal__logo-image', alt: shop.name
-            -}}
-          {%- else -%}
-            <span class="help-modal__shop-name">{{ shop.name }}</span>
-          {%- endif -%}
-        </div>
-        <button
-          type="button"
-          class="help-modal__close"
-          aria-label="{{ 'accessibility.close' | t }}"
-          on:click="dialog-component/closeDialog"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
-          </svg>
-        </button>
-      </header>
-
-      <div class="help-modal__body">
-        <h2 id="{{ help_modal_id }}-title" class="help-modal__title">
-          {{ 'content.how_can_we_help' | t }}
-        </h2>
-
-        <div class="help-modal__buttons">
-          <a
-            href="{{ whatsapp_url }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="help-modal__button help-modal__button--whatsapp"
-          >
-            <span class="help-modal__button-icon">
-              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                {%- render 'icon', icon: 'whatsapp' -%}
-              </svg>
-            </span>
-            <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
-          </a>
-
-          <a
-            href="{{ pqr_url }}"
-            class="help-modal__button help-modal__button--pqr"
-          >
-            <span class="help-modal__button-icon">
-              <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
-                {{- 'icon-cambios.svg' | inline_asset_content -}}
-              </svg>
-            </span>
-            <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </dialog>
-</dialog-component>
-
 {% stylesheet %}
+  .help-floating {
+    position: fixed;
+    inset-inline-end: var(--space-md, 16px);
+    inset-block-end: var(--space-md, 16px);
+    z-index: var(--layer-sticky, 100);
+  }
+
+  .help-floating__toggle {
+    --help-fab-size: 50px;
+    --help-fab-icon-size: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--help-fab-size);
+    block-size: var(--help-fab-size);
+    border-radius: 50%;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg, 0 4px 12px rgb(0 0 0 / 0.15));
+    transition: transform var(--duration-fast, 0.2s) var(--ease-out, ease),
+      box-shadow var(--duration-fast, 0.2s) var(--ease-out, ease);
+    list-style: none;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl, 0 6px 16px rgb(0 0 0 / 0.2));
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  .help-floating__icon {
+    display: flex;
+    inline-size: var(--help-fab-icon-size);
+    block-size: var(--help-fab-icon-size);
+    position: absolute;
+    transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+    }
+  }
+
+  .help-floating__icon--close {
+    --help-close-icon-size: 20px;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+    inline-size: var(--help-close-icon-size);
+    block-size: var(--help-close-icon-size);
+  }
+
+  .help-floating[open] .help-floating__icon--help {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
+
+  .help-floating[open] .help-floating__icon--close {
+    opacity: 1;
+    transform: rotate(0);
+  }
+
+  .help-floating__buttons {
+    position: absolute;
+    inset-block-end: calc(100% + var(--space-sm, 8px));
+    inset-inline-end: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs, 8px);
+    pointer-events: none;
+  }
+
+  .help-floating__button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs, 8px);
+    padding: var(--space-sm, 12px) var(--space-md, 16px);
+    border-radius: var(--border-radius-lg, 12px);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    text-decoration: none;
+    border: none;
+    box-shadow: var(--shadow-lg, 0 4px 12px rgb(0 0 0 / 0.15));
+    white-space: nowrap;
+    transition: transform var(--duration-fast, 0.2s) var(--ease-out, ease),
+      box-shadow var(--duration-fast, 0.2s) var(--ease-out, ease);
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    pointer-events: none;
+
+    &:nth-child(1) {
+      transition-delay: 0ms;
+    }
+
+    &:nth-child(2) {
+      transition-delay: 100ms;
+    }
+
+    &:hover {
+      transform: translateX(-4px);
+      box-shadow: var(--shadow-xl, 0 6px 16px rgb(0 0 0 / 0.2));
+    }
+
+    &:active {
+      transform: translateX(-2px) scale(0.98);
+    }
+  }
+
+  .help-floating[open] .help-floating__button {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .help-floating__button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 24px;
+    block-size: 24px;
+    flex-shrink: 0;
+
+    svg {
+      inline-size: 100%;
+      block-size: 100%;
+      fill: currentColor;
+    }
+  }
+
+  .help-floating__button-text {
+    font-size: var(--font-size-sm, 14px);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
   .help-modal-wrapper {
     --help-modal-max-width: 600px;
   }
@@ -328,3 +384,150 @@
     }
   }
 {% endstylesheet %}
+
+{%- if display_type == 'floating_buttons' -%}
+  <details class="help-floating">
+    <summary class="help-floating__toggle" aria-label="{{ 'accessibility.help_modal' | t }}">
+      <span class="help-floating__icon help-floating__icon--help">
+        {{- 'icon-informacion.svg' | inline_asset_content -}}
+      </span>
+      <span class="help-floating__icon help-floating__icon--close">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+      </span>
+    </summary>
+
+    <div class="help-floating__buttons">
+      <a
+        href="{{ whatsapp_url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="help-floating__button help-floating__button--whatsapp"
+      >
+        <span class="help-floating__button-icon">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            {%- render 'icon', icon: 'whatsapp' -%}
+          </svg>
+        </span>
+        <span class="help-floating__button-text">{{ 'content.write_whatsapp' | t }}</span>
+      </a>
+
+      <a
+        href="{{ pqr_url }}"
+        class="help-floating__button help-floating__button--pqr"
+      >
+        <span class="help-floating__button-icon">
+          <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+            {{- 'icon-cambios.svg' | inline_asset_content -}}
+          </svg>
+        </span>
+        <span class="help-floating__button-text">{{ 'content.changes_pqr' | t }}</span>
+      </a>
+    </div>
+  </details>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var helpFloating = document.querySelector('.help-floating');
+      if (!helpFloating) return;
+
+      document.addEventListener('click', function(e) {
+        if (helpFloating.open && !helpFloating.contains(e.target)) {
+          helpFloating.removeAttribute('open');
+        }
+      });
+    });
+  </script>
+
+{%- else -%}
+  <script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
+
+  {%- if show_fab -%}
+    <button
+      type="button"
+      class="help-fab__button"
+      aria-label="{{ 'accessibility.help_modal' | t }}"
+      on:click="#{{ help_modal_id }}-wrapper/showDialog"
+    >
+      <span class="help-fab__icon">
+        {{- 'icon-informacion.svg' | inline_asset_content -}}
+      </span>
+    </button>
+  {%- endif -%}
+
+  <dialog-component
+    id="{{ help_modal_id }}-wrapper"
+    class="help-modal-wrapper"
+  >
+    <dialog
+      ref="dialog"
+      class="help-modal"
+      scroll-lock
+      aria-modal="true"
+      aria-labelledby="{{ help_modal_id }}-title"
+      on:click="/closeDialogOnClickOutside"
+      on:keydown="/closeDialogOnEscapePress"
+    >
+      <div class="help-modal__inner">
+        <header class="help-modal__header">
+          <div class="help-modal__logo">
+            {%- if settings.logo != blank -%}
+              {{
+                settings.logo
+                | image_url: width: 200
+                | image_tag: loading: 'lazy', class: 'help-modal__logo-image', alt: shop.name
+              -}}
+            {%- else -%}
+              <span class="help-modal__shop-name">{{ shop.name }}</span>
+            {%- endif -%}
+          </div>
+          <button
+            type="button"
+            class="help-modal__close"
+            aria-label="{{ 'accessibility.close' | t }}"
+            on:click="dialog-component/closeDialog"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="help-modal__body">
+          <h2 id="{{ help_modal_id }}-title" class="help-modal__title">
+            {{ 'content.how_can_we_help' | t }}
+          </h2>
+
+          <div class="help-modal__buttons">
+            <a
+              href="{{ whatsapp_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="help-modal__button help-modal__button--whatsapp"
+            >
+              <span class="help-modal__button-icon">
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  {%- render 'icon', icon: 'whatsapp' -%}
+                </svg>
+              </span>
+              <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
+            </a>
+
+            <a
+              href="{{ pqr_url }}"
+              class="help-modal__button help-modal__button--pqr"
+            >
+              <span class="help-modal__button-icon">
+                <svg viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+                  {{- 'icon-cambios.svg' | inline_asset_content -}}
+                </svg>
+              </span>
+              <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </dialog>
+  </dialog-component>
+{%- endif -%}
