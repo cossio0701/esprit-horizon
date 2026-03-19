@@ -188,7 +188,8 @@
     "excerpt": "Extracto",
     "footer_password": "Pie de página de contraseña",
     "policies_and_links": "Políticas y enlaces",
-    "customer_account": "Cuenta de cliente"
+    "customer_account": "Cuenta de cliente",
+    "help": "Ayuda"
   },
   "settings": {
     "alignment": "Alineación",
@@ -564,7 +565,10 @@
     "custom_mobile_media": "Multimedia personalizada para móvil",
     "stack_media_on_mobile": "Apilar multimedia",
     "media_type_1": "Tipo de multimedia",
-    "media_type_2": "Tipo de multimedia 2"
+    "media_type_2": "Tipo de multimedia 2",
+    "help_display_type": "Tipo de visualización",
+    "help_whatsapp_url": "URL de WhatsApp",
+    "help_pqr_url": "URL de PQR"
   },
   "options": {
     "adapt_to_image": "Adaptar a la imagen",
@@ -760,6 +764,7 @@
     "media_first": "Primer elemento multimedia",
     "media_second": "Segundo elemento multimedia",
     "modal": "Modal",
+    "floating_buttons": "Botones flotantes",
     "narrow": "Estrecho",
     "never": "Nunca",
     "next_to_carousel": "Junto al carrusel",

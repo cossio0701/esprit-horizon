@@ -418,7 +418,8 @@
     "video": "Video",
     "video_section": "Video",
     "view_all_button": "View all",
-    "pills": "Pills"
+    "pills": "Pills",
+    "help": "Help"
   },
   "options": {
     "above_carousel": "Above carousel",
@@ -591,6 +592,7 @@
     // Size/weight option between small/light and large/heavy
     "medium": "Medium",
     "modal": "Modal",
+    "floating_buttons": "Floating buttons",
     "name_asc": "Name: A-Z",
     "narrow": "Narrow",
     "never": "Never",
@@ -1156,7 +1158,10 @@
     "product_corner_radius": "Product corner radius",
     "card_corner_radius": "Card corner radius",
     "media_type_1": "Media type",
-    "media_type_2": "Media 2 type"
+    "media_type_2": "Media 2 type",
+    "help_display_type": "Display type",
+    "help_whatsapp_url": "WhatsApp URL",
+    "help_pqr_url": "PQR URL"
   },
   "text_defaults": {
     "accordion_heading": "Accordion heading",
