@@ -7,9 +7,20 @@
 
 {% assign block_settings = block.settings %}
 
-{% if product_resource.metafields.custom.color_siblings != blank %}
-  {%- render 'color-siblings', product: product_resource, mode: 'pdp', section_id: section.id -%}
-{% endif %}
+{%- liquid
+  assign erp_tag = null
+  assign erp_ref = null
+  for tag in product_resource.tags
+    assign tag_parts = tag | split: '-'
+    if tag_parts.size == 2 and tag_parts[0].size > 3
+      assign erp_tag = tag
+      assign erp_ref = tag_parts[0]
+      break
+    endif
+  endfor
+-%}
+
+{%- render 'color-siblings', product: product_resource, erp_ref: erp_ref, mode: 'pdp', section_id: section.id -%}
 
 {% unless product_resource.has_only_default_variant %}
   {% liquid
@@ -40,6 +51,10 @@
     <form class="variant-picker__form">
       {%- for product_option in product_resource.options_with_values -%}
         {%- liquid
+          if erp_ref and product_option.name == 'Color'
+            continue
+          endif
+
           assign swatch_count = product_option.values | map: 'swatch' | compact | size
           assign variant_style = block_settings.variant_style
 
@@ -66,7 +81,7 @@
             ref="fieldsets[]"
             {{ option_id_attribute }}
           >
-            <legend>
+            <legend style="font-weight: 600;">
               {{ product_option.name | escape -}}
               :
               {%- if variant_style == 'swatch' -%}
@@ -663,10 +678,11 @@
   .variant-option__button-label .size-container {
     display: flex;
     align-items: center;
+    gap: 4px;
   }
   .variant-option__button-label .size-container .size-text {
     position: relative;
-    width: 20px;
+    /* width: 20px; */
   }
 
   .size-text .variant-option__button-label__text {

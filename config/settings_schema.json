@@ -2313,6 +2313,12 @@
           }
         ],
         "default": "image"
+      },
+      {
+        "type": "text",
+        "id": "storefront_token",
+        "label": "Storefront API token (público)",
+        "info": "Token público de la Storefront API. Requerido para el color picker on-demand."
       }
     ]
   },

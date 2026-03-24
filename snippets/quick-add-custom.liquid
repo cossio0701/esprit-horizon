@@ -8,13 +8,18 @@
   @param {object} [block] - The block object
 {%- enddoc -%}
 
-{% liquid
+{%- liquid
   assign product_form_id = 'QuickAddCustom-' | append: product.id | append: '-' | append: block.id
+  assign default_variant = product.selected_or_first_available_variant
+  assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
 
-  # Get available options
+  assign has_multiple_variants = false
+  if product.variants.size > 1
+    assign has_multiple_variants = true
+  endif
+
   assign size_option = null
   assign size_option_index = null
-
   for option in product.options_with_values
     assign option_name_lower = option.name | downcase
     if option_name_lower == 'size' or option_name_lower == 'talla' or option_name_lower == 'talle'
@@ -23,77 +28,83 @@
     endif
   endfor
 
-  # Get default variant
-  assign default_variant = product.selected_or_first_available_variant
-  assign has_multiple_variants = false
-  if product.variants.size > 1
-    assign has_multiple_variants = true
-  endif
+  assign erp_ref = nil
+  for tag in product.tags
+    assign tag_parts = tag | split: '-'
+    if tag_parts.size == 2 and tag_parts[0].size > 3
+      assign erp_ref = tag_parts[0]
+      break
+    endif
+  endfor
 
-  # Color siblings
-  assign siblings = product.metafields.custom.color_siblings.value
-
-  # Get the color scheme from settings (same as quick-add.liquid)
-  assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
-%}
+  assign qa_swatch_img = product.images[1] | default: product.images[0]
+  assign qa_color_name = nil
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'color' or option_name_lower == 'colour'
+      for value in option.values
+        if value.selected
+          assign qa_color_name = value.name
+          break
+        endif
+      endfor
+      break
+    endif
+  endfor
+-%}
 
 <quick-add-custom-component
   class="quick-add-custom color-{{ quick_add_color_scheme }}"
   data-product-id="{{ product.id }}"
 >
   <div class="quick-add-custom__inner">
-    {%- if has_multiple_variants -%}
-      {%- comment -%} Size Selector {%- endcomment -%}
-      {%- if size_option -%}
-        <div class="quick-add-custom__sizes" data-option-index="{{ size_option_index }}">
-          {%- for value in size_option.values -%}
-            {% liquid
-              assign size_available = false
-              for variant in product.variants
-                assign variant_size = variant.options[size_option_index]
-                if variant_size == value and variant.available
-                  assign size_available = true
-                  break
-                endif
-              endfor
-            %}
-            <button
-              type="button"
-              class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
-              data-option-value="{{ value }}"
-              data-option-index="{{ size_option_index }}"
-              {% unless size_available %}
-                disabled
-              {% endunless %}
-              aria-label="{{ value }}"
-            >
-              {{ value }}
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
 
-      {%- comment -%} Color Selector desde color_siblings {%- endcomment -%}
-      {%- if siblings and siblings.size > 0 -%}
-        <div class="quick-add-custom__colors" data-siblings-colors>
-          {%- for s in siblings -%}
-            <button
-              type="button"
-              class="quick-add-custom__color-btn{% if s.self %} is-selected{% endif %}"
-              data-handle="{{ s.handle }}"
-              data-self="{{ s.self | default: false }}"
-              aria-label="{{ s.color | default: s.title }}"
-              title="{{ s.color | default: s.title }}"
-              style="background-color: {{ s.swatch }};"
-            >
-              <span class="visually-hidden">{{ s.color | default: s.title }}</span>
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
+    {%- if has_multiple_variants and size_option -%}
+      <div class="quick-add-custom__sizes" data-option-index="{{ size_option_index }}">
+        {%- for value in size_option.values -%}
+          {%- liquid
+            assign size_available = false
+            for variant in product.variants
+              assign variant_size = variant.options[size_option_index]
+              if variant_size == value and variant.available
+                assign size_available = true
+                break
+              endif
+            endfor
+          -%}
+          <button
+            type="button"
+            class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
+            data-option-value="{{ value }}"
+            data-option-index="{{ size_option_index }}"
+            {% unless size_available %}disabled{% endunless %}
+            aria-label="{{ value }}"
+          >{{ value }}</button>
+        {%- endfor -%}
+      </div>
     {%- endif -%}
 
-    {%- comment -%} Add to Cart Button {%- endcomment -%}
+    <div
+      class="quick-add-custom__colors"
+      data-siblings-colors
+      {% if erp_ref != blank %}data-style-ref="{{ erp_ref }}"{% endif %}
+      data-current-handle="{{ product.handle }}"
+    >
+        <button
+          type="button"
+          class="quick-add-custom__color-btn is-selected"
+          data-handle="{{ product.handle }}"
+          data-self="true"
+          aria-label="{{ qa_color_name | default: product.title | escape }}"
+          title="{{ qa_color_name | default: product.title | escape }}"
+          {%- if qa_swatch_img %}
+            style="background-image: url('{{ qa_swatch_img | image_url: width: 100 }}'); background-size: 300%; background-position: center 35%;"
+          {%- endif %}
+        >
+          <span class="visually-hidden">{{ qa_color_name | default: product.title | escape }}</span>
+        </button>
+    </div>
+
     <div class="quick-add-custom__action">
       <form
         method="post"
@@ -104,57 +115,34 @@
       >
         <input type="hidden" name="id" value="{{ default_variant.id }}" data-variant-input>
         <input type="hidden" name="quantity" value="1">
-
         <button
           type="submit"
           class="quick-add-custom__submit"
-          {% unless default_variant.available %}
-            disabled
-          {% endunless %}
+          {% unless default_variant.available %}disabled{% endunless %}
           data-add-to-cart-btn
         >
           <span class="quick-add-custom__submit-text" data-btn-text>
-            {%- if default_variant.available -%}
-              Agregar a la bolsa
-            {%- else -%}
-              Agotado
-            {%- endif -%}
+            {%- if default_variant.available -%}Agregar a la bolsa{%- else -%}Agotado{%- endif -%}
           </span>
           <span class="quick-add-custom__submit-arrow">→</span>
         </button>
       </form>
-
       <div class="quick-add-custom__feedback" data-feedback hidden>
         <span data-feedback-text></span>
       </div>
     </div>
+
   </div>
 
-  {%- comment -%} Variants JSON for JavaScript {%- endcomment -%}
   <script type="application/json" data-variants-json>
-    [
-      {%- for variant in product.variants -%}
-        {
-          "id": {{ variant.id }},
-          "available": {{ variant.available }},
-          "options": {{ variant.options | json }},
-          "title": {{ variant.title | json }},
-          "price": {{ variant.price }},
-          "compare_at_price": {{ variant.compare_at_price | default: 'null' }}
-        }{% unless forloop.last %},{% endunless %}
-      {%- endfor -%}
-    ]
+    [{%- for variant in product.variants -%}{"id":{{ variant.id }},"available":{{ variant.available }},"options":{{ variant.options | json }},"title":{{ variant.title | json }},"price":{{ variant.price }},"compare_at_price":{{ variant.compare_at_price | default: 'null' }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]
   </script>
 </quick-add-custom-component>
 
-{% stylesheet %}
-  /* =====================================================
-     Quick Add Custom - Horizon Theme Color System
-     Uses theme color variables for full dark/light mode support
-     ===================================================== */
+<script src="{{ 'quick-add-custom.js' | asset_url }}" defer></script>
 
+{% stylesheet %}
   .quick-add-custom {
-    /* Container positioning - inside card-gallery */
     display: block;
     position: absolute;
     bottom: 0;
@@ -162,28 +150,20 @@
     right: 0;
     margin: var(--padding-sm);
     z-index: var(--layer-raised);
-
-    /* Theme colors - from color scheme class */
     background-color: var(--color-background);
     color: var(--color-foreground);
-
-    /* Padding using theme variables */
     padding: var(--padding-sm) var(--padding-md);
     border-radius: var(--border-radius);
-
-    /* Shadow for depth */
     box-shadow: var(--shadow-popover);
-
-    /* Hidden by default - show on hover */
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
-    transition: opacity var(--animation-speed, 0.2s) ease, transform var(--animation-speed, 0.2s) ease,
+    transition: opacity var(--animation-speed, 0.2s) ease,
+      transform var(--animation-speed, 0.2s) ease,
       visibility var(--animation-speed, 0.2s) ease;
     pointer-events: none;
   }
 
-  /* Show on hover of card-gallery (parent container) */
   .card-gallery:hover .quick-add-custom,
   .card-gallery:focus-within .quick-add-custom,
   .quick-add-custom:hover,
@@ -194,11 +174,8 @@
     pointer-events: all;
   }
 
-  /* Mobile: hide completely - use the "+" quick-add button in the title row instead */
   @media screen and (max-width: 749px) {
-    .quick-add-custom {
-      display: none !important;
-    }
+    .quick-add-custom { display: none !important; }
   }
 
   .quick-add-custom__inner {
@@ -207,9 +184,6 @@
     gap: var(--gap-sm);
   }
 
-  /* =====================================================
-     Size Selector - Minimal text-only style
-     ===================================================== */
   .quick-add-custom__sizes {
     display: flex;
     flex-wrap: wrap;
@@ -218,22 +192,16 @@
   }
 
   .quick-add-custom__size-btn {
-    /* Reset - no background, no border, no box */
     background: none;
     border: none;
     padding: 0;
     margin: 0;
-
-    /* Typography - clean editorial style */
     font-family: var(--font-body--family);
     font-size: 16px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1;
-
-    /* Muted color by default */
     color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
-
     cursor: pointer;
     position: relative;
   }
@@ -260,9 +228,7 @@
     font-weight: 600;
   }
 
-  .quick-add-custom__size-btn.is-selected::after {
-    width: 100%;
-  }
+  .quick-add-custom__size-btn.is-selected::after { width: 100%; }
 
   .quick-add-custom__size-btn.is-unavailable {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
@@ -270,9 +236,6 @@
     text-decoration: line-through;
   }
 
-  /* =====================================================
-     Color Selector - Small squares with outline
-     ===================================================== */
   .quick-add-custom__colors {
     display: flex;
     flex-wrap: wrap;
@@ -281,21 +244,15 @@
   }
 
   .quick-add-custom__color-btn {
-    /* Small square */
     width: 20px;
     height: 20px;
     border-radius: 0;
-
-    /* Subtle border */
     border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
-
     padding: 0;
     cursor: pointer;
-    background-size: cover;
-    background-position: center;
+    background-size: 300%;
+    background-position: center 35%;
     position: relative;
-
-    /* No outline by default */
     outline: none;
   }
 
@@ -316,9 +273,7 @@
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
   }
 
-  .quick-add-custom__color-btn.is-selected::after {
-    width: 82%;
-  }
+  .quick-add-custom__color-btn.is-selected::after { width: 82%; }
 
   .quick-add-custom__color-btn.is-unavailable {
     opacity: var(--opacity-35-55);
@@ -336,9 +291,6 @@
     transform: rotate(-45deg);
   }
 
-  /* =====================================================
-     Action Button - Theme link style
-     ===================================================== */
   .quick-add-custom__action {
     display: flex;
     justify-content: flex-end;
@@ -347,9 +299,7 @@
     position: relative;
   }
 
-  .quick-add-custom__form {
-    display: contents;
-  }
+  .quick-add-custom__form { display: contents; }
 
   .quick-add-custom__submit {
     display: inline-flex;
@@ -358,41 +308,28 @@
     background: transparent;
     border: none;
     padding: var(--padding-2xs) 0;
-
-    /* Typography using theme */
     font-family: var(--font-body--family);
     font-size: var(--font-size--sm, 12px);
     font-weight: 500;
     letter-spacing: 0.02em;
-
-    /* Use primary color for link-style button */
     color: var(--color-primary);
-
     cursor: pointer;
     transition: color var(--animation-speed, 0.2s) ease;
-    text-decoration: none;
   }
 
-  .quick-add-custom__submit:hover:not(:disabled) {
-    color: var(--color-primary-hover);
-  }
+  .quick-add-custom__submit:hover:not(:disabled) { color: var(--color-primary-hover); }
 
   .quick-add-custom__submit:disabled {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
     cursor: not-allowed;
   }
 
-  .quick-add-custom__submit-arrow {
-    transition: transform var(--animation-speed, 0.2s) ease;
-  }
+  .quick-add-custom__submit-arrow { transition: transform var(--animation-speed, 0.2s) ease; }
 
   .quick-add-custom__submit:hover:not(:disabled) .quick-add-custom__submit-arrow {
     transform: translateX(4px);
   }
 
-  /* =====================================================
-     Feedback Message
-     ===================================================== */
   .quick-add-custom__feedback {
     position: absolute;
     left: 0;
@@ -403,478 +340,32 @@
     color: var(--color-foreground-muted);
   }
 
-  .quick-add-custom__feedback[hidden] {
-    display: none;
-  }
+  .quick-add-custom__feedback[hidden] { display: none; }
 
-  /* =====================================================
-     Component States
-     ===================================================== */
   .quick-add-custom.needs-selection .quick-add-custom__submit {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
   }
 
-  .quick-add-custom.is-loading .quick-add-custom__submit-text {
-    opacity: var(--opacity-40-60);
-  }
+  .quick-add-custom.is-loading .quick-add-custom__submit-text { opacity: var(--opacity-40-60); }
 
-  .quick-add-custom.is-added .quick-add-custom__submit-text::after {
-    content: ' ✓';
-  }
+  .quick-add-custom.is-added .quick-add-custom__submit-text::after { content: ' ✓'; }
 
-  /* =====================================================
-     Responsive Adjustments
-     ===================================================== */
   @media screen and (max-width: 749px) {
     .quick-add-custom {
       margin: var(--padding-xs);
       padding: var(--padding-xs) var(--padding-sm);
     }
-
-    .quick-add-custom__inner {
-      gap: var(--gap-xs);
-    }
-
-    .quick-add-custom__size-btn {
-      font-size: 10px;
-    }
-
-    .quick-add-custom__color-btn {
-      width: 14px;
-      height: 14px;
-    }
-
-    .quick-add-custom__submit {
-      font-size: 11px;
-    }
+    .quick-add-custom__inner { gap: var(--gap-xs); }
+    .quick-add-custom__size-btn { font-size: 10px; }
+    .quick-add-custom__color-btn { width: 14px; height: 14px; }
+    .quick-add-custom__submit { font-size: 11px; }
   }
 
-  /* Container query for very small cards */
   @container card-gallery-container (max-width: 200px) {
-    .quick-add-custom__sizes {
-      gap: 8px;
-    }
-
-    .quick-add-custom__size-btn {
-      font-size: 9px;
-    }
-
-    .quick-add-custom__colors {
-      gap: 4px;
-    }
-
-    .quick-add-custom__color-btn {
-      width: 12px;
-      height: 12px;
-    }
-
-    .quick-add-custom__submit {
-      font-size: 10px;
-    }
+    .quick-add-custom__sizes { gap: 8px; }
+    .quick-add-custom__size-btn { font-size: 9px; }
+    .quick-add-custom__colors { gap: 4px; }
+    .quick-add-custom__color-btn { width: 12px; height: 12px; }
+    .quick-add-custom__submit { font-size: 10px; }
   }
 {% endstylesheet %}
-
-{% javascript %}
-  class QuickAddCustomComponent extends HTMLElement {
-    constructor() {
-      super();
-      this.variants = [];
-      this.selectedOptions = {};
-      this.form = null;
-      this.variantInput = null;
-      this.submitBtn = null;
-      this.btnText = null;
-      this.feedback = null;
-      this.feedbackText = null;
-      this._siblingCache = new Map();
-      this._fetchToken = 0;
-    }
-
-    connectedCallback() {
-      this.init();
-    }
-
-    init() {
-      const variantsJson = this.querySelector('[data-variants-json]');
-      if (variantsJson) {
-        try {
-          this.variants = JSON.parse(variantsJson.textContent);
-          this._originalVariants = [...this.variants];
-        } catch (e) {
-          console.error('Failed to parse variants JSON:', e);
-        }
-      }
-
-      this._originalProductId = this.dataset.productId;
-
-      this.form = this.querySelector('[data-type="add-to-cart-form"]');
-      this.variantInput = this.querySelector('[data-variant-input]');
-      this.submitBtn = this.querySelector('[data-add-to-cart-btn]');
-      this.btnText = this.querySelector('[data-btn-text]');
-      this.feedback = this.querySelector('[data-feedback]');
-      this.feedbackText = this.querySelector('[data-feedback-text]');
-
-      this._originalSizesHTML = this.querySelector('.quick-add-custom__sizes')?.innerHTML ?? null;
-
-      const cardGallery = this.closest('.card-gallery');
-      if (cardGallery) {
-        this._mode = 'slideshow';
-        this._slideshow = cardGallery.querySelector('slideshow-component') ?? null;
-        this._slideshowScroller = this._slideshow?.querySelector('[ref="scroller"]') ?? null;
-        this._originalScrollerHTML = this._slideshowScroller?.innerHTML ?? null;
-        this._cardImg = null;
-        this._cardLink = cardGallery.querySelector('[ref="cardGalleryLink"]') ?? null;
-        this._originalHref = this._cardLink?.href ?? null;
-      } else {
-        this._mode = 'simple';
-        this._cardImg = this.closest('.product-card-simple__media')?.querySelector('.product-card-simple__image') ?? null;
-        this._originalImageSrc = this._cardImg?.src ?? null;
-        this._originalImageSrcset = this._cardImg?.srcset ?? null;
-        this._cardLink = this.closest('.product-card-simple__link') ?? null;
-        this._originalHref = this._cardLink?.href ?? null;
-      }
-
-      this.initializeSelectedOptions();
-      this.bindEvents();
-    }
-
-    initializeSelectedOptions() {
-      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-      if (sizeContainer) {
-        const firstSize = sizeContainer.querySelector('.quick-add-custom__size-btn.is-selected');
-        if (firstSize) {
-          this.selectedOptions[firstSize.dataset.optionIndex] = firstSize.dataset.optionValue;
-        }
-      }
-      this.updateVariant();
-    }
-
-    bindEvents() {
-      this.addEventListener('click', (e) => e.stopPropagation());
-
-      this.querySelectorAll('.quick-add-custom__size-btn').forEach((btn) => {
-        btn.addEventListener('click', (e) => this.handleOptionClick(e));
-      });
-
-      this.querySelectorAll('[data-siblings-colors] .quick-add-custom__color-btn').forEach((btn) => {
-        btn.addEventListener('mouseenter', (e) => this.prefetchSibling(e));
-        btn.addEventListener('click', (e) => this.handleSiblingColorClick(e));
-      });
-
-      if (this.form) {
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-      }
-    }
-
-    handleOptionClick(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const btn = event.currentTarget;
-      if (btn.disabled) return;
-
-      const container = btn.parentElement;
-      container.querySelectorAll('button').forEach((b) => b.classList.remove('is-selected'));
-      btn.classList.add('is-selected');
-
-      this.selectedOptions[btn.dataset.optionIndex] = btn.dataset.optionValue;
-      this.updateVariant();
-      this.updateSizeAvailability();
-    }
-
-    prefetchSibling(event) {
-      const handle = event.currentTarget.dataset.handle;
-      if (!handle || event.currentTarget.dataset.self === 'true' || this._siblingCache.has(handle)) return;
-      fetch('/products/' + handle + '.js')
-        .then((r) => r.json())
-        .then((data) => this._siblingCache.set(handle, data))
-        .catch(() => {});
-    }
-
-    handleSiblingColorClick(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const btn = event.currentTarget;
-      const handle = btn.dataset.handle;
-
-      this.querySelectorAll('[data-siblings-colors] .quick-add-custom__color-btn').forEach((b) => {
-        b.classList.remove('is-selected');
-      });
-      btn.classList.add('is-selected');
-
-      if (btn.dataset.self === 'true') {
-        this.restoreOriginal();
-        return;
-      }
-
-      if (this._siblingCache.has(handle)) {
-        this.rebuildFromProduct(this._siblingCache.get(handle));
-        return;
-      }
-
-      this.classList.add('is-loading');
-      this.submitBtn.disabled = true;
-
-      const token = ++this._fetchToken;
-
-      fetch('/products/' + handle + '.js')
-        .then((r) => r.json())
-        .then((data) => {
-          if (token !== this._fetchToken) return;
-          this._siblingCache.set(handle, data);
-          this.rebuildFromProduct(data);
-          this.classList.remove('is-loading');
-        })
-        .catch(() => {
-          if (token !== this._fetchToken) return;
-          this.classList.remove('is-loading');
-          this.showFeedback('Error al cargar tallas');
-        });
-    }
-
-    restoreOriginal() {
-      this.variants = [...this._originalVariants];
-      this.dataset.productId = this._originalProductId;
-
-      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-      if (sizeContainer && this._originalSizesHTML !== null) {
-        sizeContainer.innerHTML = this._originalSizesHTML;
-        sizeContainer.querySelectorAll('button').forEach((btn) => {
-          btn.addEventListener('click', (e) => this.handleOptionClick(e));
-        });
-      }
-
-      const firstSize = this.querySelector('.quick-add-custom__size-btn.is-selected');
-      this.selectedOptions = firstSize
-        ? { [firstSize.dataset.optionIndex]: firstSize.dataset.optionValue }
-        : {};
-      this.updateVariant();
-
-      if (this._mode === 'slideshow') {
-        if (this._slideshowScroller && this._originalScrollerHTML !== null) {
-          this._slideshowScroller.innerHTML = this._originalScrollerHTML;
-          this._resetSlideshowToFirst();
-        }
-      } else {
-        if (this._cardImg && this._originalImageSrc) {
-          this._cardImg.src = this._originalImageSrc;
-          this._cardImg.srcset = this._originalImageSrcset ?? '';
-        }
-      }
-      if (this._cardLink && this._originalHref) this._cardLink.href = this._originalHref;
-    }
-
-    rebuildFromProduct(productData) {
-      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-      if (!sizeContainer) return;
-
-      const sizeIndex = parseInt(sizeContainer.dataset.optionIndex);
-      const sizeOption = productData.options[sizeIndex];
-      if (!sizeOption) return;
-
-      this.variants = productData.variants.map((v) => ({
-        id: v.id,
-        available: v.available,
-        options: v.options,
-        title: v.title,
-        price: v.price,
-      }));
-
-      this.dataset.productId = productData.id;
-
-      sizeContainer.innerHTML = sizeOption.values
-        .map((value, i) => {
-          const available = productData.variants.some(
-            (v) => v.options[sizeIndex] === value && v.available
-          );
-          return `<button
-            type="button"
-            class="quick-add-custom__size-btn${i === 0 ? ' is-selected' : ''}${!available ? ' is-unavailable' : ''}"
-            data-option-value="${value}"
-            data-option-index="${sizeIndex}"
-            ${!available ? 'disabled' : ''}
-            aria-label="${value}"
-          >${value}</button>`;
-        })
-        .join('');
-
-      sizeContainer.querySelectorAll('button').forEach((btn) => {
-        btn.addEventListener('click', (e) => this.handleOptionClick(e));
-      });
-
-      this.selectedOptions = { [sizeIndex]: sizeOption.values[0] };
-      this.updateVariant();
-      this.updateCardImage(productData);
-      if (this._cardLink) this._cardLink.href = '/products/' + productData.handle;
-    }
-
-    updateCardImage(productData) {
-      if (this._mode === 'slideshow') {
-        this._rebuildSlideshow(productData.images ?? []);
-      } else {
-        if (!this._cardImg) return;
-        const rawUrl = productData.featured_image;
-        if (!rawUrl) return;
-        const base = rawUrl.split('?')[0];
-        const url = base.startsWith('//') ? 'https:' + base : base;
-        this._cardImg.src = url + '?width=600';
-        this._cardImg.srcset = [200, 300, 400, 500, 600].map((w) => `${url}?width=${w} ${w}w`).join(', ');
-      }
-    }
-
-    _rebuildSlideshow(images) {
-      if (!this._slideshowScroller || !images.length) return;
-
-      const fragment = document.createDocumentFragment();
-      images.slice(0, 5).forEach((rawUrl, index) => {
-        const base = rawUrl.split('?')[0];
-        const url = base.startsWith('//') ? 'https:' + base : base;
-
-        const slide = document.createElement('slideshow-slide');
-        slide.setAttribute('ref', 'slides[]');
-        slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
-        slide.setAttribute('slide-id', `sibling-${index}`);
-        slide.className = 'product-media-container media-fit product-media-container--image';
-
-        const img = document.createElement('img');
-        img.src = url + '?width=800';
-        img.srcset = [400, 800, 1200].map((w) => `${url}?width=${w} ${w}w`).join(', ');
-        img.sizes = 'auto';
-        img.loading = index === 0 ? 'eager' : 'lazy';
-        img.className = 'product-media';
-        img.alt = '';
-
-        slide.appendChild(img);
-        fragment.appendChild(slide);
-      });
-
-      this._slideshowScroller.innerHTML = '';
-      this._slideshowScroller.appendChild(fragment);
-      this._resetSlideshowToFirst();
-    }
-
-    _resetSlideshowToFirst() {
-      if (!this._slideshow) return;
-      requestAnimationFrame(() => {
-        try { this._slideshow.select(0, null, { animate: false }); } catch (e) {}
-      });
-    }
-
-    updateVariant() {
-      const matchingVariant = this.variants.find((variant) => {
-        return Object.keys(this.selectedOptions).every((index) => {
-          return variant.options[parseInt(index)] === this.selectedOptions[index];
-        });
-      });
-
-      if (matchingVariant) {
-        this.variantInput.value = matchingVariant.id;
-        if (matchingVariant.available) {
-          this.submitBtn.disabled = false;
-          this.btnText.textContent = 'Agregar a la bolsa';
-          this.classList.remove('needs-selection');
-        } else {
-          this.submitBtn.disabled = true;
-          this.btnText.textContent = 'Agotado';
-        }
-      } else {
-        this.classList.add('needs-selection');
-      }
-    }
-
-    updateSizeAvailability() {
-      const sizeContainer = this.querySelector('.quick-add-custom__sizes');
-      if (!sizeContainer) return;
-
-      const sizeIndex = parseInt(sizeContainer.dataset.optionIndex);
-
-      sizeContainer.querySelectorAll('.quick-add-custom__size-btn').forEach((btn) => {
-        const sizeValue = btn.dataset.optionValue;
-        const isAvailable = this.variants.some(
-          (v) => v.options[sizeIndex] === sizeValue && v.available
-        );
-        btn.classList.toggle('is-unavailable', !isAvailable);
-        btn.disabled = !isAvailable;
-      });
-    }
-
-    async handleSubmit(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (!this.variantInput.value || this.submitBtn.disabled) {
-        this.showFeedback('Selecciona una talla');
-        return;
-      }
-
-      this.classList.add('is-loading');
-      const originalText = this.btnText.textContent;
-      this.btnText.textContent = 'Agregando...';
-
-      try {
-        const formData = new FormData(this.form);
-
-        const response = await fetch(window.Shopify?.routes?.root + 'cart/add.js', {
-          method: 'POST',
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          this.classList.remove('is-loading');
-          this.classList.add('is-added');
-          this.btnText.textContent = 'Agregado';
-
-          const cartResponse = await fetch(window.Shopify?.routes?.root + 'cart.js');
-          const cart = await cartResponse.json();
-
-          document.dispatchEvent(
-            new CustomEvent('cart:update', {
-              bubbles: true,
-              detail: {
-                resource: cart,
-                sourceId: 'quick-add-custom',
-                data: {
-                  source: 'quick-add-custom',
-                  itemCount: cart.item_count,
-                  variantId: String(this.variantInput.value),
-                  productId: this.dataset.productId,
-                },
-              },
-            })
-          );
-
-          setTimeout(() => {
-            this.classList.remove('is-added');
-            this.btnText.textContent = originalText;
-          }, 2000);
-        } else {
-          this.classList.remove('is-loading');
-          this.btnText.textContent = originalText;
-          this.showFeedback(result.message || 'Error al agregar');
-        }
-      } catch (error) {
-        console.error('Add to cart error:', error);
-        this.classList.remove('is-loading');
-        this.btnText.textContent = originalText;
-        this.showFeedback('Error de conexión');
-      }
-    }
-
-    showFeedback(message) {
-      if (this.feedback && this.feedbackText) {
-        this.feedbackText.textContent = message;
-        this.feedback.hidden = false;
-        setTimeout(() => {
-          this.feedback.hidden = true;
-        }, 3000);
-      }
-    }
-  }
-
-  if (!customElements.get('quick-add-custom-component')) {
-    customElements.define('quick-add-custom-component', QuickAddCustomComponent);
-  }
-{% endjavascript %}

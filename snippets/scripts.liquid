@@ -254,6 +254,12 @@
 ></script>
 
 <script>
+  window.STOREFRONT_ACCESS_TOKEN = '{{ settings.storefront_token }}';
+  window.STOREFRONT_DOMAIN = '{{ shop.permanent_domain }}';
+</script>
+<script src="{{ 'color-siblings.js' | asset_url }}" defer></script>
+
+<script>
   const basePath = 'https://cdn.shopify.com/static/themes/horizon/placeholders';
   const Theme = {
     placeholders: {

@@ -1,168 +1,86 @@
 {%- doc -%}
-  Renders cross-product color swatches from the color_siblings metafield.
-  Each sibling is a separate product sharing the same style tag.
+  Renders the color siblings swatch container (on-demand, JS-hydrated).
+  The active product swatch is rendered server-side; siblings are injected by color-siblings.js.
 
   @param {object} product - The current product object
-  @param {string} [mode] - 'card' for compact PLP swatches, 'pdp' for full picker (default: 'card')
-
-  @example
-  {% render 'color-siblings', product: product %}
-  {% render 'color-siblings', product: product, mode: 'pdp' %}
+  @param {string} erp_ref - The ERP family identifier (e.g. "119G013")
+  @param {string} [mode] - 'card' (PLP hover) or 'pdp' (immediate load, default: 'card')
+  @param {string} [section_id] - Section ID for Sections Rendering API (pdp mode only)
 {%- enddoc -%}
 
 {%- liquid
-  assign siblings = product.metafields.custom.color_siblings.value
   assign sibling_mode = mode | default: 'card'
   assign sibling_style = settings.color_siblings_style | default: 'image'
-
-  # El color del producto activo viene del propio metafield (entrada con self: true)
-  # El script de sync lo escribe así para evitar cross-lookup via all_products
-  assign current_color_name = null
-  assign self_swatch_color = null
-  for s in siblings
-    if s.self
-      assign current_color_name = s.color | default: s.title
-      assign self_swatch_color = s.swatch
+  assign self_swatch_img = product.images[1] | default: product.images[0]
+  assign active_color_hex = null
+  assign active_color_name = null
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'color' or option_name_lower == 'colour'
+      for value in option.values
+        if value.selected
+          assign active_color_name = value.name
+          if value.swatch.color
+            assign active_color_hex = value.swatch.color
+          endif
+          break
+        endif
+      endfor
       break
     endif
   endfor
-  assign self_swatch_img = product.images[1] | default: product.images[0]
 -%}
 
-{%- if siblings and siblings.size > 0 -%}
-  <div
-    class="color-siblings color-siblings--{{ sibling_mode }}"
-    aria-label="Colores disponibles"
-    {% if section_id %}
-      data-section-id="{{ section_id }}"
-    {% endif %}
-    data-product-title="{{ product.title | escape }}"
-  >
-    {%- if sibling_mode == 'pdp' and current_color_name -%}
-      <p class="color-siblings__label">
-        Color: <span class="color-siblings__label-value">{{ current_color_name }}</span>
-      </p>
-    {%- endif -%}
+<div
+  class="color-siblings color-siblings--{{ sibling_mode }}"
+  aria-label="Colores disponibles"
+  {% if erp_ref != blank %}
+    data-style-ref="{{ erp_ref }}"
+  {% endif %}
+  data-current-handle="{{ product.handle }}"
+  data-mode="{{ sibling_mode }}"
+  data-swatch-style="{{ sibling_style }}"
+  {% if sibling_mode == 'pdp' and section_id %}
+    data-section-id="{{ section_id }}"
+  {% endif %}
+  data-product-title="{{ product.title | escape }}"
+>
+  {%- if sibling_mode == 'pdp' and active_color_name -%}
+    <p class="color-siblings__label">
+      Color: <span class="color-siblings__label-value">{{ active_color_name }}</span>
+    </p>
+  {%- endif -%}
 
-    {%- comment -%} Producto actual (activo) {%- endcomment -%}
-    <a
-      href="{{ product.url }}"
-      class="color-siblings__swatch color-siblings__swatch--active"
-      aria-label="{{ product.title }}"
-      aria-current="true"
-      title="{{ product.title }}"
-      data-handle="{{ product.handle }}"
-    >
-      {%- if sibling_style == 'color' -%}
-        {%- if self_swatch_color -%}
-          <span class="color-siblings__swatch-dot" style="background-color: {{ self_swatch_color }};"></span>
-        {%- else -%}
-          <span class="color-siblings__swatch-fallback"></span>
-        {%- endif -%}
-      {%- elsif self_swatch_img -%}
-        <span class="color-siblings__swatch-media">
-          <img
-            src="{{ self_swatch_img | img_url: 'master' }}"
-            alt="{{ current_color_name | escape }}"
-            loading="lazy"
-            class="color-siblings__swatch-img"
-          >
-        </span>
+  {%- comment -%} Active swatch rendered server-side, no link (not clickable) {%- endcomment -%}
+  <span
+    class="color-siblings__swatch color-siblings__swatch--active"
+    aria-label="{{ active_color_name | default: product.title | escape }}"
+    aria-current="true"
+    title="{{ active_color_name | default: product.title | escape }}"
+    data-handle="{{ product.handle }}"
+  >
+    {%- if sibling_style == 'color' -%}
+      {%- if active_color_hex -%}
+        <span class="color-siblings__swatch-dot" style="background-color: {{ active_color_hex }};"></span>
       {%- else -%}
         <span class="color-siblings__swatch-fallback"></span>
       {%- endif -%}
-    </a>
-
-    {%- comment -%} Productos hermanos {%- endcomment -%}
-    {%- for sibling in siblings -%}
-      {%- unless sibling.self -%}
-        <a
-          href="/products/{{ sibling.handle }}"
-          class="color-siblings__swatch"
-          aria-label="{{ sibling.color | default: sibling.title }}"
-          title="{{ sibling.color | default: sibling.title }}"
-          data-handle="{{ sibling.handle }}"
+    {%- elsif self_swatch_img -%}
+      <span class="color-siblings__swatch-media">
+        <img
+          src="{{ self_swatch_img | image_url: width: 100 }}"
+          alt="{{ active_color_name | default: product.title | escape }}"
+          loading="lazy"
+          class="color-siblings__swatch-img"
         >
-          {%- if sibling_style == 'color' -%}
-            {%- if sibling.swatch -%}
-              <span class="color-siblings__swatch-dot" style="background-color: {{ sibling.swatch }};"></span>
-            {%- else -%}
-              <span class="color-siblings__swatch-fallback"></span>
-            {%- endif -%}
-          {%- elsif sibling.image -%}
-            <span class="color-siblings__swatch-media">
-              <img
-                src="{{ sibling.image | replace: '/cdn/s/', 'https://cdn.shopify.com/s/' }}"
-                alt="{{ sibling.color | default: sibling.title | escape }}"
-                loading="lazy"
-                class="color-siblings__swatch-img"
-                onerror="fixSwatchUrl(this)"
-              >
-            </span>
-          {%- else -%}
-            <span class="color-siblings__swatch-fallback"></span>
-          {%- endif -%}
-        </a>
-      {%- endunless -%}
-    {%- endfor -%}
-  </div>
-{%- endif -%}
+      </span>
+    {%- else -%}
+      <span class="color-siblings__swatch-fallback"></span>
+    {%- endif -%}
+  </span>
 
-<script>
-  window.fixSwatchUrl = function (img) {
-    img.src = img.src.replace('/cdn/s/', 'https://cdn.shopify.com/s/');
-  };
-
-  (function () {
-    if (window.__colorSiblingsInitialized) return;
-    window.__colorSiblingsInitialized = true;
-
-    document.addEventListener('click', function (e) {
-      const swatch = e.target.closest('.color-siblings__swatch');
-      if (!swatch) return;
-
-      e.preventDefault();
-
-      if (swatch.getAttribute('aria-current') === 'true') return;
-
-      const container = swatch.closest('[data-section-id]');
-
-      if (!container) {
-        window.location.href = swatch.href;
-        return;
-      }
-
-      const handle = swatch.dataset.handle;
-      const sectionId = container.dataset.sectionId;
-
-      container.classList.add('color-siblings--loading');
-
-      fetch('/products/' + handle + '?sections=' + sectionId)
-        .then(function (r) {
-          return r.json();
-        })
-        .then(function (data) {
-          const wrapper = document.getElementById('shopify-section-' + sectionId);
-          if (wrapper && data[sectionId]) {
-            wrapper.innerHTML = data[sectionId];
-            wrapper.querySelectorAll('.color-siblings__swatch-img').forEach(function (img) {
-              let src = img.getAttribute('src') || '';
-              if (src.startsWith('/cdn/s/')) src = 'https://cdn.shopify.com' + src.substring(4);
-              if (src) img.src = src;
-            });
-            history.pushState({}, '', '/products/' + handle);
-            const productTitle = wrapper.querySelector('[data-product-title]')?.dataset.productTitle;
-            if (productTitle) document.title = productTitle;
-          } else {
-            window.location.href = swatch.href;
-          }
-        })
-        .catch(function () {
-          window.location.href = swatch.href;
-        });
-    });
-  })();
-</script>
+  {%- comment -%} Sibling swatches are injected by color-siblings.js {%- endcomment -%}
+</div>
 
 {% stylesheet %}
   .color-siblings {
@@ -176,6 +94,7 @@
     width: 100%;
     margin: 0 0 4px;
     font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 600;
   }
 
   .color-siblings__label-value {
@@ -184,8 +103,8 @@
 
   .color-siblings__swatch {
     display: block;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 58px;
     border-radius: 0;
     overflow: visible;
     text-decoration: none;
@@ -225,7 +144,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: none;
+    object-fit: fill;
     object-position: center center;
   }
 
@@ -243,10 +162,24 @@
     background: rgb(var(--color-foreground-rgb) / 0.1);
   }
 
+  .color-siblings__swatch-fallback--skeleton {
+    animation: color-siblings-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes color-siblings-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
   /* PDP mode */
   .color-siblings--pdp .color-siblings__swatch {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 56px;
   }
 
   .color-siblings--loading {

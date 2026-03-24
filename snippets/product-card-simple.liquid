@@ -84,12 +84,21 @@
     </div>
   </a>
 
+  {%- liquid
+    assign erp_tag = nil
+    assign erp_ref = nil
+    for tag in product.tags
+      assign tag_parts = tag | split: '-'
+      if tag_parts.size == 2 and tag_parts[0].size > 3
+        assign erp_tag = tag
+        assign erp_ref = tag_parts[0]
+        break
+      endif
+    endfor
+  -%}
+
   <div class="product-card-simple__swatches mobile-only">
-    {%- if product.metafields.custom.color_siblings != blank -%}
-      {%- render 'color-siblings', product: product, mode: 'card' -%}
-    {%- else -%}
-      {%- render 'variant-swatches', product_resource: product, only_color: true -%}
-    {%- endif -%}
+    {%- render 'color-siblings', product: product, erp_ref: erp_ref, mode: 'card' -%}
   </div>
 
   {% comment %} Quick Add Component for modal trigger (hidden, used by mobile '+' button) {% endcomment %}
