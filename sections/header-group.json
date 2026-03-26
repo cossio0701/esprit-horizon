@@ -144,6 +144,11 @@
               "type": "_cart",
               "name": "t:names.cart",
               "settings": {
+                "cross_sell_source": "collection",
+                "cross_sell_collection": "sale",
+                "cross_sell_recommendation_type": "complementary",
+                "cross_sell_heading": "",
+                "cross_sell_max_products": 8,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
