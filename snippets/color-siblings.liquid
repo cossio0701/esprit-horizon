@@ -1,0 +1,189 @@
+{%- doc -%}
+  Renders the color siblings swatch container (on-demand, JS-hydrated).
+  The active product swatch is rendered server-side; siblings are injected by color-siblings.js.
+
+  @param {object} product - The current product object
+  @param {string} erp_ref - The ERP family identifier (e.g. "119G013")
+  @param {string} [mode] - 'card' (PLP hover) or 'pdp' (immediate load, default: 'card')
+  @param {string} [section_id] - Section ID for Sections Rendering API (pdp mode only)
+{%- enddoc -%}
+
+{%- liquid
+  assign sibling_mode = mode | default: 'card'
+  assign sibling_style = settings.color_siblings_style | default: 'image'
+  assign self_swatch_img = product.images[1] | default: product.images[0]
+  assign active_color_hex = null
+  assign active_color_name = null
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'color' or option_name_lower == 'colour'
+      for value in option.values
+        if value.selected
+          assign active_color_name = value.name
+          if value.swatch.color
+            assign active_color_hex = value.swatch.color
+          endif
+          break
+        endif
+      endfor
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="color-siblings color-siblings--{{ sibling_mode }}"
+  aria-label="Colores disponibles"
+  {% if erp_ref != blank %}
+    data-style-ref="{{ erp_ref }}"
+  {% endif %}
+  data-current-handle="{{ product.handle }}"
+  data-mode="{{ sibling_mode }}"
+  data-swatch-style="{{ sibling_style }}"
+  {% if sibling_mode == 'pdp' and section_id %}
+    data-section-id="{{ section_id }}"
+  {% endif %}
+  data-product-title="{{ product.title | escape }}"
+>
+  {%- if sibling_mode == 'pdp' and active_color_name -%}
+    <p class="color-siblings__label">
+      Color: <span class="color-siblings__label-value">{{ active_color_name }}</span>
+    </p>
+  {%- endif -%}
+
+  {%- comment -%} Active swatch rendered server-side, no link (not clickable) {%- endcomment -%}
+  <span
+    class="color-siblings__swatch color-siblings__swatch--active"
+    aria-label="{{ active_color_name | default: product.title | escape }}"
+    aria-current="true"
+    title="{{ active_color_name | default: product.title | escape }}"
+    data-handle="{{ product.handle }}"
+  >
+    {%- if sibling_style == 'color' -%}
+      {%- if active_color_hex -%}
+        <span class="color-siblings__swatch-dot" style="background-color: {{ active_color_hex }};"></span>
+      {%- else -%}
+        <span class="color-siblings__swatch-fallback"></span>
+      {%- endif -%}
+    {%- elsif self_swatch_img -%}
+      <span class="color-siblings__swatch-media">
+        <img
+          src="{{ self_swatch_img | image_url: width: 100 }}"
+          alt="{{ active_color_name | default: product.title | escape }}"
+          loading="lazy"
+          class="color-siblings__swatch-img"
+        >
+      </span>
+    {%- else -%}
+      <span class="color-siblings__swatch-fallback"></span>
+    {%- endif -%}
+  </span>
+
+  {%- comment -%} Sibling swatches are injected by color-siblings.js {%- endcomment -%}
+</div>
+
+{% stylesheet %}
+  .color-siblings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .color-siblings__label {
+    width: 100%;
+    margin: 0 0 4px;
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 600;
+  }
+
+  .color-siblings__label-value {
+    font-weight: 500;
+  }
+
+  .color-siblings__swatch {
+    display: block;
+    width: 44px;
+    height: 58px;
+    border-radius: 0;
+    overflow: visible;
+    text-decoration: none;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .color-siblings__swatch::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: rgb(var(--color-foreground-rgb));
+    transition: width 0.2s ease-in-out;
+  }
+
+  .color-siblings__swatch:hover::after {
+    width: 70%;
+  }
+
+  .color-siblings__swatch--active::after {
+    width: 70%;
+  }
+
+  .color-siblings__swatch-media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
+  }
+
+  .color-siblings__swatch-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: center center;
+  }
+
+  .color-siblings__swatch-dot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
+  }
+
+  .color-siblings__swatch-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: rgb(var(--color-foreground-rgb) / 0.1);
+  }
+
+  .color-siblings__swatch-fallback--skeleton {
+    animation: color-siblings-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes color-siblings-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  /* PDP mode */
+  .color-siblings--pdp .color-siblings__swatch {
+    width: 44px;
+    height: 56px;
+  }
+
+  .color-siblings--loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+{% endstylesheet %}

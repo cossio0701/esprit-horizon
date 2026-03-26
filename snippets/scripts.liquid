@@ -1,3 +1,8 @@
+{% comment %} Preconnect to Storefront API domain to reduce DNS/TLS latency on first fetch {% endcomment %}
+{% if settings.storefront_token != blank %}
+  <link rel="preconnect" href="https://{{ shop.permanent_domain }}" crossorigin>
+{% endif %}
+
 <script type="importmap">
   {
     "imports": {
@@ -257,6 +262,12 @@
   src="{{ 'auto-close-details.js' | asset_url }}"
   defer="defer"
 ></script>
+
+<script>
+  window.STOREFRONT_ACCESS_TOKEN = '{{ settings.storefront_token }}';
+  window.STOREFRONT_DOMAIN = '{{ shop.permanent_domain }}';
+</script>
+<script src="{{ 'color-siblings.js' | asset_url }}" defer></script>
 
 <script>
   const basePath = 'https://cdn.shopify.com/static/themes/horizon/placeholders';

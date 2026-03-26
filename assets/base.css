@@ -4297,6 +4297,7 @@ text-component {
   white-space: nowrap;
   font-size: 12px;
   opacity: 0;
+  z-index: 10;
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
