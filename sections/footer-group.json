@@ -234,6 +234,7 @@
         "ai_gen_block_8969bbd_pKjhf6",
         "container_6EPcR4"
       ],
+      "disabled": true,
       "name": "t:names.custom_section",
       "settings": {
         "content_direction": "column",
@@ -770,6 +771,7 @@
               "name": "Cambios, garantías y PQRs",
               "settings": {
                 "icon": "return",
+                "image_upload": "shopify://shop_images/icon-cambios.svg",
                 "icon_size": 20,
                 "text": "Cambios, garantías y PQRs",
                 "link": "/pages/ayuda-pqr",

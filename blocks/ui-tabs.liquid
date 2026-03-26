@@ -6,8 +6,7 @@
   data-tabs-initial="{{ block.settings.initial_index }}"
   {{ block.shopify_attributes }}
 >
-  <div class="ui-tabs__list" data-tablist role="tablist" aria-label="{{ block.settings.aria_label | escape }}">
-  </div>
+  <div class="ui-tabs__list" data-tablist role="tablist" aria-label="{{ block.settings.aria_label | escape }}"></div>
 
   <div class="ui-tabs__panels">
     {% content_for 'blocks' %}
@@ -54,6 +53,7 @@
 {% schema %}
 {
   "name": "UI Tabs",
+  "tag": "div",
   "blocks": [
     { "type": "_ui-tab" }
   ],
@@ -76,7 +76,11 @@
   ],
   "presets": [
     {
-      "name": "UI Tabs"
+      "name": "UI Tabs",
+      "blocks": [
+        { "type": "_ui-tab", "settings": { "title": "Tab 1" } },
+        { "type": "_ui-tab", "settings": { "title": "Tab 2" } }
+      ]
     }
   ]
 }

@@ -8,122 +8,107 @@
   @param {object} [block] - The block object
 {%- enddoc -%}
 
-<link rel="stylesheet" href="{{ 'quick-add-custom.css' | asset_url }}" media="print" onload="this.media='all'">
-
-{% liquid
+{%- liquid
   assign product_form_id = 'QuickAddCustom-' | append: product.id | append: '-' | append: block.id
-
-  assign size_option = null
-  assign color_option = null
-  assign size_option_index = null
-  assign color_option_index = null
-
-  for option in product.options_with_values
-    assign option_name_lower = option.name | downcase
-    if option_name_lower == 'size' or option_name_lower == 'talla' or option_name_lower == 'talle'
-      assign size_option = option
-      assign size_option_index = forloop.index0
-    elsif option_name_lower == 'color' or option_name_lower == 'colour'
-      assign color_option = option
-      assign color_option_index = forloop.index0
-    endif
-  endfor
-
   assign default_variant = product.selected_or_first_available_variant
+  assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
+
   assign has_multiple_variants = false
   if product.variants.size > 1
     assign has_multiple_variants = true
   endif
 
-  assign quick_add_color_scheme = settings.quick_add_color_scheme | default: 'scheme-1'
-%}
+  assign size_option = null
+  assign size_option_index = null
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'size' or option_name_lower == 'talla' or option_name_lower == 'talle'
+      assign size_option = option
+      assign size_option_index = forloop.index0
+    endif
+  endfor
+
+  assign erp_ref = null
+  for tag in product.tags
+    assign tag_parts = tag | split: '-'
+    if tag_parts.size == 2 and tag_parts[0].size > 3
+      assign erp_ref = tag_parts[0]
+      break
+    endif
+  endfor
+
+  assign qa_swatch_img = product.images[1] | default: product.images[0]
+  assign qa_color_name = null
+  for option in product.options_with_values
+    assign option_name_lower = option.name | downcase
+    if option_name_lower == 'color' or option_name_lower == 'colour'
+      for value in option.values
+        if value.selected
+          assign qa_color_name = value.name
+          break
+        endif
+      endfor
+      break
+    endif
+  endfor
+-%}
 
 <quick-add-custom-component
   class="quick-add-custom color-{{ quick_add_color_scheme }}"
   data-product-id="{{ product.id }}"
-  data-product-url="{{ product.url }}"
-  data-section-id="{{ section_id }}"
-  data-i18n-add-to-cart="{{ 'products.product.add_to_cart' | t }}"
-  data-i18n-sold-out="{{ 'products.product.sold_out' | t }}"
-  data-i18n-adding="{{ 'products.product.adding_to_cart' | t }}"
-  data-i18n-added="{{ 'actions.added' | t }}"
-  data-i18n-select-options="{{ 'products.product.select_options' | t }}"
-  data-i18n-error="{{ 'products.product.add_to_cart_error' | t }}"
-  data-i18n-connection-error="{{ 'products.product.connection_error' | t }}"
 >
   <div class="quick-add-custom__inner">
-    {%- if has_multiple_variants -%}
-      {%- if size_option -%}
-        <div class="quick-add-custom__sizes" data-option-index="{{ size_option_index }}">
-          {%- for value in size_option.values -%}
-            {% liquid
-              assign size_available = false
-              for variant in product.variants
-                assign variant_size = variant.options[size_option_index]
-                if variant_size == value and variant.available
-                  assign size_available = true
-                  break
-                endif
-              endfor
-            %}
-            <button
-              type="button"
-              class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
-              data-option-value="{{ value }}"
-              data-option-index="{{ size_option_index }}"
-              {% unless size_available %}
-                disabled
-              {% endunless %}
-              aria-label="{{ value }}"
-            >
-              {{ value }}
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-
-      {%- if color_option -%}
-        <div class="quick-add-custom__colors" data-option-index="{{ color_option_index }}">
-          {%- for value in color_option.values -%}
-            {% liquid
-              assign color_available = false
-              assign swatch_color = value.swatch.color
-              assign swatch_image = value.swatch.image
-
-              for variant in product.variants
-                assign variant_color = variant.options[color_option_index]
-                if variant_color == value and variant.available
-                  assign color_available = true
-                  break
-                endif
-              endfor
-            %}
-            <button
-              type="button"
-              class="quick-add-custom__color-btn{% if forloop.first %} is-selected{% endif %}{% unless color_available %} is-unavailable{% endunless %}"
-              data-option-value="{{ value }}"
-              data-option-index="{{ color_option_index }}"
-              {% unless color_available %}
-                disabled
-              {% endunless %}
-              aria-label="{{ value }}"
-              style="
-                {%- if swatch_image -%}
-                  background-image: url('{{ swatch_image | image_url: width: 50 }}');
-                {%- elsif swatch_color -%}
-                  background-color: {{ swatch_color }};
-                {%- else -%}
-                  background-color: {{ value | handleize | replace: '-', '' }};
-                {%- endif -%}
-              "
-              title="{{ value }}"
-            >
-              <span class="visually-hidden">{{ value }}</span>
-            </button>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
+    {%- if has_multiple_variants and size_option -%}
+      <div class="quick-add-custom__sizes" data-option-index="{{ size_option_index }}">
+        {%- for value in size_option.values -%}
+          {%- liquid
+            assign size_available = false
+            for variant in product.variants
+              assign variant_size = variant.options[size_option_index]
+              if variant_size == value and variant.available
+                assign size_available = true
+                break
+              endif
+            endfor
+          -%}
+          <button
+            type="button"
+            class="quick-add-custom__size-btn{% if forloop.first %} is-selected{% endif %}{% unless size_available %} is-unavailable{% endunless %}"
+            data-option-value="{{ value }}"
+            data-option-index="{{ size_option_index }}"
+            {% unless size_available %}
+              disabled
+            {% endunless %}
+            aria-label="{{ value }}"
+          >
+            {{ value }}
+          </button>
+        {%- endfor -%}
+      </div>
     {%- endif -%}
+
+    <div
+      class="quick-add-custom__colors"
+      data-siblings-colors
+      {% if erp_ref != blank %}
+        data-style-ref="{{ erp_ref }}"
+      {% endif %}
+      data-current-handle="{{ product.handle }}"
+    >
+      <button
+        type="button"
+        class="quick-add-custom__color-btn is-selected"
+        data-handle="{{ product.handle }}"
+        data-self="true"
+        aria-label="{{ qa_color_name | default: product.title | escape }}"
+        title="{{ qa_color_name | default: product.title | escape }}"
+        {%- if qa_swatch_img %}
+          style="background-image: url('{{ qa_swatch_img | image_url: width: 100 }}'); background-size: 300%; background-position: center 35%;"
+        {%- endif %}
+      >
+        <span class="visually-hidden">{{ qa_color_name | default: product.title | escape }}</span>
+      </button>
+    </div>
 
     <div class="quick-add-custom__action">
       <form
@@ -135,7 +120,6 @@
       >
         <input type="hidden" name="id" value="{{ default_variant.id }}" data-variant-input>
         <input type="hidden" name="quantity" value="1">
-
         <button
           type="submit"
           class="quick-add-custom__submit"
@@ -145,16 +129,11 @@
           data-add-to-cart-btn
         >
           <span class="quick-add-custom__submit-text" data-btn-text>
-            {%- if default_variant.available -%}
-              {{ 'products.product.add_to_cart' | t }}
-            {%- else -%}
-              {{ 'products.product.sold_out' | t }}
-            {%- endif -%}
+            {%- if default_variant.available -%}Agregar a la bolsa{%- else -%}Agotado{%- endif -%}
           </span>
           <span class="quick-add-custom__submit-arrow">→</span>
         </button>
       </form>
-
       <div class="quick-add-custom__feedback" data-feedback hidden>
         <span data-feedback-text></span>
       </div>
@@ -162,19 +141,274 @@
   </div>
 
   <script type="application/json" data-variants-json>
-    [
-      {%- for variant in product.variants -%}
-        {
-          "id": {{ variant.id }},
-          "available": {{ variant.available }},
-          "options": {{ variant.options | json }},
-          "title": {{ variant.title | json }},
-          "price": {{ variant.price }},
-          "compare_at_price": {{ variant.compare_at_price | default: 'null' }}
-        }{% unless forloop.last %},{% endunless %}
-      {%- endfor -%}
-    ]
+    [{%- for variant in product.variants -%}{"id":{{ variant.id }},"available":{{ variant.available }},"options":{{ variant.options | json }},"title":{{ variant.title | json }},"price":{{ variant.price }},"compare_at_price":{{ variant.compare_at_price | default: 'null' }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]
   </script>
 </quick-add-custom-component>
 
-<script src="{{ 'quick-add-custom.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'quick-add-custom.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .quick-add-custom {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: var(--padding-sm);
+    z-index: var(--layer-raised);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-popover);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity var(--animation-speed, 0.2s) ease, transform var(--animation-speed, 0.2s) ease,
+      visibility var(--animation-speed, 0.2s) ease;
+    pointer-events: none;
+  }
+
+  .card-gallery:hover .quick-add-custom,
+  .card-gallery:focus-within .quick-add-custom,
+  .quick-add-custom:hover,
+  .quick-add-custom.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  @media screen and (max-width: 749px) {
+    .quick-add-custom {
+      display: none !important;
+    }
+  }
+
+  .quick-add-custom__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+  }
+
+  .quick-add-custom__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .quick-add-custom__size-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+    cursor: pointer;
+    position: relative;
+  }
+
+  .quick-add-custom__size-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: black;
+    transition: width 0.2s ease-in-out;
+  }
+
+  .quick-add-custom__size-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+    width: 80%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+  }
+
+  .quick-add-custom__size-btn.is-selected {
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  .quick-add-custom__size-btn.is-selected::after {
+    width: 100%;
+  }
+
+  .quick-add-custom__size-btn.is-unavailable {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  .quick-add-custom__colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .quick-add-custom__color-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
+    padding: 0;
+    cursor: pointer;
+    background-size: 300%;
+    background-position: center 35%;
+    position: relative;
+    outline: none;
+  }
+
+  .quick-add-custom__color-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 1.5px;
+    background-color: black;
+    transition: width 0.2s ease-in-out;
+  }
+
+  .quick-add-custom__color-btn:hover:not(.is-unavailable):not(.is-selected)::after {
+    width: 60%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-40-60));
+  }
+
+  .quick-add-custom__color-btn.is-selected::after {
+    width: 82%;
+  }
+
+  .quick-add-custom__color-btn.is-unavailable {
+    opacity: var(--opacity-35-55);
+    cursor: not-allowed;
+  }
+
+  .quick-add-custom__color-btn.is-unavailable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -1px;
+    right: -1px;
+    height: 1px;
+    background-color: var(--color-foreground);
+    transform: rotate(-45deg);
+  }
+
+  .quick-add-custom__action {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: var(--gap-2xs);
+    position: relative;
+  }
+
+  .quick-add-custom__form {
+    display: contents;
+  }
+
+  .quick-add-custom__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    background: transparent;
+    border: none;
+    padding: var(--padding-2xs) 0;
+    font-family: var(--font-body--family);
+    font-size: var(--font-size--sm, 12px);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: color var(--animation-speed, 0.2s) ease;
+  }
+
+  .quick-add-custom__submit:hover:not(:disabled) {
+    color: var(--color-primary-hover);
+  }
+
+  .quick-add-custom__submit:disabled {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+    cursor: not-allowed;
+  }
+
+  .quick-add-custom__submit-arrow {
+    transition: transform var(--animation-speed, 0.2s) ease;
+  }
+
+  .quick-add-custom__submit:hover:not(:disabled) .quick-add-custom__submit-arrow {
+    transform: translateX(4px);
+  }
+
+  .quick-add-custom__feedback {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-body--family);
+    font-size: var(--font-size--xs, 11px);
+    color: var(--color-foreground-muted);
+  }
+
+  .quick-add-custom__feedback[hidden] {
+    display: none;
+  }
+
+  .quick-add-custom.needs-selection .quick-add-custom__submit {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-35-55));
+  }
+
+  .quick-add-custom.is-loading .quick-add-custom__submit-text {
+    opacity: var(--opacity-40-60);
+  }
+
+  .quick-add-custom.is-added .quick-add-custom__submit-text::after {
+    content: ' ✓';
+  }
+
+  @media screen and (max-width: 749px) {
+    .quick-add-custom {
+      margin: var(--padding-xs);
+      padding: var(--padding-xs) var(--padding-sm);
+    }
+    .quick-add-custom__inner {
+      gap: var(--gap-xs);
+    }
+    .quick-add-custom__size-btn {
+      font-size: 10px;
+    }
+    .quick-add-custom__color-btn {
+      width: 14px;
+      height: 14px;
+    }
+    .quick-add-custom__submit {
+      font-size: 11px;
+    }
+  }
+
+  @container card-gallery-container (max-width: 200px) {
+    .quick-add-custom__sizes {
+      gap: 8px;
+    }
+    .quick-add-custom__size-btn {
+      font-size: 9px;
+    }
+    .quick-add-custom__colors {
+      gap: 4px;
+    }
+    .quick-add-custom__color-btn {
+      width: 12px;
+      height: 12px;
+    }
+    .quick-add-custom__submit {
+      font-size: 10px;
+    }
+  }
+{% endstylesheet %}
