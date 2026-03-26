@@ -1,0 +1,65 @@
+{%- doc -%}
+  Renders all benefit tracker bars from the shop's benefit_tracker metafield.
+  This is the main entry point for displaying progress bars in the cart drawer.
+
+  @param {string} [location] - Where the tracker is displayed: 'drawer' (default) or 'page'
+
+  @example
+  {% render 'benefit-tracker' %}
+
+  The component expects the following metafield structure:
+  shop.metafields.custom.benefit_tracker.value = [
+    {
+      "records": [
+        {
+          "campaignName": "Free Shipping",
+          "conditionType": "CART_TOTAL",
+          "targetValue": 200,
+          "benefitType": "FREE_SHIPPING",
+          "progressMessage": "You're {faltante} away from FREE shipping!",
+          "successMessage": "Congratulations! You have FREE shipping.",
+          "widgetIcon": "truck",
+          "widgetIconUrl": null,
+          "progressColor": "#030303"
+        }
+      ]
+    }
+  ]
+{%- enddoc -%}
+
+{%- liquid
+  assign benefit_data = shop.metafields.custom.benefit_tracker.value
+  assign has_trackers = false
+
+  if benefit_data != blank
+    # The metafield contains an array of objects with 'records' arrays
+    for item in benefit_data
+      if item.records != blank
+        assign has_trackers = true
+        break
+      endif
+    endfor
+  endif
+-%}
+
+{%- if has_trackers -%}
+  <div class="benefit-trackers" data-location="{{ location | default: 'drawer' }}">
+    {%- for item in benefit_data -%}
+      {%- if item.records != blank -%}
+        {%- for tracker in item.records -%}
+          {%- render 'benefit-tracker-bar', tracker: tracker -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .benefit-trackers {
+    padding: 4px 0;
+  }
+
+  .benefit-trackers:empty {
+    display: none;
+  }
+{% endstylesheet %}
