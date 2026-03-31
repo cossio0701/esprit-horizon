@@ -92,10 +92,7 @@
 
         {%- comment -%} Form {%- endcomment -%}
         <div class="registration-modal__form-wrapper">
-          <form
-            class="registration-modal__form"
-            novalidate
-          >
+          {%- form 'create_customer', class: 'registration-modal__form', novalidate: true -%}
             <div class="registration-modal__field">
               <label for="registration-name-{{ section.id }}"> Nombre </label>
               <input
@@ -143,14 +140,23 @@
             </div>
 
             <div class="registration-modal__field">
-              <label for="registration-id-{{ section.id }}"> Identificaci&#243;n </label>
-              <input
-                id="registration-id-{{ section.id }}"
-                type="text"
-                name="customer[note][identificacion]"
-                placeholder="N&#250;mero de identificaci&#243;n"
+              <label for="registration-country-{{ section.id }}"> País </label>
+              <select
+                id="registration-country-{{ section.id }}"
+                name="customer[note][pais]"
                 required
               >
+                <option value="Bolivia" selected>Bolivia</option>
+                <option value="Colombia">Colombia</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="El Salvador">El Salvador</option>
+                <option value="Guatemala">Guatemala</option>
+                <option value="Honduras">Honduras</option>
+                <option value="Nicaragua">Nicaragua</option>
+                <option value="Panamá">Panamá</option>
+                <option value="Venezuela">Venezuela</option>
+              </select>
             </div>
 
             <div class="registration-modal__legal">
@@ -172,10 +178,16 @@
               </label>
             </div>
 
+            {%- if section.settings.data_treatment_text != blank -%}
+              <div class="registration-modal__data-treatment">
+                {{ section.settings.data_treatment_text }}
+              </div>
+            {%- endif -%}
+
             <button type="submit" class="button registration-modal__submit">
               {{ section.settings.button_text | default: 'Registrarse' }}
             </button>
-          </form>
+          {%- endform -%}
         </div>
       </div>
     </div>
@@ -404,6 +416,32 @@
     color: rgb(var(--color-foreground-rgb) / 0.35);
   }
 
+  .registration-modal__field select {
+    width: 100%;
+    padding-block: var(--padding-xs);
+    padding-inline: var(--padding-sm);
+    background: var(--color-input-background);
+    color: var(--color-input-text);
+    border: var(--style-border-width-inputs, 1px) solid var(--color-input-border);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: var(--font-size);
+    line-height: var(--line-height--body);
+    transition: border-color 0.2s var(--animation-easing);
+    box-sizing: border-box;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23444' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--padding-sm) center;
+    padding-right: var(--padding-xl);
+    cursor: pointer;
+  }
+
+  .registration-modal__field select:focus-visible {
+    outline: none;
+    border-color: var(--color-foreground);
+  }
+
   .registration-modal__field input[type='date'] {
     color: rgb(var(--color-foreground-rgb) / 0.35);
   }
@@ -462,6 +500,16 @@
     color: var(--color-foreground);
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+
+  /* -- Data treatment text -- */
+  .registration-modal__data-treatment {
+    font-size: var(--font-size--xs);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    line-height: var(--line-height--body);
+    margin: 0;
+    max-height: 120px;
+    overflow-y: auto;
   }
 
   /* -- Submit button -- */
@@ -608,6 +656,12 @@
       "type": "url",
       "id": "legal_link",
       "label": "URL del enlace legal"
+    },
+    {
+      "type": "richtext",
+      "id": "data_treatment_text",
+      "label": "Autorización tratamiento de datos",
+      "default": "<p>Al registrarte, autorizas el tratamiento de tus datos personales conforme a nuestra política de privacidad.</p>"
     },
     {
       "type": "text",

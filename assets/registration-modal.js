@@ -90,14 +90,39 @@ customElements.whenDefined('dialog-component').then(() => {
       event.preventDefault();
       if (!this.#validateForm()) return;
 
+      const form = this.#form;
       const btn = /** @type {HTMLButtonElement | null} */ (
         this.querySelector('.registration-modal__submit')
       );
       if (btn) btn.setAttribute('aria-busy', 'true');
 
       try {
-        // const result = await submitFormData(new FormData(event.currentTarget));
-        // if (!result.ok) return;
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(form),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          const errorMsg = errorData?.errors?.email?.[0]
+            || errorData?.errors?.base?.[0]
+            || 'Ocurrió un error. Intenta de nuevo.';
+          const emailField = form.querySelector('input[type="email"]');
+          const emailWrapper = emailField?.closest('.registration-modal__field');
+          if (emailField && emailWrapper) {
+            emailField.setAttribute('aria-invalid', 'true');
+            let msg = emailWrapper.querySelector('.registration-modal__error');
+            if (!msg) {
+              msg = document.createElement('span');
+              msg.className = 'registration-modal__error';
+              msg.setAttribute('role', 'alert');
+              emailWrapper.appendChild(msg);
+            }
+            msg.textContent = errorMsg;
+          }
+          return;
+        }
 
         this.#showSuccess();
       } finally {
@@ -213,13 +238,3 @@ customElements.whenDefined('dialog-component').then(() => {
     if (modal instanceof RegistrationModal) modal.showDialog();
   });
 });
-
-// async function submitFormData(formData, endpoint) {
-//   const response = await fetch(endpoint, {
-//     method: 'POST',
-//     headers: { 'X-Requested-With': 'XMLHttpRequest' },
-//     body: formData,
-//   });
-//   if (!response.ok) return { ok: false, error: await response.text() };
-//   return { ok: true, data: await response.json().catch(() => null) };
-// }
