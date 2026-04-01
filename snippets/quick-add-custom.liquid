@@ -103,7 +103,7 @@
         aria-label="{{ qa_color_name | default: product.title | escape }}"
         title="{{ qa_color_name | default: product.title | escape }}"
         {%- if qa_swatch_img %}
-          style="background-image: url('{{ qa_swatch_img | image_url: width: 100 }}'); background-size: 300%; background-position: center 35%;"
+          style="background-image: url('{{ qa_swatch_img | image_url: width: 80 }}'); background-size: 200%; background-position: center 40%;"
         {%- endif %}
       >
         <span class="visually-hidden">{{ qa_color_name | default: product.title | escape }}</span>
@@ -144,8 +144,6 @@
     [{%- for variant in product.variants -%}{"id":{{ variant.id }},"available":{{ variant.available }},"options":{{ variant.options | json }},"title":{{ variant.title | json }},"price":{{ variant.price }},"compare_at_price":{{ variant.compare_at_price | default: 'null' }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]
   </script>
 </quick-add-custom-component>
-
-<script src="{{ 'quick-add-custom.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   .quick-add-custom {
@@ -220,7 +218,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 0%;
-    height: 1.5px;
+    height: 1.7px;
     background-color: black;
     transition: width 0.2s ease-in-out;
   }
@@ -253,14 +251,14 @@
   }
 
   .quick-add-custom__color-btn {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     border-radius: 0;
     border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
     padding: 0;
     cursor: pointer;
-    background-size: 300%;
-    background-position: center 35%;
+    background-size: 200%;
+    background-position: center 40%;
     position: relative;
     outline: none;
   }
@@ -268,11 +266,11 @@
   .quick-add-custom__color-btn::after {
     content: '';
     position: absolute;
-    bottom: -4px;
+    bottom: -7px;
     left: 50%;
     transform: translateX(-50%);
     width: 0%;
-    height: 1.5px;
+    height: 1.7px;
     background-color: black;
     transition: width 0.2s ease-in-out;
   }

@@ -21,6 +21,7 @@
 
   var CACHE_PREFIX = "siblings_v2_";
   var MAX_CACHE_ENTRIES = 50;
+  var cachedKeys = [];
 
   function cacheKey(styleRef) {
     return CACHE_PREFIX + styleRef;
@@ -38,19 +39,15 @@
     try {
       pruneCache();
       sessionStorage.setItem(cacheKey(styleRef), JSON.stringify(products));
+      cachedKeys.push(cacheKey(styleRef));
     } catch (e) {}
   }
 
   /** Remove oldest entries when cache exceeds MAX_CACHE_ENTRIES */
   function pruneCache() {
     try {
-      var keys = [];
-      for (var i = 0; i < sessionStorage.length; i++) {
-        var k = sessionStorage.key(i);
-        if (k && k.indexOf(CACHE_PREFIX) === 0) keys.push(k);
-      }
-      while (keys.length >= MAX_CACHE_ENTRIES) {
-        sessionStorage.removeItem(keys.shift());
+      while (cachedKeys.length >= MAX_CACHE_ENTRIES) {
+        sessionStorage.removeItem(cachedKeys.shift());
       }
     } catch (e) {}
   }
@@ -306,9 +303,10 @@
           var media = document.createElement("span");
           media.className = "color-siblings__swatch-media";
           var img = document.createElement("img");
-          img.src = imgUrl;
+          img.src = imgUrl + (imgUrl.indexOf("?") !== -1 ? "&" : "?") + "width=88";
           img.alt = colorName;
           img.loading = "lazy";
+          img.decoding = "async";
           img.className = "color-siblings__swatch-img";
           media.appendChild(img);
           link.appendChild(media);

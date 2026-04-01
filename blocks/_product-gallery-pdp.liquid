@@ -44,33 +44,45 @@
                 {% if color_gallery %}
                   {% for image in color_gallery %}
                     <div role="listitem" class="carousel-slide">
-                      <pdp-image-zoom class="pdp-zoom-wrapper">
+                      <pdp-image-zoom class="pdp-zoom-wrapper" style="aspect-ratio: {{ image.width }} / {{ image.height }}">
                         <img
                           src="{{ image | image_url: width: 1500 }}"
                           alt="{{ product.title }} - {{ color }}"
-                          loading="lazy"
-                          width="1500"
-                          height="1500"
+                          {% if forloop.first and color == current_color %}
+                            loading="eager"
+                            fetchpriority="high"
+                          {% else %}
+                            loading="lazy"
+                          {% endif %}
+                          width="{{ image.width }}"
+                          height="{{ image.height }}"
                           class="pdp-zoom-image"
                         >
                       </pdp-image-zoom>
                     </div>
                   {% endfor %}
                 {% else %}
+                  {% assign is_first_gallery_img = true %}
                   {% for media in product.media %}
                     {% if media.media_type == 'image' %}
                       <div role="listitem" class="carousel-slide">
-                        <pdp-image-zoom class="pdp-zoom-wrapper">
+                        <pdp-image-zoom class="pdp-zoom-wrapper" style="aspect-ratio: {{ media.width }} / {{ media.height }}">
                           <img
                             src="{{ media | image_url: width: 1500 }}"
                             alt="{{ product.title }}"
-                            loading="lazy"
-                            width="1500"
-                            height="1500"
+                            {% if is_first_gallery_img and color == current_color %}
+                              loading="eager"
+                              fetchpriority="high"
+                            {% else %}
+                              loading="lazy"
+                            {% endif %}
+                            width="{{ media.width }}"
+                            height="{{ media.height }}"
                             class="pdp-zoom-image"
                           >
                         </pdp-image-zoom>
                       </div>
+                      {% assign is_first_gallery_img = false %}
                     {% endif %}
                   {% endfor %}
                 {% endif %}
@@ -106,10 +118,12 @@
                   >
                     <img
                       src="{{ image | image_url: width: 150 }}"
+                      srcset="{{ image | image_url: width: 150 }} 150w, {{ image | image_url: width: 300 }} 300w"
+                      sizes="150px"
                       alt="{{ product.title }} - {{ color }}"
                       loading="lazy"
-                      width="150"
-                      height="150"
+                      width="{{ image.width | at_most: 150 }}"
+                      height="{{ image.height | times: 150 | divided_by: image.width }}"
                     >
                   </button>
                 {% endfor %}
@@ -122,10 +136,12 @@
                     >
                       <img
                         src="{{ media | image_url: width: 150 }}"
+                        srcset="{{ media | image_url: width: 150 }} 150w, {{ media | image_url: width: 300 }} 300w"
+                        sizes="150px"
                         alt="{{ product.title }}"
                         loading="lazy"
-                        width="150"
-                        height="150"
+                        width="{{ media.width | at_most: 150 }}"
+                        height="{{ media.height | times: 150 | divided_by: media.width }}"
                       >
                     </button>
                   {% endif %}

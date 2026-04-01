@@ -71,6 +71,7 @@
           src="{{ self_swatch_img | image_url: width: 100 }}"
           alt="{{ active_color_name | default: product.title | escape }}"
           loading="lazy"
+          decoding="async"
           class="color-siblings__swatch-img"
         >
       </span>
@@ -119,7 +120,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 0%;
-    height: 1.5px;
+    height: 1.7px;
     background-color: rgb(var(--color-foreground-rgb));
     transition: width 0.2s ease-in-out;
   }
