@@ -1,0 +1,186 @@
+{%- doc -%}
+  Renders a benefit tracker bar component that shows progress towards a goal (free shipping, discounts, gifts).
+
+  @param {object} [tracker] - A single tracker record from the benefit_tracker metafield.
+    - conditionType: 'CART_TOTAL' or 'ITEM_QUANTITY'
+    - targetValue: Target value to reach
+    - progressMessage: Message with {faltante} placeholder
+    - successMessage: Message when goal is reached
+    - widgetIcon: 'truck', 'tag', 'gift', or 'url'
+    - widgetIconUrl: URL for custom icon when widgetIcon is 'url'
+    - progressColor: Hex color for progress bar
+
+  @example
+  {% render 'benefit-tracker-bar', tracker: record %}
+{%- enddoc -%}
+
+{%- liquid
+  assign condition_type = tracker.conditionType | default: 'CART_TOTAL'
+  assign target_value = tracker.targetValue | default: 0
+  assign progress_message = tracker.progressMessage
+  assign success_message = tracker.successMessage
+  assign widget_icon = tracker.widgetIcon | default: 'gift'
+  assign widget_icon_url = tracker.widgetIconUrl
+  assign progress_color = tracker.progressColor | default: '#030303'
+
+  # Calculate current value based on condition type
+  if condition_type == 'CART_TOTAL'
+    # targetValue is in major currency units (e.g., 200 for $200)
+    # cart.total_price is in minor units (cents), so convert target to cents
+    assign target_in_cents = target_value | times: 100
+    assign current_value = cart.total_price
+    assign target_display = target_value | times: 100 | money_without_trailing_zeros
+    assign remaining = target_in_cents | minus: current_value
+    assign remaining_display = remaining | money_without_trailing_zeros
+  else
+    # ITEM_QUANTITY
+    assign current_value = cart.item_count
+    assign remaining = target_value | minus: current_value
+    assign remaining_display = remaining
+  endif
+
+  # Calculate progress percentage
+  if target_value > 0
+    if condition_type == 'CART_TOTAL'
+      assign progress = current_value | times: 100 | divided_by: target_in_cents
+    else
+      assign progress = current_value | times: 100 | divided_by: target_value
+    endif
+    # Cap progress at 100
+    if progress > 100
+      assign progress = 100
+    endif
+  else
+    assign progress = 0
+  endif
+
+  # Determine if goal is reached
+  assign goal_reached = false
+  if remaining <= 0
+    assign goal_reached = true
+  endif
+
+  # Process message with placeholder
+  if goal_reached
+    assign display_message = success_message
+  else
+    assign message_parts = progress_message | split: '{faltante}'
+  endif
+-%}
+
+<div class="benefit-tracker{% if goal_reached %} benefit-tracker--success{% endif %}" data-tracker-id="{{ tracker.campaignName | handleize }}">
+  <div class="benefit-tracker__row benefit-tracker__row--header">
+    <div class="benefit-tracker__icon">
+      {%- case widget_icon -%}
+        {%- when 'truck' -%}
+          {{- 'icon-truck.svg' | inline_asset_content -}}
+        {%- when 'tag' -%}
+          {{- 'icon-tag.svg' | inline_asset_content -}}
+        {%- when 'gift' -%}
+          {{- 'icon-gift.svg' | inline_asset_content -}}
+        {%- when 'url' -%}
+          {%- if widget_icon_url != blank -%}
+            <img src="{{ widget_icon_url }}" alt="" width="24" height="24" loading="lazy">
+          {%- else -%}
+            {{- 'icon-gift.svg' | inline_asset_content -}}
+          {%- endif -%}
+        {%- else -%}
+          {{- 'icon-gift.svg' | inline_asset_content -}}
+      {%- endcase -%}
+    </div>
+    <p class="benefit-tracker__message">
+      {%- if goal_reached -%}
+        {{ display_message }}
+      {%- else -%}
+        {{ message_parts.first }}<strong>{{ remaining_display }}</strong>{{ message_parts.last }}
+      {%- endif -%}
+    </p>
+  </div>
+
+  <div class="benefit-tracker__row benefit-tracker__row--progress">
+    <div class="benefit-tracker__progress-bar" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ tracker.campaignName }}">
+      <div class="benefit-tracker__progress-fill" style="width: {{ progress }}%; background-color: {{ progress_color }};"></div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .benefit-tracker {
+    padding: 12px 16px;
+    background-color: var(--color-background, #ffffff);
+    border-radius: var(--style-border-radius-buttons-primary, 8px);
+    margin-bottom: 8px;
+  }
+
+  .benefit-tracker:last-child {
+    margin-bottom: 0;
+  }
+
+  .benefit-tracker__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .benefit-tracker__row--header {
+    margin-bottom: 8px;
+  }
+
+  .benefit-tracker__icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .benefit-tracker__icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+  }
+
+  .benefit-tracker__icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  .benefit-tracker__message {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-text, #030303);
+    flex: 1;
+  }
+
+  .benefit-tracker--success .benefit-tracker__message {
+    font-weight: 600;
+  }
+
+  .benefit-tracker__progress-bar {
+    flex: 1;
+    height: 4px;
+    background-color: #e5e5e5;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .benefit-tracker__progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease-out;
+  }
+
+  .benefit-tracker--success .benefit-tracker__progress-fill {
+    background-color: var(--color-success, #008060) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .benefit-tracker__progress-fill {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
