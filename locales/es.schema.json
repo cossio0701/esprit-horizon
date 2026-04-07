@@ -568,7 +568,9 @@
     "media_type_2": "Tipo de multimedia 2",
     "help_display_type": "Tipo de visualización",
     "help_whatsapp_url": "URL de WhatsApp",
-    "help_pqr_url": "URL de PQR"
+    "help_pqr_url": "URL de PQR",
+    "help_pqr_label": "Texto del botón de garantías y PQRs",
+    "help_whatsapp_label": "Texto del botón de WhatsApp"
   },
   "options": {
     "adapt_to_image": "Adaptar a la imagen",

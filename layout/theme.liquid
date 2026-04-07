@@ -76,7 +76,9 @@
     {% render 'help-modal',
       display_type: settings.help_display_type,
       whatsapp_url: settings.help_whatsapp_url,
-      pqr_url: settings.help_pqr_url
+      pqr_url: settings.help_pqr_url,
+      pqr_label: settings.help_pqr_label,
+      whatsapp_label: settings.help_whatsapp_label
     %}
 
     <script src="{{ 'quick-add-custom.js' | asset_url }}" defer></script>

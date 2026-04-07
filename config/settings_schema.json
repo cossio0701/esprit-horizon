@@ -2322,6 +2322,18 @@
         "id": "help_pqr_url",
         "label": "t:settings.help_pqr_url",
         "default": "/pages/ayuda-pqr"
+      },
+      {
+        "type": "text",
+        "id": "help_pqr_label",
+        "label": "t:settings.help_pqr_label",
+        "default": "Garantías, cambios y PQRs"
+      },
+      {
+        "type": "text",
+        "id": "help_whatsapp_label",
+        "label": "t:settings.help_whatsapp_label",
+        "default": "Escríbenos por WhatsApp"
       }
     ]
   }

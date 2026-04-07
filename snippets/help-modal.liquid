@@ -4,6 +4,10 @@
   assign whatsapp_url = whatsapp_url | default: 'https://wa.link/jhyooy'
   assign pqr_url = pqr_url | default: '/pages/ayuda-pqr'
   assign show_fab = show_fab | default: true
+  assign pqr_label_fallback = 'content.changes_pqr' | t
+  assign pqr_label = pqr_label | default: pqr_label_fallback
+  assign whatsapp_label_fallback = 'content.write_whatsapp' | t
+  assign whatsapp_label = whatsapp_label | default: whatsapp_label_fallback
 -%}
 
 {% stylesheet %}
@@ -396,7 +400,7 @@
               {{- 'icon-cambios.svg' | inline_asset_content -}}
             </svg>
           </span>
-          <span class="help-floating__button-text">{{ 'content.changes_pqr' | t }}</span>
+          <span class="help-floating__button-text">{{ pqr_label }}</span>
         </a>
       </div>
     </details>
@@ -479,7 +483,7 @@
                   {%- render 'icon', icon: 'whatsapp' -%}
                 </svg>
               </span>
-              <span class="help-modal__button-text">{{ 'content.write_whatsapp' | t }}</span>
+              <span class="help-modal__button-text">{{ whatsapp_label }}</span>
             </a>
 
             <a
@@ -491,7 +495,7 @@
                   {{- 'icon-cambios.svg' | inline_asset_content -}}
                 </svg>
               </span>
-              <span class="help-modal__button-text">{{ 'content.changes_pqr' | t }}</span>
+              <span class="help-modal__button-text">{{ pqr_label }}</span>
             </a>
           </div>
         </div>

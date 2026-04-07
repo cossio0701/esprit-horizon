@@ -1161,7 +1161,9 @@
     "media_type_2": "Media 2 type",
     "help_display_type": "Display type",
     "help_whatsapp_url": "WhatsApp URL",
-    "help_pqr_url": "PQR URL"
+    "help_pqr_url": "PQR URL",
+    "help_pqr_label": "Warranties and PQRs button text",
+    "help_whatsapp_label": "WhatsApp button text"
   },
   "text_defaults": {
     "accordion_heading": "Accordion heading",
