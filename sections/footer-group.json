@@ -769,12 +769,12 @@
             },
             "link_item_HajcGf": {
               "type": "link-item",
-              "name": "Cambios, garantías y PQRs",
+              "name": "Garantías, cambios y PQRs",
               "settings": {
                 "icon": "return",
                 "image_upload": "shopify://shop_images/icon-cambios.svg",
                 "icon_size": 20,
-                "text": "Cambios, garantías y PQRs",
+                "text": "Garantías, cambios y PQRs",
                 "link": "/pages/ayuda-pqr",
                 "open_in_new_tab": false,
                 "link_color": ""
