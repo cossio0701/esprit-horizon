@@ -12,25 +12,46 @@
   </div>
 {%- enddoc -%}
 
-{% assign preset = preset | default: settings.type_preset %}
+{% liquid
+  assign type_preset_key = prefix | append: 'type_preset'
+  assign preset = preset | default: settings[type_preset_key]
+  assign color_key = prefix | append: 'color'
+  assign font_size_key = prefix | append: 'font_size'
+  assign weight_key = prefix | append: 'weight'
+  assign font_key = prefix | append: 'font'
+  assign case_key = prefix | append: 'case'
+  assign line_height_key = prefix | append: 'line_height'
+  assign letter_spacing_key = prefix | append: 'letter_spacing'
+  assign font_size_unit_key = prefix | append: 'font_size_unit'
+  assign has_prefix = false
+  if prefix != '' and settings[font_size_unit_key] != blank
+    assign has_prefix = true
+  endif
+%}
 
 {%- capture variables -%}
-  {%- if preset != 'rte' and settings.color != "" -%}
-    --color: {{ settings.color }};
+  {%- if preset != 'rte' and settings[color_key] != "" -%}
+    --color: {{ settings[color_key] }};
   {%- endif -%}
   {%- if preset == 'custom' -%}
     {% liquid
       unless type
-        comment
-          When choosing to customize the font, picking a specific font size
-          determines the type of text block.
-        endcomment
-        if settings.font_size != ''
-          assign font_size_value = settings.font_size | split: 'rem' | first | times: 1.0
+        if settings[font_size_key] != ''
+          if has_prefix
+            assign font_size_rem = settings[font_size_key] | times: 1.0
+            assign fs_unit = settings[font_size_unit_key]
+            if fs_unit == 'rem'
+              assign font_size_rem = settings[font_size_key] | times: 1.0
+            elsif fs_unit == 'px'
+              assign font_size_rem = settings[font_size_key] | divided_by: 16.0
+            endif
+          else
+            assign font_size_rem = settings[font_size_key] | split: 'rem' | first | times: 1.0
+          endif
 
-          if font_size_value > 4.5
+          if font_size_rem > 4.5
             assign type = 'display'
-          elsif font_size_value > 3.5
+          elsif font_size_rem > 3.5
             assign type = 'heading'
           else
             assign type = 'body'
@@ -38,9 +59,21 @@
         endif
       endunless
     %}
-    {%- if settings.font_size != blank -%}
-      {%- liquid
-        assign font_size_rem = settings.font_size | split: 'rem' | first | times: 1.0
+    {%- if settings[font_size_key] != blank -%}
+      {% liquid
+        if has_prefix
+          assign fs_unit = settings[font_size_unit_key]
+          assign font_size_rem = settings[font_size_key] | times: 1.0
+          if fs_unit == 'rem'
+            assign font_size_rem = settings[font_size_key] | times: 1.0
+          elsif fs_unit == 'px'
+            assign font_size_rem = settings[font_size_key] | divided_by: 16.0
+          endif
+          assign fs_output = settings[font_size_key] | append: fs_unit
+        else
+          assign fs_output = settings[font_size_key]
+          assign font_size_rem = settings[font_size_key] | split: 'rem' | first | times: 1.0
+        endif
         assign fluid_size_cutoff_rem = 3.0
 
         if font_size_rem >= fluid_size_cutoff_rem
@@ -52,29 +85,29 @@
           assign scaling_bonus_rem = scale_factor | minus: 1 | times: 0.25
           assign dynamic_min_rem = base_min_rem | plus: scaling_bonus_rem
         endif
-      -%}
+      %}
       {%- if font_size_rem >= fluid_size_cutoff_rem -%}
-        --font-size: clamp({{ dynamic_min_rem }}rem, {{ vw_value }}vw, {{ settings.font_size }});
+        --font-size: clamp({{ dynamic_min_rem }}rem, {{ vw_value }}vw, {{ fs_output }});
       {%- else -%}
-        --font-size: {{ settings.font_size }};
+        --font-size: {{ fs_output }};
       {%- endif -%}
     {%- endif -%}
-    {%- if settings.weight != blank -%}
-      --font-weight: {{ settings.weight }};
+    {%- if settings[weight_key] != blank -%}
+      --font-weight: {{ settings[weight_key] }};
     {% else %}
-      --font-weight: {{ settings.font | replace: 'family', 'weight' }};
+      --font-weight: {{ settings[font_key] | replace: 'family', 'weight' }};
     {%- endif -%}
-    --font-family: {{ settings.font }};
-    --text-transform: {{ settings.case }};
+    --font-family: {{ settings[font_key] }};
+    --text-transform: {{ settings[case_key] }};
     --text-wrap: {{ settings.wrap | default: 'pretty' }};
-    {% if settings.type_preset == 'custom' and settings.font_size == blank %}
-      --line-height--display: var(--line-height--display-{{ settings.line_height }});
-      --line-height--heading: var(--line-height--heading-{{ settings.line_height }});
-      --line-height--body: var(--line-height--body-{{ settings.line_height }});
+    {% if settings[type_preset_key] == 'custom' and settings[font_size_key] == blank %}
+      --line-height--display: var(--line-height--display-{{ settings[line_height_key] }});
+      --line-height--heading: var(--line-height--heading-{{ settings[line_height_key] }});
+      --line-height--body: var(--line-height--body-{{ settings[line_height_key] }});
     {% else %}
-      --line-height: var(--line-height--{{ type }}-{{ settings.line_height }});
+      --line-height: var(--line-height--{{ type }}-{{ settings[line_height_key] }});
     {% endif %}
-    --letter-spacing: var(--letter-spacing--{{ type }}-{{ settings.letter_spacing }});
+    --letter-spacing: var(--letter-spacing--{{ type }}-{{ settings[letter_spacing_key] }});
   {%- endif -%}
 {%- endcapture -%}
 {{- variables | strip | strip_newlines -}}
