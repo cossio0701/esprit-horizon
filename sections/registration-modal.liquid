@@ -184,7 +184,7 @@
               </div>
             {%- endif -%}
 
-            <button type="submit" class="button registration-modal__submit">
+            <button type="submit" class="button registration-modal__submit" disabled>
               {{ section.settings.button_text | default: 'Registrarse' }}
             </button>
           {%- endform -%}
@@ -525,6 +525,12 @@
   .registration-modal__submit[aria-busy='true'] {
     opacity: 0.5;
     cursor: wait;
+    pointer-events: none;
+  }
+
+  .registration-modal__submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
     pointer-events: none;
   }
 

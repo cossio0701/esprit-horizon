@@ -17,6 +17,12 @@ customElements.whenDefined('dialog-component').then(() => {
       this.#removeBlurListeners();
     }
 
+    get #submitBtn() {
+      return /** @type {HTMLButtonElement | null} */ (
+        this.querySelector('.registration-modal__submit')
+      );
+    }
+
     get #form() {
       return /** @type {HTMLFormElement | null} */ (
         this.querySelector('.registration-modal__form')
@@ -46,6 +52,7 @@ customElements.whenDefined('dialog-component').then(() => {
       this.#resetState();
       this.#form?.addEventListener('submit', this.#onSubmit);
       this.#addBlurListeners();
+      this.#addInputListeners();
       super.showDialog();
       requestAnimationFrame(() =>
         requestAnimationFrame(() => this.#firstField?.focus())
@@ -59,6 +66,28 @@ customElements.whenDefined('dialog-component').then(() => {
       this.#triggerElement = null;
       this.#form?.removeEventListener('submit', this.#onSubmit);
       this.#removeBlurListeners();
+      this.#removeInputListeners();
+    };
+
+    #addInputListeners() {
+      for (const field of this.querySelectorAll('[required]')) {
+        field.addEventListener('input', this.#checkFormValidity);
+        field.addEventListener('change', this.#checkFormValidity);
+      }
+    }
+
+    #removeInputListeners() {
+      for (const field of this.querySelectorAll('[required]')) {
+        field.removeEventListener('input', this.#checkFormValidity);
+        field.removeEventListener('change', this.#checkFormValidity);
+      }
+    }
+
+    #checkFormValidity = () => {
+      const form = this.#form;
+      const btn = this.#submitBtn;
+      if (!form || !btn) return;
+      btn.disabled = !form.checkValidity();
     };
 
     #addBlurListeners() {
