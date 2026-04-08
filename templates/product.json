@@ -1198,12 +1198,65 @@
                   "block_order": [
                     "product_fit_zqCQMD"
                   ]
+                },
+                "product_accordion_item_CADKTc": {
+                  "type": "_product-accordion-item",
+                  "name": "Envio",
+                  "settings": {
+                    "title": "Envío",
+                    "open_by_default": false,
+                    "heading_tag": "h3"
+                  },
+                  "blocks": {
+                    "text_JKrFCB": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Entrega estimada de 7 a 15 días hábiles</p>",
+                        "enable_collapse": false,
+                        "collapsed_height": 50,
+                        "show_more_text": "Ver más",
+                        "show_less_text": "Ver menos",
+                        "enable_fade": true,
+                        "width": "fit-content",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "use_mobile_font_size": false,
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1rem",
+                        "font_size_mobile": "1rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0,
+                        "use_mobile_padding": false,
+                        "padding-block-start-mobile": 0,
+                        "padding-block-end-mobile": 0,
+                        "padding-inline-start-mobile": 0,
+                        "padding-inline-end-mobile": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_JKrFCB"
+                  ]
                 }
               },
               "block_order": [
                 "product_accordion_item_Uyr6wt",
                 "product_accordion_item_fijA6F",
-                "product_accordion_item_mDYTge"
+                "product_accordion_item_mDYTge",
+                "product_accordion_item_CADKTc"
               ]
             }
           },

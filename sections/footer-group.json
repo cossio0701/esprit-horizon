@@ -707,7 +707,7 @@
               "settings": {
                 "icon": "none",
                 "icon_size": 20,
-                "text": "Garantías",
+                "text": "Política de garantías, cambios y devoluciones",
                 "link": "/pages/terminos-condiciones?category=garantias",
                 "open_in_new_tab": false,
                 "link_color": ""
@@ -774,7 +774,7 @@
                 "icon": "return",
                 "image_upload": "shopify://shop_images/icon-cambios.svg",
                 "icon_size": 20,
-                "text": "Cambios, garantías y PQRs",
+                "text": "Garantías, cambios y PQRs",
                 "link": "/pages/ayuda-pqr",
                 "open_in_new_tab": false,
                 "link_color": ""
