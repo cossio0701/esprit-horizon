@@ -1,233 +1,172 @@
 /**
  * Product Carousel Web Component
- * Handles dynamic content fetching via Shopify APIs with retry logic and proper cleanup.
- * 
+ * Lazy-loads dynamic content via Shopify APIs with IntersectionObserver
+ * and retry logic. Integrates with carousel.js via reinit().
+ *
  * @extends HTMLElement
  */
 class ProductCarousel extends HTMLElement {
+  #carousel = null;
+  #source = null;
+  #productId = null;
+  #collectionHandle = null;
+  #maxProducts = 8;
+  #observer = null;
+  #abortController = null;
+
+  static get observedAttributes() {
+    return ['data-source', 'data-collection-handle', 'data-product-id', 'data-max-products'];
+  }
+
   constructor() {
     super();
-    
-    /** @type {AbortController} */
     this.#abortController = new AbortController();
-    
-    this.source = this.dataset.source;
-    this.sectionId = this.dataset.sectionId;
-    this.blockId = this.dataset.blockId;
-    this.productId = this.dataset.productId;
-    this.maxProducts = parseInt(this.dataset.maxProducts || '8', 10);
-    this.sortBy = this.dataset.sortBy;
-    this.collectionHandle = this.dataset.collectionHandle;
-
-    this.observer = new IntersectionObserver(
-      this.#handleIntersection.bind(this),
+    this.#observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          this.#observer.disconnect();
+          this._loadProducts();
+        }
+      },
       { rootMargin: '0px 0px 400px 0px' }
     );
   }
 
-  #abortController;
-  #retryCount = 0;
-  #maxRetries = 3;
-
   connectedCallback() {
-    this.observer.observe(this);
+    this.#source = this.dataset.source;
+    this.#productId = this.dataset.productId;
+    this.#collectionHandle = this.dataset.collectionHandle;
+    this.#maxProducts = parseInt(this.dataset.maxProducts || '8', 10);
+    this.#observer.observe(this);
   }
 
   disconnectedCallback() {
-    this.#abortController.abort();
-    this.observer.disconnect();
-  }
-
-  /**
-   * @param {IntersectionObserverEntry[]} entries
-   */
-  #handleIntersection(entries) {
-    if (!entries[0]?.isIntersecting) return;
-    
-    this.observer.unobserve(this);
-
-    const dynamicSources = ['best_sellers', 'related', 'recently_viewed'];
-    const shouldLoadDynamic = dynamicSources.includes(String(this.source)) ||
-      (this.source === 'collection' && this.sortBy === 'best_selling');
-
-    if (shouldLoadDynamic) {
-      this.#loadDynamicContent();
+    if (this.#abortController) {
+      this.#abortController.abort();
+      this.#abortController = null;
+    }
+    if (this.#observer) {
+      this.#observer.disconnect();
+      this.#observer = null;
     }
   }
 
-  async #loadDynamicContent() {
-    let url;
-    const routes = window.Theme?.routes || window.routes || {};
+  // ── Load orchestration ───────────────────────────────────────────────────
+
+  async _loadProducts() {
+    if (!this.#source) return;
 
     try {
-      if (this.source === 'related') {
-        url = this.#buildRecommendationsUrl(routes);
-      } else if (this.source === 'best_sellers' || 
-                 (this.source === 'collection' && this.sortBy === 'best_selling')) {
-        url = this.#buildBestSellersUrl(routes);
-      } else if (this.source === 'recently_viewed') {
-        await this.#loadRecentlyViewed();
-        return;
-      }
-
-      if (url) {
-        const html = await this.#fetchWithRetry(url);
-        this.#updateContent(html);
+      if (this.#source === 'related') {
+        const html = await this._fetchRelated();
+        this._renderProducts(html);
+      } else if (this.#source === 'best_sellers') {
+        const html = await this._fetchBestSellers();
+        this._renderProducts(html);
+      } else if (this.#source === 'recently_viewed') {
+        const ids = this._getRecentlyViewed();
+        if (ids.length > 0) {
+          const html = await this._fetchRecentlyViewed(ids);
+          this._renderProducts(html);
+        }
       }
     } catch (error) {
       if (error.name !== 'AbortError') {
-        console.error('Failed to load product carousel:', error.message);
+        console.error('[ProductCarousel] Load failed:', error.message);
       }
     }
   }
 
-  /**
-   * @param {object} routes
-   * @returns {string}
-   */
-  #buildRecommendationsUrl(routes) {
-    const recommendationsUrl = routes.product_recommendations_url || '/recommendations/products';
-    return `${recommendationsUrl}?section_id=${this.sectionId}&product_id=${this.productId}&limit=${this.maxProducts}&intent=related`;
-  }
+  // ── Fetch methods ────────────────────────────────────────────────────────
 
   /**
-   * @param {object} routes
-   * @returns {string}
-   */
-  #buildBestSellersUrl(routes) {
-    const handle = this.collectionHandle || 'all';
-    const rootUrl = routes.root_url || '/';
-    return `${rootUrl}collections/${handle}?section_id=${this.sectionId}&sort_by=best-selling`;
-  }
-
-  /**
-   * Fetch with retry logic and timeout
    * @param {string} url
-   * @param {number} maxRetries
+   * @param {number} [retries=2]
    * @returns {Promise<string>}
    */
-  async #fetchWithRetry(url, maxRetries = 3) {
-    let lastError;
-    
-    for (let i = 0; i < maxRetries; i++) {
+  async fetchWithRetry(url, retries = 2) {
+    const controller = this.#abortController;
+    for (let i = 0; i <= retries; i++) {
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
-        
-        const response = await fetch(url, {
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeout);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return await response.text();
       } catch (error) {
-        lastError = error;
-        
-        if (error.name === 'AbortError') {
-          throw error;
-        }
-        
-        if (i < maxRetries - 1) {
-          await this.#delay(1000 * (i + 1));
-        }
-      }
-    }
-    
-    throw lastError;
-  }
-
-  /**
-   * @param {number} ms
-   * @returns {Promise<void>}
-   */
-  #delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * @param {string} html
-   */
-  #updateContent(html) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    const dynamicContent = doc.querySelector(`#ProductCarousel-${this.blockId}`);
-    
-    if (dynamicContent) {
-      this.innerHTML = dynamicContent.innerHTML;
-      this.#reinitializeCarousel();
-    } else {
-      const firstCarousel = doc.querySelector('product-carousel');
-      if (firstCarousel) {
-        this.innerHTML = firstCarousel.innerHTML;
-        this.#reinitializeCarousel();
+        if (error.name === 'AbortError') throw error;
+        if (i === retries) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
   }
 
-  #reinitializeCarousel() {
-    if (window.H?.slideshow?.init) {
-      window.H.slideshow.init(this);
-    }
-    
-    const carousel = this.querySelector('carousel-component');
-    if (carousel && carousel.reinit) {
-      carousel.reinit();
-    }
+  async _fetchBestSellers() {
+    const routes = window.Theme?.routes || window.routes || {};
+    const rootUrl = routes.root_url || '/';
+    const handle = this.#collectionHandle || 'all';
+    const url = `${rootUrl}collections/${handle}?sort_by=best-selling&section_id=product-carousel`;
+    return this.fetchWithRetry(url);
+  }
+
+  async _fetchRelated() {
+    const routes = window.Theme?.routes || window.routes || {};
+    const base = routes.product_recommendations_url || '/recommendations/products';
+    const url = `${base}?product_id=${this.#productId}&limit=${this.#maxProducts}&intent=related`;
+    return this.fetchWithRetry(url);
   }
 
   /**
-   * Load recently viewed products with cache
+   * @param {string[]} ids
+   * @returns {Promise<string>}
    */
-  async #loadRecentlyViewed() {
-    const viewedIds = this.#getRecentlyViewedIds();
-    
-    if (viewedIds.length === 0) {
-      return;
-    }
-
+  async _fetchRecentlyViewed(ids) {
     const routes = window.Theme?.routes || window.routes || {};
     const searchUrl = routes.search_url || '/search';
-    
-    const query = viewedIds.map(id => `id:${id}`).join(' OR ');
-    const url = `${searchUrl}?q=${encodeURIComponent(query)}&type=product&section_id=${this.sectionId}`;
-
-    try {
-      const html = await this.#fetchWithRetry(url);
-      this.#updateContent(html);
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Failed to load recently viewed products:', error.message);
-      }
-    }
+    const query = ids.map((id) => `id:${id}`).join(' OR ');
+    const url = `${searchUrl}?q=${encodeURIComponent(query)}&type=product&section_id=product-carousel`;
+    return this.fetchWithRetry(url);
   }
+
+  // ── Recently viewed ───────────────────────────────────────────────────────
 
   /**
    * @returns {string[]}
    */
-  #getRecentlyViewedIds() {
+  _getRecentlyViewed() {
     try {
-      const data = localStorage.getItem('viewedProducts');
-      if (!data) return [];
-      
-      const parsed = JSON.parse(data);
-      
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-      
-      if (parsed.ids && Array.isArray(parsed.ids)) {
-        return parsed.ids;
-      }
-      
-      return [];
+      const raw = localStorage.getItem('horizon_recently_viewed_products');
+      if (!raw) return [];
+      const { ids, timestamp } = JSON.parse(raw);
+      const ttl = 24 * 60 * 60 * 1000;
+      if (Date.now() - timestamp > ttl) return [];
+      return (ids || []).slice(0, 12);
     } catch {
       return [];
+    }
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
+  /**
+   * @param {string} html
+   */
+  _renderProducts(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Try block-specific selector first, then generic fallback
+    const blockId = this.dataset.blockId;
+    const blockContent = blockId ? doc.querySelector(`#ProductCarousel-${blockId}`) : null;
+    const fallback = doc.querySelector('product-carousel, carousel-component');
+    const content = blockContent || fallback;
+
+    if (!content) return;
+
+    this.innerHTML = content.innerHTML;
+
+    // Reinitialize inner carousel
+    this.#carousel = this.querySelector('carousel-component');
+    if (this.#carousel?.reinit) {
+      this.#carousel.reinit();
     }
   }
 }

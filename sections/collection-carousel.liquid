@@ -47,7 +47,8 @@
 
 {% if has_carousel_items %}
   <section class="collection-carousel-section section section--{{ section_width }}">
-    <script src="{{ 'carousel-component.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'carousel.js' | asset_url }}" type="module" defer></script>
+    {{ 'carousel.css' | asset_url | stylesheet_tag }}
     <carousel-component
       class="collection-carousel-swiper"
       columns-desktop="{{ slides_per_view_desktop }}"

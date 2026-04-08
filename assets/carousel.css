@@ -1,45 +1,33 @@
 /* ==========================================================================
    Carousel Component — Global Styles
-   Parametrizable via HTML attributes on <carousel-component>:
-     - thumbs-mobile:  top | bottom | left | right | none (default: none)
-     - thumbs-desktop: top | bottom | left | right | none (default: none)
-     - show-dots:      true | false
-     - show-arrows:    true | false
+   container-name: carousel  (@container carousel queries rely on this)
+   Supports: thumbs-mobile, thumbs-desktop, show-dots, show-arrows, columns-*
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. Design Tokens
-   -------------------------------------------------------------------------- */
+/* ── Design Tokens ── */
 :root {
-  /* Carousel specific tokens */
   --carousel-button-size: 40px;
   --carousel-button-size-mobile: 32px;
   --carousel-arrow-icon-size: 16px;
-  --carousel-arrow-icon-size-mobile: 12px;
   --carousel-dot-size: 10px;
-  --carousel-gap-default: var(--space-md, 16px);
-  
-  /* Animation */
-  --carousel-transition-duration: var(--duration-fast, 0.2s);
-  --carousel-transition-easing: var(--easing-default, ease);
+  --carousel-gap: 16px;
+  --carousel-transition-duration: 0.2s;
 }
 
-/* --------------------------------------------------------------------------
-   2. Base — Grid container
-   -------------------------------------------------------------------------- */
+/* ── Container + Grid ── */
 carousel-component {
+  container-type: inline-size;
+  container-name: carousel;
   display: grid;
   grid-template-areas: "scroller" "dots";
   grid-template-columns: 1fr;
   grid-template-rows: auto;
   gap: var(--space-sm, 12px);
   width: 100%;
-  container-type: inline-size;
+  --slides-per-view: var(--slides-per-view-mobile, 1);
 }
 
-/* --------------------------------------------------------------------------
-   3. Scroller
-   -------------------------------------------------------------------------- */
+/* ── Scroller ── */
 .carousel-scroller-wrapper {
   grid-area: scroller;
   position: relative;
@@ -53,41 +41,137 @@ carousel-component {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  gap: var(--carousel-gap, var(--carousel-gap-default, 0px));
   scroll-behavior: smooth;
+  gap: 0; /* Gap handled in slide width calculation */
 }
+.carousel-scroller::-webkit-scrollbar { display: none; }
 
-.carousel-scroller::-webkit-scrollbar {
-  display: none;
-}
-
+/* ── Slides ── */
 .carousel-slide {
-  flex: 0 0 calc((100% - (var(--carousel-gap, 0px) * (var(--slides-per-view, 1) - 1))) / var(--slides-per-view, 1));
   scroll-snap-align: start;
   min-width: 0;
 }
 
-.carousel-slide img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-}
-
-/* Slides per view — mobile default */
-carousel-component {
-  --slides-per-view: var(--slides-per-view-mobile, 1);
-}
-
-@media (min-width: 769px) {
-  carousel-component {
-    --slides-per-view: var(--slides-per-view-desktop, 1);
+/* Mobile: Force columns via attribute selector (default, applies < 768px) */
+@media (max-width: 767px) {
+  carousel-component[columns-mobile="1"] .carousel-slide {
+    flex: 0 0 100%;
+    margin-right: 0;
+  }
+  
+  carousel-component[columns-mobile="2"] .carousel-slide {
+    flex: 0 0 calc(50% - 8px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-mobile="2"] .carousel-slide:last-child {
+    margin-right: 0;
   }
 }
 
-/* --------------------------------------------------------------------------
-   4. Navigation Arrows
-   -------------------------------------------------------------------------- */
+/* Desktop: Force columns via attribute selector */
+@media (min-width: 768px) {
+  carousel-component[columns-desktop="3"] .carousel-slide {
+    flex: 0 0 calc(33.3333% - 21.33px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-desktop="4"] .carousel-slide {
+    flex: 0 0 calc(25% - 12px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-desktop="5"] .carousel-slide {
+    flex: 0 0 calc(20% - 12.8px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-desktop="6"] .carousel-slide {
+    flex: 0 0 calc(16.6666% - 13.33px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-desktop="7"] .carousel-slide {
+    flex: 0 0 calc(14.2857% - 13.71px);
+    margin-right: 16px;
+  }
+  
+  carousel-component[columns-desktop="8"] .carousel-slide {
+    flex: 0 0 calc(12.5% - 14px);
+    margin-right: 16px;
+  }
+  
+  /* Last slide: no margin */
+  .carousel-slide:last-child {
+    margin-right: 0;
+  }
+}
+.carousel-slide img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+/* ── Responsive: Container Queries (for columns switch) ── */
+@container carousel (min-width: 768px) {
+  carousel-component { --slides-per-view: var(--slides-per-view-desktop, 4); }
+}
+
+/* ── Responsive: Viewport Media Query (for full-width carousels) ── */
+@media (min-width: 768px) {
+  carousel-component {
+    --slides-per-view: var(--slides-per-view-desktop, 4);
+  }
+  .carousel-button { width: var(--carousel-button-size, 40px); height: var(--carousel-button-size, 40px); }
+  .carousel-button .svg-wrapper { width: var(--carousel-arrow-icon-size, 16px); height: var(--carousel-arrow-icon-size, 16px); }
+  carousel-component[thumbs-desktop='left'],
+  carousel-component[thumbs-desktop='right'] {
+    grid-template-columns: 100px 1fr;
+    column-gap: var(--space-md, 16px);
+  }
+  carousel-component[thumbs-desktop='left'] { grid-template-areas: "thumbs scroller" "dots dots"; }
+  carousel-component[thumbs-desktop='right'] { grid-template-areas: "scroller thumbs" "dots dots"; }
+  carousel-component[thumbs-desktop='left'] .carousel-thumbs,
+  carousel-component[thumbs-desktop='right'] .carousel-thumbs { max-height: 600px; }
+}
+
+/* ── Thumb Layout — Unified (mobile + desktop attribute selectors) ── */
+carousel-component[thumbs-mobile='none'] .carousel-thumbs,
+carousel-component[thumbs-mobile='none'] .carousel-thumbs-nav,
+carousel-component[thumbs-desktop='none'] .carousel-thumbs,
+carousel-component[thumbs-desktop='none'] .carousel-thumbs-nav { display: none; }
+
+carousel-component[thumbs-mobile='bottom'],
+carousel-component[thumbs-desktop='bottom'] { grid-template-areas: "scroller" "thumbs" "dots"; }
+
+carousel-component[thumbs-mobile='top'],
+carousel-component[thumbs-desktop='top'] { grid-template-areas: "thumbs" "scroller" "dots"; }
+
+carousel-component[thumbs-mobile='left'] {
+  grid-template-areas: "thumbs scroller" "dots dots";
+  grid-template-columns: 70px 1fr;
+  column-gap: var(--space-2xs, 8px);
+}
+carousel-component[thumbs-mobile='right'] {
+  grid-template-areas: "scroller thumbs" "dots dots";
+  grid-template-columns: 1fr 70px;
+  column-gap: var(--space-2xs, 8px);
+}
+
+/* Thumbs scroll direction */
+carousel-component[thumbs-mobile='left'] .carousel-thumbs,
+carousel-component[thumbs-mobile='right'] .carousel-thumbs,
+carousel-component[thumbs-desktop='left'] .carousel-thumbs,
+carousel-component[thumbs-desktop='right'] .carousel-thumbs { flex-direction: column; overflow-y: auto; overflow-x: hidden; max-height: 400px; }
+carousel-component[thumbs-mobile='top'] .carousel-thumbs,
+carousel-component[thumbs-mobile='bottom'] .carousel-thumbs,
+carousel-component[thumbs-desktop='top'] .carousel-thumbs,
+carousel-component[thumbs-desktop='bottom'] .carousel-thumbs { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+
+/* Thumbs padding — mobile only */
+carousel-component[thumbs-mobile='top'] .carousel-thumbs,
+carousel-component[thumbs-mobile='bottom'] .carousel-thumbs { padding-bottom: var(--space-2xs, 4px); }
+
+/* Dots hidden when thumbs visible (thumbs take priority) */
+carousel-component[thumbs-mobile='top'] .carousel-dots, carousel-component[thumbs-mobile='bottom'] .carousel-dots, carousel-component[thumbs-mobile='left'] .carousel-dots, carousel-component[thumbs-mobile='right'] .carousel-dots, carousel-component[thumbs-desktop='top'] .carousel-dots, carousel-component[thumbs-desktop='bottom'] .carousel-dots, carousel-component[thumbs-desktop='left'] .carousel-dots, carousel-component[thumbs-desktop='right'] .carousel-dots { display: none; }
+
+/* ── Navigation Arrows ── */
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -96,65 +180,42 @@ carousel-component {
   background: var(--color-background, var(--color-surface, #fff));
   border: var(--border-width-sm, 1px) solid var(--color-border, rgba(0, 0, 0, 0.12));
   border-radius: var(--border-radius-full, 50%);
-  width: var(--carousel-button-size, 40px);
-  height: var(--carousel-button-size, 40px);
+  width: var(--carousel-button-size-mobile, 32px);
+  height: var(--carousel-button-size-mobile, 32px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--shadow-sm, 0 2px 5px rgba(0, 0, 0, 0.2));
-  transition: transform var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease),
-              background var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease),
-              border-color var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease);
+  transition: transform var(--carousel-transition-duration) ease,
+              background var(--carousel-transition-duration) ease,
+              border-color var(--carousel-transition-duration) ease;
   color: var(--color-foreground, #000);
 }
-
-.carousel-button.prev {
-  left: var(--space-2xs, 10px);
-}
-
-.carousel-button.next {
-  right: var(--space-2xs, 10px);
-}
-
-.carousel-button:disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
+.carousel-button.prev { left: var(--space-2xs, 10px); }
+.carousel-button.next { right: var(--space-2xs, 10px); }
+.carousel-button:disabled { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
 .carousel-button:hover:not(:disabled) {
   background: var(--color-foreground, #000);
   color: var(--color-background, #fff);
   border-color: var(--color-foreground, #000);
   transform: translateY(-50%) scale(1.05);
 }
-
 .carousel-button:focus-visible {
   outline: var(--focus-outline-width, 2px) solid var(--color-foreground, #000);
   outline-offset: var(--focus-outline-offset, 2px);
 }
-
 .carousel-button .svg-wrapper {
-  width: var(--carousel-arrow-icon-size, 16px);
-  height: var(--carousel-arrow-icon-size, 16px);
   display: flex;
   align-items: center;
   justify-content: center;
+  width: var(--carousel-arrow-icon-size-mobile, 12px);
+  height: var(--carousel-arrow-icon-size-mobile, 12px);
 }
+.carousel-button .svg-wrapper svg { width: 100%; height: 100%; }
 
-.carousel-button .svg-wrapper svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* --------------------------------------------------------------------------
-   5. Pagination Dots
-   -------------------------------------------------------------------------- */
-.carousel-dots[hidden] {
-  display: none;
-}
-
+/* ── Pagination Dots ── */
+.carousel-dots[hidden] { display: none; }
 .carousel-dots {
   grid-area: dots;
   display: flex;
@@ -163,7 +224,6 @@ carousel-component {
   gap: var(--space-sm, 12px);
   padding: var(--space-sm, 10px) 0;
 }
-
 .carousel-dots button {
   width: var(--carousel-dot-size, 10px);
   height: var(--carousel-dot-size, 10px);
@@ -172,31 +232,24 @@ carousel-component {
   background: transparent;
   cursor: pointer;
   padding: 0;
-  transition: background var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease),
-              transform var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease);
+  transition: background var(--carousel-transition-duration) ease,
+              transform var(--carousel-transition-duration) ease;
 }
-
-.carousel-dots button:hover {
-  transform: scale(1.2);
-}
-
-.carousel-dots button[aria-selected='true'] {
-  background: var(--color-foreground, #000);
-}
-
+.carousel-dots button:hover { transform: scale(1.2); }
+.carousel-dots button[aria-selected='true'] { background: var(--color-foreground, #000); }
 .carousel-dots button:focus-visible {
   outline: var(--focus-outline-width, 2px) solid var(--color-foreground, #000);
   outline-offset: var(--focus-outline-offset, 2px);
 }
 
-/* --------------------------------------------------------------------------
-   6. Thumbnails — Base
-   -------------------------------------------------------------------------- */
+/* ── Thumbnails ── */
 .carousel-thumbs {
   grid-area: thumbs;
   display: flex;
   gap: var(--space-2xs, 8px);
+  scrollbar-width: none;
 }
+.carousel-thumbs::-webkit-scrollbar { display: none; }
 
 .carousel-thumb {
   flex: 0 0 70px;
@@ -205,39 +258,19 @@ carousel-component {
   background: none;
   cursor: pointer;
   line-height: 0;
-  transition: border-color var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease),
-              transform var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease);
+  transition: border-color var(--carousel-transition-duration) ease,
+              transform var(--carousel-transition-duration) ease;
 }
-
-.carousel-thumb:hover {
-  transform: scale(1.05);
-}
-
-.carousel-thumb[aria-selected='true'] {
-  border-color: var(--color-foreground, #000);
-}
-
-.carousel-thumb img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  display: block;
-}
-
+.carousel-thumb:hover { transform: scale(1.05); }
+.carousel-thumb[aria-selected='true'] { border-color: var(--color-foreground, #000); }
+.carousel-thumb img { width: 100%; height: auto; object-fit: cover; display: block; }
 .carousel-thumb:focus-visible {
   outline: var(--focus-outline-width, 2px) solid var(--color-foreground, #000);
   outline-offset: var(--focus-outline-offset, 2px);
 }
 
-/* --------------------------------------------------------------------------
-   7. Thumbnails — Navigation Wrapper & Arrows
-   -------------------------------------------------------------------------- */
-.carousel-thumbs-nav {
-  grid-area: thumbs;
-  position: relative;
-  display: flex;
-  align-items: stretch;
-}
+/* Thumb nav wrapper */
+.carousel-thumbs-nav { grid-area: thumbs; position: relative; display: flex; align-items: stretch; }
 
 .carousel-thumbs-arrow {
   flex: 0 0 auto;
@@ -252,261 +285,86 @@ carousel-component {
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: opacity var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease),
-              background var(--carousel-transition-duration, 0.2s) var(--carousel-transition-easing, ease);
+  transition: opacity var(--carousel-transition-duration) ease,
+              background var(--carousel-transition-duration) ease;
   box-shadow: var(--shadow-xs, 0 1px 3px rgba(0, 0, 0, 0.12));
   line-height: 0;
 }
-
 .carousel-thumbs-arrow:hover {
   background: var(--color-background, #fff);
   box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.18));
 }
-
 .carousel-thumbs-arrow:focus-visible {
   outline: var(--focus-outline-width, 2px) solid var(--color-foreground, #000);
   outline-offset: var(--focus-outline-offset, 2px);
 }
 
-/* --- Vertical thumbs (left/right): nav stacks column, arrows top/bottom --- */
+/* Thumbs nav direction */
 carousel-component[thumbs-desktop='left'] .carousel-thumbs-nav,
 carousel-component[thumbs-desktop='right'] .carousel-thumbs-nav,
 carousel-component[thumbs-mobile='left'] .carousel-thumbs-nav,
-carousel-component[thumbs-mobile='right'] .carousel-thumbs-nav {
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2xs, 6px);
-}
-
+carousel-component[thumbs-mobile='right'] .carousel-thumbs-nav { flex-direction: column; align-items: center; gap: var(--space-2xs, 6px); }
 carousel-component[thumbs-desktop='left'] .carousel-thumbs-arrow svg,
 carousel-component[thumbs-desktop='right'] .carousel-thumbs-arrow svg,
 carousel-component[thumbs-mobile='left'] .carousel-thumbs-arrow svg,
-carousel-component[thumbs-mobile='right'] .carousel-thumbs-arrow svg {
-  transform: rotate(90deg);
-}
-
-/* --- Horizontal thumbs (top/bottom): nav in row, arrows left/right --- */
+carousel-component[thumbs-mobile='right'] .carousel-thumbs-arrow svg { transform: rotate(90deg); }
 carousel-component[thumbs-desktop='top'] .carousel-thumbs-nav,
 carousel-component[thumbs-desktop='bottom'] .carousel-thumbs-nav,
 carousel-component[thumbs-mobile='top'] .carousel-thumbs-nav,
-carousel-component[thumbs-mobile='bottom'] .carousel-thumbs-nav {
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2xs, 6px);
+carousel-component[thumbs-mobile='bottom'] .carousel-thumbs-nav { flex-direction: row; align-items: center; gap: var(--space-2xs, 6px); }
+
+/* ── PDP Gallery Overrides (section-variant-gallery) ── */
+.section-variant-gallery carousel-component[thumbs-mobile='none'] .carousel-dots {
+  position: absolute;
+  bottom: 30px;
+  left: var(--space-md, 16px);
+  z-index: 10;
+  padding: 0;
 }
+.section-variant-gallery .carousel-dots { gap: var(--space-2xs, 5px); }
+.section-variant-gallery .carousel-dots button { border-color: #fff; width: 8px; height: 8px; }
+.section-variant-gallery .carousel-dots button[aria-selected='true'] { background: #fff; }
 
-/* --------------------------------------------------------------------------
-   8. MOBILE Layout (< 769px)
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-
-  /* --- none --- */
-  carousel-component[thumbs-mobile='none'] .carousel-thumbs,
-  carousel-component[thumbs-mobile='none'] .carousel-thumbs-nav {
-    display: none;
-  }
-
-  /* --- bottom (default behavior) --- */
-  carousel-component[thumbs-mobile='bottom'] {
-    grid-template-areas: "scroller" "thumbs" "dots";
-    grid-template-columns: 1fr;
-  }
-
-  carousel-component[thumbs-mobile='bottom'] .carousel-thumbs {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: var(--space-2xs, 4px);
-  }
-
-  /* --- top --- */
-  carousel-component[thumbs-mobile='top'] {
-    grid-template-areas: "thumbs" "scroller" "dots";
-    grid-template-columns: 1fr;
-  }
-
-  carousel-component[thumbs-mobile='top'] .carousel-thumbs {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: var(--space-2xs, 4px);
-  }
-
-  /* --- left --- */
-  carousel-component[thumbs-mobile='left'] {
-    grid-template-areas: "thumbs scroller" "dots dots";
-    grid-template-columns: 70px 1fr;
-    column-gap: var(--space-2xs, 8px);
-  }
-
-  carousel-component[thumbs-mobile='left'] .carousel-thumbs {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 400px;
-  }
-
-  /* --- right --- */
-  carousel-component[thumbs-mobile='right'] {
-    grid-template-areas: "scroller thumbs" "dots dots";
-    grid-template-columns: 1fr 70px;
-    column-gap: var(--space-2xs, 8px);
-  }
-
-  carousel-component[thumbs-mobile='right'] .carousel-thumbs {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 400px;
-  }
-
-  /* --- Priority: thumbs > dots — hide dots when thumbs are visible --- */
-  carousel-component[thumbs-mobile='top'] .carousel-dots,
-  carousel-component[thumbs-mobile='bottom'] .carousel-dots,
-  carousel-component[thumbs-mobile='left'] .carousel-dots,
-  carousel-component[thumbs-mobile='right'] .carousel-dots {
-    display: none;
-  }
-
-  /* --- Override PDP mobile dots position and color --- */
-  .section-variant-gallery carousel-component[thumbs-mobile='none'] .carousel-dots {
-    position: absolute;
-    bottom: 30px;
-    left: var(--space-md, 16px);
-    z-index: 10;
-    padding: 0;
-  }
-
-  .section-variant-gallery .carousel-dots {
-    gap: var(--space-2xs, 5px);
-  }
-
-  .section-variant-gallery .carousel-dots button {
-    border-color: #fff;
-    width: 8px;
-    height: 8px;
-  }
-
-  .section-variant-gallery .carousel-dots button[aria-selected='true'] {
-    background: #fff;
-  }
-  
-  /* Mobile button sizes */
-  .carousel-button {
-    width: var(--carousel-button-size-mobile, 32px);
-    height: var(--carousel-button-size-mobile, 32px);
-  }
-  
-  .carousel-button .svg-wrapper {
-    width: var(--carousel-arrow-icon-size-mobile, 12px);
-    height: var(--carousel-arrow-icon-size-mobile, 12px);
-  }
-}
-
-/* --------------------------------------------------------------------------
-   9. DESKTOP Layout (>= 769px)
-   -------------------------------------------------------------------------- */
-@media (min-width: 769px) {
-
-  /* --- none --- */
-  carousel-component[thumbs-desktop='none'] .carousel-thumbs,
-  carousel-component[thumbs-desktop='none'] .carousel-thumbs-nav {
-    display: none;
-  }
-
-  /* --- bottom --- */
-  carousel-component[thumbs-desktop='bottom'] {
-    grid-template-areas: "scroller" "thumbs" "dots";
-    grid-template-columns: 1fr;
-  }
-
-  carousel-component[thumbs-desktop='bottom'] .carousel-thumbs {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-
-  /* --- top --- */
-  carousel-component[thumbs-desktop='top'] {
-    grid-template-areas: "thumbs" "scroller" "dots";
-    grid-template-columns: 1fr;
-  }
-
-  carousel-component[thumbs-desktop='top'] .carousel-thumbs {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-
-  /* --- left --- */
-  carousel-component[thumbs-desktop='left'] {
-    grid-template-areas: "thumbs scroller" "dots dots";
-    grid-template-columns: 100px 1fr;
-    column-gap: var(--space-md, 16px);
-  }
-
-  carousel-component[thumbs-desktop='left'] .carousel-thumbs {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 600px;
-  }
-
-  /* --- right --- */
-  carousel-component[thumbs-desktop='right'] {
-    grid-template-areas: "scroller thumbs" "dots dots";
-    grid-template-columns: 1fr 100px;
-    column-gap: var(--space-md, 16px);
-  }
-
-  carousel-component[thumbs-desktop='right'] .carousel-thumbs {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 600px;
-  }
-
-  /* --- Priority: thumbs > dots — hide dots when thumbs are visible --- */
-  carousel-component[thumbs-desktop='top'] .carousel-dots,
-  carousel-component[thumbs-desktop='bottom'] .carousel-dots,
-  carousel-component[thumbs-desktop='left'] .carousel-dots,
-  carousel-component[thumbs-desktop='right'] .carousel-dots {
-    display: none;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   10. Scrollbar hide for thumbs
-   -------------------------------------------------------------------------- */
-.carousel-thumbs {
-  scrollbar-width: none;
-}
-
-.carousel-thumbs::-webkit-scrollbar {
-  display: none;
-}
-
-/* --------------------------------------------------------------------------
-   11. Reduced Motion
-   -------------------------------------------------------------------------- */
+/* ── Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
-  carousel-component *,
-  carousel-component *::before,
-  carousel-component *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  
-  .carousel-scroller {
-    scroll-behavior: auto;
-  }
+  .carousel-scroller { scroll-behavior: auto; }
+  .carousel-slide,
+  .carousel-button,
+  .carousel-dots button,
+  .carousel-thumb { transition: none; }
 }
 
-/* --------------------------------------------------------------------------
-   12. Accessibility Utilities
-   -------------------------------------------------------------------------- */
+/* ── Skeleton Loaders ── */
+.carousel__skeleton {
+  display: grid;
+  grid-template-columns: repeat(var(--slides-per-view, 1), 1fr);
+  gap: var(--carousel-gap, 16px);
+}
+.carousel-skeleton__slide {
+  animation: carousel-pulse 1.5s ease-in-out infinite;
+  background: var(--color-skeleton, rgba(0, 0, 0, 0.05));
+  border-radius: var(--border-radius-sm, 4px);
+  overflow: hidden;
+}
+.carousel-skeleton__image { height: 200px; background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1)); }
+.carousel-skeleton__content { padding: var(--space-sm, 8px); }
+.carousel-skeleton__title {
+  height: var(--font-size-md, 16px);
+  width: 80%;
+  background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1));
+  border-radius: var(--border-radius-sm, 4px);
+  margin-block-start: var(--space-2xs, 4px);
+}
+.carousel-skeleton__price {
+  height: var(--font-size-sm, 14px);
+  width: 50%;
+  background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1));
+  border-radius: var(--border-radius-sm, 4px);
+  margin-block-start: var(--space-2xs, 4px);
+}
+@keyframes carousel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* ── Utilities ── */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -517,65 +375,4 @@ carousel-component[thumbs-mobile='bottom'] .carousel-thumbs-nav {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* --------------------------------------------------------------------------
-   13. Skeleton Loaders
-   -------------------------------------------------------------------------- */
-.carousel__skeleton {
-  display: grid;
-  grid-template-columns: repeat(var(--slides-per-view, 1), 1fr);
-  gap: var(--carousel-gap, var(--space-md, 16px));
-}
-
-.carousel-skeleton__slide {
-  animation: carousel-pulse 1.5s ease-in-out infinite;
-  background: var(--color-skeleton, rgba(0, 0, 0, 0.05));
-  border-radius: var(--border-radius-sm, 4px);
-  overflow: hidden;
-}
-
-.carousel-skeleton__image {
-  height: 200px;
-  background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1));
-}
-
-.carousel-skeleton__content {
-  padding: var(--space-sm, 8px);
-}
-
-.carousel-skeleton__title {
-  height: var(--font-size-md, 16px);
-  width: 80%;
-  background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1));
-  border-radius: var(--border-radius-sm, 4px);
-  margin-block-start: var(--space-2xs, 4px);
-}
-
-.carousel-skeleton__price {
-  height: var(--font-size-sm, 14px);
-  width: 50%;
-  background: var(--color-skeleton-base, rgba(0, 0, 0, 0.1));
-  border-radius: var(--border-radius-sm, 4px);
-  margin-block-start: var(--space-2xs, 4px);
-}
-
-@keyframes carousel-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* --------------------------------------------------------------------------
-   14. Container Query Enhancements
-   -------------------------------------------------------------------------- */
-@container (min-width: 400px) {
-  .carousel--responsive .carousel-scroller {
-    gap: var(--carousel-gap, var(--space-md, 16px));
-  }
-}
-
-@container (min-width: 600px) {
-  .carousel--responsive .carousel-scroller {
-    gap: var(--carousel-gap, var(--space-lg, 20px));
-  }
 }

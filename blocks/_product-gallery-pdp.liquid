@@ -372,7 +372,7 @@
 
           // carousel-component index might include clones if loop is on
           // but logicalIndex is 0-based original count
-          // In carousel-component.js, slides includes clones.
+          // carousel.js doesn't use clones — slides are the original DOM elements.
           // Let's find the slide that is currently in view (left matches scroller scrollLeft)
           const scrollLeft = scroller.scrollLeft;
           const activeSlide = slides.find((s) => Math.abs(s.offsetLeft - scrollLeft) < 10);
