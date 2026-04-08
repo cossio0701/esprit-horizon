@@ -131,18 +131,31 @@
         </div>
       </div>
     {% endif %}
-    <button
-      type="submit"
-      id="checkout"
-      class="cart__checkout-button button"
-      name="checkout"
-      {% if cart == empty %}
-        disabled
-      {% endif %}
-      form="cart-form"
-    >
-      {{ 'content.checkout' | t }}
-    </button>
+    {% if simple == true %}
+      <a
+        href="{{ routes.cart_url }}"
+        id="checkout"
+        class="cart__checkout-button button"
+        {% if cart == empty %}
+          disabled
+        {% endif %}
+      >
+        {{ 'content.checkout' | t }}
+      </a>
+    {% else %}
+      <button
+        type="submit"
+        id="checkout"
+        class="cart__checkout-button button"
+        name="checkout"
+        {% if cart == empty %}
+          disabled
+        {% endif %}
+        form="cart-form"
+      >
+        {{ 'content.checkout' | t }}
+      </button>
+    {% endif %}
 
     {% if simple != true %}
       <a href="/collections/all" class="cart__continue-shopping-button">
