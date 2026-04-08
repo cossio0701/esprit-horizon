@@ -37,7 +37,7 @@
     <summary class="facets__summary">
       <span class="facets__label">{{ filter.label }}</span>
       <facet-status-component class="facets__status">
-        <template ref="moneyFormat">{{ shop.money_format }}</template>
+        <template ref="moneyFormat">{{ shop.money_with_currency_format }}</template>
 
         <span
           class="hide-when-empty"
@@ -48,16 +48,16 @@
         >
           {%- if filter.min_value.value != null or filter.max_value.value != null %}
             {%- if filter.min_value.value != null and filter.max_value.value != null %}
-              {{- filter.min_value.value | money | strip_html -}}
+              {{- filter.min_value.value | money_with_currency | strip_html -}}
               –
-              {{- filter.max_value.value | money | strip_html -}}
+              {{- filter.max_value.value | money_with_currency | strip_html -}}
             {%- elsif filter.min_value.value != null -%}
-              {{ filter.min_value.value | money | strip_html }}–{{ filter.range_max | money | strip_html }}
+              {{ filter.min_value.value | money_with_currency | strip_html }}–{{ filter.range_max | money_with_currency | strip_html }}
 
             {%- elsif filter.max_value.value != null -%}
-              {{- range_min_cents | money | strip_html -}}
+              {{- range_min_cents | money_with_currency | strip_html -}}
               –
-              {{- filter.max_value.value | money | strip_html -}}
+              {{- filter.max_value.value | money_with_currency | strip_html -}}
             {%- endif -%}
           {%- endif -%}
         </span>
@@ -113,16 +113,16 @@
         data-range-max="{{ range_max_units }}"
         data-range-min="{{ range_min_units }}"
         data-currency="{{ localization.country.currency.iso_code }}"
-        data-money-format="{{ shop.money_format | escape }}"
+        data-money-format="{{ shop.money_with_currency_format | escape }}"
         data-minor-unit-factor="100"
         on:change="/updatePriceFilterAndResults"
       >
         <div class="price-facet__range-values" aria-hidden="true">
           <span class="price-facet__range-value" ref="minLabel">
-            {{ min_value_cents | money | strip_html }}
+            {{ min_value_cents | money_with_currency | strip_html }}
           </span>
           <span class="price-facet__range-value" ref="maxLabel">
-            {{ max_value_cents | money | strip_html }}
+            {{ max_value_cents | money_with_currency | strip_html }}
           </span>
         </div>
 
@@ -196,7 +196,7 @@
         </div>
 
         <div class="price-facet__highest-price">
-          {%- assign formatted_highest_price = range_max_cents | money -%}
+          {%- assign formatted_highest_price = range_max_cents | money_with_currency -%}
           {{ 'content.price_filter_html' | t: price: formatted_highest_price }}
         </div>
 

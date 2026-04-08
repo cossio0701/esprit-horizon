@@ -824,13 +824,13 @@
         "ai_gen_block_bc699b9_akw8am": {
           "type": "ai_gen_block_bc699b9",
           "settings": {
-            "company_line_1": "COMODÍN S.A.S / NIT:800069933-6",
-            "company_line_2": "Calle 14 # 52 A 37 Medellín, Colombia",
+            "company_line_1": "<p>COMODÍN S.A.S / NIT:800069933-6<br/>Calle 14 # 52 A 37 Medellín, Colombia<br/>servicioalcliente@esprit.shop</p>",
+            "company_line_2": "",
             "icon_size": 150,
             "center_line_1": "",
             "center_line_2": "",
             "center_text_size": 10,
-            "copyright_text": "© 2025 ESPRIT, todos los derechos reservados",
+            "copyright_text": "<p>© 2025 ESPRIT, todos los derechos reservados</p>",
             "instagram_url": "#",
             "tiktok_url": "#",
             "facebook_url": "#",

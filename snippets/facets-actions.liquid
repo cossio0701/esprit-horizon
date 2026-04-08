@@ -34,15 +34,13 @@
     </facet-remove-component>
   {% endif %}
 
-  {% if products_count > 0 %}
-    <button
-      class="button button-primary facets__see-results"
-      type="button"
-      on:click="dialog-component/closeDialog"
-    >
-      {{- 'actions.see_items' | t: count: products_count -}}
-    </button>
-  {% endif %}
+  <button
+    class="button button-primary facets__see-results"
+    type="button"
+    on:click="dialog-component/closeDialog"
+  >
+    {{- 'actions.see_items' | t: count: products_count -}}
+  </button>
 </div>
 
 {% stylesheet %}

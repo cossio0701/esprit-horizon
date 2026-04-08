@@ -60,7 +60,7 @@
       {%- if line_discounts_total > 0 -%}
         <span class="cart__summary-item cart__discount">
           <span class="cart__discount-label">Descuento</span>
-          <span class="cart__discount-value cart-secondary-typography"> -{{ line_discounts_total | money }} </span>
+          <span class="cart__discount-value cart-secondary-typography"> -{{ line_discounts_total | money_with_currency }} </span>
         </span>
       {%- endif -%}
 
@@ -71,7 +71,7 @@
             {{ discount.title | escape }}
           </span>
           <span class="cart__discount-value cart-secondary-typography">
-            -{{ discount.total_allocated_amount | money }}
+            -{{ discount.total_allocated_amount | money_with_currency }}
           </span>
         </span>
       {%- endfor -%}
