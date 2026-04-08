@@ -144,8 +144,8 @@
   <div class="ai-footer-container-{{ ai_gen_id }}">
     <div class="ai-footer-left-section-{{ ai_gen_id }}">
       <div class="ai-footer-left-{{ ai_gen_id }}">
-        <p class="ai-footer-left-text-{{ ai_gen_id }}">{{ block.settings.company_line_1 }}</p>
-        <p class="ai-footer-left-text-{{ ai_gen_id }}">{{ block.settings.company_line_2 }}</p>
+        <div class="ai-footer-left-text-{{ ai_gen_id }}">{{ block.settings.company_line_1 }}</div>
+        <div class="ai-footer-left-text-{{ ai_gen_id }}">{{ block.settings.company_line_2 }}</div>
       </div>
 
       <div class="ai-footer-center-{{ ai_gen_id }}">
@@ -161,13 +161,13 @@
           </div>
         {% endif %}
         <div class="ai-footer-center-text-{{ ai_gen_id }}">
-          <p class="ai-footer-center-text-line-{{ ai_gen_id }}">{{ block.settings.center_line_1 }}</p>
-          <p class="ai-footer-center-text-line-{{ ai_gen_id }}">{{ block.settings.center_line_2 }}</p>
+          <div class="ai-footer-center-text-line-{{ ai_gen_id }}">{{ block.settings.center_line_1 }}</div>
+          <div class="ai-footer-center-text-line-{{ ai_gen_id }}">{{ block.settings.center_line_2 }}</div>
         </div>
       </div>
     </div>
 
-    <p class="ai-footer-copyright-{{ ai_gen_id }}">{{ block.settings.copyright_text }}</p>
+    <div class="ai-footer-copyright-{{ ai_gen_id }}">{{ block.settings.copyright_text }}</div>
 
     <div class="ai-footer-social-{{ ai_gen_id }}">
       {% if block.settings.instagram_url != blank %}
@@ -297,16 +297,16 @@
       "content": "Company information"
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "company_line_1",
       "label": "Company line 1",
-      "default": "COMODÍN S.A.S / NIT:800069933-6"
+      "default": "<p>COMODÍN S.A.S / NIT:800069933-6</p>"
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "company_line_2",
       "label": "Company line 2",
-      "default": "Calle 14 # 52 A 37 Medellín, Colombia"
+      "default": "<p>Calle 14 # 52 A 37 Medellín, Colombia</p>"
     },
     {
       "type": "header",
@@ -328,16 +328,16 @@
       "default": 40
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "center_line_1",
       "label": "Line 1",
-      "default": "Industry and Commerce"
+      "default": "<p>Industry and Commerce</p>"
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "center_line_2",
       "label": "Line 2",
-      "default": "Superintendence"
+      "default": "<p>Superintendence</p>"
     },
     {
       "type": "range",
@@ -354,10 +354,10 @@
       "content": "Copyright"
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "copyright_text",
       "label": "Copyright text",
-      "default": "© 2025 ESPRIT, all rights reserved"
+      "default": "<p>© 2025 ESPRIT, all rights reserved</p>"
     },
     {
       "type": "header",
