@@ -1589,7 +1589,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Una vez hayas elegido el producto que deseas, selecciona el color, la talla y agrégalo a tu bolsa de compras dando clic en el botón <strong>AGREGAR AL CARRITO</strong>.</p>",
+                    "text": "<p>Una vez hayas elegido el producto que deseas, selecciona el color, la talla y agrégalo a tu bolsa de compras dando clic en el botón AGREGAR AL CARRITO.</p>",
                     "enable_collapse": false,
                     "collapsed_height": 50,
                     "show_more_text": "Ver más",
