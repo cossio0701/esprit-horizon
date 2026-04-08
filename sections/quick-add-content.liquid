@@ -32,7 +32,7 @@
       columns-desktop="2.5"
       columns-mobile="2.25"
       gap="1"
-      show-arrows="false"
+      show-arrows="true"
       show-dots="false"
       thumbs-mobile="none"
       thumbs-desktop="none"
@@ -156,6 +156,12 @@
   .quick-add-content__media carousel-component {
     display: block;
     width: 100%;
+    --carousel-button-bg: transparent;
+    --carousel-button-border-color: transparent;
+    --carousel-button-shadow: none;
+    --carousel-button-hover-bg: transparent;
+    --carousel-button-hover-color: var(--color-foreground);
+    --carousel-button-hover-border-color: transparent;
   }
 
   .quick-add-content__info {

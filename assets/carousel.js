@@ -152,16 +152,23 @@ class Carousel extends HTMLElement {
 
   #setupScrollSnap() {
     if (!this.#scroller) return;
+    const gap = parseFloat(this.getAttribute('gap') || '16') || 16;
+    const spv = this.#slidesPerView;
+
     Object.assign(this.#scroller.style, {
       scrollSnapType: 'x mandatory',
       overflowX: 'auto',
       overflowY: 'hidden',
       scrollbarWidth: 'none',
       WebkitOverflowScrolling: 'touch',
+      gap: `${gap}px`,
     });
+
+    const basis = `calc((100% - (${spv} - 1) * ${gap}px) / ${spv})`;
     this.#slides.forEach(s => Object.assign(s.style, {
       scrollSnapAlign: 'start',
-      flexShrink: '0'
+      flex: `0 0 ${basis}`,
+      marginRight: '0',
     }));
 
     if (this.#isLoop) {

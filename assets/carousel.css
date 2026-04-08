@@ -52,6 +52,16 @@ carousel-component {
   min-width: 0;
 }
 
+/* Dynamic columns — uses CSS custom properties for fractional/non-standard values */
+carousel-component .carousel-slide {
+  flex: 0 0 calc((100% - (var(--slides-per-view, 1) - 1) * var(--carousel-gap, 0px)) / var(--slides-per-view, 1));
+  margin-right: var(--carousel-gap, 0px);
+}
+
+carousel-component .carousel-slide:last-child {
+  margin-right: 0;
+}
+
 /* Mobile: Force columns via attribute selector (default, applies < 768px) */
 @media (max-width: 767px) {
   carousel-component[columns-mobile="1"] .carousel-slide {
@@ -177,8 +187,8 @@ carousel-component[thumbs-mobile='top'] .carousel-dots, carousel-component[thumb
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background: var(--color-background, var(--color-surface, #fff));
-  border: var(--border-width-sm, 1px) solid var(--color-border, rgba(0, 0, 0, 0.12));
+  background: var(--carousel-button-bg, var(--color-background, var(--color-surface, #fff)));
+  border: var(--border-width-sm, 1px) solid var(--carousel-button-border-color, var(--color-border, rgba(0, 0, 0, 0.12)));
   border-radius: var(--border-radius-full, 50%);
   width: var(--carousel-button-size-mobile, 32px);
   height: var(--carousel-button-size-mobile, 32px);
@@ -186,19 +196,19 @@ carousel-component[thumbs-mobile='top'] .carousel-dots, carousel-component[thumb
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-sm, 0 2px 5px rgba(0, 0, 0, 0.2));
+  box-shadow: var(--carousel-button-shadow, var(--shadow-sm, 0 2px 5px rgba(0, 0, 0, 0.2)));
   transition: transform var(--carousel-transition-duration) ease,
               background var(--carousel-transition-duration) ease,
               border-color var(--carousel-transition-duration) ease;
-  color: var(--color-foreground, #000);
+  color: var(--carousel-button-color, var(--color-foreground, #000));
 }
 .carousel-button.prev { left: var(--space-2xs, 10px); }
 .carousel-button.next { right: var(--space-2xs, 10px); }
 .carousel-button:disabled { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
 .carousel-button:hover:not(:disabled) {
-  background: var(--color-foreground, #000);
-  color: var(--color-background, #fff);
-  border-color: var(--color-foreground, #000);
+  background: var(--carousel-button-hover-bg, var(--color-foreground, #000));
+  color: var(--carousel-button-hover-color, var(--color-background, #fff));
+  border-color: var(--carousel-button-hover-border-color, var(--color-foreground, #000));
   transform: translateY(-50%) scale(1.05);
 }
 .carousel-button:focus-visible {
