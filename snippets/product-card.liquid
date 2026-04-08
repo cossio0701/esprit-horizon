@@ -83,6 +83,15 @@
   if product.id == empty or product == blank
     assign onboarding = true
   endif
+
+  assign erp_ref = nil
+  for tag in product.tags
+    assign tag_parts = tag | split: '-'
+    if tag_parts.size == 2 and tag_parts[0].size > 3
+      assign erp_ref = tag_parts[0]
+      break
+    endif
+  endfor
 %}
 
 {%- if settings.transition_to_main_product -%}
@@ -148,7 +157,7 @@
     {{ children }}
     
     <div class="product-card-swatches mobile-only">
-      {%- render 'variant-swatches', product_resource: product, only_color: true -%}
+      {%- render 'color-siblings', product: product, erp_ref: erp_ref, mode: 'card' -%}
     </div>
   </div>
 </product-card>
@@ -167,7 +176,7 @@
     }
   }
 
-  /* Product Card - compact color swatches (matching carousel style) */
+  /* Product Card - compact color swatches using color-siblings */
   .product-card .product-card-swatches {
     padding-top: 4px;
     padding-bottom: 8px;
@@ -177,62 +186,36 @@
     overflow: visible;
   }
 
-  .product-card .product-card-swatches .variant-option {
-    margin-bottom: 0;
-    overflow: visible;
+  .product-card .product-card-swatches .color-siblings {
+    gap: 6px;
   }
 
-  .product-card .product-card-swatches .variant-option__swatch {
-    margin-bottom: 0;
-    overflow: visible;
-  }
-
-  .product-card .product-card-swatches .variant-option__button-label--has-swatch {
+  .product-card .product-card-swatches .color-siblings__swatch {
     width: 16px;
     height: 24px;
-    border-radius: 0;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow: visible;
   }
 
-  .product-card .product-card-swatches .swatch {
-    width: 16px;
-    height: 16px;
-    border-radius: 0 !important;
-    display: block;
-    flex: 0 0 16px;
-  }
-
-  /* Active swatch underline */
-  .product-card .product-card-swatches .variant-option__button-label--has-swatch:has(input:checked)::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
+  .product-card .product-card-swatches .color-siblings__swatch::after {
+    bottom: -2px;
     height: 1.5px;
+    width: 0;
     background-color: var(--color-foreground, #1a1a1a);
-    z-index: 3;
   }
 
-  .product-card .product-card-swatches swatches-variant-picker-component form {
-    padding-bottom: 0px;
-    overflow: visible;
+  .product-card .product-card-swatches .color-siblings__swatch:hover::after {
+    width: 70%;
   }
 
-  .product-card .product-card-swatches .overflow-list__container {
-    gap: 10px;
-    overflow: visible;
+  .product-card .product-card-swatches .color-siblings__swatch--active::after {
+    width: 70%;
   }
 
-  .product-card .product-card-swatches overflow-list {
-    display: block;
-    overflow: visible;
+  .product-card .product-card-swatches .color-siblings__swatch-media {
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
+  }
+
+  .product-card .product-card-swatches .color-siblings__swatch-dot {
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.12);
   }
 
   product-card-link,
@@ -250,29 +233,26 @@
     }
   }
 
-  /* Hide the variant swatches for product cards that show a swatches variant picker */
-  :is(.product-card):has(swatches-variant-picker-component) .quick-add .variant-option--swatches {
+  /* Hide "Add" button for single option product cards that show color-siblings */
+  :is(.product-card):has(.color-siblings) .quick-add .variant-option--swatches {
     display: none;
   }
 
-  /* Hide "Add" button for single option product cards that show a swatches variant picker */
   :is(.product-card:not([data-no-swatch-selected])):has(.quick-add__product-form-component--single-option):has(
-      swatches-variant-picker-component
+      .color-siblings
     )
     .quick-add__button--choose {
     display: none;
   }
 
-  /* Hide "Add" button for single option product cards that show a swatches variant picker */
   :is(.product-card[data-no-swatch-selected]):has(.quick-add__product-form-component--single-option):has(
-      swatches-variant-picker-component
+      .color-siblings
     )
     add-to-cart-component {
     display: none;
   }
 
-  /* Hide "add" button for multi-variant product cards that don't show a swatches variant picker */
-  :is(.product-card):has(.quick-add__product-form-component--multi-variant):not(:has(swatches-variant-picker-component))
+  :is(.product-card):has(.quick-add__product-form-component--multi-variant):not(:has(.color-siblings))
     .quick-add__button--add {
     display: none;
   }
