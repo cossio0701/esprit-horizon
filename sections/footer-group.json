@@ -306,9 +306,9 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "shopify://shop_images/Banner-suscribe-desktop-_640x250_5ecdb469-1df0-4716-9128-0aaa906ee4a3.jpg",
+                "image": "shopify://shop_images/9-SUSCRIPCIO_uN.jpg",
                 "use_mobile_image": true,
-                "image_mobile": "shopify://shop_images/Banner-suscribe-_390x177_35d106fa-9c91-415c-9540-2d9385574673.jpg",
+                "image_mobile": "shopify://shop_images/9-SUSCRIPCIO_uN_4093b683-1e9a-43cb-9673-a4a593b36724.jpg",
                 "link": "",
                 "image_ratio": "adapt",
                 "width": "fill",
