@@ -1,0 +1,223 @@
+{%- comment -%}
+  Breadcrumb Section — V2 (Reimplementación completa)
+
+  Section OS 2.0 que integra el sistema de breadcrumb dinámico
+  con árbol de categorías.
+
+  Obtiene automáticamente: shop.metafields.custom.category_tree
+  Soporta: collection, product, page, search, blog, article, cart
+
+  Assets:
+    - category-tree.js (parse + índices O(1) + helpers)
+    - breadcrumb.js (resolver + renderer)
+    - breadcrumb.css (estilos)
+{%- endcomment -%}
+
+{%- liquid
+  # Obtener árbol de categorías (raw — JS normaliza todas las variantes)
+  assign category_tree = shop.metafields.custom.category_tree.value
+
+  if category_tree == blank
+    assign category_tree = shop.metafields.custom.category_tree
+  endif
+
+  # Determinar tipo de página
+  assign page_type = template.name
+
+  # Separador
+  assign separator_style = section.settings.separator_style | default: 'slash'
+  case separator_style
+    when 'slash'
+      assign separator = '/'
+    when 'chevron'
+      assign separator = '›'
+    when 'arrow'
+      assign separator = '→'
+    else
+      assign separator = '/'
+  endcase
+-%}
+
+{%- comment -%}
+  Árbol de categorías: un solo script JSON para toda la página.
+  Se parsea UNA vez por ShopifyBreadcrumb.Tree.init().
+{%- endcomment -%}
+{%- if category_tree != blank -%}
+  <script id="breadcrumb-tree-data" type="application/json">{{ category_tree | json }}</script>
+{%- endif -%}
+
+{%- comment -%} Assets: cargados con defer, orden garantiza dependencias {%- endcomment -%}
+<script src="{{ 'category-tree.js' | asset_url }}" defer></script>
+<script src="{{ 'breadcrumb.js' | asset_url }}" defer></script>
+{{ 'breadcrumb.css' | asset_url | stylesheet_tag }}
+
+<div class="breadcrumb-section"
+     data-section-id="{{ section.id }}"
+     style="--bc-padding-top: {{ section.settings.padding_top }}px;
+            --bc-padding-right: {{ section.settings.padding_right }}%;
+            --bc-padding-bottom: {{ section.settings.padding_bottom }}px;
+            --bc-padding-left: {{ section.settings.padding_left }}%;
+            --bc-background-color: {{ section.settings.background_color }};
+            --bc-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+            --bc-padding-right-mobile: {{ section.settings.padding_right_mobile }}%;
+            --bc-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+            --bc-padding-left-mobile: {{ section.settings.padding_left_mobile }}%;">
+  {%- if category_tree == blank -%}
+    {%- comment -%} Sin árbol: renderizar breadcrumb simple server-side {%- endcomment -%}
+    {%- render 'breadcrumb',
+      page_type: page_type,
+      home_text: section.settings.home_text,
+      separator: separator,
+      product: product,
+      collection: collection,
+      page: page,
+      search: search,
+      blog: blog,
+      article: article
+    -%}
+  {%- else -%}
+    {%- render 'breadcrumb',
+      tree: category_tree,
+      page_type: page_type,
+      home_text: section.settings.home_text,
+      separator: separator,
+      product: product,
+      collection: collection,
+      page: page,
+      search: search,
+      blog: blog,
+      article: article
+    -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Breadcrumb Dinámico",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "El árbol de categorías se obtiene automáticamente de: shop.metafields.custom.category_tree"
+    },
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "text",
+      "id": "home_text",
+      "label": "Texto de inicio",
+      "default": "Inicio"
+    },
+    {
+      "type": "select",
+      "id": "separator_style",
+      "label": "Separador",
+      "options": [
+        { "value": "slash", "label": "/" },
+        { "value": "chevron", "label": "›" },
+        { "value": "arrow", "label": "→" }
+      ],
+      "default": "slash"
+    },
+    {
+      "type": "header",
+      "content": "Estilos"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Padding derecho",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Padding izquierdo",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior (móvil)",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Padding derecho (móvil)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior (móvil)",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Padding izquierdo (móvil)",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Breadcrumb Dinámico",
+      "category": "Navegación"
+    }
+  ],
+  "templates": ["product", "collection", "page", "search", "blog", "article", "cart"]
+}
+{% endschema %}
