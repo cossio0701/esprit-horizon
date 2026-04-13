@@ -1144,6 +1144,7 @@
     "video_external_url": "URL",
     "video_loop": "Loop video",
     "video_position": "Video position",
+    "video_preload": "Video preload",
     "video_source": "Source",
     "view_all_as_last_card": "\"View all\" as last card",
     "view_more_show": "Show View more button",
