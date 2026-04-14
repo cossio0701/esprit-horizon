@@ -1,42 +1,59 @@
 {% # theme-check-disable %}
+{%- assign emitted_font_urls = '' -%}
 {%- unless settings.type_body_font.system? -%}
+  {%- assign body_url = settings.type_body_font | font_url -%}
+  {%- unless emitted_font_urls contains body_url -%}
   <link
     rel="preload"
     as="font"
-    href="{{ settings.type_body_font | font_url }}"
+    href="{{ body_url }}"
     type="font/woff2"
     crossorigin
     fetchpriority="low"
   >
+  {%- assign emitted_font_urls = emitted_font_urls | append: body_url | append: '|' -%}
+  {%- endunless -%}
 {%- endunless -%}
 {%- unless settings.type_subheading_font.system? -%}
+  {%- assign subheading_url = settings.type_subheading_font | font_url -%}
+  {%- unless emitted_font_urls contains subheading_url -%}
   <link
     rel="preload"
     as="font"
-    href="{{ settings.type_subheading_font | font_url }}"
+    href="{{ subheading_url }}"
     type="font/woff2"
     crossorigin
     fetchpriority="low"
   >
+  {%- assign emitted_font_urls = emitted_font_urls | append: subheading_url | append: '|' -%}
+  {%- endunless -%}
 {%- endunless -%}
 {%- unless settings.type_heading_font.system? -%}
+  {%- assign heading_url = settings.type_heading_font | font_url -%}
+  {%- unless emitted_font_urls contains heading_url -%}
   <link
     rel="preload"
     as="font"
-    href="{{ settings.type_heading_font | font_url }}"
+    href="{{ heading_url }}"
     type="font/woff2"
     crossorigin
     fetchpriority="low"
   >
+  {%- assign emitted_font_urls = emitted_font_urls | append: heading_url | append: '|' -%}
+  {%- endunless -%}
 {%- endunless -%}
 {%- unless settings.type_accent_font.system? -%}
+  {%- assign accent_url = settings.type_accent_font | font_url -%}
+  {%- unless emitted_font_urls contains accent_url -%}
   <link
     rel="preload"
     as="font"
-    href="{{ settings.type_accent_font | font_url }}"
+    href="{{ accent_url }}"
     type="font/woff2"
     crossorigin
     fetchpriority="low"
   >
+  {%- assign emitted_font_urls = emitted_font_urls | append: accent_url | append: '|' -%}
+  {%- endunless -%}
 {%- endunless -%}
 {% # theme-check-enable %}

@@ -195,11 +195,13 @@
   type="module"
   fetchpriority="low"
 ></script>
+{% if template.name == 'collection' or template.name == 'search' %}
 <script
   src="{{ 'show-more.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>
+{% endif %}
 <script
   src="{{ 'slideshow.js' | asset_url }}"
   type="module"
@@ -230,21 +232,25 @@
   type="module"
   fetchpriority="low"
 ></script>
+{% if template == 'product' %}
 <script
   src="{{ 'media-gallery.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>
+{% endif %}
 <script
   src="{{ 'rte-formatter.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>
+{% if template == 'product' %}
 <script
   src="{{ 'gift-card-recipient-form.js' | asset_url }}"
   type="module"
   fetchpriority="low"
 ></script>
+{% endif %}
 
 {% if localization.available_countries.size > 1 or localization.available_languages.size > 1 %}
   <script

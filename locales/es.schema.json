@@ -245,6 +245,7 @@
     "video_alt_text": "Texto alternativo",
     "video_loop": "Video en bucle",
     "video_position": "Posición del video",
+    "video_preload": "Precarga de video",
     "width": "Anchura",
     "z_index": "Índice Z",
     "limit_content_width": "Ancho límite del contenido",

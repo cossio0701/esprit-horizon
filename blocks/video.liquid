@@ -32,7 +32,8 @@
     video_preview_image: block_settings.video.preview_image,
     additional_attributes: block.shopify_attributes,
     section_id: section.id,
-    disable_controls: true
+    disable_controls: true,
+    preload: block_settings.preload
   %}
 {% else %}
   {% render 'video',
@@ -45,7 +46,8 @@
     video_preview_image: block_settings.cover_image,
     additional_attributes: block.shopify_attributes,
     section_id: section.id,
-    disable_controls: true
+    disable_controls: true,
+    preload: block_settings.preload
   %}
 {% endif %}
 
@@ -60,7 +62,8 @@
       video_preview_image: block_settings.video_mobile.preview_image,
       additional_attributes: block.shopify_attributes,
       section_id: section.id,
-      disable_controls: true
+      disable_controls: true,
+      preload: block_settings.preload
     %}
   {% else %}
     {% render 'video',
@@ -73,7 +76,8 @@
       video_preview_image: block_settings.cover_image_mobile,
       additional_attributes: block.shopify_attributes,
       section_id: section.id,
-      disable_controls: true
+      disable_controls: true,
+      preload: block_settings.preload
     %}
   {% endif %}
 {% endif %}
@@ -216,6 +220,27 @@
       "id": "video_loop",
       "label": "t:settings.video_loop",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "preload",
+      "label": "t:settings.video_preload",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto"
+        },
+        {
+          "value": "metadata",
+          "label": "Metadata"
+        },
+        {
+          "value": "none",
+          "label": "None (lazy)"
+        }
+      ],
+      "default": "auto",
+      "info": "Use 'None' for below-fold autoplay videos"
     },
     {
       "type": "image_picker",

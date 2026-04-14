@@ -5,6 +5,7 @@
 
   @param {boolean} [video_autoplay] - Whether the video should autoplay
   @param {boolean} [video_loop] - Whether the video should loop
+  @param {string} [preload] - Video preload attribute: 'auto', 'metadata', or 'none'. When set, builds manual <video> tag instead of using video_tag filter.
   @param {string} [video_class] - Additional classes for the video element
   @param {string} [video_style] - Additional inline styles
   @param {object} [video_preview_image] - Preview image to show before video plays
@@ -115,7 +116,22 @@
         | external_video_tag: data-video-type: 'vimeo'
       }}
     {% else %}
-      {{ video | video_tag: image_size: '2500x', autoplay: true, loop: video_loop, muted: true, controls: controls }}
+      {% if preload %}
+        <video
+          autoplay
+          {% if video_loop %}loop{% endif %}
+          muted
+          {% if controls %}controls{% endif %}
+          preload="{{ preload }}"
+          {% if video.preview_image %}poster="{{ video.preview_image | image_url: width: 2500 }}"{% endif %}
+        >
+          {%- for source in video.sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endfor -%}
+        </video>
+      {% else %}
+        {{ video | video_tag: image_size: '2500x', autoplay: true, loop: video_loop, muted: true, controls: controls }}
+      {% endif %}
     {% endif %}
   {% endcapture %}
 {% endif %}
