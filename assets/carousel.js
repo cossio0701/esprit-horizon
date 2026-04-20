@@ -30,11 +30,20 @@ class Carousel extends HTMLElement {
       'loop', 'columns-desktop', 'columns-mobile', 'gap',
       'show-arrows', 'show-dots', 'show-thumbs-arrows',
       'thumbs-mobile', 'thumbs-desktop', 'autoplay', 'autoplay-speed',
+      'lazy-init',
     ];
   }
 
+  #lazyObserver = null;
+  #isInitialized = false;
+
   connectedCallback() {
-    this.#init();
+    if (this.hasAttribute('lazy-init')) {
+      this.classList.add('carousel--pending');
+      this.#createLazyObserver();
+    } else {
+      this.#init();
+    }
     const s = this.#abortController.signal;
     this.addEventListener('mouseenter', () => this.stopAutoplay(), { signal: s });
     this.addEventListener('mouseleave', () => this.startAutoplay(), { signal: s });
@@ -45,23 +54,46 @@ class Carousel extends HTMLElement {
     }, { signal: s });
     window.addEventListener('resize', () => {
       this.#slidesPerView = this.#calculateSlidesPerView();
-      this.#init();
+      if (this.#isInitialized) {
+        this.#init();
+      }
     }, { signal: s });
+  }
+
+  #createLazyObserver() {
+    this.#lazyObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          this.classList.remove('carousel--pending');
+          this.#init();
+          this.#lazyObserver?.disconnect();
+          this.#lazyObserver = null;
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+    this.#lazyObserver.observe(this);
   }
 
   disconnectedCallback() {
     this.#abortController.abort();
+    this.#lazyObserver?.disconnect();
+    this.#lazyObserver = null;
+    this.#isInitialized = false;
     this.stopAutoplay();
     this.dispatchEvent(new CustomEvent('carousel:destroy', { bubbles: true }));
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
-    if (['loop', 'autoplay', 'autoplay-speed'].includes(name)) this.#init();
+    if (['loop', 'autoplay', 'autoplay-speed'].includes(name) && this.isConnected) this.#init();
     this.#renderAttributes();
   }
 
   #init() {
+    if (this.#isInitialized) return;
+    this.#isInitialized = true;
+
     this.#scroller = this.querySelector('[role="list"]');
     if (!this.#scroller) return;
 
@@ -78,6 +110,8 @@ class Carousel extends HTMLElement {
     if (this.#isLoop) this.#buildClones();
     this.#buildSentinels();
     this.#buildDots();
+    this.#setupThumbs();
+    this.#buildThumbsArrows();
     this.#setupArrows();
     this.#setupKeyboard();
     this.startAutoplay();
@@ -150,9 +184,71 @@ class Carousel extends HTMLElement {
     this.appendChild(container);
   }
 
+  #setupThumbs() {
+    const thumbs = Array.from(this.querySelectorAll('.carousel-thumb'));
+    const s = this.#abortController.signal;
+
+    thumbs.forEach((thumb, index) => {
+      thumb.addEventListener('click', () => {
+        this.stopAutoplay();
+        this.scrollToLogicalIndex(index);
+      }, { signal: s });
+    });
+  }
+
+  #buildThumbsArrows() {
+    if (this.getAttribute('show-thumbs-arrows') !== 'true') return;
+
+    // Remove existing nav wrapper if present (re-init safety)
+    const existingNav = this.querySelector('.carousel-thumbs-nav');
+    if (existingNav) {
+      const thumbsInside = existingNav.querySelector('.carousel-thumbs');
+      if (thumbsInside) existingNav.before(thumbsInside);
+      existingNav.remove();
+    }
+
+    const thumbsContainer = this.querySelector('.carousel-thumbs');
+    if (!thumbsContainer) return;
+
+    const thumbCount = thumbsContainer.querySelectorAll('.carousel-thumb').length;
+    if (thumbCount <= 1) return;
+
+    // Wrap thumbs in a nav container
+    const nav = document.createElement('div');
+    nav.className = 'carousel-thumbs-nav';
+    thumbsContainer.before(nav);
+    nav.appendChild(thumbsContainer);
+
+    // Create arrows
+    const prevArrow = this.#createThumbArrow('prev', 'Previous');
+    const nextArrow = this.#createThumbArrow('next', 'Next');
+
+    nav.insertBefore(prevArrow, thumbsContainer);
+    nav.appendChild(nextArrow);
+  }
+
+  #createThumbArrow(direction, label) {
+    const arrow = document.createElement('button');
+    arrow.type = 'button';
+    arrow.className = `carousel-thumbs-arrow carousel-thumbs-arrow--${direction}`;
+    arrow.setAttribute('aria-label', label);
+
+    const svgContent = direction === 'prev'
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>';
+
+    arrow.innerHTML = svgContent;
+    arrow.addEventListener('click', () => {
+      this.stopAutoplay();
+      this.scrollStep(direction === 'prev' ? -1 : 1);
+    });
+
+    return arrow;
+  }
+
   #setupScrollSnap() {
     if (!this.#scroller) return;
-    const gap = parseFloat(this.getAttribute('gap') || '16') || 16;
+    const gap = parseFloat(this.getAttribute('gap') ?? '16') ?? 16;
     const spv = this.#slidesPerView;
 
     Object.assign(this.#scroller.style, {
@@ -332,9 +428,23 @@ class Carousel extends HTMLElement {
     const slidesPerView = Math.ceil(this.#slidesPerView);
     const realIndex = this.#currentIndex - slidesPerView;
 
+    // Sync dots
     this.querySelectorAll('.carousel-dots button').forEach((d, i) => {
       d.setAttribute('aria-selected', String(i === realIndex));
     });
+
+    // Sync thumbs & auto-scroll active into view
+    const thumbs = this.querySelectorAll('.carousel-thumb');
+    if (thumbs.length > 0) {
+      thumbs.forEach((thumb, index) => {
+        thumb.setAttribute('aria-selected', String(index === realIndex));
+      });
+
+      const activeThumb = thumbs[realIndex];
+      if (activeThumb) {
+        activeThumb.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+      }
+    }
 
     const prev = this.querySelector('[name="previous"]');
     const next = this.querySelector('[name="next"]');
@@ -417,6 +527,9 @@ class Carousel extends HTMLElement {
   }
 
   reinit() {
+    this.#abortController.abort();
+    this.#abortController = new AbortController();
+    this.#isInitialized = false;
     this.#slidesPerView = this.#calculateSlidesPerView();
     this.#init();
   }
@@ -463,9 +576,10 @@ class Carousel extends HTMLElement {
   #renderAttributes() {
     const d = parseFloat(this.getAttribute('columns-desktop') ?? '4') || 4;
     const m = parseFloat(this.getAttribute('columns-mobile') ?? '1') || 1;
-    const g = parseFloat(this.getAttribute('gap') || '16') || 16;
+    const g = parseFloat(this.getAttribute('gap') ?? '16') ?? 16;
     const showA = this.getAttribute('show-arrows') !== 'false';
     const showD = this.getAttribute('show-dots') === 'true';
+    const showThumbsArrows = this.getAttribute('show-thumbs-arrows') === 'true';
 
     Object.assign(this.style, {
       '--slides-per-view-desktop': String(d),
@@ -480,6 +594,11 @@ class Carousel extends HTMLElement {
     if (prev) prev.toggleAttribute('hidden', !showA);
     if (next) next.toggleAttribute('hidden', !showA);
     if (dots) dots.toggleAttribute('hidden', !showD);
+
+    // Thumbs arrows visibility
+    this.querySelectorAll('.carousel-thumbs-arrow').forEach(arrow => {
+      arrow.toggleAttribute('hidden', !showThumbsArrows);
+    });
   }
 }
 

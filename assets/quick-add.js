@@ -6,6 +6,26 @@ import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utili
 
 const MAX_CACHE_SIZE = 20;
 
+/**
+ * Dynamically imports product-form.js and variant-picker.js when on non-product pages.
+ * Caches the promise to avoid re-fetching on subsequent calls.
+ * @returns {Promise<[unknown, unknown]> | void}
+ */
+let productFormScriptsPromise = null;
+
+function ensureProductFormScripts() {
+  // Already on product page where scripts are already loaded
+  if (window.Theme?.template?.name === 'product') return;
+  // Return cached promise if already loading/loaded
+  if (productFormScriptsPromise) return productFormScriptsPromise;
+
+  productFormScriptsPromise = Promise.all([
+    import('@theme/product-form'),
+    import('@theme/variant-picker'),
+  ]);
+  return productFormScriptsPromise;
+}
+
 class LRUCache {
   /** @type {Map<string, string>} */
   #cache = new Map();
@@ -96,6 +116,12 @@ export class QuickAddComponent extends Component {
    */
   handleClick = async (event) => {
     event.preventDefault();
+
+    // Dynamic import for non-product pages (home, collection, search)
+    // On product pages, scripts are already loaded via scripts.liquid
+    if (window.Theme?.template?.name !== 'product') {
+      await ensureProductFormScripts();
+    }
 
     const currentUrl = this.productPageUrl;
     if (!currentUrl) return;

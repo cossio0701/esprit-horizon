@@ -140,11 +140,13 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'variant-picker.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{% if template == 'product' or request.design_mode %}
+  <script
+    src="{{ 'variant-picker.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 <script
   src="{{ 'product-card.js' | asset_url }}"
   type="module"
@@ -160,11 +162,13 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'product-form.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{% if template == 'product' or request.design_mode %}
+  <script
+    src="{{ 'product-form.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 <script
   src="{{ 'accordion-custom.js' | asset_url }}"
   type="module"
@@ -175,11 +179,13 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'media.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{% if template == 'product' or request.design_mode %}
+  <script
+    src="{{ 'media.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 <script
   src="{{ 'product-price.js' | asset_url }}"
   type="module"
@@ -190,11 +196,13 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'product-inventory.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{% if template == 'product' or request.design_mode %}
+  <script
+    src="{{ 'product-inventory.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 {% if template.name == 'collection' or template.name == 'search' %}
 <script
   src="{{ 'show-more.js' | asset_url }}"
@@ -227,11 +235,13 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'component-quantity-selector.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{% if template == 'product' or template == 'cart' or request.design_mode %}
+  <script
+    src="{{ 'component-quantity-selector.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 {% if template == 'product' %}
 <script
   src="{{ 'media-gallery.js' | asset_url }}"
@@ -284,7 +294,9 @@
   window.STOREFRONT_ACCESS_TOKEN = '{{ settings.storefront_token }}';
   window.STOREFRONT_DOMAIN = '{{ shop.permanent_domain }}';
 </script>
-<script src="{{ 'color-siblings.js' | asset_url }}" defer></script>
+{% if template.name == 'index' or template.name == 'collection' or template.name == 'search' or template == 'product' or request.design_mode %}
+  <script src="{{ 'color-siblings.js' | asset_url }}" defer></script>
+{% endif %}
 
 <script>
   const basePath = 'https://cdn.shopify.com/static/themes/horizon/placeholders';

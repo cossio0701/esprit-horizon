@@ -404,12 +404,35 @@
 
     const color = variant.option1;
     document.querySelectorAll('.variant-carousel').forEach((block) => {
+      const wasHidden = block.hidden;
       block.hidden = block.dataset.color !== color;
+
+      // Reinit carousel when it becomes visible (was hidden, now shown)
+      if (wasHidden && !block.hidden) {
+        const carousel = block.querySelector('carousel-component');
+        if (carousel && typeof carousel.reinit === 'function') {
+          // Small delay to ensure the block is rendered before reinit
+          requestAnimationFrame(() => carousel.reinit());
+        }
+      }
     });
   });
 </script>
 
 {% stylesheet %}
+  .gallery-main-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .variant-carousels {
+    width: 100%;
+  }
+
+  .variant-carousel {
+    width: 100%;
+  }
+
   .pdp-zoom-wrapper {
     position: relative;
     display: block;

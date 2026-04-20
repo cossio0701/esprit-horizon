@@ -268,7 +268,7 @@
       display: flex !important;
     }
 
-    .header[transparent]:not([data-sticky-state='active']) [data-block-handle='header-dynamic-menu'] {
+    .header[transparent]:not([data-sticky-state='active']) .shopify-app-block:has(.tae-dynamic-menu) {
       width: 100%;
       order: 4;
     }
@@ -585,7 +585,7 @@
       margin-right: 88px;
     }
 
-    [data-block-handle='header-dynamic-menu'] {
+    .shopify-app-block:has(.tae-dynamic-menu) {
       grid-column: 1 / span 3;
       grid-row: 2;
       width: 100%;
