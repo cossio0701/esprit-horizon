@@ -9,35 +9,21 @@
  */
 {
   "sections": {
-    "product_breadcrumb_AxrkRp": {
-      "type": "product-breadcrumb",
-      "name": "Breadcrumb de Producto",
+    "breadcrumb_section_4FXrnP": {
+      "type": "breadcrumb-section",
+      "name": "Breadcrumb Dinámico",
       "settings": {
         "home_text": "Inicio",
-        "show_home_icon": false,
-        "aria_label": "Navegación de migas de pan",
-        "fallback_collection": "",
-        "use_category_metafield": false,
-        "enable_navigation_tracking": true,
         "separator_style": "slash",
-        "font_family": "inherit",
-        "font_size": 14,
-        "current_font_weight": "600",
         "background_color": "#ffffff",
-        "link_color": "#666666",
-        "link_hover_color": "#000000",
-        "separator_color": "#999999",
-        "current_color": "#000000",
-        "link_underline": true,
-        "item_spacing": 8,
-        "item_spacing_mobile": 6,
         "padding_top": 16,
+        "padding_right": 0,
         "padding_bottom": 16,
+        "padding_left": 3,
         "padding_top_mobile": 12,
+        "padding_right_mobile": 0,
         "padding_bottom_mobile": 12,
-        "section_width": "page-width",
-        "truncate_on_mobile": true,
-        "enable_json_ld": true
+        "padding_left_mobile": 0
       }
     },
     "product_detail_kyYc9C": {
@@ -125,8 +111,8 @@
                     "alignment": "left",
                     "use_mobile_font_size": false,
                     "type_preset": "custom",
-                    "font": "var(--font-body--family)",
-                    "font_size": "1rem",
+                    "font": "var(--font-heading--family)",
+                    "font_size": "1.25rem",
                     "font_size_mobile": "1rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
@@ -1777,7 +1763,7 @@
     }
   },
   "order": [
-    "product_breadcrumb_AxrkRp",
+    "breadcrumb_section_4FXrnP",
     "product_detail_kyYc9C",
     "main",
     "section_PNtdan"
