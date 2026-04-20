@@ -1,0 +1,153 @@
+{%- comment -%}
+  Breadcrumb Snippet - V2
+
+  Uso:
+    {% render 'breadcrumb',
+      tree: category_tree,
+      page_type: template.name,
+      product: product,
+      collection: collection,
+      page: page,
+      search: search,
+      blog: blog,
+      article: article,
+      home_text: 'Inicio',
+      separator: '/'
+    %}
+{%- endcomment -%}
+
+{%- liquid
+  assign page_type = page_type | default: template.name
+  assign home_text = home_text | default: 'Inicio'
+  assign separator = separator | default: '/'
+  assign has_tree = false
+
+  if tree != blank
+    assign has_tree = true
+  endif
+
+  assign bc_identifier = ''
+  assign bc_type = ''
+  assign bc_fallback = ''
+
+  case page_type
+    when 'collection'
+      assign bc_type = 'collection'
+      assign bc_identifier = collection.handle
+      assign bc_fallback = collection.title
+
+    when 'product'
+      assign bc_type = 'product'
+      if product.metafields.custom.product_category != blank
+        assign bc_identifier = product.metafields.custom.product_category
+      else
+        # Tomar el tag más largo (más niveles de jerarquía)
+        assign bc_identifier = ''
+        assign bc_identifier_length = 0
+        for tag in product.tags
+          if tag contains '/'
+            assign tag_length = tag | size
+            if tag_length > bc_identifier_length
+              assign bc_identifier = tag
+              assign bc_identifier_length = tag_length
+            endif
+          endif
+        endfor
+      endif
+      assign bc_fallback = product.title
+  endcase
+-%}
+
+<nav class="breadcrumb" aria-label="Breadcrumb" data-page-type="{{ page_type | escape }}">
+  <ol class="breadcrumb__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" data-breadcrumb-home="true">
+      <a href="{{ routes.root_url }}" itemprop="item" class="breadcrumb__link">
+        <span itemprop="name">{{ home_text | escape }}</span>
+      </a>
+      <meta itemprop="position" content="1">
+    </li>
+
+    {%- if has_tree and bc_identifier != blank -%}
+      <li data-breadcrumb-dynamic
+        data-breadcrumb-type="{{ bc_type | escape }}"
+        data-breadcrumb-identifier="{{ bc_identifier | escape }}"
+        data-breadcrumb-separator="{{ separator | escape }}"
+        data-breadcrumb-shop-url="{{ shop.url | escape }}"
+        data-breadcrumb-fallback="{{ bc_fallback | escape }}"
+        {%- if bc_type == 'product' -%}
+        data-breadcrumb-product-title="{{ product.title | escape }}"
+        data-breadcrumb-product-url="{{ product.url | escape }}"
+        {%- endif -%}
+      >
+        <noscript>
+          <span class="breadcrumb__current" aria-current="page">{{ bc_fallback | escape }}</span>
+        </noscript>
+      </li>
+
+    {%- elsif bc_type == 'collection' -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">{{ collection.title | escape }}</span>
+        <link itemprop="item" href="{{ shop.url }}{{ collection.url }}">
+        <meta itemprop="position" content="2">
+      </li>
+
+    {%- elsif bc_type == 'product' -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">{{ product.title | escape }}</span>
+        <link itemprop="item" href="{{ shop.url }}{{ product.url }}">
+        <meta itemprop="position" content="2">
+      </li>
+
+    {%- elsif page_type == 'page' and page != blank -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">{{ page.title | escape }}</span>
+        <link itemprop="item" href="{{ shop.url }}{{ page.url }}">
+        <meta itemprop="position" content="2">
+      </li>
+
+    {%- elsif page_type == 'search' -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">Buscar: {{ search.terms | escape }}</span>
+        <link itemprop="item" href="{{ routes.search_url }}?q={{ search.terms | url_param_escape }}">
+        <meta itemprop="position" content="2">
+      </li>
+
+    {%- elsif page_type == 'blog' and blog != blank -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">{{ blog.title | escape }}</span>
+        <link itemprop="item" href="{{ shop.url }}{{ blog.url }}">
+        <meta itemprop="position" content="2">
+      </li>
+
+    {%- elsif page_type == 'article' -%}
+      {%- if blog != blank -%}
+        <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+        <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="{{ blog.url }}" itemprop="item" class="breadcrumb__link">
+            <span itemprop="name">{{ blog.title | escape }}</span>
+          </a>
+          <meta itemprop="position" content="2">
+        </li>
+      {%- endif -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">{{ article.title | escape }}</span>
+        <link itemprop="item" href="{{ shop.url }}{{ article.url }}">
+        <meta itemprop="position" content="{% if blog != blank %}3{% else %}2{% endif %}">
+      </li>
+
+    {%- elsif page_type == 'cart' -%}
+      <li class="breadcrumb__separator" aria-hidden="true">{{ separator }}</li>
+      <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name" class="breadcrumb__current" aria-current="page">Carrito</span>
+        <link itemprop="item" href="{{ routes.cart_url }}">
+        <meta itemprop="position" content="2">
+      </li>
+    {%- endif -%}
+  </ol>
+</nav>

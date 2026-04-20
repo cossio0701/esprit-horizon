@@ -43,35 +43,21 @@
         "padding-block-end": 0
       }
     },
-    "product_breadcrumb_UDdjrC": {
-      "type": "product-breadcrumb",
-      "name": "Breadcrumb de Producto",
+    "breadcrumb_section_8BA9Dp": {
+      "type": "breadcrumb-section",
+      "name": "Breadcrumb Dinámico",
       "settings": {
         "home_text": "Inicio",
-        "show_home_icon": false,
-        "aria_label": "Navegación de migas de pan",
-        "fallback_collection": "",
-        "use_category_metafield": false,
-        "enable_navigation_tracking": true,
         "separator_style": "slash",
-        "font_family": "inherit",
-        "font_size": 14,
-        "current_font_weight": "600",
         "background_color": "#ffffff",
-        "link_color": "#666666",
-        "link_hover_color": "#000000",
-        "separator_color": "#999999",
-        "current_color": "#000000",
-        "link_underline": true,
-        "item_spacing": 8,
-        "item_spacing_mobile": 6,
-        "padding_top": 24,
-        "padding_bottom": 8,
+        "padding_top": 16,
+        "padding_right": 0,
+        "padding_bottom": 16,
+        "padding_left": 3,
         "padding_top_mobile": 12,
+        "padding_right_mobile": 0,
         "padding_bottom_mobile": 12,
-        "section_width": "page-width",
-        "truncate_on_mobile": true,
-        "enable_json_ld": true
+        "padding_left_mobile": 0
       }
     },
     "section": {
@@ -492,7 +478,7 @@
   },
   "order": [
     "17679063291942452f",
-    "product_breadcrumb_UDdjrC",
+    "breadcrumb_section_8BA9Dp",
     "section",
     "collection_carousel_yzVRRp",
     "main",

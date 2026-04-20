@@ -1,0 +1,224 @@
+/**
+ * Breadcrumb V2 — Estilos
+ *
+ * CSS limpio y mínimo. Sin scoped IDs por sección.
+ * BEM-like naming para evitar colisiones.
+ *
+ * Principios:
+ *   - Sin layout shift (dimensiones estables)
+ *   - Separadores con aria-hidden (accesibilidad)
+ *   - Item actual diferenciado visualmente
+ *   - Responsive con truncado en móvil
+ */
+
+/* ============================================
+   Base
+   ============================================ */
+
+.breadcrumb {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ============================================
+   Links
+   ============================================ */
+
+.breadcrumb__link {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb__link:hover,
+.breadcrumb__link:focus {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ============================================
+   Current page (último item)
+   ============================================ */
+
+.breadcrumb__current {
+  color: #000;
+  font-weight: 600;
+}
+
+/* ============================================
+   Separator
+   ============================================ */
+
+.breadcrumb__separator {
+  color: #999;
+  user-select: none;
+  font-size: inherit;
+}
+
+/* ============================================
+   Dynamic placeholder (hidratación JS)
+   Se reemplaza completamente al hidratar.
+   Sin display:contents — accesibilidad correcta.
+
+   Cuando JS está habilitado:
+     - <noscript> es ignorado por el browser
+     - El <li> queda vacío (sin contenido visible)
+     - El renderer lo reemplaza con items reales
+
+   Cuando JS está deshabilitado:
+     - <noscript> renderiza su contenido
+     - El <li> muestra el fallback
+   ============================================ */
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media screen and (max-width: 749px) {
+  .breadcrumb {
+    font-size: 12px;
+  }
+
+  .breadcrumb__list {
+    gap: 6px;
+  }
+
+  .breadcrumb__current {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ============================================
+   Section wrapper (padding via CSS custom properties)
+   ============================================ */
+
+.breadcrumb-section {
+  width: 100%;
+  padding: var(--bc-padding-top, 16px)
+           var(--bc-padding-right, 0px)
+           var(--bc-padding-bottom, 16px)
+           var(--bc-padding-left, 0px);
+  background-color: var(--bc-background-color, #ffffff);
+}
+
+@media screen and (max-width: 749px) {
+  .breadcrumb-section {
+    padding: var(--bc-padding-top-mobile, 12px)
+             var(--bc-padding-right-mobile, 0px)
+             var(--bc-padding-bottom-mobile, 12px)
+             var(--bc-padding-left-mobile, 0px);
+  }
+}
+
+/* ============================================
+   Category Filter — UI Component
+   ============================================ */
+
+.category-filter__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.category-filter__item {
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.category-filter__item:last-child {
+  border-bottom: none;
+}
+
+.category-filter__link,
+.category-filter__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.15s ease;
+}
+
+.category-filter__link:hover,
+.category-filter__link:focus {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.category-filter__item--active > .category-filter__link {
+  color: #000;
+  font-weight: 600;
+  background-color: #f0f0f0;
+}
+
+.category-filter__toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #999;
+  font-size: 14px;
+  line-height: 1;
+  z-index: 1;
+}
+
+.category-filter__toggle:hover {
+  color: #333;
+}
+
+.category-filter__toggle-icon::after {
+  content: '+';
+}
+
+.category-filter__toggle[aria-expanded="true"] .category-filter__toggle-icon::after {
+  content: '−';
+}
+
+.category-filter__children {
+  padding-left: 16px;
+}
+
+.category-filter__list[data-filter-level="1"] .category-filter__item {
+  border-bottom-color: #f0f0f0;
+}
+
+.category-filter__list[data-filter-level="2"] .category-filter__item {
+  border-bottom-color: #f5f5f5;
+}
+
+/* Indentación por nivel */
+.category-filter__list[data-filter-level="1"] {
+  padding-left: 12px;
+}
+
+.category-filter__list[data-filter-level="2"] {
+  padding-left: 24px;
+}
+
+.category-filter__list[data-filter-level="3"] {
+  padding-left: 36px;
+}
