@@ -88,7 +88,7 @@
                 "text": "<p>Forever Essentials</p>",
                 "enable_collapse": false,
                 "collapsed_height": 50,
-                "show_more_text": "Ver m\u00e1s",
+                "show_more_text": "Ver más",
                 "show_less_text": "Ver menos",
                 "enable_fade": true,
                 "width": "fit-content",
@@ -126,7 +126,7 @@
                 "text": "<p>MODA Y ESTILO</p>",
                 "enable_collapse": false,
                 "collapsed_height": 50,
-                "show_more_text": "Ver m\u00e1s",
+                "show_more_text": "Ver más",
                 "show_less_text": "Ver menos",
                 "enable_fade": true,
                 "width": "fit-content",
@@ -164,7 +164,7 @@
                 "text": "<p>PARA CADA MUJER</p>",
                 "enable_collapse": false,
                 "collapsed_height": 50,
-                "show_more_text": "Ver m\u00e1s",
+                "show_more_text": "Ver más",
                 "show_less_text": "Ver menos",
                 "enable_fade": true,
                 "width": "fit-content",
@@ -354,7 +354,7 @@
             "custom_width_mobile": 72,
             "height": "fit",
             "custom_height": 100,
-            "inherit_color_scheme": true,
+            "inherit_color_scheme": false,
             "color_scheme": "",
             "background_media": "none",
             "video_position": "cover",
@@ -364,7 +364,7 @@
             "border_opacity": 100,
             "border_radius": 0,
             "toggle_overlay": false,
-            "overlay_color": "#00000026",
+            "overlay_color": "#ffffff26",
             "overlay_style": "solid",
             "gradient_direction": "to top",
             "link": "",
@@ -390,25 +390,48 @@
               },
               "blocks": {}
             },
-            "ai_gen_block_8969bbd_9qem8G": {
-              "type": "ai_gen_block_8969bbd",
-              "name": "Custom text",
+            "text_j4cDCt": {
+              "type": "text",
+              "name": "t:names.text",
               "settings": {
-                "text": "\u00bfQU\u00c9 ESTAS BUSCANDO?",
-                "enable_line_breaks": false,
-                "custom_break_marker": "",
-                "font_size": 16,
-                "font_weight": "700",
-                "line_height": 1.5,
-                "text_alignment": "left",
-                "text_color": "#000000"
+                "text": "<h3>¿QUÉ ESTAS BUSCANDO?</h3>",
+                "enable_collapse": false,
+                "collapsed_height": 50,
+                "show_more_text": "Ver más",
+                "show_less_text": "Ver menos",
+                "enable_fade": true,
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "use_mobile_font_size": false,
+                "type_preset": "custom",
+                "font": "var(--font-accent--family)",
+                "font_size": "1rem",
+                "font_size_mobile": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0,
+                "use_mobile_padding": false,
+                "padding-block-start-mobile": 0,
+                "padding-block-end-mobile": 0,
+                "padding-inline-start-mobile": 0,
+                "padding-inline-end-mobile": 0
               },
               "blocks": {}
             }
           },
           "block_order": [
             "spacer_3iEnFz",
-            "ai_gen_block_8969bbd_9qem8G"
+            "text_j4cDCt"
           ]
         },
         "ai_gen_block_5d9738d_7rRXqK": {
@@ -463,6 +486,7 @@
         "group_KE7aiP",
         "ai_gen_block_5d9738d_7rRXqK"
       ],
+      "custom_css": [],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -470,12 +494,12 @@
         "vertical_alignment": "center",
         "align_baseline": false,
         "horizontal_alignment_flex_direction_column": "flex-start",
-        "vertical_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 0,
         "section_width": "full-width",
         "section_height": "",
-        "section_height_custom": 50,
-        "color_scheme": "",
+        "section_height_custom": 24,
+        "color_scheme": "scheme-1",
         "background_media": "none",
         "video_position": "cover",
         "background_image_position": "cover",
@@ -484,11 +508,11 @@
         "border_opacity": 100,
         "border_radius": 0,
         "toggle_overlay": false,
-        "overlay_color": "#00000026",
+        "overlay_color": "#ffffff26",
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "padding-block-start": 0,
-        "padding-block-end": 10
+        "padding-block-end": 0
       }
     },
     "section_9GwNEK": {
@@ -588,7 +612,7 @@
                         "text": "<p>Meet our New Collection</p>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "fit-content",
@@ -626,7 +650,7 @@
                         "text": "<p>Spring'25</p>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "fit-content",
@@ -696,10 +720,10 @@
                       "type": "text",
                       "name": "Nomad",
                       "settings": {
-                        "text": "<p>Nomad</p>",
+                        "text": "<h3>Nomad</h3>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "fit-content",
@@ -734,10 +758,10 @@
                       "type": "text",
                       "name": "t:names.text",
                       "settings": {
-                        "text": "<p>La colecci\u00f3n perfecta para cualquier ocasi\u00f3n, este drop incluye camisas de botones de ajuste f\u00e1cil, pantalones ligeros y chaquetas de lino transpirable, todo dise\u00f1ado para ofrecer comodidad y estilo.</p>",
+                        "text": "<p>La colección perfecta para cualquier ocasión, este drop incluye camisas de botones de ajuste fácil, pantalones ligeros y chaquetas de lino transpirable, todo diseñado para ofrecer comodidad y estilo.</p>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "100%",
@@ -778,7 +802,7 @@
                   "type": "button",
                   "name": "t:names.button",
                   "settings": {
-                    "label": "CONOCER M\u00c1S",
+                    "label": "CONOCER MÁS",
                     "link": "shopify://collections/all",
                     "open_in_new_tab": false,
                     "style_class": "button",
@@ -812,6 +836,7 @@
                 "video_url": "",
                 "video_autoplay": true,
                 "video_loop": true,
+                "preload": "auto",
                 "alt": "",
                 "use_mobile_video": true,
                 "source_mobile": "uploaded",
@@ -874,7 +899,7 @@
       "custom_css": [
         "@media only screen and (min-width: 768px) {.container-nomad-meet {padding-bottom: 60px !important; }}"
       ],
-      "name": "Secci\u00f3n Nomad",
+      "name": "Sección Nomad",
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -1032,7 +1057,7 @@
                         "text": "<p>Spring Days</p>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "fit-content",
@@ -1067,10 +1092,10 @@
                       "type": "text",
                       "name": "t:names.text",
                       "settings": {
-                        "text": "<p><a href=\"/collections/sale\" title=\"Sale\">Comprar Colecci\u00f3n</a></p>",
+                        "text": "<p><a href=\"/collections/sale\" title=\"Sale\">Comprar Colección</a></p>",
                         "enable_collapse": false,
                         "collapsed_height": 50,
-                        "show_more_text": "Ver m\u00e1s",
+                        "show_more_text": "Ver más",
                         "show_less_text": "Ver menos",
                         "enable_fade": true,
                         "width": "fit-content",
@@ -1634,6 +1659,7 @@
             "video_url": "",
             "video_autoplay": true,
             "video_loop": true,
+            "preload": "none",
             "alt": "",
             "use_mobile_video": true,
             "source_mobile": "uploaded",
@@ -1651,8 +1677,7 @@
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "preload": "none"
+            "padding-inline-end": 0
           },
           "blocks": {}
         }
@@ -1701,7 +1726,7 @@
           "type": "product-carousel",
           "name": "t:names.product_carousel",
           "settings": {
-            "heading": "\u00daLTIMOS VISTOS",
+            "heading": "ÚLTIMOS VISTOS",
             "view_all_link": "shopify://collections/sale",
             "view_all_label": "Ver todo",
             "heading_type_preset": "h2",

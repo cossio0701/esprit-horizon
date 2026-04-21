@@ -1,9 +1,9 @@
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
-  {% assign product_title = '<p>' | append: text | append: '</p>' %}
+  {% assign product_title = '<h3>' | append: text | append: '</h3>' %}
   {% render 'text', fallback_text: product_title, block: block %}
 {% elsif closest.product != blank %}
-  {% assign product_title = '<p>' | append: closest.product.title | append: '</p>' %}
+  {% assign product_title = '<h3>' | append: closest.product.title | append: '</h3>' %}
 
   {%- comment -%} Mobile: wrap title + quick-add "+" button in a flex row {%- endcomment -%}
   {% liquid
@@ -92,8 +92,8 @@
   }
 
   /* Title truncation - 2 lines max with ellipsis */
-  .product-card .product-title-row__link .text-block > p,
-  .product-card .product-title-row .text-block > p {
+  .product-card .product-title-row__link .text-block > h3,
+  .product-card .product-title-row .text-block > h3 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -242,7 +242,7 @@
           "label": "t:options.custom"
         }
       ],
-      "default": "rte",
+      "default": "h3",
       "info": "t:info.edit_presets_in_theme_settings"
     },
     {
