@@ -47,6 +47,10 @@ customElements.whenDefined('dialog-component').then(() => {
       );
     }
 
+    get #syncEndpoint() {
+      return this.dataset.syncEndpoint?.trim() || '';
+    }
+
     showDialog() {
       this.#triggerElement = document.activeElement;
       this.#resetState();
@@ -120,6 +124,8 @@ customElements.whenDefined('dialog-component').then(() => {
       if (!this.#validateForm()) return;
 
       const form = this.#form;
+      if (!form) return;
+
       const btn = /** @type {HTMLButtonElement | null} */ (
         this.querySelector('.registration-modal__submit')
       );
@@ -153,11 +159,111 @@ customElements.whenDefined('dialog-component').then(() => {
           return;
         }
 
+        const payload = this.#buildSyncPayload(form);
+
         this.#showSuccess();
+        this.#dispatchRegistrationSuccess(payload);
+        this.#sendSyncPayload(payload);
       } finally {
         if (btn) btn.removeAttribute('aria-busy');
       }
     };
+
+    /** @param {HTMLFormElement} form */
+    #buildSyncPayload(form) {
+      const formData = new FormData(form);
+
+      return {
+        customer: {
+          first_name: this.#getFieldValue(form, 'customer[first_name]'),
+          email: this.#getFieldValue(form, 'customer[email]'),
+          phone: this.#getFieldValue(form, 'customer[phone]'),
+          accepts_marketing: formData.has('customer[accepts_marketing]'),
+        },
+        extra_fields: this.#getExtraFields(form),
+        meta: {
+          source: 'registration-modal',
+          submitted_at: new Date().toISOString(),
+          shopify_form: 'create_customer',
+        },
+      };
+    }
+
+    /**
+     * @param {HTMLFormElement} form
+     * @param {string} name
+     * @returns {string}
+     */
+    #getFieldValue(form, name) {
+      const field = form.elements.namedItem(name);
+
+      if (
+        !(field instanceof HTMLInputElement)
+        && !(field instanceof HTMLSelectElement)
+        && !(field instanceof HTMLTextAreaElement)
+      ) {
+        return '';
+      }
+
+      return field.value.trim();
+    }
+
+    /** @param {HTMLFormElement} form */
+    #getExtraFields(form) {
+      const extraFields = {};
+
+      for (const field of form.querySelectorAll('[data-sync-field]')) {
+        const key = field.getAttribute('data-sync-field')?.trim();
+        if (!key) continue;
+
+        if (field instanceof HTMLInputElement && field.type === 'checkbox') {
+          extraFields[key] = field.checked;
+          continue;
+        }
+
+        if (field instanceof HTMLInputElement && field.type === 'radio') {
+          if (!field.checked) continue;
+          extraFields[key] = field.value.trim();
+          continue;
+        }
+
+        if (
+          field instanceof HTMLInputElement
+          || field instanceof HTMLSelectElement
+          || field instanceof HTMLTextAreaElement
+        ) {
+          extraFields[key] = field.value.trim();
+        }
+      }
+
+      return extraFields;
+    }
+
+    /** @param {{ customer: object, extra_fields: object, meta: object }} payload */
+    #dispatchRegistrationSuccess(payload) {
+      this.dispatchEvent(new CustomEvent('registration-modal:registration-success', {
+        detail: payload,
+        bubbles: true,
+        composed: true,
+      }));
+    }
+
+    /** @param {{ customer: object, extra_fields: object, meta: object }} payload */
+    #sendSyncPayload(payload) {
+      const endpoint = this.#syncEndpoint;
+      if (!endpoint) return;
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch((error) => {
+        console.warn('Registration modal sync failed', error);
+      });
+    }
 
     /** @returns {boolean} */
     #validateForm() {

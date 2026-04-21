@@ -2,6 +2,7 @@
 
 <registration-modal
   id="registration-modal-{{ section.id }}"
+  data-sync-endpoint="{{ section.settings.post_registration_sync_endpoint | strip | escape }}"
   {% if section.settings.close_color_on_image != blank %}
     style="--close-color-on-image: {{ section.settings.close_color_on_image }}"
   {% endif %}
@@ -135,6 +136,7 @@
                 id="registration-dob-{{ section.id }}"
                 type="date"
                 name="customer[note][fecha_nacimiento]"
+                data-sync-field="fecha_nacimiento"
                 required
               >
             </div>
@@ -144,6 +146,7 @@
               <select
                 id="registration-country-{{ section.id }}"
                 name="customer[note][pais]"
+                data-sync-field="pais"
                 required
               >
                 <option value="Bolivia" selected>Bolivia</option>
@@ -674,6 +677,12 @@
       "id": "button_text",
       "label": "Texto del botón",
       "default": "Registrarse"
+    },
+    {
+      "type": "text",
+      "id": "post_registration_sync_endpoint",
+      "label": "Endpoint de sincronización post-registro",
+      "info": "Opcional. Recibe el payload JSON luego del registro exitoso en Shopify."
     },
     {
       "type": "header",
