@@ -160,11 +160,7 @@
     &[data-hidden-on-home-page] {
       display: none;
 
-      #header-component:is(
-          [sticky='always']:not([data-scroll-direction='none']),
-          [sticky='scroll-up'][data-scroll-direction='up']
-        )
-        & {
+      #header-component[data-sticky-state='active'] & {
         display: flex;
       }
     }

@@ -29,18 +29,6 @@ class HeaderComponent extends Component {
   #menuDrawerHiddenWidth = null;
 
   /**
-   * An intersection observer for monitoring sticky header position
-   * @type {IntersectionObserver | null}
-   */
-  #intersectionObserver = null;
-
-  /**
-   * Whether the header has been scrolled offscreen, when sticky behavior is 'scroll-up'
-   * @type {boolean}
-   */
-  #offscreen = false;
-
-  /**
    * The last recorded scrollTop of the document, when sticky behavior is 'scroll-up
    * @type {number}
    */
@@ -59,6 +47,14 @@ class HeaderComponent extends Component {
   #animationDelay = 150;
 
   /**
+   * Minimum document scroll needed before the home header switches state.
+   * This avoids micro-scroll jitter while still making the transition depend
+   * on real document scroll instead of the header's viewport position.
+   * @constant {number}
+   */
+  #scrollThreshold = 8;
+
+  /**
    * Keeps the global `--header-height` custom property up to date,
    * which other theme components can then consume
    */
@@ -75,30 +71,99 @@ class HeaderComponent extends Component {
   });
 
   /**
-   * Observes the header while scrolling the viewport to track when its actively sticky
-   * @param {Boolean} alwaysSticky - Determines if we need to observe when the header is offscreen
+   * Returns the current document scroll position.
+   * @returns {number}
    */
-  #observeStickyPosition = (alwaysSticky = true) => {
-    if (this.#intersectionObserver) return;
+  #getScrollTop = () => Math.max(0, document.scrollingElement?.scrollTop ?? window.scrollY ?? 0);
 
-    const config = {
-      threshold: alwaysSticky ? 1 : 0,
-    };
+  /**
+   * Clears the pending hide timeout for scroll-up sticky mode.
+   */
+  #clearHideTimeout = () => {
+    if (!this.#timeout) return;
 
-    this.#intersectionObserver = new IntersectionObserver(([entry]) => {
-      if (!entry) return;
+    clearTimeout(this.#timeout);
+    this.#timeout = null;
+  };
 
-      const { isIntersecting } = entry;
+  /**
+   * Updates the header sticky datasets with a single source of truth.
+   * @param {'inactive' | 'active' | 'idle'} stickyState
+   * @param {'none' | 'up' | 'down'} scrollDirection
+   */
+  #setStickyPresentation = (stickyState, scrollDirection) => {
+    const stateChanged = this.dataset.stickyState !== stickyState;
+    const directionChanged = this.dataset.scrollDirection !== scrollDirection;
 
-      if (alwaysSticky) {
-        this.dataset.stickyState = isIntersecting ? 'inactive' : 'active';
-        changeMetaThemeColor(this.refs.headerRowTop);
-      } else {
-        this.#offscreen = !isIntersecting || this.dataset.stickyState === 'active';
-      }
-    }, config);
+    if (stateChanged) {
+      this.dataset.stickyState = stickyState;
+      changeMetaThemeColor(this.refs.headerRowTop);
+    }
 
-    this.#intersectionObserver.observe(this);
+    if (directionChanged) {
+      this.dataset.scrollDirection = scrollDirection;
+    }
+  };
+
+  /**
+   * Updates sticky state for `sticky="always"` based on real document scroll.
+   * @param {number} scrollTop
+   */
+  #updateAlwaysStickyState = (scrollTop) => {
+    const hasScrolled = scrollTop > this.#scrollThreshold;
+    const isScrollingUp = scrollTop < this.#lastScrollTop;
+
+    this.removeAttribute('data-animating');
+    this.#clearHideTimeout();
+
+    this.#setStickyPresentation(
+      hasScrolled ? 'active' : 'inactive',
+      hasScrolled ? (isScrollingUp ? 'up' : 'down') : 'none'
+    );
+
+    this.#lastScrollTop = scrollTop;
+  };
+
+  /**
+   * Updates sticky state for `sticky="scroll-up"` based on real document scroll.
+   * @param {number} scrollTop
+   */
+  #updateScrollUpStickyState = (scrollTop) => {
+    const headerHeight = this.getBoundingClientRect().height;
+    const hasScrolled = scrollTop > this.#scrollThreshold;
+    const hasPassedHeader = scrollTop > headerHeight;
+    const isScrollingUp = scrollTop < this.#lastScrollTop;
+
+    if (!hasScrolled || !hasPassedHeader) {
+      this.removeAttribute('data-animating');
+      this.#clearHideTimeout();
+      this.#setStickyPresentation('inactive', 'none');
+      this.#lastScrollTop = scrollTop;
+      return;
+    }
+
+    if (isScrollingUp) {
+      this.removeAttribute('data-animating');
+      this.#clearHideTimeout();
+      this.#setStickyPresentation('active', 'up');
+      this.#lastScrollTop = scrollTop;
+      return;
+    }
+
+    if (this.dataset.stickyState === 'active') {
+      this.setAttribute('data-animating', '');
+      this.#setStickyPresentation('active', 'none');
+      this.#clearHideTimeout();
+
+      this.#timeout = setTimeout(() => {
+        this.#setStickyPresentation('idle', 'none');
+        this.removeAttribute('data-animating');
+      }, this.#animationDelay);
+    } else {
+      this.#setStickyPresentation('idle', 'none');
+    }
+
+    this.#lastScrollTop = scrollTop;
   };
 
   /**
@@ -127,58 +192,16 @@ class HeaderComponent extends Component {
 
   #handleWindowScroll = () => {
     const stickyMode = this.getAttribute('sticky');
-    if (!this.#offscreen && stickyMode !== 'always') return;
-
-    const scrollTop = document.scrollingElement?.scrollTop ?? 0;
-    const isScrollingUp = scrollTop < this.#lastScrollTop;
-    if (this.#timeout) {
-      clearTimeout(this.#timeout);
-      this.#timeout = null;
-    }
+    const scrollTop = this.#getScrollTop();
 
     if (stickyMode === 'always') {
-      const isAtTop = this.getBoundingClientRect().top >= 0;
-
-      if (isAtTop) {
-        this.dataset.scrollDirection = 'none';
-      } else if (isScrollingUp) {
-        this.dataset.scrollDirection = 'up';
-      } else {
-        this.dataset.scrollDirection = 'down';
-      }
-
-      this.#lastScrollTop = scrollTop;
+      this.#updateAlwaysStickyState(scrollTop);
       return;
     }
 
-    if (isScrollingUp) {
-      this.removeAttribute('data-animating');
-
-      if (this.getBoundingClientRect().top >= 0) {
-        // reset sticky state when header is scrolled up to natural position
-        this.#offscreen = false;
-        this.dataset.stickyState = 'inactive';
-        this.dataset.scrollDirection = 'none';
-      } else {
-        // show sticky header when scrolling up
-        this.dataset.stickyState = 'active';
-        this.dataset.scrollDirection = 'up';
-      }
-    } else if (this.dataset.stickyState === 'active') {
-      this.dataset.scrollDirection = 'none';
-      // delay transitioning to idle hidden state for hiding animation
-      this.setAttribute('data-animating', '');
-
-      this.#timeout = setTimeout(() => {
-        this.dataset.stickyState = 'idle';
-        this.removeAttribute('data-animating');
-      }, this.#animationDelay);
-    } else {
-      this.dataset.scrollDirection = 'none';
-      this.dataset.stickyState = 'idle';
+    if (stickyMode === 'scroll-up') {
+      this.#updateScrollUpStickyState(scrollTop);
     }
-
-    this.#lastScrollTop = scrollTop;
   };
 
   /**
@@ -210,13 +233,18 @@ class HeaderComponent extends Component {
     super.connectedCallback();
     this.#resizeObserver.observe(this);
     this.addEventListener('overflowMinimum', this.#handleOverflowMinimum);
+    this.#lastScrollTop = this.#getScrollTop();
 
     const stickyMode = this.getAttribute('sticky');
     if (stickyMode) {
-      this.#observeStickyPosition(stickyMode === 'always');
+      if (stickyMode === 'always') {
+        this.#updateAlwaysStickyState(this.#lastScrollTop);
+      } else if (stickyMode === 'scroll-up') {
+        this.#updateScrollUpStickyState(this.#lastScrollTop);
+      }
 
       if (stickyMode === 'scroll-up' || stickyMode === 'always') {
-        document.addEventListener('scroll', this.#handleWindowScroll);
+        document.addEventListener('scroll', this.#handleWindowScroll, { passive: true });
       }
     }
 
@@ -233,7 +261,7 @@ class HeaderComponent extends Component {
   disconnectedCallback() {
     super.disconnectedCallback();
     this.#resizeObserver.disconnect();
-    this.#intersectionObserver?.disconnect();
+    this.#clearHideTimeout();
     this.removeEventListener('overflowMinimum', this.#handleOverflowMinimum);
     document.removeEventListener('scroll', this.#handleWindowScroll);
     document.body.style.setProperty('--header-height', '0px');
