@@ -9,11 +9,35 @@
  */
 {
   "sections": {
+    "breadcrumb_section_8BA9Dp": {
+      "type": "breadcrumb-section",
+      "name": "Breadcrumb Dinámico",
+      "settings": {
+        "home_text": "Inicio",
+        "separator_style": "slash",
+        "background_color": "#ffffff",
+        "padding_top": 16,
+        "padding_right": 0,
+        "padding_bottom": 16,
+        "padding_left": 3,
+        "padding_top_mobile": 12,
+        "padding_right_mobile": 0,
+        "padding_bottom_mobile": 12,
+        "padding_left_mobile": 0
+      }
+    },
     "17679063291942452f": {
       "type": "_blocks",
-      "custom_css": [
-        "div[id*=\"Some:Same\"][id$=\"commons_components_banner_landing\"] {}"
+      "blocks": {
+        "commonst_esprit_ltm_banner_landing_L9kNYn": {
+          "type": "shopify://apps/commonst-esprit-ltm/blocks/banner-landing/019c9588-d6c1-7783-b00f-ead27b343848",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "commonst_esprit_ltm_banner_landing_L9kNYn"
       ],
+      "custom_css": [],
       "name": "Banner Landing ",
       "settings": {
         "content_direction": "column",
@@ -23,7 +47,7 @@
         "align_baseline": false,
         "horizontal_alignment_flex_direction_column": "flex-start",
         "vertical_alignment_flex_direction_column": "center",
-        "gap": 12,
+        "gap": 0,
         "section_width": "page-width",
         "section_height": "",
         "section_height_custom": 50,
@@ -41,23 +65,6 @@
         "gradient_direction": "to top",
         "padding-block-start": 0,
         "padding-block-end": 0
-      }
-    },
-    "breadcrumb_section_8BA9Dp": {
-      "type": "breadcrumb-section",
-      "name": "Breadcrumb Dinámico",
-      "settings": {
-        "home_text": "Inicio",
-        "separator_style": "slash",
-        "background_color": "#ffffff",
-        "padding_top": 16,
-        "padding_right": 0,
-        "padding_bottom": 16,
-        "padding_left": 3,
-        "padding_top_mobile": 12,
-        "padding_right_mobile": 0,
-        "padding_bottom_mobile": 12,
-        "padding_left_mobile": 0
       }
     },
     "section": {
@@ -261,9 +268,9 @@
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "rte",
+                "type_preset": "custom",
                 "font": "var(--font-body--family)",
-                "font_size": "1rem",
+                "font_size": "0.875rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
@@ -477,8 +484,8 @@
     }
   },
   "order": [
-    "17679063291942452f",
     "breadcrumb_section_8BA9Dp",
+    "17679063291942452f",
     "section",
     "collection_carousel_yzVRRp",
     "main",
